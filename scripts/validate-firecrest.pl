@@ -1,12 +1,14 @@
 #!/util/bin/perl -w
 
-$USAGE = <<'END';
+use strict;
 
-    validate-firecrest.pl FILE
+our $USAGE = <<'END';
 
-Perform some simple checks on a Firecrest/Bustard file.
+    validate-firecrest.pl FILE1 FILE2 ...
 
-The filename must be of the form s_x_y_{int,sig2}.txt, where x and y
+Perform some simple checks on a set of Firecrest/Bustard files.
+
+The filenames must be of the form s_x_y_{int,sig2}.txt, where x and y
 are unsigned decimal integers.  The additional suffix .old is also
 permitted.
 
@@ -29,52 +31,79 @@ and only if there were errors.
 END
 ;
 
-die $USAGE unless 1 == @ARGV and -r ($file = shift @ARGV);
+=pod
 
-$basename = (split "/", $file)[-1];
+Things to do to generalize this for multiple files:
 
-die $USAGE unless $basename =~ /^s_(\d+)_(\d+)_(int|sig2)\.txt$/;
+* keep track of total good & bad files instead of dying on bad files
 
-$signature = join "\t", 0+$1, 0+$2;
+* return fail if any files were bad
 
-open FILE, "<$file" or die "Can't read $file: $!";
+* exactly one line of output per file (first problem or summary)
 
-$width = undef;
+=cut
 
-$error = 0;
+# main body
+END {
 
-LINE:
-while (<FILE>) {
+  die $USAGE unless @ARGV;
 
-    unless ($_ =~ s/^$signature\t//) {
-	warn "bad signature at $file:$.: $_";
-	$error = 1;
-	next LINE;
-    }
+  my %signatures = ();
 
-    unless ($_ =~ s/^(-?\d+)\t(-?\d+)\t//) {
-	warn "missing two leading integers after signature at $file:$.: $_";
-	$error = 2;
-	next LINE;
-    }
+  for (@ARGV) {
 
-    @fields = split;
+    my $basename = (split "/", $_)[-1];
 
-    unless (defined($width)) {
-	$width = scalar @fields;
-	next LINE;
-    }
+    die "Filename '$basename' does not have the right format.\n\n$USAGE"
+      unless $basename =~ /^s_(\d+)_(\d+)_(int|sig2)\.txt(?:\.old)?$/;
 
-    unless ($width == ($w = scalar @fields)) {
-	warn "width changed from $width to $w at $file:$.: $_";
-	$error = 3;
-	next LINE;
-    }
+    $signatures{$_} ||= join "\t", 0+$1, 0+$2;
 
-    for (@fields) {
-	next if /^-?\d+\.\d/;
-	die "bad field at $file:$.: $_\n";
-    }
+  }
+
+  my @errors = ();
+
+  for (@ARGV) { push @errors, check_file($_, $signatures{$_}) }
+
+  exit (0 < @errors);
 }
 
-exit $error;
+sub check_file($$) {
+
+  my ($file, $signature) = @_;
+
+  unless (open FILE, "<$file") {
+    warn "$file: can't open: $!";
+    return 1;
+  }
+
+  my $validator = qr!^$signature\t-?\d+\t-?\d+((?:\s+-?\d+\.\d)+)\s*$!;
+
+  my ($reference_width, $width, $fields, $error) = undef, undef, undef, 0;
+
+  while (<FILE>) {
+
+    unless (/$validator/) {
+      warn "$file: line $. does not match /$validator/\n";
+      $error = 2;
+      last;
+    }
+
+    $fields = $1;
+     
+    # count runs of whitespace (= # of fields) in the group
+    $width = (() = ($fields =~ /\s+/g));
+
+    $reference_width ||= $width;
+
+    unless ($width == $reference_width) {
+      warn "$file: line $. has $width decimal fields instead of $reference_width\n";
+      $error = 3;
+      last;
+    }
+  }
+
+  close FILE;
+
+  return $error;
+}
