@@ -105,5 +105,7 @@ sub check_file($$) {
 
   close FILE;
 
+  print "$file: OK, $reference_width fields\n" unless $error;
+
   return $error;
 }
