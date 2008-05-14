@@ -22,7 +22,7 @@ Within a file,
 * The first four fields must be integers.
 
 * The remainder of the fields must be decimal numbers with 1-5 digits
-  before the decimal point and exactly 1 after, with an optional minus
+  before the decimal point and at most 1 after, with an optional minus
   sign in front.
 
 The script reports all errors it finds and returns a nonzero value if
@@ -77,7 +77,7 @@ sub check_file($$) {
     return 1;
   }
 
-  my $validator = qr!^$signature\t-?\d+\t-?\d+((?:\s+-?\d+\.\d)+)\s*$!;
+  my $validator = qr!^$signature\t-?\d+\t-?\d+((?:\s+-?\d+\.\d?)+)\s*$!;
 
   my ($reference_width, $width, $fields, $error) = undef, undef, undef, 0;
 
@@ -103,9 +103,14 @@ sub check_file($$) {
     }
   }
 
-  close FILE;
+  unless ($. or $error) {
+    warn "$file: seems to be empty\n";
+    $error = 4;
+  }
 
-  print "$file: OK, $reference_width fields\n" unless $error;
+  print "$file: OK, $. lines of $reference_width fields\n" unless $error;
+
+  close FILE;
 
   return $error;
 }
