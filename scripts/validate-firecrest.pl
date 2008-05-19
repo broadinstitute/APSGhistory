@@ -25,23 +25,11 @@ Within a file,
   before the decimal point and at most 1 after, with an optional minus
   sign in front.
 
-The script reports all errors it finds and returns a nonzero value if
-and only if there were errors.
+The script reports the first error it finds in each file and returns a
+nonzero value if and only if there were errors.
 
 END
 ;
-
-=pod
-
-Things to do to generalize this for multiple files:
-
-* keep track of total good & bad files instead of dying on bad files
-
-* return fail if any files were bad
-
-* exactly one line of output per file (first problem or summary)
-
-=cut
 
 # main body
 END {
