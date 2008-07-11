@@ -1,4 +1,4 @@
-#!/usr/bin/ruby
+#!/util/bin/ruby
 
 # This is for disentangling LSF logs that have lines splatted into
 # other lines from stdout/stderr mixing.
