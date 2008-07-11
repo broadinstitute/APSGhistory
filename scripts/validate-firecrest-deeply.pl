@@ -65,7 +65,7 @@ sub check_file($$) {
     return 1;
   }
 
-  my $validator = qr!^$signature\t-?\d+\t-?\d+((?:\s+-?\d+\.\d?)+)\s*$!;
+  my $validator = qr!^$signature\t-?\d+\t-?\d+((?:\s+-?\d+(?:\.\d?)?)+)\s*$!;
 
   my ($reference_width, $width, $fields, $error) = undef, undef, undef, 0;
 
