@@ -1,0 +1,70 @@
+This summarizes the errors found in the 3315110 Firecrest and Bustard
+files examined.  The scripts used to produce these data are in the
+scripts/ subdirectory; diffs of the corrupt files are in the
+bad-files/ subdirectory.
+
+Note that about 800 files were missing, presumably moved or removed
+between when their validation jobs were queued and when the jobs ran;
+these files were ignored.
+
+Three cases of corruption were found, plus 19 questionable files.
+
+Binary Corruption
+=================
+
+Two Firecrest files are definitely corrupt.  There are some lines that
+are subtly malformed, and then a bunch of binary garbage.
+
+ /seq/solexaproc/SL-XAS/analyzed/080125_SL-XAS_0006_FC13327AAXX/Data/C1-36_Firecrest1.8.28_28-01-2008_prodinfo.2/s_8_0072_int.txt
+
+  (The first problematic line is 6473.  Obvious binary corruption
+  starts at line 8072.)
+
+ /seq/solexaproc/SL-XAF/analyzed/071113_SL-XAF_0003_FC10036AAXX/Data/C1-36_Firecrest1.8.28_16-11-2007_prodinfo.2/s_6_0078_int.txt
+
+  (The first problematic line is 11171.  Obvious binary corruption
+  starts at line 11179.)
+
+Text Corruption
+===============
+
+One Bustard file was corrupted with text from some other file
+(containing strings of base letters):
+
+  /seq/solexaproc/SL-XAR/analyzed/080212_SL-XAR_0001_FC205C7AAXX/Data/C1-36_Firecrest1.8.28_16-02-2008_prodinfo/Bustard1.8.28_16-02-2008_prodinfo/s_2_0269_sig2.txt
+
+We had previously found another Bustard file with corruption.  That
+file is now OK;  presumably the users regenerated it from the
+corresponding Firecrest file.
+
+Mislabeled Files
+================
+
+Four Firecrest files are internally consistent but their names don't
+match their contents:
+
+ /seq/solexaproc/SL-XAN/analyzed/080104_SL-XAN_0001_FC2020TAAXX/Data/C1-47_Firecrest1.8.28_10-01-2008_prodinfo/s_3_0184_int.txt
+ /seq/solexaproc/SL-XAN/analyzed/080201_SL-XAN_0002_FC13267AAXX/Data/C1-74_Firecrest1.8.28_25-02-2008_prodinfo/s_4_0087_int.txt
+ /seq/solexaproc/SL-XAT/analyzed/071228_SL-XAT_0002_FC13297AAXX/Data/C1-73_Firecrest1.8.28_15-01-2008_prodinfo/s_8_0033_int.txt
+ /seq/solexaproc/SL-XAT/analyzed/080101_SL-XAT_0007_FC13297AAXX/Data/C1-37_Firecrest1.8.28_08-01-2008_prodinfo/s_8_0033_int.txt
+
+Truncation
+==========
+
+Fifteen Bustard files were truncated:
+
+ /seq/solexaproc/SL-XAU/analyzed/071227_SL-XAU_0001_FC20421AAXX/Data/C1-43_Firecrest1.8.28_02-01-2008_prodinfo/Bustard1.8.28_02-01-2008_prodinfo/s_1_0001_sig2.txt
+ /seq/solexaproc/SL-XAU/analyzed/071227_SL-XAU_0001_FC20421AAXX/Data/C1-43_Firecrest1.8.28_02-01-2008_prodinfo/Bustard1.8.28_02-01-2008_prodinfo/s_1_0002_sig2.txt
+ /seq/solexaproc/SL-XAU/analyzed/071227_SL-XAU_0001_FC20421AAXX/Data/C1-43_Firecrest1.8.28_02-01-2008_prodinfo/Bustard1.8.28_02-01-2008_prodinfo/s_1_0003_sig2.txt
+ /seq/solexaproc/SL-XAU/analyzed/071227_SL-XAU_0001_FC20421AAXX/Data/C1-43_Firecrest1.8.28_02-01-2008_prodinfo/Bustard1.8.28_02-01-2008_prodinfo/s_1_0004_sig2.txt
+ /seq/solexaproc/SL-XAU/analyzed/071227_SL-XAU_0001_FC20421AAXX/Data/C1-43_Firecrest1.8.28_02-01-2008_prodinfo/Bustard1.8.28_02-01-2008_prodinfo/s_1_0005_sig2.txt
+ /seq/solexaproc/SL-XAU/analyzed/071227_SL-XAU_0001_FC20421AAXX/Data/C1-43_Firecrest1.8.28_02-01-2008_prodinfo/Bustard1.8.28_02-01-2008_prodinfo/s_2_0001_sig2.txt
+ /seq/solexaproc/SL-XAU/analyzed/071227_SL-XAU_0001_FC20421AAXX/Data/C1-43_Firecrest1.8.28_02-01-2008_prodinfo/Bustard1.8.28_02-01-2008_prodinfo/s_2_0002_sig2.txt
+ /seq/solexaproc/SL-XAU/analyzed/071227_SL-XAU_0001_FC20421AAXX/Data/C1-43_Firecrest1.8.28_02-01-2008_prodinfo/Bustard1.8.28_02-01-2008_prodinfo/s_2_0003_sig2.txt
+ /seq/solexaproc/SL-XAU/analyzed/071227_SL-XAU_0001_FC20421AAXX/Data/C1-43_Firecrest1.8.28_02-01-2008_prodinfo/Bustard1.8.28_02-01-2008_prodinfo/s_2_0004_sig2.txt
+ /seq/solexaproc/SL-XAU/analyzed/071227_SL-XAU_0001_FC20421AAXX/Data/C1-43_Firecrest1.8.28_02-01-2008_prodinfo/Bustard1.8.28_02-01-2008_prodinfo/s_2_0005_sig2.txt
+ /seq/solexaproc/SL-XAV/analyzed/071227_SL-XAV_0003_FC203E8AAXX/Data/C1-71_Firecrest1.8.28_09-01-2008_prodinfo/Bustard1.8.28_09-01-2008_prodinfo/s_1_0007_sig2.txt
+ /seq/solexaproc/SL-XAV/analyzed/071227_SL-XAV_0003_FC203E8AAXX/Data/C1-71_Firecrest1.8.28_09-01-2008_prodinfo/Bustard1.8.28_09-01-2008_prodinfo/s_1_0008_sig2.txt
+ /seq/solexaproc/SL-XAV/analyzed/071227_SL-XAV_0003_FC203E8AAXX/Data/C1-71_Firecrest1.8.28_09-01-2008_prodinfo/Bustard1.8.28_09-01-2008_prodinfo/s_1_0011_sig2.txt
+ /seq/solexaproc/SL-XAV/analyzed/071227_SL-XAV_0003_FC203E8AAXX/Data/C1-71_Firecrest1.8.28_09-01-2008_prodinfo/Bustard1.8.28_09-01-2008_prodinfo/s_2_0001_sig2.txt
+ /seq/solexaproc/SL-XAV/analyzed/071227_SL-XAV_0003_FC203E8AAXX/Data/C1-71_Firecrest1.8.28_09-01-2008_prodinfo/Bustard1.8.28_09-01-2008_prodinfo/s_2_0002_sig2.txt
