@@ -92,6 +92,10 @@ def run_status(logfile):
             handler.next_check, handler.deck_state)
 
 def update_run_info(deck,rundir,logpath,log_mtime):
+    if rundir.startswith(logpath):
+        rundir = rundir[len(logpath):]
+    else:
+        sys.exit('rundir not in logpath: this should not happen')
     run_name = os.path.basename(rundir)
     log_change = datetime.utcfromtimestamp(log_mtime)
     curs.execute('SELECT log_last_changed FROM runs WHERE run_name = :rname',
@@ -141,11 +145,6 @@ def check_deck(deck,basedir):
     orcl.commit()
     logmsg('parsing logfile %s, mtime %s' % (newest['path'],
                                              time.ctime(newest['time'])))
-    run_dir = os.path.dirname(newest['path'])
-    if run_dir.startswith(logpath):
-        run_dir = run_dir[len(logpath):]
-    else:
-        sys.exit('run_dir not in logpath: this should not happen')
     (can_start, must_stop,
      next_check_secs, deck_state) = run_status(newest['path'])
     # update deck state in database
