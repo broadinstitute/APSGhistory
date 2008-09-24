@@ -68,7 +68,7 @@ my $err_flag = 0;
 my %tmp;
 my $bpc = 0;
 for my $chassis (@BCHASSIS) {
-  my @blades = `cat /root/bin/blades$chassis`;
+  my @blades = `cat /broad/tools/hostlists/blades$chassis`;
   chomp @blades;
   $bpc = $#blades > $bpc ? $#blades : $bpc;
   for my $b (@blades) {
