@@ -4,9 +4,9 @@ import os,tarfile
 
 downloads_dir = '/broad/data/blastdb/download'
 unpack_dir = '/broad/data/blastdb/unpack'
-semaphore_file = os.path.join(downloads_dir,'.unpack_done')
+semaphore_file = os.path.join(unpack_dir,'.unpack_done')
 
-os.spawnl(os.P_WAIT,'/bin/rm','-rf',unpack_dir);
+os.spawnl(os.P_WAIT,'/bin/rm','rm','-rf',unpack_dir);
 
 tarfiles = sorted(os.listdir(downloads_dir))
 
