@@ -53,9 +53,6 @@ def pid_exists(pid):
 def handler_noop(signum,frame):
     pass
 
-signal.signal(signal.SIGALRM,handler_noop)
-signal.signal(signal.SIGCHLD,handler_noop)
-
 orcl = cx_Oracle.connect(oraconn)
 curs = orcl.cursor()
 
@@ -403,10 +400,14 @@ def main():
         if next_check < 300:
             next_check = 300
         # signal handler for CHLD/ALRM can be a no-op but must not be sig_ign
+        signal.signal(signal.SIGALRM,handler_noop)
+        signal.signal(signal.SIGCHLD,handler_noop)
         signal.alarm(next_check)
         signal.pause()
         # reset the alarm; if sigchld woke us, we don't want it to go off later
         signal.alarm(0)
+        signal.signal(signal.SIGALRM,signal.SIG_IGN)
+        signal.signal(signal.SIGCHLD,signal.SIG_IGN)
     # reached by break
     # before we exit, clean up database
     curs.execute('''UPDATE decks SET state='idle', transfer_host = NULL,
