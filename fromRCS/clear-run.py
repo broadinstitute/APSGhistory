@@ -15,7 +15,7 @@ def ResultIter(cursor, arraysize=1000):
         for result in results:
             yield result
 
-orcl = cx_Oracle.connect('slxasync/c0piiRn2@seqdel1')
+orcl = cx_Oracle.connect('slxasync/c0piiRn2pr@seqprod')
 curs = orcl.cursor()
 
 if len(sys.argv) > 1:
