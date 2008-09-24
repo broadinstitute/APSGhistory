@@ -118,9 +118,8 @@ def run_status(logfile):
     return (handler.start_ok, handler.must_stop,
             handler.next_check, handler.deck_state, handler.last_cycle)
 
-def update_run_info(deck,rundir,logfile,log_mtime):
+def update_run_info(deck,rundir,logfile,log_change):
     run_name = os.path.basename(rundir)
-    log_change = datetime.utcfromtimestamp(log_mtime)
     curs.execute("""SELECT log_last_changed FROM runs
     WHERE run_name = :rname AND deck_name = :dname""",
                  rname=run_name,dname=deck)
@@ -166,7 +165,7 @@ def check_deck(deck,basedir):
                 xmllog.close()
                 if foundconv:
                     rundir = dirname[len(logpath):]
-                    mtime = os.path.getmtime(path)
+                    mtime = datetime.utcfromtimestamp(os.path.getmtime(path))
                     update_run_info(deck,rundir,path,mtime)
                     if mtime > newest['time']:
                         newest['time'] = mtime
@@ -175,7 +174,7 @@ def check_deck(deck,basedir):
     # commit all the run status updates
     orcl.commit()
     logmsg('parsing logfile %s, mtime %s' % (newest['path'],
-                                             time.ctime(newest['time'])))
+                                             newest['time'].ctime()))
     (can_start, must_stop,
      next_check_secs, deck_state, last_cycle) = run_status(newest['path'])
     if not newest['name'] in cycle_times:
@@ -255,6 +254,15 @@ def find_eligible_run(deck):
     else:
         return None
 
+def get_log_mtime(run)
+    curs.execute("SELECT log_last_changed FROM runs WHERE run_name = :rname",
+                 rname=run)
+    retval = curs.fetchone()
+    if retval:
+        if retval[0]:
+            return retval[0]
+    return datetime.utcfromtimestamp(0)
+
 def write_exclude_file(destpath,rundir):
     run = os.path.basename(rundir)
     curs.execute("SELECT last_sync_start FROM runs WHERE run_name = :rname",
@@ -278,8 +286,8 @@ def write_exclude_file(destpath,rundir):
 
 def main():
     pid = 0
-    last_start = 0
-    last_rundir = ''
+    last_start = datetime.utcfromtimestamp(0)
+    last_run = ''
     if len(sys.argv) > 1:
         deck = sys.argv[1].upper()
     else:
@@ -307,6 +315,7 @@ def main():
             # not running: no proc, or proc completed
             if pidcheck != False:
                 (oldpid,exit_status) = pidcheck
+                log_mtime = get_log_mtime(last_run)
                 if exit_status == 0 and last_start > log_mtime:
                     logmsg('rsync completed and no log change since start')
                     set_run_status(rundir,'complete')
@@ -317,8 +326,8 @@ def main():
                                           'rsync of %s started at %s',
                                           'last logfile change at %s'])
                                 % (time.ctime(),
-                                   rundir,time.ctime(last_start),
-                                   time.ctime(log_mtime)))
+                                   rundir,last_start.ctime(),
+                                   log_mtime.ctime()))
                     stamp.close()
             if start_ok:
                 rundir = find_eligible_run(deck)
@@ -330,11 +339,11 @@ def main():
                        '--exclude-from=%s' % excludepath,
                        '%s::runs/%s' % ( deck, rundir ),
                        mirrpath])
-                last_start = time.time()
-                set_run_status(os.path.basename(rundir),'syncing',
-                               last_sync=datetime.utcfromtimestamp(last_start))
+                last_run = os.path.basename(rundir)
+                last_start = datetime.utcnow()
                 logmsg('started rsync of %s: pid %s at %s' %
-                       (rundir,pid,last_start))
+                       (rundir,pid,last_start.ctime()))
+                set_run_status(last_run,'syncing',last_sync=last_start)
             else:
                 pid = 0
         if next_check < 300:
