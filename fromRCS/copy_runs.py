@@ -151,9 +151,9 @@ def check_deck(deck):
     # update deck state in database
     this_check = datetime.utcnow()
     next_check = this_check + timedelta(seconds=next_check_secs)
-    curs.execute('UPDATE decks SET state = :dstate,
+    curs.execute("""UPDATE decks SET state = :dstate,
     state_check_last = :this, state_check_next = :next
-    WHERE decks.deck_name = :dname',
+    WHERE decks.deck_name = :dname""",
                  dstate=deck_state,this=this_check,next=next_check,dname=deck)
     curs.commit()
     return (can_start,must_stop,next_check_secs,newest['time'])
@@ -174,30 +174,31 @@ def get_basedir(deck):
     myname = socket.getfqdn()
     mypid = os.getpid()
     
-    curs.execute('SELECT transfer_basedir,transfer_host,transfer_pid,
+    curs.execute("""SELECT transfer_basedir,transfer_host,transfer_pid,
     state,state_check_last,state_check_next
     FROM decks
-    WHERE deck_name = :dname',dname=deck)
+    WHERE deck_name = :dname""",dname=deck)
     result = curs.fetchone()
     if not result:
         sys.exit('FATAL: deck %s not found in database' % deck)
     else:
         (basedir,t_host,t_pid,deck_state,state_last,state_next) = result
-    if deck_state = 'offline':
-        return None,'deck %s marked as offline' % deck
+    if deck_state == 'offline':
+        return (None,'deck %s marked as offline' % deck)
     elif not (t_host == myname and t_pid == mypid):
         # maybe someone else has it?
         right_now = datetime.utcnow()
         # has it been twice as long as it should have been since last check?
-        if (state_next - state_last) < (right_now - state_next):
+        if not state_next or not state_last or \
+               (state_next - state_last) < (right_now - state_next):
             # stale data/dead process. plant our flag on it.
-            curs.execute('UPDATE decks SET transfer_host = :myname,
-            transfer_pid = :mypid WHERE decks.deck_name = :dname',
+            curs.execute("""UPDATE decks SET transfer_host = :myname,
+            transfer_pid = :mypid WHERE decks.deck_name = :dname""",
                          myname=myname,mypid=mypid,dname=deck)
         else:
-            return None,'deck %s locked by %s:%s' % (deck,t_host,t_pid)
+            return (None,'deck %s locked by %s:%s' % (deck,t_host,t_pid))
     else:
-        return basedir,None
+        return (basedir,None)
 
 def set_run_status(run,state):
     curs.execute('UPDATE runs SET state = :rstate WHERE run_name = :rname',
@@ -205,9 +206,9 @@ def set_run_status(run,state):
     curs.commit()
 
 def find_eligible_run(deck):
-    curs.execute('SELECT run_name FROM runs
+    curs.execute("""SELECT run_name FROM runs
     WHERE deck_name = :dname AND (state = 'syncing' OR state = 'pending')
-    ORDER BY log_last_changed ASC',dname=deck)
+    ORDER BY log_last_changed ASC""",dname=deck)
     return curs.fetchone()
 
 def main():
@@ -218,7 +219,7 @@ def main():
         deck = sys.argv[1].upper()
     else:
         sys.exit('must provide deck on command line')
-    basedir,message = get_basedir(deck)
+    (basedir,message) = get_basedir(deck)
     if not basedir:
         sys.exit(message)
     mirrpath = os.path.join(basedir,deck,mirrdir)
@@ -264,8 +265,8 @@ def main():
         time.sleep(next_check)
     # reached by break
     # before we exit, clean up database
-    curs.execute('UPDATE decks SET transfer_host = NULL,
-    transfer_pid = NULL WHERE decks.deck_name = :dname',
+    curs.execute('''UPDATE decks SET transfer_host = NULL,
+    transfer_pid = NULL WHERE decks.deck_name = :dname''',
                  dname=deck)
     curs.commit()
 
