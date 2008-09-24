@@ -313,9 +313,9 @@ def main():
                     stamp = open(os.path.join(mirrpath,
                                               os.path.basename(rundir),
                                               stampfile),'w')
-                    stamp.write('\n'.join('Run completed at %s',
+                    stamp.write('\n'.join(['Run completed at %s',
                                           'rsync of %s started at %s',
-                                          'last logfile change at %s')
+                                          'last logfile change at %s'])
                                 % (time.ctime(),
                                    rundir,time.ctime(last_start),
                                    time.ctime(log_mtime)))
