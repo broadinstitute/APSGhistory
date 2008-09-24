@@ -130,13 +130,19 @@ def setup_dirs(src,dst):
     src_data = os.path.join(src,"Data")
     src_focus = os.path.join(src,"Focus")
     src_images = os.path.join(src,"Images")
+    src_logs = os.path.join(src,"logs")
     dst_data = os.path.join(dst,"Data")
     dst_focus = os.path.join(dst,"Focus")
     dst_images = os.path.join(dst,"Images")
+    dst_logs = os.path.join(dst,"logs")
     if not os.path.exists(dst_data):
         os.makedirs(dst_data)
     if not os.path.exists(src_data):
         os.symlink(dst_data,src_data)
+    if not os.path.exists(dst_logs):
+        os.makedirs(dst_logs)
+    if not os.path.exists(src_logs):
+        os.symlink(dst_logs,src_logs)
     if not os.path.exists(dst_focus) and os.path.exists(src_focus):
         os.symlink(src_focus,dst_focus)
     if not os.path.exists(dst_images):
