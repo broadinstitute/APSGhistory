@@ -27,25 +27,29 @@ def ResultIter(cursor, arraysize=1000):
             yield result
 
 orcl = cx_Oracle.connect(oraconn)
+curs = orcl.cursor()
 
 class LogHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
         self.in_gap = False
         self.start_ok = False
         self.must_stop = True
+        self.deck_state = 'unknown'
         self.last_conv_path = ''
         self.next_check = 15 * 60
     
     def startElement(self,name,attributes):
         if name == 'CONVERSION':
             self.last_conv_path = attributes.get('Path')
+            self.deck_state = 'running'
             if '\\D' in self.last_conv_path:
                 self.in_gap = True
                 self.start_ok = True
             else:
                 self.in_gap = False
-        if name == 'PUMP_TO_FLOWCELL':
+        elif name == 'PUMP_TO_FLOWCELL':
             self.in_gap = True
+            self.deck_state = 'running'
             if '\\D' in self.last_conv_path:
                 solution = int(attributes.get('Solution'))
                 if solution in [1, 5]:
@@ -54,10 +58,11 @@ class LogHandler(xml.sax.handler.ContentHandler):
                     self.in_gap = False
         if self.in_gap:
             self.next_check = 5 * 60
-        elif name == 'INCOMPLETE':
-            # run was stopped
+        elif name == 'INCOMPLETE' or name == 'PARTIAL_SAFE_STATE':
+            # run stopped
             self.start_ok = True
             self.must_stop = False
+            self.deck_state = 'idle'
             # FIXME check file timestamp and use that as base
             self.next_check = 15*60
         else:
@@ -83,10 +88,28 @@ def run_status(logfile):
     except xml.sax._exceptions.SAXParseException:
         pass
     logfobj.close()
-    return (handler.start_ok, handler.must_stop, handler.next_check)
+    return (handler.start_ok, handler.must_stop,
+            handler.next_check, handler.deck_state)
 
-def check_deck(deck,basedir):
-    logpath = os.path.join(basedir,deck,logdir)
+def update_run_info(deck,rundir,logpath,log_mtime):
+    run_name = os.path.basename(rundir)
+    log_change = datetime.utcfromtimestamp(log_mtime)
+    curs.execute('SELECT log_last_changed FROM runs WHERE run_name = :rname',
+                 rname=run_name)
+    lastlogdate = curs.fetchone()
+    print lastlogdate,log_change
+    # the "if not" is to cover None return, which would break comparison
+    if not lastlogdate or lastlogdate > log_change:
+        curs.execute("""MERGE INTO runs r USING dual ON (r.run_name = :rname)
+        WHEN matched THEN UPDATE SET log_last_changed = :mtime
+        WHEN NOT matched THEN
+        INSERT (run_name, deck_name, log_last_changed, state)
+        VALUES (:rname,:dname,:mtime,:state)""",
+                     rname=run_name,dname=deck,
+                     mtime=log_change,state='pending')
+
+def check_deck(deck):
+    logpath = os.path.join(get_deck_basedir(deck),logdir)
     if not os.path.exists(logpath):
         os.makedirs(logpath)
     if os.spawnlp(os.P_WAIT,'rsync',
@@ -106,24 +129,34 @@ def check_deck(deck,basedir):
                 for line in xmllog:
                     if 'CONVERSION' in line:
                         foundconv = 1
-                        # XXX add run to database
                         break
                 xmllog.close()
                 if foundconv:
                     mtime = os.path.getmtime(path)
+                    update_run_info(deck,dirname,path,mtime)
                     if mtime > newest['time']:
                         newest['time'] = mtime
                         newest['path'] = path
+    # commit all the run status updates
+    curs.commit()
     logmsg('parsing logfile %s, mtime %s' % (newest['path'],
                                              time.ctime(newest['time'])))
-    (can_start,must_stop,next_check) = run_status(newest['path'])
     run_dir = os.path.dirname(newest['path'])
     if run_dir.startswith(logpath):
         run_dir = run_dir[len(logpath):]
     else:
         sys.exit('run_dir not in logpath: this should not happen')
-    # XXX update deck state in database
-    return (run_dir,can_start,must_stop,next_check,newest['time'])
+    (can_start, must_stop,
+     next_check_secs, deck_state) = run_status(newest['path'])
+    # update deck state in database
+    this_check = datetime.utcnow()
+    next_check = this_check + timedelta(seconds=next_check_secs)
+    curs.execute('UPDATE decks SET state = :dstate,
+    state_check_last = :this, state_check_next = :next
+    WHERE decks.deck_name = :dname',
+                 dstate=deck_state,this=this_check,next=next_check,dname=deck)
+    curs.commit()
+    return (can_start,must_stop,next_check_secs,newest['time'])
 
 def check_pid(pid):
     # False: no pid
@@ -137,6 +170,46 @@ def check_pid(pid):
             return True
         return retval
 
+def get_basedir(deck):
+    myname = socket.getfqdn()
+    mypid = os.getpid()
+    
+    curs.execute('SELECT transfer_basedir,transfer_host,transfer_pid,
+    state,state_check_last,state_check_next
+    FROM decks
+    WHERE deck_name = :dname',dname=deck)
+    result = curs.fetchone()
+    if not result:
+        sys.exit('FATAL: deck %s not found in database' % deck)
+    else:
+        (basedir,t_host,t_pid,deck_state,state_last,state_next) = result
+    if deck_state = 'offline':
+        return None,'deck %s marked as offline' % deck
+    elif not (t_host == myname and t_pid == mypid):
+        # maybe someone else has it?
+        right_now = datetime.utcnow()
+        # has it been twice as long as it should have been since last check?
+        if (state_next - state_last) < (right_now - state_next):
+            # stale data/dead process. plant our flag on it.
+            curs.execute('UPDATE decks SET transfer_host = :myname,
+            transfer_pid = :mypid WHERE decks.deck_name = :dname',
+                         myname=myname,mypid=mypid,dname=deck)
+        else:
+            return None,'deck %s locked by %s:%s' % (deck,t_host,t_pid)
+    else:
+        return basedir,None
+
+def set_run_status(run,state):
+    curs.execute('UPDATE runs SET state = :rstate WHERE run_name = :rname',
+                 rstate=state,rname=run)
+    curs.commit()
+
+def find_eligible_run(deck):
+    curs.execute('SELECT run_name FROM runs
+    WHERE deck_name = :dname AND (state = 'syncing' OR state = 'pending')
+    ORDER BY log_last_changed ASC',dname=deck)
+    return curs.fetchone()
+
 def main():
     pid = 0
     last_start = 0
@@ -145,20 +218,18 @@ def main():
         deck = sys.argv[1].upper()
     else:
         sys.exit('must provide deck on command line')
-    # XXX check deck host/pid to see if we match
-    myname = socket.getfqdn()
-    mypid = os.getpid()
-    # XXX if we don't, check state_check_last for stale info
-    # XXX get basedir from database
+    basedir,message = get_basedir(deck)
+    if not basedir:
+        sys.exit(message)
     mirrpath = os.path.join(basedir,deck,mirrdir)
     if not os.path.exists(mirrpath):
         os.makedirs(mirrpath)
     while True:
-        (rundir,start_ok,stop_now,
+        (start_ok,stop_now,
          next_check,log_mtime) = check_deck(deck, basedir)
         pidcheck = check_pid(pid)
-        logmsg('run %s, start %s, stop %s, next %s, pid %s, chk %s' % 
-               (rundir, start_ok, stop_now,next_check,pid,pidcheck))
+        logmsg('deck %s, start %s, stop %s, next %s, pid %s, chk %s' % 
+               (deck, start_ok, stop_now,next_check,pid,pidcheck))
         if pidcheck == True:
             if stop_now:
                 os.kill(pid,signal.SIGSTOP)
@@ -172,15 +243,18 @@ def main():
                 (oldpid,exit_status) = pidcheck
                 if exit_status == 0 and last_start > log_mtime:
                     logmsg('rsync completed and no log change since start')
-                    # XXX update database
-                    sys.exit(0)
+                    set_run_status(rundir,'complete')
             if start_ok:
+                rundir = find_eligible_run(deck)
+                if not rundir:
+                    break
                 pid = os.spawnlp(os.P_NOWAIT,'rsync',
                                  'rsync','-a','-v',
                                  '%s::runs/%s' % ( deck, rundir ),
                                  mirrpath)
                 last_start = time.time()
                 last_rundir = rundir
+                set_run_status(rundir,'syncing')
                 logmsg('started rsync of %s: pid %s at %s' %
                        (rundir,pid,last_start))
             else:
@@ -188,6 +262,12 @@ def main():
         if next_check < 300:
             next_check = 300
         time.sleep(next_check)
+    # reached by break
+    # before we exit, clean up database
+    curs.execute('UPDATE decks SET transfer_host = NULL,
+    transfer_pid = NULL WHERE decks.deck_name = :dname',
+                 dname=deck)
+    curs.commit()
 
 if __name__ == '__main__':
     main()
