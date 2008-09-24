@@ -175,12 +175,23 @@ def build_makefiles(basedir,cycle,old_dir):
         return True
     return False
 
-def run_the_make(rundir):
+def dtstring():
+    return datetime.utcnow().strftime("%Y%m%d%H%M%S")
+
+def run_the_make(rundir,logdir):
     os.chdir(rundir)
-    # need logfile name
-    # reopen stdout/stderr to logfile name
+    cycpart = os.path.basename(rundir).split('_')[0]
+    logfile = os.path.join(logdir, "firecrestAnalysis%s.%s.out" %
+                           (dtstring(), cycpart))
+    saveout = sys.stdout
+    saveerr = sys.stderr
+    logfp = open(logfile,"w")
+    sys.stdout = logfp
+    sys.stderr = logfp
     retval = os.spawnvp(os.P_WAIT,'make',['make'] + make_args)
-    # close logfile
+    sys.stdout = saveout
+    sys.stderr = saveerr
+    logfp.close()
     if retval == 0:
         return True
     return False
@@ -214,7 +225,8 @@ def main():
         # okay, we have a winner
         if build_makefiles(results_dir,last_copied,newest_dir):
             new_dir = find_newest(datadir)
-            if run_the_make(new_dir):
+            log_dir = os.path.join(results_dir,"logs")
+            if run_the_make(new_dir,log_dir):
                 if run_state == 'complete':
                     write_flagfile(results_dir,
                                    new_dir[len(results_dir)-len(run):])
