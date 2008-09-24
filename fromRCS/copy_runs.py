@@ -4,53 +4,36 @@ import cx_Oracle,sys,os,time,signal
 import xml.sax.handler
 from datetime import datetime,timedelta
 
-basedir = '/seq/solexaproc'
-stampfile = 'SyncComplete'
+# these must end with slash
+mirrdir = 'mirror/'
+logdir = 'logs/'
 
 class LogHandler(xml.sax.handler.ContentHandler):
-    # empirically determined gap size, 75 minutes
-    # log uses 1/1000s time units
-    gapsize = 75 * 60 * 1000
-    # empirically determined rsync startup time, 20 minutes
-    # plus we want at least 5 minutes of copying
-    startcost = 25 * 60 * 1000
-
     def __init__(self):
         self.in_gap = False
-        self.last_conv = 0
-        self.last_seen = 0
-        self.next_check = 15 * 60
         self.start_ok = False
         self.must_stop = True
+        self.last_conv_path = ''
+        self.next_check = 15 * 60
     
     def startElement(self,name,attributes):
-        if (name == 'READ_FLOWCELL_TMPR' or
-            name == 'READ_AMBIENT_TMPR' or
-            name == 'READ_STORAGE_TMPR'):
-            return
-        else:
-            self.last_seen = int(attributes.get('start') or 0) \
-                             or self.last_seen
         if name == 'CONVERSION':
-            if '\\D' in attributes.get('Path'):
+            self.last_conv_path = attributes.get('Path')
+            if '\\D' in self.last_conv_path:
                 self.in_gap = True
+                self.start_ok = True
             else:
-                self.last_conv = int(attributes.get('start') or 0) \
-                                 or self.last_conv
                 self.in_gap = False
         if name == 'PUMP_TO_FLOWCELL':
             self.in_gap = True
+            if '\\D' in self.last_conv_path:
+                solution = int(attributes.get('Solution'))
+                if solution in [1, 5]:
+                    self.start_ok = False
+                elif solution in [3, 4]:
+                    self.in_gap = False
         if self.in_gap:
-            # time remaining in gap
-            timeleft = self.gapsize - (self.last_seen - self.last_conv)
-            if timeleft > self.startcost or self.last_conv == 0:
-                self.start_ok = True
-                self.must_stop = False
-                self.next_check = min(int(timeleft / 1000) + 5*60,15*60)
-            else:
-                self.start_ok = False
-                self.must_stop = False
-                self.next_check = min(int((self.startcost-timeleft)/1000) + 60, 5*60)
+            self.next_check = 5 * 60
         elif name == 'INCOMPLETE':
             # run was stopped
             self.start_ok = True
@@ -74,24 +57,26 @@ def run_status(logfile):
 
     # catch exception: xml.sax._exceptions.SAXParseException
     # if we catch that, finish up; file is incomplete
+    logfobj = open(logfile)
     try:
-        parser.parse(logfile)
+        parser.parse(logfobj)
     except xml.sax._exceptions.SAXParseException:
         pass
+    logfobj.close()
     return (handler.start_ok, handler.must_stop, handler.next_check)
 
 def check_host(host):
-    logdir = os.path.join(basedir,host,'logs/')
-    if not os.path.exists(logdir):
-        os.makedirs(logdir)
+    logpath = os.path.join(basedir,host,logdir)
+    if not os.path.exists(logpath):
+        os.makedirs(logpath)
     if os.spawnlp(os.P_WAIT,'rsync',
-                  'rsync','-a',
+                  'rsync','-a','--delete',
                   '--exclude=Focus*/','--exclude=Images*/',
                   '--exclude=Data*/',
-                  '%s::runs/' % host, logdir) != 0:
+                  '%s::runs/' % host, logpath) != 0:
         sys.exit('rsync of logs failed')
     newest = {'time': 0, 'path': ''}
-    for (dirname,dirs,files) in os.walk(logdir):
+    for (dirname,dirs,files) in os.walk(logpath):
         for file in files:
             if (file.startswith('Log.xml_') or file.startswith('RunLog_')) \
                    and file.endswith('.xml'):
@@ -112,10 +97,10 @@ def check_host(host):
                                              time.ctime(newest['time'])))
     (can_start,must_stop,next_check) = run_status(newest['path'])
     run_dir = os.path.dirname(newest['path'])
-    if run_dir.startswith(logdir):
-        run_dir = run_dir[len(logdir):]
+    if run_dir.startswith(logpath):
+        run_dir = run_dir[len(logpath):]
     else:
-        sys.exit('run_dir not in logdir: should not happen')
+        sys.exit('run_dir not in logpath: this should not happen')
     return (run_dir,can_start,must_stop,next_check,newest['time'])
 
 def check_pid(pid):
@@ -138,9 +123,9 @@ def main():
         host = sys.argv[1].upper()
     else:
         sys.exit('must provide host on command line')
-    mirrdir = os.path.join(basedir,host,'mirror/')
-    if not os.path.exists(mirrdir):
-        os.makedirs(mirrdir)
+    mirrpath = os.path.join(basedir,host,mirrdir)
+    if not os.path.exists(mirrpath):
+        os.makedirs(mirrpath)
     while True:
         (rundir,start_ok,stop_now,next_check,log_mtime) = check_host(host)
         pidcheck = check_pid(pid)
@@ -149,31 +134,23 @@ def main():
         if pidcheck == True:
             if stop_now:
                 os.kill(pid,signal.SIGSTOP)
+                logmsg('stopped pid %d' % pid)
             elif start_ok:
                 os.kill(pid,signal.SIGCONT)
+                logmsg('continued pid %d' % pid)
         else:
             # not running: no proc, or proc completed
             if pidcheck != False:
                 (oldpid,exit_status) = pidcheck
                 if exit_status == 0 and last_start > log_mtime:
                     logmsg('rsync completed and no log change since start')
-                    # XXX drop a timestamp file in the dir
-                    stamp = open(os.path.join(mirrdir,
-                                              os.path.basename(last_rundir),
-                                              stampfile))
-                    stamp.write('''Run completed at %s
-                    rsync of %s started at %s
-                    last logfile change at %s
-                    ''' % (time.ctime(),
-                           last_rundir,time.ctime(last_start),
-                           time.ctime(log_mtime)))
-                    stamp.close()
+                    # XXX update database
                     sys.exit(0)
             if start_ok:
                 pid = os.spawnlp(os.P_NOWAIT,'rsync',
-                                 'rsync','-a',
+                                 'rsync','-a','-v',
                                  '%s::runs/%s' % ( host, rundir ),
-                                 mirrdir)
+                                 mirrpath)
                 last_start = time.time()
                 last_rundir = rundir
                 logmsg('started rsync of %s: pid %s at %s' %
