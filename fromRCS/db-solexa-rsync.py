@@ -205,7 +205,7 @@ def set_run_status(run,state):
     curs.commit()
 
 def find_eligible_run(deck):
-    curs.execute("""SELECT run_name FROM runs
+    curs.execute("""SELECT run_sourcepath FROM runs
     WHERE deck_name = :dname AND (state = 'syncing' OR state = 'pending')
     ORDER BY log_last_changed ASC""",dname=deck)
     return curs.fetchone()
@@ -253,8 +253,7 @@ def main():
                                  '%s::runs/%s' % ( deck, rundir ),
                                  mirrpath)
                 last_start = time.time()
-                last_rundir = rundir
-                set_run_status(rundir,'syncing')
+                set_run_status(os.path.basename(rundir),'syncing')
                 logmsg('started rsync of %s: pid %s at %s' %
                        (rundir,pid,last_start))
             else:
