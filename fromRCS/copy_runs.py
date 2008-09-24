@@ -256,7 +256,7 @@ def update_cycle_count(rundir_path):
                  rname=run)
     result = curs.fetchone()
     if result:
-        cycles_done = result[0]
+        cycles_done = result
     else:
         sys.exit("couldn't find run %s in database updating cycle count" % run)
     
@@ -266,10 +266,9 @@ def update_cycle_count(rundir_path):
         cycles_needed = (sys.maxint,sys.maxint)
     else:
         cycles_needed = checkrun.check_recipe(recipes[0])
-    
     (C_cycles, D_cycles, run_is_complete) = \
                 checkrun.check_cycles(rundir_path, cycles_done, cycles_needed)
-    curs.execute("UPDATE runs SET last_cycle_copied = :lc, last_d_cycle_copied = :ld WHERE run_name = :rname",lc=C_cycle,ld=D_cycle,rname=run)
+    curs.execute("UPDATE runs SET last_cycle_copied = :lc, last_d_cycle_copied = :ld WHERE run_name = :rname",lc=C_cycles,ld=D_cycles,rname=run)
     if run_is_complete:
         curs.execute("UPDATE runs SET state = 'complete' WHERE run_name = :rname",rname=run)
     orcl.commit()
