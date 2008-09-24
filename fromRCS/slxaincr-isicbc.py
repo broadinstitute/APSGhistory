@@ -240,8 +240,13 @@ def main():
     newest_dir = find_newest(datadir)
     print 'newest',newest_dir,'data',datadir
     print 'runinfo',analysis_dir,run_state,last_copied
-    if newest_dir:
-        if analysis_dir:
+    if run_state == 'complete':
+        # we don't need to run anything, but may need to clean up complete run
+        new_dir = find_newest(datadir)
+        write_flagfile(sync_dir, new_dir[len(results_dir)-len(run):])
+        update_rundir(run,None)
+    else:
+        if newest_dir and analysis_dir:
             match = cycle_regex.search(analysis_dir)
             if match:
                 prev_cycle = int(match.group(1))
@@ -249,26 +254,21 @@ def main():
                 match = first_cycle_regex.search(analysis_dir)
                 if match:
                     prev_cycle = int(match.group(1))
-    print 'prev',prev_cycle
-    if prev_cycle < last_copied:
-        # okay, we have a winner
-        if build_makefiles(results_dir,last_copied,newest_dir):
-            new_dir = find_newest(datadir)
-            log_dir = os.path.join(results_dir,"logs")
-            if run_the_make(new_dir,log_dir):
-                if run_state == 'complete':
-                    write_flagfile(sync_dir,
-                                   new_dir[len(results_dir)-len(run):])
-                    update_rundir(run,None)
-                else:
-                    update_rundir(run,new_dir)
-                if run_cycle_analysis(new_dir,log_dir,prev_cycle+1):
-                    print '*** cycle by cycle successful for',prev_cycle+1
-    elif run_state == 'complete':
-        # we don't need to run anything, but may need to clean up complete run
-        new_dir = find_newest(datadir)
-        write_flagfile(sync_dir, new_dir[len(results_dir)-len(run):])
-        update_rundir(run,None)
+        print 'prev',prev_cycle
+        if prev_cycle < last_copied:
+            # okay, we have a winner
+            if build_makefiles(results_dir,last_copied,newest_dir):
+                new_dir = find_newest(datadir)
+                log_dir = os.path.join(results_dir,"logs")
+                if run_the_make(new_dir,log_dir):
+                    if run_state == 'complete':
+                        write_flagfile(sync_dir,
+                                       new_dir[len(results_dir)-len(run):])
+                        update_rundir(run,None)
+                    else:
+                        update_rundir(run,new_dir)
+                    if run_cycle_analysis(new_dir,log_dir,prev_cycle+1):
+                        print '*** cycle by cycle successful for',prev_cycle+1
     unlock_run(run)
 
 if __name__ == '__main__':
