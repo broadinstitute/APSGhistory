@@ -55,7 +55,8 @@ def get_runlist(deck):
     curs.execute("""SELECT run_name,state,analysis_dir
     FROM runs
     WHERE deck_name = :dname AND state != 'ignore' AND
-    (analysis_dir IS NOT NULL OR state = 'syncing')""",dname=deck)
+    (analysis_dir IS NOT NULL OR state = 'syncing')
+    ORDER BY log_last_changed""",dname=deck)
     runlist = curs.fetchall()
     if not len(runlist):
         sys.exit('no eligible runs found')
