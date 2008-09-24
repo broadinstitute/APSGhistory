@@ -34,7 +34,7 @@ max_retries = 5
 
 statuses = ['unprocessed', 'running', 'complete', 'failed']
 
-subdirs = [ 'htgs', 'nt' ]
+subdirs = [ 'htgs', 'nt', 'taxdb' ]
 
 semaphore_file = '.unpack_done'
 
