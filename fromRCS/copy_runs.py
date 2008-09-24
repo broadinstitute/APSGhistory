@@ -9,8 +9,13 @@ from datetime import datetime,timedelta
 mirrdir = 'mirror/'
 logdir = 'logs/'
 
+stampfile = 'SyncComplete'
+excludefile = '.rsync_exclude'
+
 # oracle connection string
 oraconn = 'slxasync/c0piiRn2@seqdel1'
+
+cycle_times = {}
 
 # design notes:
 # all datetime objects are to be handled as UTC, except possibly on output
@@ -26,6 +31,15 @@ def ResultIter(cursor, arraysize=1000):
         for result in results:
             yield result
 
+# os.spawn replacement that does setpgrp() to allow killpg()
+def pg_spawnvp(prog,argv):
+    'spawnvp replacement using setpgrp() and exec(), allowing parent to killpg()'
+    pid = os.fork()
+    if pid == 0:
+        os.setpgrp()
+        os.execvp(prog,argv)
+    return pid
+
 orcl = cx_Oracle.connect(oraconn)
 curs = orcl.cursor()
 
@@ -36,17 +50,23 @@ class LogHandler(xml.sax.handler.ContentHandler):
         self.must_stop = True
         self.deck_state = 'unknown'
         self.last_conv_path = ''
+        self.last_cycle = 0
         self.next_check = 15 * 60
     
     def startElement(self,name,attributes):
         if name == 'CONVERSION':
-            self.last_conv_path = attributes.get('Path')
             self.deck_state = 'running'
-            if '\\D' in self.last_conv_path:
+            self.last_conv_path = attributes.get('Path')
+            lcitems = self.last_conv_path.split('\\')
+            cycle_dir = lcitems[-2]
+            if cycle_dir.startswith('D'):
                 self.in_gap = True
                 self.start_ok = True
             else:
                 self.in_gap = False
+            # int(float()) to turn "23.1" into 23.1 into 23
+            # N.B. we return *current* (prob incomplete) cycle
+            self.last_cycle = int(float(cycle_dir[1:]))
         elif name == 'PUMP_TO_FLOWCELL':
             self.in_gap = True
             self.deck_state = 'running'
@@ -90,7 +110,7 @@ def run_status(logfile):
         pass
     logfobj.close()
     return (handler.start_ok, handler.must_stop,
-            handler.next_check, handler.deck_state)
+            handler.next_check, handler.deck_state, handler.last_cycle)
 
 def update_run_info(deck,rundir,logfile,log_mtime):
     run_name = os.path.basename(rundir)
@@ -145,12 +165,19 @@ def check_deck(deck,basedir):
                     if mtime > newest['time']:
                         newest['time'] = mtime
                         newest['path'] = path
+                        newest['name'] = os.path.basename(rundir)
     # commit all the run status updates
     orcl.commit()
     logmsg('parsing logfile %s, mtime %s' % (newest['path'],
                                              time.ctime(newest['time'])))
     (can_start, must_stop,
-     next_check_secs, deck_state) = run_status(newest['path'])
+     next_check_secs, deck_state, last_cycle) = run_status(newest['path'])
+    if not newest['name'] in cycle_times:
+        cycle_times[newest['name']] = {}
+    # xrange will give 1-(last-1), so we won't get the partial cycle
+    mtime_utcdt = datetime.utcfromtimestamp(newest['time'])
+    for cyc in xrange(1,last_cycle):
+        cycle_times[newest['name']].setdefault(cyc, mtime_utcdt)
     # update deck state in database
     this_check = datetime.utcnow()
     next_check = this_check + timedelta(seconds=next_check_secs)
@@ -203,9 +230,13 @@ def get_basedir(deck):
             return (None,'deck %s locked by %s:%s' % (deck,t_host,t_pid))
     return (basedir,None)
 
-def set_run_status(run,state):
+def set_run_status(run,state,last_sync=None):
     curs.execute('UPDATE runs SET state = :rstate WHERE run_name = :rname',
                  rstate=state,rname=run)
+    if last_sync:
+        curs.execute('''UPDATE runs SET last_sync_start = :lsync
+        WHERE run_name = :rname''',
+                 lsync=last_sync,rname=run)
     orcl.commit()
 
 def find_eligible_run(deck):
@@ -217,6 +248,27 @@ def find_eligible_run(deck):
         return retval[0]
     else:
         return None
+
+def write_exclude_file(destpath,rundir):
+    run = os.path.basename(rundir)
+    curs.execute("SELECT last_sync_start FROM runs WHERE run_name = :rname",
+                 rname=run)
+    result = curs.fetchone()
+    if result:
+        lastsync = result[0]
+    else:
+        lastsync = None
+    destdir = os.path.join(destpath,rundir)
+    if not os.path.exists(destdir):
+        os.makedirs(destdir)
+    excludepath = os.path.join(destdir,excludefile)
+    excl = open(excludepath,'w')
+    if lastsync:
+        for cycle in cycle_times[run]:
+            if cycle_times[run][cycle] < lastsync:
+                excl.write('C%d.1/\nD%d.1/\n' % (cycle,cycle))
+    excl.close()
+    return excludepath
 
 def main():
     pid = 0
@@ -240,10 +292,10 @@ def main():
                (deck, start_ok, stop_now,next_check,pid,pidcheck))
         if pidcheck == True:
             if stop_now:
-                os.kill(pid,signal.SIGSTOP)
+                os.killpg(pid,signal.SIGSTOP)
                 logmsg('stopped pid %d' % pid)
             elif start_ok:
-                os.kill(pid,signal.SIGCONT)
+                os.killpg(pid,signal.SIGCONT)
                 logmsg('continued pid %d' % pid)
         else:
             # not running: no proc, or proc completed
@@ -252,16 +304,29 @@ def main():
                 if exit_status == 0 and last_start > log_mtime:
                     logmsg('rsync completed and no log change since start')
                     set_run_status(rundir,'complete')
+                    stamp = open(os.path.join(mirrpath,
+                                              os.path.basename(rundir),
+                                              stampfile),'w')
+                    stamp.write('\n'.join('Run completed at %s',
+                                          'rsync of %s started at %s',
+                                          'last logfile change at %s')
+                                % (time.ctime(),
+                                   rundir,time.ctime(last_start),
+                                   time.ctime(log_mtime)))
+                    stamp.close()
             if start_ok:
                 rundir = find_eligible_run(deck)
                 if not rundir:
                     break
-                pid = os.spawnlp(os.P_NOWAIT,'rsync',
-                                 'rsync','-a','-v',
-                                 '%s::runs/%s' % ( deck, rundir ),
-                                 mirrpath)
+                excludepath = write_exclude_file(mirrpath,rundir)
+                pid = pg_spawnvp('rsync',
+                      ['rsync','-a','-v',
+                       '--exclude-from=%s' % excludepath,
+                       '%s::runs/%s' % ( deck, rundir ),
+                       mirrpath])
                 last_start = time.time()
-                set_run_status(os.path.basename(rundir),'syncing')
+                set_run_status(os.path.basename(rundir),'syncing',
+                               last_sync=datetime.utcfromtimestamp(last_start))
                 logmsg('started rsync of %s: pid %s at %s' %
                        (rundir,pid,last_start))
             else:
