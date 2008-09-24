@@ -219,6 +219,14 @@ def check_pid(pid):
             return True
         return retval
 
+def lock_deck(deck):
+    myname = socket.getfqdn()
+    mypid = os.getpid()
+    curs.execute("""UPDATE decks SET transfer_host = :myname,
+    transfer_pid = :mypid WHERE decks.deck_name = :dname""",
+                 myname=myname,mypid=mypid,dname=deck)
+    orcl.commit()
+
 def get_basedir(deck):
     myname = socket.getfqdn()
     mypid = os.getpid()
@@ -237,9 +245,11 @@ def get_basedir(deck):
         return (None,'deck %s marked as offline' % deck)
     elif not t_host or not t_pid:
         # no valid lock
+        lock_deck(deck)
         return (basedir,None)
     elif t_host == myname and not pid_exists(t_pid):
         # lock was on this host, but process is dead
+        lock_deck(deck)
         return (basedir,None)
     else:
         return (None,'deck %s locked by %s:%s' % (deck,t_host,t_pid))
