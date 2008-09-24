@@ -129,6 +129,7 @@ def setup_dirs(src,dst):
     os.spawnlp(os.P_WAIT,'rsync','rsync','-av',
                '--exclude=/Data', '--exclude=/Images/',
                '--exclude=/Focus/', '--exclude=/Focus0/',
+               '--exclude=/logs',
                src + '/', dst + '/')
     src_data = os.path.join(src,"Data")
     src_focus = os.path.join(src,"Focus")
