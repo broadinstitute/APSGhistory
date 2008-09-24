@@ -270,7 +270,7 @@ def write_exclude_file(destpath,rundir):
     excludepath = os.path.join(destdir,excludefile)
     excl = open(excludepath,'w')
     if lastsync:
-        for cycle in cycle_times.get(run):
+        for cycle in cycle_times.get(run,[]):
             if cycle_times[run][cycle] < lastsync:
                 excl.write('C%d.1/\nD%d.1/\n' % (cycle,cycle))
     excl.close()
