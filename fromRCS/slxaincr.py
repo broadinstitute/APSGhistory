@@ -54,7 +54,7 @@ def get_deckinfo(deck):
 def get_runlist(deck):
     curs.execute("""SELECT run_name,state,analysis_dir
     FROM runs
-    WHERE deck_name = :dname AND
+    WHERE deck_name = :dname AND state != 'ignore' AND
     (analysis_dir IS NOT NULL OR state = 'syncing')""",dname=deck)
     runlist = curs.fetchall()
     if not len(runlist):
