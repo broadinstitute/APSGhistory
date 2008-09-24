@@ -41,6 +41,21 @@ def pg_spawnvp(prog,argv):
         os.execvp(prog,argv)
     return pid
 
+# modified http://mail.python.org/pipermail/python-list/2002-May/144522.html
+def pid_exists(pid):
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError, err:
+        return err.errno == errno.EPERM
+
+# signal handler to do nothing
+def handler_noop(signum,frame):
+    pass
+
+signal.signal(signal.SIGALRM,noop)
+signal.signal(signal.SIGCHLD,noop)
+
 orcl = cx_Oracle.connect(oraconn)
 curs = orcl.cursor()
 
@@ -221,21 +236,16 @@ def get_basedir(deck):
     else:
         (basedir,t_host,t_pid,deck_state,state_last,state_next) = result
     if deck_state == 'offline':
+        # ignore the deck
         return (None,'deck %s marked as offline' % deck)
-    elif not (t_host == myname and t_pid == mypid):
-        # maybe someone else has it?
-        right_now = datetime.utcnow()
-        # has it been twice as long as it should have been since last check?
-        if not state_next or not state_last or not t_host or not t_pid or \
-               (state_next - state_last) < (right_now - state_next):
-            # stale data/dead process. plant our flag on it.
-            curs.execute("""UPDATE decks SET transfer_host = :myname,
-            transfer_pid = :mypid WHERE decks.deck_name = :dname""",
-                         myname=myname,mypid=mypid,dname=deck)
-            orcl.commit()
-        else:
-            return (None,'deck %s locked by %s:%s' % (deck,t_host,t_pid))
-    return (basedir,None)
+    elif not t_host or not t_pid:
+        # no valid lock
+        return (basedir,None)
+    elif t_host == myname and not pid_exists(t_pid):
+        # lock was on this host, but process is dead
+        return (basedir,None)
+    else:
+        return (None,'deck %s locked by %s:%s' % (deck,t_host,t_pid))
 
 def set_run_status(run,state,last_sync=None):
     curs.execute('UPDATE runs SET state = :rstate WHERE run_name = :rname',
@@ -303,6 +313,20 @@ def write_exclude_file(rundir_path):
     excl.close()
     return excludepath
 
+def start_rsync(deck,run_srcpath,mirrpath):
+    run_name = os.path.basename(run_srcpath)
+    excludepath = write_exclude_file(os.path.join(mirrpath, run_name))
+    pid = pg_spawnvp('rsync',
+                     ['rsync','-a','-v',
+                      '--exclude-from=%s' % excludepath,
+                      '%s::runs/%s' % ( deck, run_srcpath ),
+                      mirrpath])
+    last_start = datetime.utcnow()
+    logmsg('started rsync of %s: pid %s at %s' %
+           (rundir,pid,last_start.ctime()))
+    set_run_status(last_run,'syncing',last_sync=last_start)
+    return (pid,last_start)
+
 def main():
     pid = 0
     last_start = datetime.utcfromtimestamp(0)
@@ -318,6 +342,7 @@ def main():
     if not os.path.exists(mirrpath):
         os.makedirs(mirrpath)
     while True:
+        already_started = False
         (start_ok,stop_now,
          next_check,log_mtime) = check_deck(deck,basedir)
         pidcheck = check_pid(pid)
@@ -338,43 +363,50 @@ def main():
                 (C_cycles, D_cycles, is_complete) = \
                            update_cycle_count(os.path.join(mirrpath,last_run))
                 if is_complete:
-                    stamp = open(os.path.join(mirrpath, last_run, stampfile),
-                                 'w')
-                    stamp.write('\n'.join(['Run completed at %s (local)',
-                                           'rsync of %s started at %s UTC',
-                                           'last logfile change at %s UTC',
-                                           ''])
-                                % (time.ctime(),
-                                   last_run,last_start.ctime(),
-                                   get_log_mtime(last_run).ctime()))
-                    stamp.close()
+                    logtime = get_log_mtime(last_run)
+                    if last_start < logtime:
+                        curs.execute("""SELECT run_sourcepath FROM runs
+                        WHERE run_name = :rname""",rname=last_run)
+                        retval = curs.fetchone()
+                        if retval:
+                            run_srcpath = retval[0]
+                        else:
+                            logmsg("couldn't find run %s in database preparing final rsync - SHOULD NOT HAPPEN" % run)
+                            break
+                        (pid,last_start) = start_rsync(deck,run_srcpath,mirrpath)
+                        already_started = True
+                    else:
+                        stamp = open(os.path.join(mirrpath, last_run, stampfile),
+                                     'w')
+                        stamp.write('\n'.join(['Run completed at %s (local)',
+                                               'rsync of %s started at %s UTC',
+                                               'last logfile change at %s UTC',
+                                               ''])
+                                    % (time.ctime(),
+                                       last_run,last_start.ctime(),
+                                       logtime.ctime()))
+                        stamp.close()
                 elif exit_status != 0:
                     # failed; set run back to pending and unsynced
                     logmsg("run %s failed with status %s" %
                            (last_run, str(exit_status)))
                     set_run_status(last_run,'pending',
                                    last_sync=datetime.utcfromtimestamp(0))
-            if start_ok:
+            if start_ok and not already_started:
                 rundir = find_eligible_run(deck)
                 if not rundir:
                     break
                 last_run = os.path.basename(rundir)
-                excludepath = write_exclude_file(os.path.join(mirrpath,
-                                                              last_run))
-                pid = pg_spawnvp('rsync',
-                      ['rsync','-a','-v',
-                       '--exclude-from=%s' % excludepath,
-                       '%s::runs/%s' % ( deck, rundir ),
-                       mirrpath])
-                last_start = datetime.utcnow()
-                logmsg('started rsync of %s: pid %s at %s' %
-                       (rundir,pid,last_start.ctime()))
-                set_run_status(last_run,'syncing',last_sync=last_start)
-            else:
+                (pid,last_start) = start_rsync(deck,rundir,mirrpath)
+            elif not already_started:
                 pid = 0
         if next_check < 300:
             next_check = 300
-        time.sleep(next_check)
+        # signal handler for CHLD/ALRM can be a no-op but must not be sig_ign
+        signal.alarm(next_check)
+        signal.pause()
+        # reset the alarm; if sigchld woke us, we don't want it to go off later
+        signal.alarm(0)
     # reached by break
     # before we exit, clean up database
     curs.execute('''UPDATE decks SET state='idle', transfer_host = NULL,
