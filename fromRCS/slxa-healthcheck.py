@@ -64,7 +64,7 @@ if messagelines:
 # any job in PENDING is one that has been detected but not started syncing
 # this is a warning sign since this can only happen when we are behind
 curs.execute("""SELECT deck_name,run_name,state,log_last_changed
-                FROM runs ORDER BY deck_name""")
+                FROM runs ORDER BY deck_name,log_last_changed""")
 
 for row in ResultIter(curs):
     (deck,run,r_state,r_lastchg) = row
