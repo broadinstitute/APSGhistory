@@ -10,7 +10,7 @@ import cx_Oracle,errno,re,signal,socket,stat,sys,time
 from datetime import datetime,timedelta
 from subprocess import *
 
-solexa_sw_dir = '/broad/tools/solexa/src/SolexaPipeline-0.2.2.4'
+solexa_sw_dir = '/broad/tools/solexa/pipeline'
 
 analysis_dest = '/broad/solexaproc'
 analysis_suffix = 'analyzed'
