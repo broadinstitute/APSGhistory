@@ -15,8 +15,6 @@ pathre = re.compile('<CONVERSION.*Path="([^"]+?)"')
 def check_cycles(basedir,run,logfiles):
     lastseen = {}
     scandirs = {}
-    missing = False
-    missingcycle = sys.maxint
     cycle = 1
     # read the list of files to look for into memory
     # (why not check for os.path.exists as we go?
@@ -37,40 +35,32 @@ def check_cycles(basedir,run,logfiles):
                 if cycle_dir[0] in 'CD' and cycle_dir[1] in "0123456789":
                     cycle = int(float(cycle_dir[1:]))
                     lastseen[cycle] = fname
+                else:
+                    sys.exit("could not find cycle in path %s" % path)
                 imagedir = os.path.join(basedir,'mirror',run,*pathitems[:-1])
-                scandirs.setdefault(imagedir,{})[fname] = 1
+                scandirs.setdefault((cycle,imagedir),{})[fname] = 1
         lfp.close()
     # now that we have the list in memory, do an efficient listdir
     # across each of the directories and remove files that we find exist.
     # after that, if anything is left we are missing a file.
-    # XXX FIXME check for OSError on the chdir... if that fails, add
-    # the appropriate cycle number to the "missing" list and move on
-    for scandir in scandirs:
-        cycle_dir = os.path.basename(scandir)
-        if cycle_dir[0] in 'CD' and cycle_dir[1] in "0123456789":
-            cycle = int(float(cycle_dir[1:]))
-        else:
-            # this should not happen
-            sys.exit("tried scanning dir %s which is not a cycle dir"
-                     % scandir)
+    # XXX FIXME optimizations:
+    # - don't rescan older dirs
+    # (check the DB's copied cycles, we don't have to keep rechecking them,
+    #   just as the rsync can ignore them)
+    for scantuple in sorted(scandirs):
+        print scantuple
+        (cycle,scandir) = scantuple
         try:
             os.chdir(scandir)
         except OSError:
             print 'could not chdir to %s' % scandir
-            missing = True
-            if cycle < missingcycle:
-                missingcycle = cycle
+            return cycle-1
         else:
             for fname in os.listdir(scandir):
-                scandirs[scandir].pop(fname,None)
-            if len(scandirs[scandir]):
+                scandirs[scantuple].pop(fname,None)
+            if len(scandirs[scantuple]):
                 # we're missing something in this directory!
-                missing = True
-                # we only care about the cycle number, not the actual filename
-                if cycle < missingcycle:
-                    missingcycle = cycle
-    if missing:
-        return missingcycle - 1
+                return cycle-1
     # if all files exist, check if last cycle is actually complete
     # we do this by saving the last file of each cycle,
     # then checking if last cycle's last file matches the pattern
@@ -116,6 +106,8 @@ def main():
 
     complete_cycle = check_cycles(basedir,run,logfiles)
     print complete_cycle
+    # XXX FIXME check  how many cycles there SHOULD BE
+    # and complete run as appropriate
 
 if __name__ == '__main__':
     main()
