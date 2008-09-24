@@ -97,7 +97,11 @@ def update_run_info(deck,rundir,logpath,log_mtime):
     curs.execute("""SELECT log_last_changed FROM runs
     WHERE run_name = :rname AND deck_name = :dname""",
                  rname=run_name,dname=deck)
-    (lastlogdate) = curs.fetchone()
+    result = curs.fetchone()
+    if result:
+        lastlogdate = result[0]
+    else:
+        lastlogdate = None
     # the "if not" is to cover None return, which would break comparison
     if not lastlogdate or lastlogdate > log_change:
         curs.execute("""MERGE INTO runs r USING dual ON (r.run_name = :rname)
