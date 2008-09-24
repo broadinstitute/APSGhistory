@@ -46,21 +46,24 @@ def check_cycles(basedir,run,logfiles):
     # XXX FIXME check for OSError on the chdir... if that fails, add
     # the appropriate cycle number to the "missing" list and move on
     for scandir in scandirs:
-        print 'scanning',scandir
-        os.chdir(scandir)
+        cycle_dir = os.path.basename(scandir)
+        if cycle_dir[0] in 'CD' and cycle_dir[1] in "0123456789":
+            cycle = int(float(cycle_dir[1:]))
+        else:
+            # this should not happen
+            sys.exit("tried scanning dir %s which is not a cycle dir"
+                     % scandir)
+        try:
+            os.chdir(scandir)
+        except OSError:
+            print 'could not chdir to %s' % scandir
+            if cycle < missingcycle:
+                missingcycle = cycle
         for fname in os.listdir(scandir):
-            print 'fname',fname
             scandirs[scandir].pop(fname,None)
         if len(scandirs[scandir]):
             # we're missing something in this directory!
             missing = True
-            cycle_dir = os.path.basename(scandir)
-            if cycle_dir[0] in 'CD' and cycle_dir[1] in "0123456789":
-                cycle = int(float(cycle_dir[1:]))
-            else:
-                # this should not happen
-                sys.exit("missing file(s) in dir %s which is not a cycle dir"
-                         % scandir)
             # we only care about the cycle number, not the actual filename
             if cycle < missingcycle:
                 missingcycle = cycle
