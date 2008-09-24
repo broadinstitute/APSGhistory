@@ -16,7 +16,7 @@ exp_time = timedelta(hours=2)
 slop_time = timedelta(minutes=5)
 
 #ignore_these = ['SL-XAE','SL-XAP']
-ignore_these = ['SL-XAR']
+ignore_these = ['']
 
 from_addr = 'apsg@broad.mit.edu'
 to_addr = 'solexa-alerts@broad.mit.edu'
