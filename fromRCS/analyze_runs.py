@@ -181,7 +181,7 @@ def build_makefiles(basedir,cycle,old_dir):
     return False
 
 def dtstring():
-    return datetime.utcnow().strftime("%Y%m%d%H%M%S")
+    return datetime.now().strftime("%Y%m%d%H%M%S")
 
 def run_the_make(rundir,logdir):
     os.chdir(rundir)
