@@ -7,12 +7,11 @@
 # <source node info here>
 #
 # Nodes are identified and organized by set (chassis number, oneoff or
-# four54). Eight random sets are chosen and one node is identified from
-# each for NSF parallel sync. Henceforth, each available source eligible
-# node scans for an unprocessed node, with the following preference
-# scheme:
+# four54). Eight nodes are chosen, each from a different set, for NFS
+# parallel sync. Henceforth, each available source eligible node scans
+# for an unprocessed node, with the following preference scheme:
 #
-# a. sets with no source eligible nodes
+# a. sets with no source eligible nodes (XXX: not yet implemented)
 # b. nodes within the same set as the source node
 # c. any unprocessed node
 # 
@@ -36,26 +35,28 @@ max_retries = 5
 statuses = ['unprocessed', 'running', 'complete', 'failed']
 
 rsync = '/usr/bin/rsync'
-rsync_args = '-rlptDL --delete --exclude="queries/" --exclude="ftpdownload/"'
+rsync_args = '-rlptDL --delete'
 rsync_ssh_args = '-e ssh'
 nfs_source = '/broad/data/blastdb/'
 local_dir = '/ibm_local/blastdb/'
 hostlists_dir = '/broad/tools/hostlists/'
 ssh = '/usr/bin/ssh'
 
-rsync = '/bin/echo'
-rsync_args = ''
-rsync_ssh_args = ''
+nfs_source = '/broad/test/apsg/faketree/'
+local_dir = '/var/tmp/faketree/'
+#rsync = '/broad/tools/scripts/fakersync'
 
 pids = {}
 nodes = {}
-nodes.update(dict.fromkeys(['node243', 'node244', 'node245', 'node246',
-                            'node247', 'node248', 'node249'],
-                           {'set': 'oneoffs', 'retries': 0,
-                            'status': 'unprocessed', 'pids':[] }))
-nodes.update(dict.fromkeys(['node126', 'node219', 'node220', 'node224'],
-                           {'set': 'four54', 'retries':0,
-                            'status': 'unprocessed', 'pids':[] }))
+
+for node in ['node243', 'node244', 'node245', 'node246',
+             'node247', 'node248', 'node249']:
+    nodes[node] = {'set': 'oneoffs', 'retries': 0,
+                   'status': 'unprocessed', 'pids':[]}
+
+for node in ['node126', 'node219', 'node220', 'node224']:
+    nodes[node] = {'set': 'four54', 'retries':0,
+                   'status': 'unprocessed', 'pids':[]}
 
 for chassis in ['01', '02', '03', '04','05', '06', '07',
                 '10', '13', '14', '15', '17']:
@@ -63,7 +64,7 @@ for chassis in ['01', '02', '03', '04','05', '06', '07',
     for node in open(hostlists_dir + setname):
         node = node.strip()
         nodes[node]={'set': setname, 'retries':0,
-                     'status':'unprocessed', 'pids':[] }
+                     'status':'unprocessed', 'pids':[]}
 
 ###
 # process handling (start/stop)
@@ -85,7 +86,10 @@ def rsync_ssh(srcnode,dstnode):
 
 def sigchld_handler(signum, stackframe):
     while pids:
-        pid, exitcode = os.waitpid(0,os.WNOHANG)
+        try:
+            pid, exitcode = os.waitpid(0,os.WNOHANG)
+        except OSError:
+            pid = 0
         if pid != 0:
             node = pids[pid]['dstnode']
             src = pids[pid].get('srcnode')
@@ -121,23 +125,25 @@ for node in nodes:
 
 # signal handling
 signal.signal(signal.SIGCHLD,sigchld_handler)
-signal.signal(signal.SIGALRM,signal.SIG_IGN)
+signal.signal(signal.SIGALRM,sigchld_handler)
 
 for node in candidates.values():
     rsync_nfs(node)
 
 while True:
-    can_update = []
-    need_update = []
+    # important! foo = bar = baz = [] makes them all references to the
+    # SAME empty list...  meaning that foo.append(item) adds it to all
+    # of them because it's in-place. tricky!
+    can_update, need_update, running_update = [],[],[]
     for node in nodes:
         if (nodes[node]['status'] == 'complete' and
             len(nodes[node]['pids']) <= node_parallel):
             can_update.append(node)
         elif nodes[node]['status'] == 'unprocessed':
             need_update.append(node)
-    print 'need',need_update
-    print 'can',can_update
-    if not need_update:
+        elif nodes[node]['status'] == 'running':
+            running_update.append(node)
+    if not need_update and not running_update:
         break
     for can in can_update:
         neighbors = [node for node in need_update
@@ -154,7 +160,5 @@ while True:
     signal.alarm(60)
     signal.pause()
 
-for node in nodes:
+for node in sorted(nodes.keys()):
     print node,nodes[node]['status']
-
-print 'done'
