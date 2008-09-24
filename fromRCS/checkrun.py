@@ -71,14 +71,12 @@ def check_cycles(rundir,cycles_done,cycles_expected):
     if cycle == 1:
         return (0,False)
     if (lastseen[('C',cycle_max['C'])] == lastseen[('C',1)]
-        and lastseen[('D',cycle_max['D'])] == lastseen[('D',1)]):
-        if (cycle_max['C'],cycle_max['D']) == cycles_expected:
+        and lastseen[('D',cycle_max['D'])] == lastseen[('D',1)]
+        and (cycle_max['C'],cycle_max['D']) == cycles_expected):
             # we're finished
             # return C assuming C >= D
-            return(cycle_max['C'],True)
-        else:
-            # return D assuming D <= C
-            return(cycle_max['D'],False)
+            return (cycle_max['C'],True)
+    return (cycle_max['D'],False)
 
 def check_recipe(recipe_file):
     seen_protocol = False
