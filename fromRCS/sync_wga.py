@@ -49,7 +49,7 @@ for node in ['node243', 'node244', 'node245', 'node246',
                    'status': 'unprocessed', 'pids':[]}
 
 for chassis in ['01', '02', '03', '04','05', '06', '07',
-                '10', '13', '14', '15', '17']:
+                '10', '11', '13', '14', '15', '17']:
     setname = 'blades'+chassis
     for node in open(hostlists_dir + setname):
         node = node.strip()
