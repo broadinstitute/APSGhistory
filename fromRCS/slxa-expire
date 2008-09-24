@@ -120,7 +120,7 @@ def main(sys_argv):
     update.execute("""UPDATE runs
     SET images_expire = CASE WHEN log_last_changed > last_sync_start
     THEN log_last_changed
-    ELSE last_sync_start END + 60
+    ELSE last_sync_start END + 45
     WHERE images_expire is null
     AND (log_last_changed < sysdate -14 and
     last_sync_start < sysdate -14)""")
@@ -146,7 +146,7 @@ def main(sys_argv):
             print
             print deck,"-" * 30
             last_deck = deck
-        if runs_this_deck > 3:
+        if runs_this_deck > 4:
             continue
         if check_run(run):
             runs_this_deck = runs_this_deck + 1
