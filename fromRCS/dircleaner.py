@@ -25,24 +25,17 @@ def handle_item(dir,file):
     if timestamp < exptime:
         status = ''
         if stat.S_ISDIR(mode):
-            if not options.dry_run:
-                try:
-                    print 'os.rmdir',path
-                except OSError:
-                    status = 'failed '
-            if options.verbose:
-                print status + 'rmdir:',path
+            dirlist.append(path)
         else:
-            if not options.dry_run:
-                try:
-                    print 'os.remove',path
-                except OSError:
-                    status = 'failed '
-            if options.verbose:
-                print status + 'rm:',path
+            filelist.append(path)
 
 def main():
-    global options, hasproc
+    global options
+    global hasproc,filelist,dirlist
+
+    hasproc = {}
+    filelist = []
+    dirlist = []
 
     usage = 'usage: %prog [options] directory ...'
     parser = OptionParser(usage)
@@ -56,7 +49,6 @@ def main():
     if len(args) == 0:
         parser.error('No directories given!')
 
-    hasproc = {}
     proclist = os.popen('ps --no-headers -eo uid')
     for line in proclist:
         hasproc[int(line)] = True
@@ -75,6 +67,22 @@ def main():
                     handle_item(dirname,dir)
         else:
             print 'skipping %s, use -f to force' % tree
+        for file in filelist:
+            if not options.dry_run:
+                try:
+                    print 'os.remove',path
+                except OSError:
+                    status = 'failed '
+            if options.verbose:
+                print status + 'rm:',path
+        for dir in dirlist:
+            if not options.dry_run:
+                try:
+                    print 'os.rmdir',path
+                except OSError:
+                    status = 'failed '
+            if options.verbose:
+                print status + 'rmdir:',path
 
 if __name__ == '__main__':
     main()
