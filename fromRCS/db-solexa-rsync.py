@@ -1,12 +1,32 @@
 #!/util/bin/python
 
-import cx_Oracle,sys,os,time,signal
+import cx_Oracle,os,signal,socket,sys,time
 import xml.sax.handler
 from datetime import datetime,timedelta
+
 
 # these must end with slash
 mirrdir = 'mirror/'
 logdir = 'logs/'
+
+# oracle connection string
+oraconn = 'slxasync/c0piiRn2@seqdel1'
+
+# design notes:
+# all datetime objects are to be handled as UTC, except possibly on output
+# (avoids DST problems)
+
+# from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/137270
+def ResultIter(cursor, arraysize=1000):
+    'An iterator that uses fetchmany to keep memory usage down'
+    while True:
+        results = cursor.fetchmany(arraysize)
+        if not results:
+            break
+        for result in results:
+            yield result
+
+orcl = cx_Oracle.connect(oraconn)
 
 class LogHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
@@ -65,15 +85,15 @@ def run_status(logfile):
     logfobj.close()
     return (handler.start_ok, handler.must_stop, handler.next_check)
 
-def check_host(host):
-    logpath = os.path.join(basedir,host,logdir)
+def check_deck(deck,basedir):
+    logpath = os.path.join(basedir,deck,logdir)
     if not os.path.exists(logpath):
         os.makedirs(logpath)
     if os.spawnlp(os.P_WAIT,'rsync',
                   'rsync','-a','--delete',
                   '--exclude=Focus*/','--exclude=Images*/',
                   '--exclude=Data*/',
-                  '%s::runs/' % host, logpath) != 0:
+                  '%s::runs/' % deck, logpath) != 0:
         sys.exit('rsync of logs failed')
     newest = {'time': 0, 'path': ''}
     for (dirname,dirs,files) in os.walk(logpath):
@@ -86,6 +106,7 @@ def check_host(host):
                 for line in xmllog:
                     if 'CONVERSION' in line:
                         foundconv = 1
+                        # XXX add run to database
                         break
                 xmllog.close()
                 if foundconv:
@@ -101,6 +122,7 @@ def check_host(host):
         run_dir = run_dir[len(logpath):]
     else:
         sys.exit('run_dir not in logpath: this should not happen')
+    # XXX update deck state in database
     return (run_dir,can_start,must_stop,next_check,newest['time'])
 
 def check_pid(pid):
@@ -120,14 +142,20 @@ def main():
     last_start = 0
     last_rundir = ''
     if len(sys.argv) > 1:
-        host = sys.argv[1].upper()
+        deck = sys.argv[1].upper()
     else:
-        sys.exit('must provide host on command line')
-    mirrpath = os.path.join(basedir,host,mirrdir)
+        sys.exit('must provide deck on command line')
+    # XXX check deck host/pid to see if we match
+    myname = socket.getfqdn()
+    mypid = os.getpid()
+    # XXX if we don't, check state_check_last for stale info
+    # XXX get basedir from database
+    mirrpath = os.path.join(basedir,deck,mirrdir)
     if not os.path.exists(mirrpath):
         os.makedirs(mirrpath)
     while True:
-        (rundir,start_ok,stop_now,next_check,log_mtime) = check_host(host)
+        (rundir,start_ok,stop_now,
+         next_check,log_mtime) = check_deck(deck, basedir)
         pidcheck = check_pid(pid)
         logmsg('run %s, start %s, stop %s, next %s, pid %s, chk %s' % 
                (rundir, start_ok, stop_now,next_check,pid,pidcheck))
@@ -149,7 +177,7 @@ def main():
             if start_ok:
                 pid = os.spawnlp(os.P_NOWAIT,'rsync',
                                  'rsync','-a','-v',
-                                 '%s::runs/%s' % ( host, rundir ),
+                                 '%s::runs/%s' % ( deck, rundir ),
                                  mirrpath)
                 last_start = time.time()
                 last_rundir = rundir
