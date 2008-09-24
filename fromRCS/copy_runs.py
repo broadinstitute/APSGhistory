@@ -406,8 +406,8 @@ def main():
         signal.pause()
         # reset the alarm; if sigchld woke us, we don't want it to go off later
         signal.alarm(0)
-        signal.signal(signal.SIGALRM,signal.SIG_IGN)
-        signal.signal(signal.SIGCHLD,signal.SIG_IGN)
+        signal.signal(signal.SIGALRM,signal.SIG_DFL)
+        signal.signal(signal.SIGCHLD,signal.SIG_DFL)
     # reached by break
     # before we exit, clean up database
     curs.execute('''UPDATE decks SET state='idle', transfer_host = NULL,
