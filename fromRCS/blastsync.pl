@@ -64,6 +64,7 @@ my $nfscmd = "$RSYNC $ARGS $SRCDIR $TGTDIR";
 
 my @nodes = ();
 my ($node, $rc, $cmd);
+my $err_flag = 0;
 my %tmp;
 my $bpc = 0;
 for my $chassis (@BCHASSIS) {
@@ -102,6 +103,7 @@ for my $n (0..$limit-1) {
   $rc = system($cmd);
   if ($rc) {
     warn "\"$cmd\" returned $rc";
+    $err_flag = 1;
   }
 }
 ##
@@ -112,6 +114,7 @@ $DEBUG and print STDERR "Running $cmd\n";
 $rc = system($cmd);
 if ($rc) {
   warn "\"$cmd\" returned $rc";
+  $err_flag = 1; 
 }
 
 ##
@@ -127,6 +130,7 @@ while (@nodes) {
     $rc = system($cmd);
     if ($rc) {
       warn "\"$cmd\" returned $rc";
+      $err_flag = 1; 
     }
   }
   ##
@@ -138,6 +142,7 @@ while (@nodes) {
   $rc = system($cmd);
   if ($rc) {
     warn "\"$cmd\" returned $rc";
+    $err_flag = 1; 
   }
   next;
   ##
@@ -152,6 +157,7 @@ while (@nodes) {
     $rc = system($cmd);
     if ($rc) {
       warn "\"$cmd\" returned $rc";
+      $err_flag = 1; 
     }
   }
   $node = shift @nodes;
@@ -161,6 +167,7 @@ while (@nodes) {
   $rc = system($cmd);
   if ($rc) {
     warn "\"$cmd\" returned $rc";
+    $err_flag = 1; 
   }
-  exit;
+  exit $err_flag;
 }
