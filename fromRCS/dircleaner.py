@@ -66,7 +66,7 @@ def main():
                     handle_item(dirname,dir)
         else:
             print 'skipping %s, use -f to force' % tree
-        for file in filelist:
+        for path in filelist:
             status = ''
             if not options.dry_run:
                 try:
@@ -75,7 +75,7 @@ def main():
                     status = 'failed '
             if options.verbose:
                 print status + 'rm:',path
-        for dir in dirlist:
+        for path in dirlist:
             status = ''
             if not options.dry_run:
                 try:
