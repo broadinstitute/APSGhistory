@@ -39,6 +39,7 @@ messagelines = []
 # decks check - last state update recent enough?
 curs.execute("""SELECT deck_name, state_check_last
              FROM decks
+             WHERE state != 'ignore'
              ORDER BY deck_name""")
 
 for row in ResultIter(curs):
