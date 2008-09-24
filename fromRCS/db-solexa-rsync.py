@@ -106,7 +106,7 @@ def update_run_info(deck,rundir,logpath,log_mtime):
     if not lastlogdate or lastlogdate > log_change:
         curs.execute("""MERGE INTO runs r USING dual ON (r.run_name = :rname)
         WHEN matched THEN
-        UPDATE SET log_last_changed = :mtime, log_currfile = :currfile
+        UPDATE SET log_last_changed = :mtime, log_currfile = :logcurr
         WHEN NOT matched THEN
         INSERT (run_name, deck_name, run_sourcepath, log_currfile,
                 log_last_changed, state)
