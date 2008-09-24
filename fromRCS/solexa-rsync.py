@@ -73,10 +73,12 @@ def run_status(logfile):
 
     # catch exception: xml.sax._exceptions.SAXParseException
     # if we catch that, finish up; file is incomplete
+    logfobj = open(logfile)
     try:
-        parser.parse(logfile)
+        parser.parse(logfobj)
     except xml.sax._exceptions.SAXParseException:
         pass
+    logfobj.close()
     return (handler.start_ok, handler.must_stop, handler.next_check)
 
 def check_host(host):
@@ -148,8 +150,10 @@ def main():
         if pidcheck == True:
             if stop_now:
                 os.kill(pid,signal.SIGSTOP)
+                logmsg('stopped pid %d' % pid)
             elif start_ok:
                 os.kill(pid,signal.SIGCONT)
+                logmsg('continued pid %d' % pid)
         else:
             # not running: no proc, or proc completed
             if pidcheck != False:
@@ -170,7 +174,7 @@ def main():
                     sys.exit(0)
             if start_ok:
                 pid = os.spawnlp(os.P_NOWAIT,'rsync',
-                                 'rsync','-a',
+                                 'rsync','-a','-v',
                                  '%s::runs/%s' % ( host, rundir ),
                                  mirrdir)
                 last_start = time.time()
