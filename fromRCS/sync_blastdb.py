@@ -26,7 +26,7 @@
 #
 #####
 
-import os, signal
+import os, signal, sys
 
 nfs_parallel = 8
 node_parallel = 2
@@ -36,15 +36,15 @@ statuses = ['unprocessed', 'running', 'complete', 'failed']
 
 subdirs = [ 'htgs', 'nt' ]
 
+semaphore_file = '.unpack_done'
+
 rsync = '/usr/bin/rsync'
-rsync_args = '-rlptDL --delete'
+rsync_args = '-rlptDL --delete --exclude=/' + semaphore_file
 rsync_ssh_args = '-e ssh'
 nfs_source = '/broad/data/blastdb/'
-local_dir = '/ibm_local/blastdb/'
+local_dir = '/local/blastdb/'
 hostlists_dir = '/broad/tools/hostlists/'
 ssh = '/usr/bin/ssh'
-
-rsync = '/broad/tools/scripts/fakersync'
 
 nfs_sources = [ nfs_source + subdir for subdir in subdirs ]
 local_sources = [ local_dir + subdir for subdir in subdirs ]
@@ -109,6 +109,13 @@ def sigchld_handler(signum, stackframe):
             pids.pop(pid)
         else:
             break
+
+###
+# check for successful unpack
+###
+
+if not os.path.exists(os.path.join(nfs_source,semaphore_file)):
+    sys.exit("No semaphore file - did unpack succeed?")
 
 ###
 # first pass NFS copies
