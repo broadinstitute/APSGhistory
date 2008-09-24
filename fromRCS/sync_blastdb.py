@@ -63,8 +63,7 @@ for node in ['node126', 'node219', 'node220', 'node224']:
                    'status': 'unprocessed', 'pids':[]}
 
 # note: if we add blades18 or later, update exception list
-for chassis in ['01', '02', '03', '04','05', '06', '07',
-                '11', '14', '15', '17']:
+for chassis in ['01', '02', '03', '04','05', '06', '07']
     setname = 'blades'+chassis
     for node in open(hostlists_dir + setname):
         node = node.strip()
