@@ -13,6 +13,8 @@ solexa_sw_dir = '/zpool1/ckdtest/SolexaPipeline-0.2.2.4'
 
 analysis_dest = '/broad/solexaproc/fromThumpers'
 
+flag_file = '.imageDir'
+
 make_args = ['-j5']
 
 cycle_regex = re.compile('/C1-(\d+)_Firecrest')
@@ -106,6 +108,14 @@ def update_rundir(run,rundir):
                  rname=run,a_dir=rundir)
     orcl.commit()
 
+def write_flagfile(dstdir,data):
+    dst_flagfile = os.path.join(dstdir,flag_file)
+    fp = open(dst_flagfile,"w")
+    if data:
+        fp.write(data)
+        fp.write("\n")
+    fp.close()
+
 def setup_dirs(src,dst):
     if not os.path.exists(dst):
         os.makedirs(dst)
@@ -118,6 +128,7 @@ def setup_dirs(src,dst):
     dst_data = os.path.join(dst,"Data")
     dst_focus = os.path.join(dst,"Focus")
     dst_images = os.path.join(dst,"Images")
+    dst_flagfile = os.path.join(dst,flag_file)
     if not os.path.exists(dst_data):
         os.makedirs(dst_data)
     if not os.path.exists(src_data):
@@ -126,6 +137,8 @@ def setup_dirs(src,dst):
         os.symlink(src_focus,dst_focus)
     if not os.path.exists(dst_images):
         os.symlink(src_images,dst_images)
+    if not os.path.exists(dst_flagfile):
+        write_flagfile(dst,None)
 
 def find_newest(basedir):
     newest_dir = ''
@@ -176,6 +189,8 @@ def main():
     datadir = os.path.join(results_dir,"Data")
     newest_dir = find_newest(datadir)
     print 'newest',newest_dir,'data',datadir
+    if run_state == 'complete':
+        last_copied = last_copied + 1
     print 'runinfo',analysis_dir,run_state,last_copied
     if newest_dir:
         # NB: we check analysis_dir for the last cycle DONE
@@ -189,7 +204,11 @@ def main():
         if build_makefiles(results_dir,last_copied,newest_dir):
             new_dir = find_newest(datadir)
             if run_the_make(new_dir):
-                update_rundir(run,new_dir)
+                if run_state == 'complete':
+                    write_flagfile(results_dir,new_dir[len(analysis_dir)+1:])
+                    update_rundir(run,None)
+                else:
+                    update_rundir(run,new_dir)
     unlock_run(run)
 
 if __name__ == '__main__':
