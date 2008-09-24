@@ -66,6 +66,10 @@ def check_cycles(rundir,cycles_already_done,cycles_expected):
         if cycles_done[cycle_type] >= cycles_needed[cycle_type]:
             cycles_completed[cycle_type] = (cycles_done[cycle_type],True)
             continue
+        # nothing to scan => we have everything up to the end of last cycle
+        if len(scandirs[cycle_type]) == 0:
+            cycles_completed[cycle_type] = (cycles_done[cycle_type],False)
+            continue
         for scantuple in sorted(scandirs[cycle_type]):
             (cycle,scandir) = scantuple
             try:
@@ -133,6 +137,7 @@ def main():
                  rname=run);
     result = curs.fetchone()
     if result:
+        print 'result is',result
         (deck,run_srcpath,C_cycles_done,D_cycles_done) = result
     else:
         sys.exit('run not found in database')
