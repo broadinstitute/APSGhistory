@@ -237,8 +237,6 @@ def main():
                 if run_state == 'complete':
                     write_flagfile(sync_dir,
                                    new_dir[len(results_dir)-len(run):])
-                    write_flagfile(results_dir,
-                                   new_dir[len(results_dir)-len(run):])
                     update_rundir(run,None)
                 else:
                     update_rundir(run,new_dir)
