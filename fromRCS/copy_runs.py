@@ -340,6 +340,7 @@ def main():
                 elif exit_status != 0:
                     # failed; set run back to pending and unsynced
                     set_run_status(last_run,'pending',last_sync=datetime.utcfromtimestamp(0))
+                    cycle_times[last_run] = {}
             if start_ok:
                 rundir = find_eligible_run(deck)
                 if not rundir:
