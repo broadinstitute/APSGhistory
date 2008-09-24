@@ -240,6 +240,10 @@ def main():
                     update_rundir(run,None)
                 else:
                     update_rundir(run,new_dir)
+    elif run_state == 'complete':
+        # we don't need to run anything, but may need to clean up complete run
+        write_flagfile(sync_dir, new_dir[len(results_dir)-len(run):])
+        update_rundir(run,None)
     unlock_run(run)
 
 if __name__ == '__main__':
