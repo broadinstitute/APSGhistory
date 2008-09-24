@@ -219,9 +219,10 @@ def main():
     if newest_dir:
         # NB: we check analysis_dir for the last cycle DONE
         # even though the newest_dir may be for a newer cycle
-        match = cycle_regex.search(analysis_dir)
-        if match:
-            prev_cycle = int(match.group(1))
+        if analysis_dir:
+            match = cycle_regex.search(analysis_dir)
+            if match:
+                prev_cycle = int(match.group(1))
     print 'prev',prev_cycle
     if prev_cycle < last_copied:
         # okay, we have a winner
