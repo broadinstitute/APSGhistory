@@ -118,10 +118,14 @@ def write_flagfile(dstdir,data):
     fp.close()
 
 def setup_dirs(src,dst):
+    src_flagfile = os.path.join(src,flag_file)
+    if not os.path.exists(src_flagfile):
+        write_flagfile(src,None)
     if not os.path.exists(dst):
         os.makedirs(dst)
     os.spawnlp(os.P_WAIT,'rsync','rsync','-av',
-               '--exclude=/Data', '--exclude=/Images/', '--exclude=/Focus/',
+               '--exclude=/Data', '--exclude=/Images/',
+               '--exclude=/Focus/', '--exclude=/Focus0/',
                src + '/', dst + '/')
     src_data = os.path.join(src,"Data")
     src_focus = os.path.join(src,"Focus")
@@ -129,7 +133,6 @@ def setup_dirs(src,dst):
     dst_data = os.path.join(dst,"Data")
     dst_focus = os.path.join(dst,"Focus")
     dst_images = os.path.join(dst,"Images")
-    dst_flagfile = os.path.join(dst,flag_file)
     if not os.path.exists(dst_data):
         os.makedirs(dst_data)
     if not os.path.exists(src_data):
@@ -138,8 +141,6 @@ def setup_dirs(src,dst):
         os.symlink(src_focus,dst_focus)
     if not os.path.exists(dst_images):
         os.symlink(src_images,dst_images)
-    if not os.path.exists(dst_flagfile):
-        write_flagfile(dst,None)
 
 def find_newest(basedir):
     newest_dir = ''
