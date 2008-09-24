@@ -98,6 +98,9 @@ def run_status(logfile):
     handler = LogHandler()
     parser.setContentHandler(handler)
 
+    if not logfile:
+        sys.exit("no logfiles found")
+
     # catch exception: xml.sax._exceptions.SAXParseException
     # if we catch that, finish up; file is incomplete
     logfobj = open(logfile)
