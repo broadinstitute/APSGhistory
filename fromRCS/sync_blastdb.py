@@ -53,7 +53,7 @@ pids = {}
 nodes = {}
 
 for node in ['node135', 'node136', 'node140',
-             'node243', 'node244', 'node245', 'node246',
+             'node243', 'node245', 'node246',
              'node247', 'node248', 'node249']:
     nodes[node] = {'set': 'oneoffs', 'retries': 0,
                    'status': 'unprocessed', 'pids':[]}
