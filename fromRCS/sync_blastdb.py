@@ -52,7 +52,8 @@ local_sources = [ local_dir + subdir for subdir in subdirs ]
 pids = {}
 nodes = {}
 
-for node in ['node243', 'node244', 'node245', 'node246',
+for node in ['node135', 'node136', 'node137', 'node138', 'node139', 'node140',
+             'node243', 'node244', 'node245', 'node246',
              'node247', 'node248', 'node249']:
     nodes[node] = {'set': 'oneoffs', 'retries': 0,
                    'status': 'unprocessed', 'pids':[]}
@@ -62,7 +63,7 @@ for node in ['node126', 'node219', 'node220', 'node224']:
                    'status': 'unprocessed', 'pids':[]}
 
 for chassis in ['01', '02', '03', '04','05', '06', '07',
-                '10', '13', '14', '15', '17']:
+                '11', '13', '14', '15', '17']:
     setname = 'blades'+chassis
     for node in open(hostlists_dir + setname):
         node = node.strip()
