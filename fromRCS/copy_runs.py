@@ -53,8 +53,8 @@ def pid_exists(pid):
 def handler_noop(signum,frame):
     pass
 
-signal.signal(signal.SIGALRM,noop)
-signal.signal(signal.SIGCHLD,noop)
+signal.signal(signal.SIGALRM,handler_noop)
+signal.signal(signal.SIGCHLD,handler_noop)
 
 orcl = cx_Oracle.connect(oraconn)
 curs = orcl.cursor()
