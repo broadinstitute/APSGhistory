@@ -15,7 +15,7 @@ the_time = datetime.utcnow().replace(microsecond=0,tzinfo=utc)
 exp_time = timedelta(hours=2)
 slop_time = timedelta(minutes=5)
 
-#ignore_these = ['SL-XAE','SL-XAP']
+#ignore_these = ['SL-XAN','SL-XAR']
 ignore_these = ['']
 
 from_addr = 'apsg@broad.mit.edu'
@@ -70,7 +70,10 @@ for row in ResultIter(curs):
     (deck,run,r_state,r_lastchg) = row
     if deck in ignore_these:
         continue
-    r_lastchg = r_lastchg.replace(tzinfo=utc)
+    try:
+        r_lastchg = r_lastchg.replace(tzinfo=utc)
+    except AttributeError:
+        continue
     r_lastchg_age = the_time - r_lastchg
     if r_lastchg - slop_time > the_time:
         messagelines.append("%s: %s log change in the future (%s)" % (
