@@ -197,8 +197,7 @@ def get_basedir(deck):
                          myname=myname,mypid=mypid,dname=deck)
         else:
             return (None,'deck %s locked by %s:%s' % (deck,t_host,t_pid))
-    else:
-        return (basedir,None)
+    return (basedir,None)
 
 def set_run_status(run,state):
     curs.execute('UPDATE runs SET state = :rstate WHERE run_name = :rname',
