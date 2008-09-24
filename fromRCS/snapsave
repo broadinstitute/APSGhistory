@@ -1,0 +1,68 @@
+#!/usr/local/bin/python
+
+from datetime import date,timedelta
+from subprocess import *
+import getopt,re,sys
+
+snapname = '@bkup'
+datefmt = '%Y%m%d'
+
+try:
+    opts,args = getopt.getopt(sys.argv[1:],'d:')
+except getopt.GetoptError:
+    usage()
+    sys.exit(2)
+
+keepdays = 60
+for o,a in opts:
+    if o == '-d':
+        keepdays = int(a)
+
+if len(args) == 0:
+    args = ['zpool1/']
+
+if not len(args) == 1:
+    sys.exit("one (and only one) regexp needed")
+
+name_re = re.compile(args[0])
+
+keepfor = timedelta(days=keepdays)
+
+today = date.today()
+expiry = today - keepfor
+
+today_str = today.strftime(datefmt)
+expiry_str = expiry.strftime(datefmt)
+
+# check for scrub in progress
+zpool_status = Popen(['zpool','status'],stdout=PIPE)
+
+(status_out,status_err) = zpool_status.communicate()
+
+if "scrub: scrub in progress" in status_out:
+    sys.exit("aborting - scrub in progress")
+
+zfs_list = Popen(['zfs','list'],stdout=PIPE)
+
+for line in zfs_list.stdout:
+    name = line.split()[0]
+    if '@' in name:
+        # skip any snapshots that this script didn't create
+        if not snapname in name:
+            continue
+        basename = name[0:name.index('@')]
+        # does it match the pattern we're looking for?
+        if not name_re.search(basename):
+            continue
+        datestart = name.rindex(snapname) + len(snapname)
+        snapdate = name[datestart:]
+        if snapdate < expiry_str:
+            try:
+                check_call(['zfs','destroy',name])
+            except CalledProcessError:
+                print "zfs destroy of",name,"failed"
+    elif name_re.search(name):
+        try:
+            check_call(['zfs','snapshot',name + snapname + today_str])
+        except CalledProcessError:
+            print "zfs snapshot of",name,"failed"
