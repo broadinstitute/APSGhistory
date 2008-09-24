@@ -264,7 +264,7 @@ def write_exclude_file(destpath,rundir):
         lastsync = result[0]
     else:
         lastsync = None
-    destdir = os.path.join(destpath,rundir)
+    destdir = os.path.join(destpath,run)
     if not os.path.exists(destdir):
         os.makedirs(destdir)
     excludepath = os.path.join(destdir,excludefile)
