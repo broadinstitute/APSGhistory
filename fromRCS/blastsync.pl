@@ -21,8 +21,8 @@
 ##
 use strict;
 
-my @BCHASSIS = qw[ 01 02 03 04 05 06 07 10 13 14 15 17 ];
-my @ONEOFFS  = qw[ node243 node244 node245 node246 node247 node248 node249 ];
+my @BCHASSIS = qw[ 01 02 03 05 06 07 10 13 14 15 17 ];
+my @ONEOFFS  = qw[ node043 node045 node046 node047 node048 node049 node050 node051 node052 node053 node054 node055 node056 node243 node244 node245 node246 node247 node248 node249 ];
 my @FOUR54   = qw[ node126 node219 node220 node224 ];
 
 my $SYNCWIDTH = 0;
