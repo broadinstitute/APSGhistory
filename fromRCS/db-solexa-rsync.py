@@ -76,9 +76,9 @@ class LogHandler(xml.sax.handler.ContentHandler):
             self.deck_state = 'running'
             if '\\D' in self.last_conv_path:
                 solution = int(attributes.get('Solution'))
-                if solution in [1, 5]:
+                if solution in [4]:
                     self.start_ok = False
-                elif solution in [3, 4]:
+                elif solution in [3]:
                     self.in_gap = False
             else:
                 self.start_ok = True
