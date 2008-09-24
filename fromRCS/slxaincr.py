@@ -12,8 +12,11 @@ from subprocess import *
 
 solexa_sw_dir = '/broad/tools/solexa/pipeline'
 
-analysis_dest = '/broad/solexaproc'
+analysis_dest = '/slxa'
 analysis_suffix = 'analyzed'
+
+compat_symlink_dest = '/broad/solexaproc'
+compat_symlink_suffix = 'analyzed'
 
 flag_file = '.imageDir'
 
@@ -121,7 +124,7 @@ def write_flagfile(dstdir,data):
         fp.write("\n")
     fp.close()
 
-def setup_dirs(src,dst):
+def setup_dirs(src,dst,symlinkfrom=None):
     src_flagfile = os.path.join(src,flag_file)
     if not os.path.exists(src_flagfile):
         write_flagfile(src,None)
@@ -155,6 +158,8 @@ def setup_dirs(src,dst):
         os.symlink(src_focus,dst_focus)
     if not os.path.exists(dst_images):
         os.symlink(src_images,dst_images)
+    if symlinkfrom and not os.path.exists(symlinkfrom):
+        os.symlink(dst,symlinkfrom)
 
 def find_newest(basedir):
     newest_dir = ''
@@ -209,12 +214,11 @@ def main():
     (analysis_dir,run_state,last_copied) = get_runinfo(run)
     sync_dir = os.path.join(xferbase,"mirror",run)
     results_dir = os.path.join(analysis_dest,deck,analysis_suffix,run)
-    setup_dirs(sync_dir,results_dir)
+    compat_link = os.path.join(compat_symlink_dest,deck,compat_symlink_suffix,run)
+    setup_dirs(sync_dir,results_dir,symlinkfrom=compat_link)
     datadir = os.path.join(results_dir,"Data")
     newest_dir = find_newest(datadir)
     print 'newest',newest_dir,'data',datadir
-    if run_state == 'complete':
-        last_copied = last_copied + 1
     print 'runinfo',analysis_dir,run_state,last_copied
     if newest_dir:
         # NB: we check analysis_dir for the last cycle DONE
