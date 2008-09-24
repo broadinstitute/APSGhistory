@@ -150,7 +150,7 @@ def check_deck(deck,basedir):
                   '--exclude=Data*/',
                   '%s::runs/' % deck, logpath) != 0:
         sys.exit('rsync of logs failed')
-    newest = {'time': 0, 'path': ''}
+    newest = {'time': datetime.utcfromtimestamp(0), 'path': ''}
     for (dirname,dirs,files) in os.walk(logpath):
         for file in files:
             if (file.startswith('Log.xml_') or file.startswith('RunLog_')) \
@@ -254,7 +254,7 @@ def find_eligible_run(deck):
     else:
         return None
 
-def get_log_mtime(run)
+def get_log_mtime(run):
     curs.execute("SELECT log_last_changed FROM runs WHERE run_name = :rname",
                  rname=run)
     retval = curs.fetchone()
