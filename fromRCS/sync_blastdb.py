@@ -53,6 +53,8 @@ pids = {}
 nodes = {}
 
 for node in ['node135', 'node136', 'node140',
+             'node174', 'node175', 'node176', 'node177',
+             'node181', 'node182',
              'node243', 'node244', 'node245', 'node246',
              'node247', 'node248', 'node249']:
     nodes[node] = {'set': 'oneoffs', 'retries': 0,
@@ -62,8 +64,9 @@ for node in ['node126', 'node219', 'node220', 'node224']:
     nodes[node] = {'set': 'four54', 'retries':0,
                    'status': 'unprocessed', 'pids':[]}
 
+# note: if we add blades18 or later, update exception list
 for chassis in ['01', '02', '03', '04','05', '06', '07',
-                '11', '13', '14', '15', '17']:
+                '11', '14', '15', '17']:
     setname = 'blades'+chassis
     for node in open(hostlists_dir + setname):
         node = node.strip()
