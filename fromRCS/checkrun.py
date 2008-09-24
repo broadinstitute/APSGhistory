@@ -57,16 +57,18 @@ def check_cycles(basedir,run,logfiles):
             os.chdir(scandir)
         except OSError:
             print 'could not chdir to %s' % scandir
-            if cycle < missingcycle:
-                missingcycle = cycle
-        for fname in os.listdir(scandir):
-            scandirs[scandir].pop(fname,None)
-        if len(scandirs[scandir]):
-            # we're missing something in this directory!
             missing = True
-            # we only care about the cycle number, not the actual filename
             if cycle < missingcycle:
                 missingcycle = cycle
+        else:
+            for fname in os.listdir(scandir):
+                scandirs[scandir].pop(fname,None)
+            if len(scandirs[scandir]):
+                # we're missing something in this directory!
+                missing = True
+                # we only care about the cycle number, not the actual filename
+                if cycle < missingcycle:
+                    missingcycle = cycle
     if missing:
         return missingcycle - 1
     # if all files exist, check if last cycle is actually complete
