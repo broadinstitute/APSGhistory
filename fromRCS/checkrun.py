@@ -42,6 +42,8 @@ def check_cycles(rundir,cycles_already_done,cycles_expected):
             match = pathre.search(line)
             if match:
                 path = match.group(1)
+                if run not in path:
+                    continue
                 # convert filename to unix path relative to rundir
                 pathitems = path.split('\\')
                 pathitems = pathitems[pathitems.index(run)+1:]
