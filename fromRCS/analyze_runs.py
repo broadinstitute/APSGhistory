@@ -6,7 +6,7 @@ os.environ['ORACLE_HOME'] = '/oracle/apps/oracle/product/101'
 os.environ['LD_LIBRARY_PATH'] = '/oracle/apps/oracle/product/101/lib'
 os.environ['PATH'] = '/usr/local/bin:%s' % os.environ['PATH']
 
-import cx_Oracle,errno,re,signal,socket,stat,sys,time
+import cx_Oracle,errno,re,signal,socket,stat,subprocess,sys,time
 from datetime import datetime,timedelta
 
 solexa_sw_dir = '/broad/tools/solexa/src/SolexaPipeline-0.2.2.4'
@@ -186,18 +186,12 @@ def dtstring():
     return datetime.now().strftime("%Y%m%d%H%M%S")
 
 def run_the_make(rundir,logdir):
-    os.chdir(rundir)
     cycpart = os.path.basename(rundir).split('_')[0]
     logfile = os.path.join(logdir, "firecrestAnalysis%s.%s.out" %
                            (dtstring(), cycpart))
-    saveout = sys.stdout
-    saveerr = sys.stderr
     logfp = open(logfile,"w")
-    sys.stdout = logfp
-    sys.stderr = logfp
-    retval = os.spawnvp(os.P_WAIT,'make',['make'] + make_args)
-    sys.stdout = saveout
-    sys.stderr = saveerr
+    retval = subprocess.call(['make'] + make_args,stdout=logfp,stderr=STDOUT,
+                             cwd=rundir)
     logfp.close()
     if retval == 0:
         return True
