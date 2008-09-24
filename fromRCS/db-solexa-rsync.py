@@ -103,9 +103,9 @@ def update_run_info(deck,rundir,logpath,log_mtime):
         curs.execute("""MERGE INTO runs r USING dual ON (r.run_name = :rname)
         WHEN matched THEN UPDATE SET log_last_changed = :mtime
         WHEN NOT matched THEN
-        INSERT (run_name, deck_name, log_last_changed, state)
-        VALUES (:rname,:dname,:mtime,:state)""",
-                     rname=run_name,dname=deck,
+        INSERT (run_name, deck_name, run_sourcepath, log_last_changed, state)
+        VALUES (:rname,:dname,:rpath,:mtime,:state)""",
+                     rname=run_name,dname=deck,rpath=rundir,
                      mtime=log_change,state='pending')
 
 def check_deck(deck,basedir):
