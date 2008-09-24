@@ -12,10 +12,16 @@ oraconn = 'slxasync/c0piiRn2pr@seqprod'
 
 pathre = re.compile('<CONVERSION.*Path="([^"]+?)"')
 
-def check_cycles(basedir,run,logfiles,cycles_done,cycles_expected):
+def check_cycles(rundir,cycles_done,cycles_expected):
+    run = os.path.basename(rundir)
     lastseen = {}
     scandirs = {}
     cycle_max = {}
+    
+    logfiles = glob.glob(os.path.join(rundir,"RunLog*.xml"))
+    # we depend on the filenames lexically sorting in chronological order
+    logfiles.sort()
+
     # read the list of files to look for into memory
     # (why not check for os.path.exists as we go?
     #  two reasons:
@@ -40,8 +46,7 @@ def check_cycles(basedir,run,logfiles,cycles_done,cycles_expected):
                 else:
                     sys.exit("could not find cycle in path %s" % path)
                 if cycle > cycles_done:
-                    imagedir = os.path.join(basedir,'mirror',
-                                            run,*pathitems[:-1])
+                    imagedir = os.path.join(rundir,*pathitems[:-1])
                     scandirs.setdefault((cycle,imagedir),{})[fname] = 1
         lfp.close()
     # now that we have the list in memory, do an efficient listdir
@@ -120,20 +125,20 @@ def main():
     else:
         sys.exit('deck not found in database')
 
-    runlogs_dir = os.path.join(basedir,'logs',run_srcpath)
+    run_dir = os.path.join(basedir,'mirror',run)
 
-    logfiles = glob.glob(os.path.join(runlogs_dir,"RunLog*.xml"))
+    logfiles = glob.glob(os.path.join(run_dir,"RunLog*.xml"))
     # we depend on the filenames lexically sorting in chronological order
     logfiles.sort()
 
-    recipes = glob.glob(os.path.join(runlogs_dir,"Recipe*.xml"))
+
+    recipes = glob.glob(os.path.join(run_dir,"Recipe*.xml"))
     if len(recipes) != 1:
         sys.exit("no recipe file, or multiple recipe files")
 
     cycles_needed = check_recipe(recipes[0])
 
-    complete_cycle = check_cycles(basedir,run,logfiles,
-                                  cycles_done,cycles_needed)
+    complete_cycle = check_cycles(run_dir,cycles_done,cycles_needed)
     print complete_cycle
     # XXX FIXME check for stalled run/stalled copy
     # stalled run: 'syncing' or 'running' and no log change in N hours
