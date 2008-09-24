@@ -153,7 +153,7 @@ def find_newest(basedir):
     newest_time = 0
     for item in os.listdir(basedir):
         item_path = os.path.join(basedir,item)
-        if os.path.isdir(item_path) and item.startswith("C1-"):
+        if os.path.isdir(item_path) and item.startswith("C1"):
             item_mtime = os.path.getmtime(item_path)
             if item_mtime > newest_time:
                 newest_time = item_mtime
@@ -177,7 +177,10 @@ def build_makefiles(basedir,cycle,old_dir):
 
 def run_the_make(rundir):
     os.chdir(rundir)
+    # need logfile name
+    # reopen stdout/stderr to logfile name
     retval = os.spawnvp(os.P_WAIT,'make',['make'] + make_args)
+    # close logfile
     if retval == 0:
         return True
     return False
