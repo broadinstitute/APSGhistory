@@ -17,7 +17,7 @@ stampfile = 'SyncComplete'
 excludefile = '.rsync_exclude'
 
 # oracle connection string
-oraconn = 'slxasync/c0piiRn2@seqdel1'
+oraconn = 'slxasync/c0piiRn2pr@seqprod'
 
 cycle_times = {}
 
