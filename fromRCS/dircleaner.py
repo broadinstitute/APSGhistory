@@ -23,7 +23,6 @@ def handle_item(dir,file):
         # sockets, devices, whatever: ignore them
         return
     if timestamp < exptime:
-        status = ''
         if stat.S_ISDIR(mode):
             dirlist.append(path)
         else:
@@ -68,6 +67,7 @@ def main():
         else:
             print 'skipping %s, use -f to force' % tree
         for file in filelist:
+            status = ''
             if not options.dry_run:
                 try:
                     print 'os.remove',path
@@ -76,6 +76,7 @@ def main():
             if options.verbose:
                 print status + 'rm:',path
         for dir in dirlist:
+            status = ''
             if not options.dry_run:
                 try:
                     print 'os.rmdir',path
