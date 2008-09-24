@@ -39,7 +39,7 @@ subdirs = [ 'htgs', 'nt' ]
 semaphore_file = '.unpack_done'
 
 rsync = '/usr/bin/rsync'
-rsync_args = '-rlptDL --delete --exclude=/' + semaphore_file
+rsync_args = '-rlptDL --delete --timeout=600'
 rsync_ssh_args = '-e ssh'
 nfs_source = '/broad/data/blastdb/'
 local_dir = '/local/blastdb/'
@@ -114,7 +114,7 @@ def sigchld_handler(signum, stackframe):
 # check for successful unpack
 ###
 
-if not os.path.exists(os.path.join(nfs_source,semaphore_file)):
+if not os.path.exists(nfs_source + semaphore_file):
     sys.exit("No semaphore file - did unpack succeed?")
 
 ###
