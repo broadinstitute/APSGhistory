@@ -211,7 +211,11 @@ def find_eligible_run(deck):
     curs.execute("""SELECT run_sourcepath FROM runs
     WHERE deck_name = :dname AND (state = 'syncing' OR state = 'pending')
     ORDER BY log_last_changed ASC""",dname=deck)
-    return curs.fetchone()
+    retval = curs.fetchone()
+    if retval:
+        return retval[0]
+    else:
+        return None
 
 def main():
     pid = 0
