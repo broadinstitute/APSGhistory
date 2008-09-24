@@ -4,7 +4,7 @@ import sys
 
 sys.path.append('/broad/tools/lib/python2.4/site-packages/')
 
-import cx_Oracle,errno,os,re,signal,socket,time
+import cx_Oracle,errno,os,re,signal,socket,stat,time
 from datetime import datetime,timedelta
 
 os.environ['PATH'] = '/usr/local/bin:' + os.environ['PATH']
@@ -19,6 +19,8 @@ flag_file = '.imageDir'
 make_args = ['-j5']
 
 cycle_regex = re.compile('/C1-(\d+)_Firecrest')
+
+sequence_gid = 52
 
 # oracle connection string
 oraconn = 'slxasync/c0piiRn2pr@seqprod'
@@ -137,6 +139,9 @@ def setup_dirs(src,dst):
     dst_logs = os.path.join(dst,"logs")
     if not os.path.exists(dst_data):
         os.makedirs(dst_data)
+    dst_data_stat = os.stat(dst_data)
+    os.chmod(dst_data,dst_data_stat.st_mode | stat.S_ISGID)
+    os.chown(dst_data,-1,sequence_gid)
     if not os.path.exists(src_data):
         os.symlink(dst_data,src_data)
     if not os.path.exists(dst_logs):
