@@ -5,17 +5,15 @@ import sys
 sys.path.append('/broad/tools/lib/python2.4/site-packages/')
 
 import cx_Oracle,glob,os,re
-#from datetime import datetime
 
 # oracle connection string
 oraconn = 'slxasync/c0piiRn2pr@seqprod'
 
 pathre = re.compile('<CONVERSION.*Path="([^"]+?)"')
 
-def check_cycles(basedir,run,logfiles):
+def check_cycles(basedir,run,logfiles,cycles_done):
     lastseen = {}
     scandirs = {}
-    cycle = 1
     # read the list of files to look for into memory
     # (why not check for os.path.exists as we go?
     #  two reasons:
@@ -37,16 +35,14 @@ def check_cycles(basedir,run,logfiles):
                     lastseen[cycle] = fname
                 else:
                     sys.exit("could not find cycle in path %s" % path)
-                imagedir = os.path.join(basedir,'mirror',run,*pathitems[:-1])
-                scandirs.setdefault((cycle,imagedir),{})[fname] = 1
+                if cycle > cycles_done:
+                    imagedir = os.path.join(basedir,'mirror',
+                                            run,*pathitems[:-1])
+                    scandirs.setdefault((cycle,imagedir),{})[fname] = 1
         lfp.close()
     # now that we have the list in memory, do an efficient listdir
     # across each of the directories and remove files that we find exist.
     # after that, if anything is left we are missing a file.
-    # XXX FIXME optimizations:
-    # - don't rescan older dirs
-    # (check the DB's copied cycles, we don't have to keep rechecking them,
-    #   just as the rsync can ignore them)
     for scantuple in sorted(scandirs):
         print scantuple
         (cycle,scandir) = scantuple
@@ -80,12 +76,12 @@ def main():
     orcl = cx_Oracle.connect(oraconn)
     curs = orcl.cursor()
 
-    curs.execute("""SELECT deck_name,run_sourcepath FROM runs
+    curs.execute("""SELECT deck_name,run_sourcepath,last_cycle_copied FROM runs
     WHERE run_name = :rname""",
                  rname=run);
     result = curs.fetchone()
     if result:
-        (deck,run_srcpath) = result
+        (deck,run_srcpath,cycles_done) = result
     else:
         sys.exit('run not found in database')
 
@@ -104,7 +100,7 @@ def main():
     # we depend on the filenames lexically sorting in chronological order
     logfiles.sort()
 
-    complete_cycle = check_cycles(basedir,run,logfiles)
+    complete_cycle = check_cycles(basedir,run,logfiles,cycles_done)
     print complete_cycle
     # XXX FIXME check  how many cycles there SHOULD BE
     # and complete run as appropriate
