@@ -70,7 +70,7 @@ def main():
             status = ''
             if not options.dry_run:
                 try:
-                    print 'os.remove',path
+                    os.remove(path)
                 except OSError:
                     status = 'failed '
             if options.verbose:
@@ -79,7 +79,7 @@ def main():
             status = ''
             if not options.dry_run:
                 try:
-                    print 'os.rmdir',path
+                    os.rmdir(path)
                 except OSError:
                     status = 'failed '
             if options.verbose:
