@@ -12,6 +12,9 @@ from subprocess import *
 fromaddr = 'apsg@broad.mit.edu'
 toaddr = 'solexa-image-expiry@broad.mit.edu'
 
+expire_days = 21
+notice_days = 6
+
 utc = pytz.utc
 local = pytz.timezone('US/Eastern')
 output_fmt = '%Y-%m-%d %H:%M:%S %Z%z'
@@ -103,9 +106,9 @@ def main(sys_argv):
     curs.execute("""SELECT deck_name,RUN_NAME from runs
     where sys_extract_utc(systimestamp)>images_Expire
     and state != 'ignore'
-    and image_expiry_notice_sent + 6 <
+    and image_expiry_notice_sent + %d <
     sys_extract_utc(systimestamp)
-    order by deck_name,images_expire""")
+    order by deck_name,images_expire""" % notice_days)
     for row in ResultIter(curs):
         (deck,run) = row
         runpath = os.path.join('/slxa',deck,'transfer/mirror',run)
@@ -120,10 +123,10 @@ def main(sys_argv):
     update.execute("""UPDATE runs
     SET images_expire = CASE WHEN log_last_changed > last_sync_start
     THEN log_last_changed
-    ELSE last_sync_start END + 45
+    ELSE last_sync_start END + %d
     WHERE images_expire is null
     AND (log_last_changed < sysdate -14 and
-    last_sync_start < sysdate -14)""")
+    last_sync_start < sysdate -14)""" % expire_days)
     orcl.commit()
     curs.execute("""SELECT deck_name,RUN_NAME,images_expire from runs
     where sys_extract_utc(systimestamp)>images_Expire
