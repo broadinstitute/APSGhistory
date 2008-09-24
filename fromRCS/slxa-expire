@@ -13,7 +13,7 @@ fromaddr = 'apsg@broad.mit.edu'
 toaddr = 'solexa-image-expiry@broad.mit.edu'
 
 expire_days = 14
-notice_days = 0
+notice_days = 6
 
 utc = pytz.utc
 local = pytz.timezone('US/Eastern')
