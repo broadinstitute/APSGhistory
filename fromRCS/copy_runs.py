@@ -70,7 +70,8 @@ class LogHandler(xml.sax.handler.ContentHandler):
                 self.in_gap = False
             # int(float()) to turn "23.1" into 23.1 into 23
             # N.B. we return *current* (prob incomplete) cycle
-            self.last_cycle = int(float(cycle_dir[1:]))
+            if cycle_dir[1] in "0123456789":
+                self.last_cycle = int(float(cycle_dir[1:]))
         elif name == 'PUMP_TO_FLOWCELL':
             self.in_gap = True
             self.deck_state = 'running'
