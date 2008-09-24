@@ -1,13 +1,9 @@
 #!/util/bin/python
 
-import sys
-
-sys.path.append('/broad/tools/lib/python2.4/site-packages/')
-
-import cx_Oracle,os,signal,socket,time
+import cx_Oracle,glob,os,signal,socket,sys,time
 import xml.sax.handler
+import checkrun
 from datetime import datetime,timedelta
-
 
 # these must end with slash
 mirrdir = 'mirror/'
@@ -18,8 +14,6 @@ excludefile = '.rsync_exclude'
 
 # oracle connection string
 oraconn = 'slxasync/c0piiRn2pr@seqprod'
-
-cycle_times = {}
 
 # design notes:
 # all datetime objects are to be handled as UTC, except possibly on output
@@ -54,7 +48,6 @@ class LogHandler(xml.sax.handler.ContentHandler):
         self.must_stop = True
         self.deck_state = 'unknown'
         self.last_conv_path = ''
-        self.last_cycle = 0
         self.next_check = 15 * 60
     
     def startElement(self,name,attributes):
@@ -68,10 +61,6 @@ class LogHandler(xml.sax.handler.ContentHandler):
                 self.start_ok = True
             else:
                 self.in_gap = False
-            # int(float()) to turn "23.1" into 23.1 into 23
-            # N.B. we return *current* (prob incomplete) cycle
-            if cycle_dir[1] in "0123456789":
-                self.last_cycle = int(float(cycle_dir[1:]))
         elif name == 'PUMP_TO_FLOWCELL':
             self.in_gap = True
             self.deck_state = 'running'
@@ -118,7 +107,7 @@ def run_status(logfile):
         pass
     logfobj.close()
     return (handler.start_ok, handler.must_stop,
-            handler.next_check, handler.deck_state, handler.last_cycle)
+            handler.next_check, handler.deck_state)
 
 def update_run_info(deck,rundir,logfile,log_change):
     run_name = os.path.basename(rundir)
@@ -180,12 +169,7 @@ def check_deck(deck,basedir):
     logmsg('parsing logfile %s, mtime %s' % (newest['path'],
                                              newest['time'].ctime()))
     (can_start, must_stop,
-     next_check_secs, deck_state, last_cycle) = run_status(newest['path'])
-    if not newest['name'] in cycle_times:
-        cycle_times[newest['name']] = {}
-    # xrange will give 1-(last-1), so we won't get the partial cycle
-    for cyc in xrange(1,last_cycle):
-        cycle_times[newest['name']].setdefault(cyc, newest['time'])
+     next_check_secs, deck_state) = run_status(newest['path'])
     # update deck state in database
     this_check = datetime.utcnow()
     next_check = this_check + timedelta(seconds=next_check_secs)
@@ -266,29 +250,43 @@ def get_log_mtime(run):
             return retval[0]
     return datetime.utcfromtimestamp(0)
 
-def write_exclude_file(destpath,rundir):
-    max_cycle = 0
-    run = os.path.basename(rundir)
-    curs.execute("SELECT last_sync_start FROM runs WHERE run_name = :rname",
+def update_cycle_count(rundir_path):
+    run = os.path.basename(rundir_path)
+    curs.execute("SELECT last_cycle_copied,last_d_cycle_copied FROM runs WHERE run_name = :rname",
                  rname=run)
     result = curs.fetchone()
     if result:
-        lastsync = result[0]
+        cycles_done = result[0]
     else:
-        lastsync = None
-    destdir = os.path.join(destpath,run)
-    if not os.path.exists(destdir):
-        os.makedirs(destdir)
-    excludepath = os.path.join(destdir,excludefile)
+        sys.exit("couldn't find run %s in database updating cycle count" % run)
+    
+    recipes = glob.glob(os.path.join(rundir_path,"Recipe*.xml"))
+    if len(recipes) != 1:
+        logmsg("no recipe or multiple recipes for run %s" % run)
+        cycles_needed = (sys.maxint,sys.maxint)
+    else:
+        cycles_needed = checkrun.check_recipe(recipes[0])
+    
+    (C_cycles, D_cycles, run_is_complete) = \
+                checkrun.check_cycles(rundir_path, cycles_done, cycles_needed)
+    curs.execute("UPDATE runs SET last_cycle_copied = :lc, last_d_cycle_copied = :ld WHERE run_name = :rname",lc=C_cycle,ld=D_cycle,rname=run)
+    if run_is_complete:
+        curs.execute("UPDATE runs SET state = 'complete' WHERE run_name = :rname",rname=run)
+    orcl.commit()
+    return (C_cycles,D_cycles,run_is_complete)
+
+def write_exclude_file(rundir_path):
+    run = os.path.basename(rundir_path)
+    if not os.path.exists(rundir_path):
+        os.makedirs(rundir_path)
+    (C_cycles, D_cycles, is_complete) = update_cycle_count(rundir_path)
+    excludepath = os.path.join(rundir_path,excludefile)
     excl = open(excludepath,'w')
-    if lastsync:
-        for cycle in cycle_times.get(run,[]):
-            if cycle_times[run][cycle] < lastsync:
-                excl.write('C%d.1/\nD%d.1/\n' % (cycle,cycle))
-                if max_cycle < cycle:
-                    max_cycle = cycle
+    for cycle in range(1,C_cycle+1):
+        excl.write('C%d.1/\n' % cycle)
+    for cycle in range(1,D_cycle+1):
+        excl.write('D%d.1/\n' % cycle)
     excl.close()
-    curs.execute("UPDATE runs SET last_cycle_copied = :lc WHERE run_name = :rname",lc=max_cycle,rname=run)
     return excludepath
 
 def main():
@@ -322,36 +320,37 @@ def main():
             # not running: no proc, or proc completed
             if pidcheck != False:
                 (oldpid,exit_status) = pidcheck
-                log_mtime = get_log_mtime(last_run)
-                if exit_status == 0 and last_start > log_mtime:
-                    logmsg('rsync completed and no log change since start')
-                    set_run_status(last_run,'complete')
-                    stamp = open(os.path.join(mirrpath,
-                                              os.path.basename(rundir),
-                                              stampfile),'w')
+                (C_cycles, D_cycles, is_complete) = \
+                           update_cycle_count(os.path.join(mirrpath,last_run))
+                if is_complete:
+                    stamp = open(os.path.join(mirrpath, last_run, stampfile),
+                                 'w')
                     stamp.write('\n'.join(['Run completed at %s (local)',
                                            'rsync of %s started at %s UTC',
                                            'last logfile change at %s UTC',
                                            ''])
                                 % (time.ctime(),
-                                   rundir,last_start.ctime(),
-                                   log_mtime.ctime()))
+                                   last_run,last_start.ctime(),
+                                   get_log_mtime(last_run).ctime()))
                     stamp.close()
                 elif exit_status != 0:
                     # failed; set run back to pending and unsynced
-                    set_run_status(last_run,'pending',last_sync=datetime.utcfromtimestamp(0))
-                    cycle_times[last_run] = {}
+                    logmsg("run %s failed with status %s" %
+                           (last_run, str(exit_status)))
+                    set_run_status(last_run,'pending',
+                                   last_sync=datetime.utcfromtimestamp(0))
             if start_ok:
                 rundir = find_eligible_run(deck)
                 if not rundir:
                     break
-                excludepath = write_exclude_file(mirrpath,rundir)
+                last_run = os.path.basename(rundir)
+                excludepath = write_exclude_file(os.path.join(mirrpath,
+                                                              last_run))
                 pid = pg_spawnvp('rsync',
                       ['rsync','-a','-v',
                        '--exclude-from=%s' % excludepath,
                        '%s::runs/%s' % ( deck, rundir ),
                        mirrpath])
-                last_run = os.path.basename(rundir)
                 last_start = datetime.utcnow()
                 logmsg('started rsync of %s: pid %s at %s' %
                        (rundir,pid,last_start.ctime()))
