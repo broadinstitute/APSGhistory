@@ -12,12 +12,17 @@ oraconn = 'slxasync/c0piiRn2pr@seqprod'
 
 pathre = re.compile('<CONVERSION.*Path="([^"]+?)"')
 
-def check_cycles(rundir,cycles_done,cycles_expected):
+def check_cycles(rundir,cycles_already_done,cycles_expected):
     run = os.path.basename(rundir)
     lastseen = {}
-    scandirs = {}
+    scandirs = {'C':{}, 'D':{}}
     cycle_max = {}
-    
+    cycles_done = {}
+    cycles_needed = {}
+
+    (cycles_done['C'],cycles_done['D']) = cycles_already_done
+    (cycles_needed['C'],cycles_needed['D']) = cycles_expected
+
     logfiles = glob.glob(os.path.join(rundir,"RunLog*.xml"))
     # we depend on the filenames lexically sorting in chronological order
     logfiles.sort()
@@ -45,38 +50,50 @@ def check_cycles(rundir,cycles_done,cycles_expected):
                     lastseen[(cycle_type,cycle)] = fname
                 else:
                     sys.exit("could not find cycle in path %s" % path)
-                if cycle > cycles_done:
+                if cycle > cycles_done[cycle_type]:
                     imagedir = os.path.join(rundir,*pathitems[:-1])
-                    scandirs.setdefault((cycle,imagedir),{})[fname] = 1
+                    scandirs[cycle_type].setdefault((cycle,imagedir),
+                                                    {})[fname] = 1
         lfp.close()
     # now that we have the list in memory, do an efficient listdir
     # across each of the directories and remove files that we find exist.
     # after that, if anything is left we are missing a file.
-    for scantuple in sorted(scandirs):
-        (cycle,scandir) = scantuple
-        try:
-            os.chdir(scandir)
-        except OSError:
-            return (cycle-1,False)
-        else:
-            for fname in os.listdir(scandir):
-                scandirs[scantuple].pop(fname,None)
-            if len(scandirs[scantuple]):
+    for cycle_type in ['C','D']:
+        for scantuple in sorted(scandirs[cycle_type]):
+            (cycle,scandir) = scantuple
+            try:
+                os.chdir(scandir)
+            except OSError:
+                # directory isn't there at all
+                cycles_done[cycle_type] = (cycle-1,False)
+                break
+            else:
+                for fname in os.listdir(scandir):
+                    scandirs[cycle_type][scantuple].pop(fname,None)
+            if len(scandirs[cycle_type][scantuple]):
                 # we're missing something in this directory!
-                return (cycle-1,False)
-    # if all files exist, check if last cycle is actually complete
-    # we do this by saving the last file of each cycle,
-    # then checking if last cycle's last file matches the pattern
-    # and that it's not the only cycle
-    if cycle == 1:
-        return (0,False)
-    if (lastseen[('C',cycle_max['C'])] == lastseen[('C',1)]
-        and lastseen[('D',cycle_max['D'])] == lastseen[('D',1)]
-        and (cycle_max['C'],cycle_max['D']) == cycles_expected):
-            # we're finished
-            # return C assuming C >= D
-            return (cycle_max['C'],True)
-    return (cycle_max['D'],False)
+                cycles_done[cycle_type] = (cycle-1,False)
+                break
+            else:
+                # nothing is missing
+                cycles_done[cycle_type] = (cycle, True)
+        # now, if everything was there, more checks
+        if cycles_done[cycle_type][1]:
+            # can't tell if cycle 1 is complete, so punt
+            if cycles_done[cycle_type][0] == 1:
+                cycles_done[cycle_type] = (0,False)
+            elif not (lastseen[(cycle_type,cycle_max[cycle_type])] ==
+                      lastseen[(cycle_type,1)]):
+                # last cycle doesn't have the same last file as cycle 1
+                # this means it's not complete
+                cycles_done[cycle_type] = (cycles_done[cycle_type][0]-1,
+                                           False)
+            elif cycles_done[cycle_type][0] < cycles_needed[cycle_type]:
+                # last cycle is complete, but run is not complete
+                cycles_done[cycle_type] = (cycles_done[cycle_type][0],
+                                           False)
+    return(cycles_done['C'][0],cycles_done['D'][0],
+           cycles_done['C'][1] and cycles_done['D'][1])
 
 def check_recipe(recipe_file):
     seen_protocol = False
@@ -106,12 +123,12 @@ def main():
     orcl = cx_Oracle.connect(oraconn)
     curs = orcl.cursor()
 
-    curs.execute("""SELECT deck_name,run_sourcepath,last_cycle_copied FROM runs
-    WHERE run_name = :rname""",
+    curs.execute("""SELECT deck_name,run_sourcepath,last_cycle_copied,last_d_cycle_copied
+    FROM runs WHERE run_name = :rname""",
                  rname=run);
     result = curs.fetchone()
     if result:
-        (deck,run_srcpath,cycles_done) = result
+        (deck,run_srcpath,C_cycles_done,D_cycles_done) = result
     else:
         sys.exit('run not found in database')
 
@@ -136,8 +153,10 @@ def main():
 
     cycles_needed = check_recipe(recipes[0])
 
-    complete_cycle = check_cycles(run_dir,cycles_done,cycles_needed)
-    print complete_cycle
+    complete_cycle = check_cycles(run_dir,(C_cycles_done,D_cycles_done),cycles_needed)
+    print 'regular check',complete_cycle
+
+    #print 'check from 0',check_cycles(run_dir,(0,0),cycles_needed)
     # XXX FIXME check for stalled run/stalled copy
     # stalled run: 'syncing' or 'running' and no log change in N hours
     # stalled copy: log changed recently but last cycle not incrementing
