@@ -11,7 +11,8 @@ os.environ['PATH'] = '/usr/local/bin:' + os.environ['PATH']
 
 solexa_sw_dir = '/zpool1/ckdtest/SolexaPipeline-0.2.2.4'
 
-analysis_dest = '/broad/solexaproc/fromThumpers'
+analysis_dest = '/broad/solexaproc'
+analysis_suffix = 'analyzed'
 
 flag_file = '.imageDir'
 
@@ -184,7 +185,7 @@ def main():
     run = lock_eligible_run(get_runlist(deck))
     (analysis_dir,run_state,last_copied) = get_runinfo(run)
     sync_dir = os.path.join(xferbase,"mirror",run)
-    results_dir = os.path.join(analysis_dest,run)
+    results_dir = os.path.join(analysis_dest,deck,analysis_suffix,run)
     setup_dirs(sync_dir,results_dir)
     datadir = os.path.join(results_dir,"Data")
     newest_dir = find_newest(datadir)
@@ -205,7 +206,8 @@ def main():
             new_dir = find_newest(datadir)
             if run_the_make(new_dir):
                 if run_state == 'complete':
-                    write_flagfile(results_dir,new_dir[len(analysis_dir)+1:])
+                    write_flagfile(results_dir,
+                                   new_dir[len(results_dir)-len(run):])
                     update_rundir(run,None)
                 else:
                     update_rundir(run,new_dir)
