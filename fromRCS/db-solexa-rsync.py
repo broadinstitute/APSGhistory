@@ -92,24 +92,22 @@ def run_status(logfile):
             handler.next_check, handler.deck_state)
 
 def update_run_info(deck,rundir,logpath,log_mtime):
-    if rundir.startswith(logpath):
-        rundir = rundir[len(logpath):]
-    else:
-        sys.exit('rundir not in logpath: this should not happen')
     run_name = os.path.basename(rundir)
     log_change = datetime.utcfromtimestamp(log_mtime)
-    curs.execute('SELECT log_last_changed FROM runs WHERE run_name = :rname',
-                 rname=run_name)
+    curs.execute("""SELECT log_last_changed FROM runs
+    WHERE run_name = :rname AND deck_name = :dname""",
+                 rname=run_name,dname=deck)
     lastlogdate = curs.fetchone()
-    print lastlogdate,log_change
     # the "if not" is to cover None return, which would break comparison
     if not lastlogdate or lastlogdate > log_change:
         curs.execute("""MERGE INTO runs r USING dual ON (r.run_name = :rname)
-        WHEN matched THEN UPDATE SET log_last_changed = :mtime
+        WHEN matched THEN
+        UPDATE SET log_last_changed = :mtime, log_currfile = :currfile
         WHEN NOT matched THEN
-        INSERT (run_name, deck_name, run_sourcepath, log_last_changed, state)
-        VALUES (:rname,:dname,:rpath,:mtime,:state)""",
-                     rname=run_name,dname=deck,rpath=rundir,
+        INSERT (run_name, deck_name, run_sourcepath, log_currfile,
+                log_last_changed, state)
+        VALUES (:rname,:dname,:rpath,:logcurr, :mtime,:state)""",
+                     rname=run_name,dname=deck,rpath=rundir, logcurr=logpath,
                      mtime=log_change,state='pending')
 
 def check_deck(deck,basedir):
@@ -136,8 +134,9 @@ def check_deck(deck,basedir):
                         break
                 xmllog.close()
                 if foundconv:
+                    rundir = rundir[len(logpath):]
                     mtime = os.path.getmtime(path)
-                    update_run_info(deck,dirname,path,mtime)
+                    update_run_info(deck,rundir,logpath,mtime)
                     if mtime > newest['time']:
                         newest['time'] = mtime
                         newest['path'] = path
