@@ -48,7 +48,7 @@ class LogHandler(xml.sax.handler.ContentHandler):
         self.must_stop = True
         self.deck_state = 'unknown'
         self.last_conv_path = ''
-        self.next_check = 15 * 60
+        self.next_check = 10 * 60
     
     def startElement(self,name,attributes):
         if name == 'CONVERSION':
@@ -78,7 +78,7 @@ class LogHandler(xml.sax.handler.ContentHandler):
         else:
             self.start_ok = False
             self.must_stop = True
-            self.next_check = 15*60
+            self.next_check = 10*60
         if (name == 'INCOMPLETE') or (name == 'PARTIAL_SAFE_STATE'):
             # run stopped; override everything else
             self.in_gap = True
@@ -309,6 +309,7 @@ def main():
         logmsg('deck %s, start %s, stop %s, next %s, pid %s, chk %s' % 
                (deck, start_ok, stop_now,next_check,pid,pidcheck))
         if pidcheck == True:
+            update_cycle_count(os.path.join(mirrpath,last_run))
             if stop_now:
                 os.killpg(pid,signal.SIGSTOP)
                 logmsg('stopped pid %d' % pid)
