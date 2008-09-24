@@ -5,15 +5,17 @@ import sys
 sys.path.append('/broad/tools/lib/python2.4/site-packages/')
 
 import cx_Oracle,glob,os,re
+from datetime import datetime,timedelta
 
 # oracle connection string
 oraconn = 'slxasync/c0piiRn2pr@seqprod'
 
 pathre = re.compile('<CONVERSION.*Path="([^"]+?)"')
 
-def check_cycles(basedir,run,logfiles,cycles_done):
+def check_cycles(basedir,run,logfiles,cycles_done,cycles_expected):
     lastseen = {}
     scandirs = {}
+    cycle_max = {}
     # read the list of files to look for into memory
     # (why not check for os.path.exists as we go?
     #  two reasons:
@@ -30,9 +32,11 @@ def check_cycles(basedir,run,logfiles,cycles_done):
                 pathitems = pathitems[pathitems.index(run)+1:]
                 fname = pathitems[-1]
                 cycle_dir = pathitems[-2]
-                if cycle_dir[0] in 'CD' and cycle_dir[1] in "0123456789":
+                cycle_type = cycle_dir[0]
+                if cycle_type in 'CD' and cycle_dir[1] in "0123456789":
                     cycle = int(float(cycle_dir[1:]))
-                    lastseen[cycle] = fname
+                    cycle_max[cycle_type] = cycle
+                    lastseen[(cycle_type,cycle)] = fname
                 else:
                     sys.exit("could not find cycle in path %s" % path)
                 if cycle > cycles_done:
@@ -50,21 +54,46 @@ def check_cycles(basedir,run,logfiles,cycles_done):
             os.chdir(scandir)
         except OSError:
             print 'could not chdir to %s' % scandir
-            return cycle-1
+            return (cycle-1,False)
         else:
             for fname in os.listdir(scandir):
                 scandirs[scantuple].pop(fname,None)
             if len(scandirs[scantuple]):
                 # we're missing something in this directory!
-                return cycle-1
+                return (cycle-1,False)
     # if all files exist, check if last cycle is actually complete
     # we do this by saving the last file of each cycle,
     # then checking if last cycle's last file matches the pattern
     # and that it's not the only cycle
-    if cycle > 1 and lastseen[cycle] == lastseen[1]:
-        return cycle
-    else:
-        return cycle-1
+    if cycle == 1:
+        return (0,False)
+    if (lastseen[('C',cycle_max['C'])] == lastseen[('C',1)]
+        and lastseen[('D',cycle_max['D'])] == lastseen[('D',1)]):
+        if (cycle_max['C'],cycle_max['D']) == cycles_expected:
+            # we're finished
+            # return C assuming C >= D
+            return(cycle_max['C'],True)
+        else:
+            # return D assuming D <= C
+            return(cycle_max['D'],False)
+
+def check_recipe(recipe_file):
+    seen_protocol = False
+    C_cycles = 0
+    D_cycles = 0
+    fp = open(recipe_file)
+    for line in fp:
+        if '<Protocol>' in line:
+            seen_protocol = True
+            continue
+        elif not seen_protocol:
+            continue
+        if '<Incorporation ' in line:
+            C_cycles = C_cycles + 1
+        elif '<Cleavage ' in line:
+            D_cycles = D_cycles + 1
+    fp.close()
+    return (C_cycles,D_cycles)
 
 def main():
     # get run name
@@ -100,10 +129,19 @@ def main():
     # we depend on the filenames lexically sorting in chronological order
     logfiles.sort()
 
-    complete_cycle = check_cycles(basedir,run,logfiles,cycles_done)
+    recipes = glob.glob(os.path.join(runlogs_dir,"Recipe*.xml"))
+    if len(recipes) != 1:
+        sys.exit("no recipe file, or multiple recipe files")
+
+    cycles_needed = check_recipe(recipes[0])
+
+    complete_cycle = check_cycles(basedir,run,logfiles,
+                                  cycles_done,cycles_needed)
     print complete_cycle
-    # XXX FIXME check  how many cycles there SHOULD BE
-    # and complete run as appropriate
+    # XXX FIXME check for stalled run/stalled copy
+    # stalled run: 'syncing' or 'running' and no log change in N hours
+    # stalled copy: log changed recently but last cycle not incrementing
+    
 
 if __name__ == '__main__':
     main()
