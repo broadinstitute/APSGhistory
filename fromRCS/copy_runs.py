@@ -1,6 +1,6 @@
 #!/util/bin/python
 
-import cx_Oracle,glob,os,signal,socket,sys,time
+import cx_Oracle,errno,glob,os,signal,socket,sys,time
 import xml.sax.handler
 import checkrun
 from datetime import datetime,timedelta
