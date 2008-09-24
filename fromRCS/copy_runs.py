@@ -287,7 +287,7 @@ def main():
     (basedir,message) = get_basedir(deck)
     if not basedir:
         sys.exit(message)
-    mirrpath = os.path.join(basedir,deck,mirrdir)
+    mirrpath = os.path.join(basedir,mirrdir)
     if not os.path.exists(mirrpath):
         os.makedirs(mirrpath)
     while True:
