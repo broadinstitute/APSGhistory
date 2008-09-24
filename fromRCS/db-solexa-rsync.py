@@ -134,7 +134,7 @@ def check_deck(deck,basedir):
                         break
                 xmllog.close()
                 if foundconv:
-                    rundir = rundir[len(logpath):]
+                    rundir = dirname[len(logpath):]
                     mtime = os.path.getmtime(path)
                     update_run_info(deck,rundir,logpath,mtime)
                     if mtime > newest['time']:
@@ -187,12 +187,13 @@ def get_basedir(deck):
         # maybe someone else has it?
         right_now = datetime.utcnow()
         # has it been twice as long as it should have been since last check?
-        if not state_next or not state_last or \
+        if not state_next or not state_last or not t_host or not t_pid or \
                (state_next - state_last) < (right_now - state_next):
             # stale data/dead process. plant our flag on it.
             curs.execute("""UPDATE decks SET transfer_host = :myname,
             transfer_pid = :mypid WHERE decks.deck_name = :dname""",
                          myname=myname,mypid=mypid,dname=deck)
+            orcl.commit()
         else:
             return (None,'deck %s locked by %s:%s' % (deck,t_host,t_pid))
     return (basedir,None)
