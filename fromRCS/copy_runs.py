@@ -108,8 +108,8 @@ def update_run_info(deck,rundir,logpath,log_mtime):
                      rname=run_name,dname=deck,
                      mtime=log_change,state='pending')
 
-def check_deck(deck):
-    logpath = os.path.join(get_deck_basedir(deck),logdir)
+def check_deck(deck,basedir):
+    logpath = os.path.join(basedir,logdir)
     if not os.path.exists(logpath):
         os.makedirs(logpath)
     if os.spawnlp(os.P_WAIT,'rsync',
@@ -226,7 +226,7 @@ def main():
         os.makedirs(mirrpath)
     while True:
         (start_ok,stop_now,
-         next_check,log_mtime) = check_deck(deck)
+         next_check,log_mtime) = check_deck(deck,basedir)
         pidcheck = check_pid(pid)
         logmsg('deck %s, start %s, stop %s, next %s, pid %s, chk %s' % 
                (deck, start_ok, stop_now,next_check,pid,pidcheck))
