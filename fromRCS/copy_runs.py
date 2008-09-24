@@ -138,7 +138,7 @@ def check_deck(deck,basedir):
                         newest['time'] = mtime
                         newest['path'] = path
     # commit all the run status updates
-    curs.commit()
+    orcl.commit()
     logmsg('parsing logfile %s, mtime %s' % (newest['path'],
                                              time.ctime(newest['time'])))
     run_dir = os.path.dirname(newest['path'])
@@ -155,7 +155,7 @@ def check_deck(deck,basedir):
     state_check_last = :this, state_check_next = :next
     WHERE decks.deck_name = :dname""",
                  dstate=deck_state,this=this_check,next=next_check,dname=deck)
-    curs.commit()
+    orcl.commit()
     return (can_start,must_stop,next_check_secs,newest['time'])
 
 def check_pid(pid):
@@ -202,7 +202,7 @@ def get_basedir(deck):
 def set_run_status(run,state):
     curs.execute('UPDATE runs SET state = :rstate WHERE run_name = :rname',
                  rstate=state,rname=run)
-    curs.commit()
+    orcl.commit()
 
 def find_eligible_run(deck):
     curs.execute("""SELECT run_sourcepath FROM runs
@@ -266,7 +266,7 @@ def main():
     curs.execute('''UPDATE decks SET transfer_host = NULL,
     transfer_pid = NULL WHERE decks.deck_name = :dname''',
                  dname=deck)
-    curs.commit()
+    orcl.commit()
 
 if __name__ == '__main__':
     main()
