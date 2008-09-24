@@ -2,8 +2,8 @@
 
 import os,tarfile
 
-downloads_dir = '/broad/data/blastdb-download'
-unpack_dir = '/broad/data/blastdb'
+downloads_dir = '/broad/newdata/blastdb-download'
+unpack_dir = '/broad/newdata/blastdb'
 semaphore_file = os.path.join(unpack_dir,'.unpack_done')
 
 os.spawnl(os.P_WAIT,'/bin/rm','rm','-rf',unpack_dir);
