@@ -18,10 +18,14 @@ def check_cycles(rundir,cycles_already_done,cycles_expected):
     scandirs = {'C':{}, 'D':{}}
     cycle_max = {}
     cycles_done = {}
+    cycles_completed = {}
     cycles_needed = {}
 
     (cycles_done['C'],cycles_done['D']) = cycles_already_done
     (cycles_needed['C'],cycles_needed['D']) = cycles_expected
+
+    cycles_completed['C'] = (0,False)
+    cycles_completed['D'] = (0,False)
 
     logfiles = glob.glob(os.path.join(rundir,"RunLog*.xml"))
     # we depend on the filenames lexically sorting in chronological order
@@ -65,35 +69,33 @@ def check_cycles(rundir,cycles_already_done,cycles_expected):
                 os.chdir(scandir)
             except OSError:
                 # directory isn't there at all
-                cycles_done[cycle_type] = (cycle-1,False)
+                cycles_completed[cycle_type] = (cycle-1,False)
                 break
             else:
                 for fname in os.listdir(scandir):
                     scandirs[cycle_type][scantuple].pop(fname,None)
             if len(scandirs[cycle_type][scantuple]):
                 # we're missing something in this directory!
-                cycles_done[cycle_type] = (cycle-1,False)
+                cycles_completed[cycle_type] = (cycle-1,False)
                 break
             else:
                 # nothing is missing
-                cycles_done[cycle_type] = (cycle, True)
+                cycles_completed[cycle_type] = (cycle, True)
         # now, if everything was there, more checks
-        if cycles_done[cycle_type][1]:
+        if cycles_completed[cycle_type][1]:
             # can't tell if cycle 1 is complete, so punt
-            if cycles_done[cycle_type][0] == 1:
-                cycles_done[cycle_type] = (0,False)
+            if cycles_completed[cycle_type][0] == 1:
+                cycles_completed[cycle_type] = (0,False)
             elif not (lastseen[(cycle_type,cycle_max[cycle_type])] ==
                       lastseen[(cycle_type,1)]):
                 # last cycle doesn't have the same last file as cycle 1
                 # this means it's not complete
-                cycles_done[cycle_type] = (cycles_done[cycle_type][0]-1,
-                                           False)
-            elif cycles_done[cycle_type][0] < cycles_needed[cycle_type]:
+                cycles_completed[cycle_type] = (cycles_completed[cycle_type][0]-1, False)
+            elif cycles_completed[cycle_type][0] < cycles_needed[cycle_type]:
                 # last cycle is complete, but run is not complete
-                cycles_done[cycle_type] = (cycles_done[cycle_type][0],
-                                           False)
-    return(cycles_done['C'][0],cycles_done['D'][0],
-           cycles_done['C'][1] and cycles_done['D'][1])
+                cycles_completed[cycle_type] = (cycles_completed[cycle_type][0], False)
+    return(cycles_completed['C'][0],cycles_completed['D'][0],
+           cycles_completed['C'][1] and cycles_completed['D'][1])
 
 def check_recipe(recipe_file):
     seen_protocol = False
