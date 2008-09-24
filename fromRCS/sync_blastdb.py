@@ -52,7 +52,7 @@ local_sources = [ local_dir + subdir for subdir in subdirs ]
 pids = {}
 nodes = {}
 
-for node in ['node135', 'node136', 'node137', 'node138', 'node139', 'node140',
+for node in ['node135', 'node136', 'node137', 'node138', 'node140',
              'node243', 'node244', 'node245', 'node246',
              'node247', 'node248', 'node249']:
     nodes[node] = {'set': 'oneoffs', 'retries': 0,
