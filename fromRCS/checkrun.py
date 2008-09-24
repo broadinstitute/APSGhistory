@@ -152,6 +152,7 @@ def main():
         sys.exit("no recipe file, or multiple recipe files")
 
     cycles_needed = check_recipe(recipes[0])
+    print 'cycles needed',cycles_needed
 
     complete_cycle = check_cycles(run_dir,(C_cycles_done,D_cycles_done),cycles_needed)
     print 'regular check',complete_cycle
