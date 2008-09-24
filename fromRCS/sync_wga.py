@@ -64,6 +64,7 @@ def rsync_nfs(node):
     pid = os.spawnv(os.P_NOWAIT, ssh,
                     [ssh, node, rsync, rsync_args] + nfs_sources + [local_dir] )
     print [ssh, node, rsync, rsync_args] + nfs_sources + [local_dir]
+    sys.stdout.flush()
     pids[pid] = { 'dstnode' : node }
     nodes[node]['status'] = 'running'
 
@@ -73,6 +74,7 @@ def rsync_ssh(srcnode,dstnode):
                      local_sources + [ dstnode + ':' + local_dir])
     print [ssh, srcnode, rsync, rsync_args, rsync_ssh_args] + \
                      local_sources + [ dstnode + ':' + local_dir]
+    sys.stdout.flush()
     pids[pid] = { 'srcnode' : srcnode, 'dstnode' : dstnode }
     nodes[dstnode]['status'] = 'running'
     nodes[srcnode]['pids'].append(pid)
