@@ -46,6 +46,10 @@ use constant USER => "anonymous";
 use constant PASSWORD => "anonymous";
 use constant DEBUG => 0;
 
+use constant DOWNLOAD_DIR => '/broad/data/blastdb/download/';
+
+chdir(DOWNLOAD_DIR) || die "can't chdir to " . DOWNLOAD_DIR;
+
 # Process command line options
 my $opt_verbose = 1;
 my $opt_quiet = 0;
