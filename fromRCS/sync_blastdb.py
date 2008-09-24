@@ -34,6 +34,8 @@ max_retries = 5
 
 statuses = ['unprocessed', 'running', 'complete', 'failed']
 
+subdirs = [ 'htgs', 'nt' ]
+
 rsync = '/usr/bin/rsync'
 rsync_args = '-rlptDL --delete'
 rsync_ssh_args = '-e ssh'
@@ -42,9 +44,10 @@ local_dir = '/ibm_local/blastdb/'
 hostlists_dir = '/broad/tools/hostlists/'
 ssh = '/usr/bin/ssh'
 
-nfs_source = '/broad/test/apsg/faketree/'
-local_dir = '/var/tmp/faketree/'
-#rsync = '/broad/tools/scripts/fakersync'
+rsync = '/broad/tools/scripts/fakersync'
+
+nfs_sources = [ nfs_source + subdir for subdir in subdirs ]
+local_sources = [ local_dir + subdir for subdir in subdirs ]
 
 pids = {}
 nodes = {}
@@ -72,14 +75,14 @@ for chassis in ['01', '02', '03', '04','05', '06', '07',
 
 def rsync_nfs(node):
     pid = os.spawnv(os.P_NOWAIT, ssh,
-                    (ssh, node, rsync, rsync_args, nfs_source, local_dir))
+                    [ssh, node, rsync, rsync_args] +  nfs_sources + [local_dir] )
     pids[pid] = { 'dstnode' : node }
     nodes[node]['status'] = 'running'
 
 def rsync_ssh(srcnode,dstnode):
     pid = os.spawnv(os.P_NOWAIT, ssh,
-                    (ssh, srcnode, rsync, rsync_args, rsync_ssh_args,
-                     local_dir, dstnode + ':' + local_dir ))
+                    [ssh, srcnode, rsync, rsync_args, rsync_ssh_args] +
+                     local_sources + [ dstnode + ':' + local_dir])
     pids[pid] = { 'srcnode' : srcnode, 'dstnode' : dstnode }
     nodes[dstnode]['status'] = 'running'
     nodes[srcnode]['pids'].append(pid)
@@ -161,4 +164,5 @@ while True:
     signal.pause()
 
 for node in sorted(nodes.keys()):
-    print node,nodes[node]['status']
+    if nodes[node]['status'] != 'complete':
+        print node,nodes[node]['status']
