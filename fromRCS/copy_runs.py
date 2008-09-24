@@ -350,7 +350,7 @@ def main():
         time.sleep(next_check)
     # reached by break
     # before we exit, clean up database
-    curs.execute('''UPDATE decks SET transfer_host = NULL,
+    curs.execute('''UPDATE decks SET state='idle', transfer_host = NULL,
     transfer_pid = NULL WHERE decks.deck_name = :dname''',
                  dname=deck)
     orcl.commit()
