@@ -158,7 +158,7 @@ def check_deck(deck,basedir):
     if os.spawnlp(os.P_WAIT,'rsync',
                   'rsync','-a','--delete',
                   '--exclude=Focus*/','--exclude=Images*/',
-                  '--exclude=Data*/',
+                  '--exclude=Data*/','--exclude=data/',
                   '%s::runs/' % deck, logpath) != 0:
         sys.exit('rsync of logs failed')
     newest = {'time': datetime.utcfromtimestamp(0), 'path': ''}
