@@ -306,7 +306,7 @@ def update_cycle_count(rundir_path):
     else:
         cycles_needed = checkrun.check_recipe(recipes[0])
     (C_cycles, D_cycles, run_is_complete) = \
-                checkrun.check_cycles(rundir_path, cycles_done, cycles_needed)
+                checkrun.check_cycles(rundir_path, (0, 0), cycles_needed)
     curs.execute("UPDATE runs SET last_cycle_copied = :lc, last_d_cycle_copied = :ld WHERE run_name = :rname",lc=C_cycles,ld=D_cycles,rname=run)
     if run_is_complete:
         curs.execute("UPDATE runs SET state = 'complete' WHERE run_name = :rname",rname=run)
