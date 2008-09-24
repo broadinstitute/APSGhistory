@@ -85,17 +85,17 @@ class LogHandler(xml.sax.handler.ContentHandler):
         if self.in_gap:
             self.must_stop = False
             self.next_check = 5 * 60
-        elif name == 'INCOMPLETE' or name == 'PARTIAL_SAFE_STATE':
-            # run stopped
+        else:
+            self.start_ok = False
+            self.must_stop = True
+            self.next_check = 15*60
+        if (name == 'INCOMPLETE') or (name == 'PARTIAL_SAFE_STATE'):
+            # run stopped; override everything else
             self.in_gap = True
             self.start_ok = True
             self.must_stop = False
             self.deck_state = 'idle'
             # FIXME check file timestamp and use that as base
-            self.next_check = 15*60
-        else:
-            self.start_ok = False
-            self.must_stop = True
             self.next_check = 15*60
 
 def logmsg(msg):
