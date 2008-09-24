@@ -158,7 +158,8 @@ sub download($)
 
         if ($opt_force_download or
             not -f $file or 
-            ((stat($file))->mtime < $ftp->mdtm($file))) {
+            ((stat($file))->mtime < $ftp->mdtm($file)) or
+            ((stat($file))->size < $ftp->size($file))) {
             print STDERR "Downloading $file... " if $opt_verbose;
             $ftp->get($file);
             print STDERR "done.\n" if $opt_verbose;
