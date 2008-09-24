@@ -113,8 +113,8 @@ def update_rundir(run,rundir):
     orcl.commit()
 
 def write_flagfile(dstdir,data):
-    dst_flagfile = os.path.join(dstdir,flag_file)
-    fp = open(dst_flagfile,"w")
+    flagfile_path = os.path.join(dstdir,flag_file)
+    fp = open(flagfile_path,"w")
     if data:
         fp.write(data)
         fp.write("\n")
@@ -235,6 +235,8 @@ def main():
             log_dir = os.path.join(results_dir,"logs")
             if run_the_make(new_dir,log_dir):
                 if run_state == 'complete':
+                    write_flagfile(sync_dir,
+                                   new_dir[len(results_dir)-len(run):])
                     write_flagfile(results_dir,
                                    new_dir[len(results_dir)-len(run):])
                     update_rundir(run,None)
