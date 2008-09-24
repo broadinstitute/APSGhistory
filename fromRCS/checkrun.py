@@ -48,12 +48,10 @@ def check_cycles(basedir,run,logfiles,cycles_done,cycles_expected):
     # across each of the directories and remove files that we find exist.
     # after that, if anything is left we are missing a file.
     for scantuple in sorted(scandirs):
-        print scantuple
         (cycle,scandir) = scantuple
         try:
             os.chdir(scandir)
         except OSError:
-            print 'could not chdir to %s' % scandir
             return (cycle-1,False)
         else:
             for fname in os.listdir(scandir):
@@ -123,7 +121,6 @@ def main():
         sys.exit('deck not found in database')
 
     runlogs_dir = os.path.join(basedir,'logs',run_srcpath)
-    print 'runlogsdir',runlogs_dir
 
     logfiles = glob.glob(os.path.join(runlogs_dir,"RunLog*.xml"))
     # we depend on the filenames lexically sorting in chronological order
