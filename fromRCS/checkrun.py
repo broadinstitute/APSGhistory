@@ -20,10 +20,15 @@ def check_cycles(rundir,cycles_already_done,cycles_expected):
     cycles_done = {}
     cycles_completed = {}
     cycles_needed = {}
+    cycles_range = {'C':[], 'D':[]}
 
     (cycles_done['C'],cycles_done['D']) = cycles_already_done
     (cycles_needed['C'],cycles_needed['D']) = cycles_expected
 
+    for cyctype in ['C','D']:
+        cycles_range[cyctype] = range(cycles_done[cyctype]+1,
+                                      cycles_needed[cyctype]+1)
+    
     cycles_completed['C'] = (0,False)
     cycles_completed['D'] = (0,False)
 
@@ -54,6 +59,10 @@ def check_cycles(rundir,cycles_already_done,cycles_expected):
                     cycle = int(float(cycle_dir[1:]))
                     cycle_max[cycle_type] = cycle
                     lastseen[(cycle_type,cycle)] = fname
+                    try:
+                        cycles_range[cycle_type].remove(cycle)
+                    except ValueError:
+                        pass
                 else:
                     sys.exit("could not find cycle in path %s" % path)
                 if cycle > cycles_done[cycle_type]:
@@ -74,6 +83,15 @@ def check_cycles(rundir,cycles_already_done,cycles_expected):
             continue
         for scantuple in sorted(scandirs[cycle_type]):
             (cycle,scandir) = scantuple
+            try:
+                cycles_range[cycle_type].remove(cycle)
+            except ValueError:
+                pass
+            if cycles_range[cycle_type] and min(cycles_range[cycle_type]) < cycle:
+                # we're missing a cycle somewhere somehow
+                cycles_completed[cycle_type] = (
+                    min(cycles_range[cycle_type])-1, False)
+                break
             try:
                 os.chdir(scandir)
             except OSError:
