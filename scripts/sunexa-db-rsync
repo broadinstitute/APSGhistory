@@ -1,0 +1,6 @@
+#!/bin/sh
+
+env PATH=/usr/local/bin:$PATH \
+    LD_LIBRARY_PATH=/oracle/apps/oracle/product/101/lib \
+    ORACLE_HOME=/oracle/apps/oracle/product/101 \
+ /usr/local/bin/python /broad/tools/scripts/db-solexa-rsync.py "$@"

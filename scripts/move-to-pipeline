@@ -1,0 +1,106 @@
+#!/usr/bin/env python
+
+import os
+
+#os.environ['ORACLE_HOME'] = '/oracle/apps/oracle/product/101'
+#os.environ['LD_LIBRARY_PATH'] = '/oracle/apps/oracle/product/101/lib'
+#os.environ['PATH'] = '/usr/local/bin:%s' % os.environ['PATH']
+
+import site
+site.addsitedir('/broad/tools/lib/python2.4/site-packages/')
+
+import cx_Oracle,errno,re,signal,socket,stat,sys,time
+from datetime import datetime,timedelta
+from subprocess import *
+
+solexa_sw_dir = '/broad/tools/solexa/pipeline'
+
+analysis_dest = '/seq/solexaproc'
+analysis_suffix = 'analyzed'
+
+compat_symlink_dest = '/slxa'
+compat_symlink_suffix = 'analyzed'
+
+flag_file = '.imageDir'
+
+make_args = ['-j5']
+
+cycle_regex = re.compile('/C1-(\d+)_Firecrest')
+first_cycle_regex = re.compile('/C(1+)_Firecrest')
+
+sequence_gid = 52
+umask_val = 002
+
+# oracle connection string
+oraconn = 'slxasync/c0piiRn2pr@seqprod'
+
+orcl = cx_Oracle.connect(oraconn)
+curs = orcl.cursor()
+
+def get_deckinfo(deck):
+    curs.execute("""SELECT transfer_basedir,state
+    FROM decks
+    WHERE deck_name = :dname""",dname=deck)
+    result = curs.fetchone()
+    if not result:
+        sys.exit('FATAL: deck %s not found in database' % deck)
+    else:
+        return(result)
+
+def get_runinfo(run):
+    curs.execute("""SELECT analysis_dir,state,last_cycle_copied,deck_name
+    FROM runs
+    WHERE run_name = :rname""",rname=run)
+    result = curs.fetchone()
+    if not result:
+        sys.exit('FATAL: run %s not found in database' % run)
+    else:
+        return result
+
+def update_rundir(run,rundir):
+    curs.execute("""UPDATE runs SET analysis_dir = :a_dir
+    WHERE runs.run_name = :rname""",
+                 rname=run,a_dir=rundir)
+    orcl.commit()
+
+def write_flagfile(dstdir,data):
+    flagfile_path = os.path.join(dstdir,flag_file)
+    fp = open(flagfile_path,"w")
+    if data:
+        fp.write(data)
+        fp.write("\n")
+    fp.close()
+
+def find_newest(basedir):
+    newest_dir = ''
+    newest_time = 0
+    for item in os.listdir(basedir):
+        item_path = os.path.join(basedir,item)
+        if os.path.isdir(item_path) and item.startswith("C1"):
+            item_mtime = os.path.getmtime(item_path)
+            if item_mtime > newest_time:
+                newest_time = item_mtime
+                newest_dir = item_path
+    return newest_dir
+
+def dtstring():
+    return datetime.now().strftime("%Y%m%d%H%M%S")
+
+def main():
+    for run in sys.argv[1:]:
+	print "processing run %s" % run
+        (analysis_dir,run_state,last_copied,deck) = get_runinfo(run)
+        if run_state != 'complete':
+            print 'skipping run %s - not complete' % run
+            continue
+        (xferbase, deckstate) = get_deckinfo(deck)
+        sync_dir = os.path.join(xferbase,"mirror",run)
+        results_dir = os.path.join(analysis_dest,deck,analysis_suffix,run)
+        datadir = os.path.join(results_dir,"Data")
+        newest_dir = find_newest(datadir)
+	print 'found %s in %s' % (newest_dir,datadir)
+        write_flagfile(sync_dir, newest_dir[len(results_dir)-len(run):])
+	#update_rundir(run,newest_dir)
+
+if __name__ == '__main__':
+    main()

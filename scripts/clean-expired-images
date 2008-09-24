@@ -1,0 +1,5 @@
+#!/bin/sh
+
+for dir in /zpool1/SL-X??_images/transfer/deleting ; do
+    cd $dir && rm -rf $dir/*
+done

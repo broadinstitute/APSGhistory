@@ -1,0 +1,219 @@
+#!/usr/bin/perl
+
+# finblade - pick a blade for finishing use
+# basically a hacked-up copy of lbcdclient
+
+my @blades = ( 'node170',
+	       'node171',
+	       'node172',
+	       'node173',
+	       );
+
+require 5.004;
+use strict;
+use Socket;
+
+#------------#
+# Prototypes #
+#------------#
+
+sub send_query($$$$@);		# perform queries
+sub udp_connect($$$$);		# connect to host using udp
+sub unpack_response($);		# unpack reply packet
+
+#------#
+# MAIN #
+#------#
+{
+    my ($reply);
+    my ($version) = 3;
+    my (@services);
+    my (%results);
+
+    foreach my $server (@blades) {
+	next unless udp_connect(\*SH,$server,"lbcd",4330);
+	next unless send_query(\*SH,\$reply,$version,10,@services) == 0;
+	$results{$server} = unpack_response($reply);
+    }
+    my @hostlist = sort {$results{$a} cmp $results{$b}} keys %results;
+    print shift(@hostlist),"\n";
+    exit(0);
+}
+
+#-------------#
+# Subroutines #
+#-------------#
+
+sub send_query ($$$$@) {
+    my($SH,$reply,$version,$timeout,@services) = @_;
+    my($num_services);
+    
+    # struct P_HEADER
+    # u_short   version;  /* protocol version */
+    # u_short   id;       /* requestor's uniq request id */
+    # u_short   op;       /* operation requested */
+    # u_short   status;   /* set on reply */ (used for extended protocol)
+
+    # Are we using the extended protocol?
+    if ($version > 2) {
+	$num_services = $#services + 1;
+    }
+
+    # Form register packet ("version operation operation status")
+    my($template) = "nnnn" . " a32" x $num_services;
+    my($packet) = pack($template,$version,0,1,$num_services,@services);
+
+    # Send registration
+    unless (send($SH,$packet,0)) {
+	warn "send: $!\n";
+	return 0;
+    }
+
+    # Obtain reply (with timeout)
+    my($rin,$nfound) = ('',0);
+    vec($rin,fileno($SH),1) = 1;
+    if (($nfound = select($rin,undef,undef,$timeout)) != 1) {
+	#warn "timeout\n";
+	return 1;		# timeout
+    }
+    $$reply = '';
+    unless (recv($SH,$$reply,256,0)) {
+	#warn "recv: $!\n";
+	return 1;
+    }
+    0;				# zero signifies no error
+}
+
+
+#---------------------#
+# Auxilliary Routines #
+#---------------------#
+sub udp_connect ($$$$) {
+    my($SH,$server,$port,$defaultport) = @_;
+
+    my ($proto,$iaddr,$sin);
+
+    $proto = getprotobyname('udp');
+    unless (socket($SH, PF_INET, SOCK_DGRAM, $proto)) {
+	return 0;
+    }
+    unless ($iaddr = gethostbyname($server)) {
+	return 0;
+    }
+    $port = getservbyname($port, 'udp') || $defaultport;
+    unless ($sin = sockaddr_in($port, $iaddr)) {
+	return 0;
+    }
+    unless (connect($SH,$sin)) {
+	close $SH; return undef;
+    }
+    1;
+}
+
+sub unpack_response($) {
+    my ($reply) = @_;
+
+    # Response packet
+    # struct P_HEADER;
+    #  u_int boot_time;
+    #  u_int current_time;
+    #  u_int user_mtime;  /* time user information last changed */
+    #  u_short l1; /* (int) (load*100) */
+    #  u_short l5;
+    #  u_short l15;
+    #  u_short tot_users;  /* total number of users logged in */
+    #  u_short uniq_users; /* total number of uniq users */
+    #  u_char  on_console; /* true if somone on console */
+    #  u_char  reserved;   /* future use, padding ... */
+    #  u_char  tmp_full;   /* percernt of tmp full */
+    #  u_char  tmpdir_full;  /* percernt of P_tmpdir full */
+    #  u_char pad;         /* padding */
+    #  u_char services;    /* number of service requests */
+    #  LBCD_SERVICE weights[LBCD_MAX_SERVICES+1];
+    my ($version,$op,$id,$status,
+	$btime,$ctime,$utime,
+	$l1,$l5,$l15,$tot_user,$uniq_user,
+	$on_console,$reserved,$tmp_full,
+	$tmpdir_full,$pad,$services) =
+	    unpack("nnnnNNNnnnnnCCCCCC",$reply);
+
+    return sprintf("%02x%02x%02x%02x%02x",$uniq_user, $tot_user, $l1, $l5, $l15);
+}
+
+__END__
+
+=head1 NAME
+
+lbcdclient - Query a remote lbcd daemon for system load
+
+=head1 SYNOPSIS
+
+lbcdclient [B<-2>] [B<-s> I<service>[,I<service> ...]] I<host> ...
+
+=head1 DESCRIPTION
+
+B<lbcdclient> sends a query packet to a remote B<lbcd> server and prints the
+results.  The result output will look something like this:
+
+    btime 1092858021 ctime 1092960298 utime 1092955199
+    load l1 96 l5 69 l15 57
+    total 0 unique 0 console 0
+    tmp full 0 P_tmpdir full 2
+    services 0 pads 0 0
+    service 0: weight 1 increment 1
+
+btime is the time of the last system boot in seconds since epoch.  ctime is
+the current system time in seconds since epoch.  utime is the last
+modification time of the information about logged in users in seconds since
+epoch.
+
+The load line gives the one-minute (l1), five-minute (l5), and
+fifteen-minute (l15) load averages, multiplied by 100.
+
+The next line gives the count of logged-in users.  total gives the count of
+all logged-in users, unique lists the total number of unique users, and
+console is 1 if a user is logged in to the console of the system.
+
+tmp full is the percentage used in the system F</tmp> directory and P_tmpdir
+full is the percentage full in the system F</var/tmp> directory.
+
+Finally, the last lines give information for each service, using the
+extended service response for the version three packet format.  The first
+line gives the count of number of configured services minus one.  (The pads
+numbers are reserved space in the packet and will generally always be zero.)
+Then, each subsequent line lists the weights and increments for each service
+B<lbcd> is monitoring on the system.
+
+If the B<-2> option is used, B<lbcdclient> will send a version two packet
+instead, and the returned results will not include the services line and
+everything after that.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-2>
+
+Send a version two protocol packet instead of a version three packet.
+Version two doesn't support the separate service weights.
+
+=item B<-s> I<service>,[I<service> ...]
+
+Request information for the specified service names.  It's not entirely
+clear whether this works correctly.
+
+=back
+
+=head1 SEE ALSO
+
+lbcd(8)
+
+The current version of this program is available from its web page at
+L<http://www.eyrie.org/~eagle/software/lbcd/>.
+
+=head1 AUTHORS
+
+Written by Larry Schwimmer.  Currently maintained by Russ Allbery
+<rra@stanford.edu>.
+
+=cut

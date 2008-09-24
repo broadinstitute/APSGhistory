@@ -1,0 +1,53 @@
+#!/usr/bin/python
+# -*-Python-*-
+
+import site
+site.addsitedir('/broad/tools/lib/python2.4/site-packages/')
+import cx_Oracle
+
+import os,sys
+
+# we could use rrdtool directly instead of going through mrtg....
+#import rrdtool
+
+# from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/137270
+def ResultIter(cursor, arraysize=1000):
+    'An iterator that uses fetchmany to keep memory usage down'
+    while True:
+        results = cursor.fetchmany(arraysize)
+        if not results:
+            break
+        for result in results:
+            yield result
+
+orcl = cx_Oracle.connect('slxasync/c0piiRn2pr@seqprod')
+curs = orcl.cursor()
+
+curs.execute("SELECT deck_name FROM decks ORDER BY deck_name")
+
+patt = sys.argv[1]
+
+avail_k = 0
+used_k = 0
+
+#fs_patterns = ['/slxa/%s','/slxa/%s_images']
+
+for filesys in [ patt % deck for deck in ResultIter(curs) ]:
+    try:
+        fsinfo = os.statvfs(filesys)
+    except OSError:
+        continue
+    k_per_block = fsinfo.f_bsize / 1024
+    avail_k += fsinfo.f_bavail * k_per_block
+    used_k += (fsinfo.f_blocks - fsinfo.f_bavail) * k_per_block
+
+# MRTG expects the following set of lines, but later ones are optional
+#   incomingbytes
+#   outgoingbytes
+#   uptime of target
+#   name of target
+# so here we go...
+# incoming = free space
+print avail_k
+# outgoing = used space
+print used_k

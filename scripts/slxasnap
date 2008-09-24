@@ -1,0 +1,33 @@
+#!/usr/local/bin/python
+
+from datetime import date,timedelta
+from subprocess import *
+
+snapname = '@bkup'
+datefmt = '%Y%m%d'
+
+keepfor = timedelta(days=14)
+
+today = date.today()
+expiry = today - keepfor
+
+today_str = today.strftime(datefmt)
+expiry_str = expiry.strftime(datefmt)
+
+zfs_list = Popen(['zfs','list'],stdout=PIPE)
+
+for line in zfs_list.stdout:
+    name = line.split()[0]
+    if snapname in name:
+        datestart = name.rindex(snapname) + len(snapname)
+        snapdate = name[datestart:]
+        if snapdate < expiry_str:
+            try:
+                check_call(['zfs','destroy',name])
+            except CalledProcessError:
+                print "zfs destroy of",name,"failed"
+    elif 'SL-X' in name and not '@' in name and not 'images' in name:
+        try:
+            check_call(['zfs','snapshot',name + snapname + today_str])
+        except CalledProcessError:
+            print "zfs snapshot of",name,"failed"

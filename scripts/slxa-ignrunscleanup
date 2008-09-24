@@ -1,0 +1,55 @@
+#!/usr/bin/env python
+
+# SELECT deck_name,RUN_NAME,images_expire from runs where sys_extract_utc(systimestamp)>images_Expire order by deck_name,images_expire
+
+import site
+site.addsitedir('/broad/tools/lib/python2.4/site-packages/')
+
+import os
+import sys
+import cx_Oracle
+
+ocsfile = '/broad/tools/etc/slxasync-connectstring'
+def OracleConnectString(ocsfile):
+    'Read an Oracle connect string from OCSFILE.'
+    fp = open(ocsfile)
+    ocs = fp.readline().strip()
+    fp.close()
+    if not '/' in ocs or not '@' in ocs:
+        sys.exit("%s doesn't look like an Oracle connect string (from %s)"
+                 % (ocs,ocsfile))
+    return ocs
+
+# from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/137270
+def ResultIter(cursor, arraysize=1000):
+    'An iterator that uses fetchmany to keep memory usage down'
+    while True:
+        results = cursor.fetchmany(arraysize)
+        if not results:
+            break
+        for result in results:
+            yield result
+
+orcl = cx_Oracle.connect(OracleConnectString(ocsfile))
+curs = orcl.cursor()
+update = orcl.cursor()
+
+def main(sys_argv):
+    curs.execute("""SELECT deck_name,RUN_NAME from runs
+    where sys_extract_utc(systimestamp)>log_last_changed + 7
+    and state = 'ignore'
+    order by deck_name,images_expire""")
+    for row in ResultIter(curs):
+        (deck,run) = row
+        runpath = os.path.join('/slxa',deck,'transfer/mirror',run)
+        deletepath = os.path.join('/slxa',deck,'transfer/ignored',run)
+        if not os.path.exists(runpath):
+            continue
+        try:
+            os.renames(runpath,deletepath)
+            print "mv %s %s" % (runpath,deletepath)
+        except:
+            print 'rename failed for',runpath
+
+if __name__ == '__main__':
+    main(sys.argv[1:])

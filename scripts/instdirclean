@@ -1,0 +1,7 @@
+#!/bin/sh
+mkdir -p /root/bin/
+cp -p /broad/tools/scripts/dircleaner.py /root/bin/
+grep -v dirclean /etc/crontab > /etc/crontab.new
+echo '11 */4 * * * root /root/bin/dircleaner.py /local/scratch' >> /etc/crontab.new
+mv /etc/crontab.new /etc/crontab
+

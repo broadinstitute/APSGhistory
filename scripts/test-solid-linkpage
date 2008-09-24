@@ -1,0 +1,121 @@
+#!/usr/bin/env python
+
+# make-solid-linkpage: copy data from SOLiDs, build index.html files
+
+import os
+import signal
+import sys
+import errno
+from subprocess import *
+
+solid_results_dir='/seq/solid_results'
+
+skipdirs = [ 'basecalls', 'jobs' ]
+
+path_prefixes = { 'ab-saa' : 'Solid0048',
+                  'ab-sab' : 'Solid0038',
+                  'ab-sac' : 'Solid0060',
+                  }
+
+pidlist = []
+max_children = 2
+
+# modified http://mail.python.org/pipermail/python-list/2002-May/144522.html
+def pid_exists(pid):
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError, err:
+        return err.errno == errno.EPERM
+
+def process_deck(deck):
+    deck_dir = os.path.join(solid_results_dir,deck)
+    deck_subdir = os.path.join(deck_dir,path_prefixes[deck])
+    destfile = os.path.join(deck_dir,'index.html')
+    destfile_tmp = destfile + '.tmp'
+    destfile_lock = destfile + '.lock'
+    if os.path.exists(destfile_lock):
+        lockfp = open(destfile_lock)
+        pid = int(lockfp.readline())
+        lockfp.close()
+        if pid and pid_exists(pid):
+            return
+    # no lock or stale lock, so write our lockfile
+    lockfp = open(destfile_lock,"w")
+    lockfp.write("%d\n" % os.getpid())
+    lockfp.close()
+    retcode = call(['/usr/bin/rsync','-a', '--filter=merge /broad/tools/etc/solid-rsync-filter',
+                    "%s::results/" % deck, os.path.join(deck_dir,'')])
+    if retcode != 0:
+        print >> sys.stderr, "rsync error on deck %s: retval %d" % (
+            deck,retcode)
+    sys.stdout = open(destfile_tmp,'w')
+    print """<html><head><title>SOLiD Results for %s</title></head>
+<body><h1>SOLiD Results for %s</h1>
+""" % (deck.upper(),deck.upper())
+
+    print '<h3><a href="%s">QC reports</a></h3>' % \
+          os.path.join(path_prefixes[deck],"qcreport/index.htm")
+    
+    topdirs = {}
+    
+    for root,dirs,files in os.walk(deck_subdir):
+        for skipdir in skipdirs:
+            try:
+                dirs.remove(skipdir)
+            except ValueError:
+                pass
+        if 'index.html' in files:
+            myroot = root[len(deck_subdir):].lstrip(os.path.sep)
+            if len(myroot) == 0:
+                continue
+            topdir,rest = myroot.split(os.path.sep,1)
+            topdirs.setdefault(topdir,[]).append(rest)
+
+    for item in reversed(sorted(topdirs)):
+        print "<h3>%s</h3><ul>" % item
+        for line in sorted(topdirs[item]):
+            print '<li><a href="%s">%s</a>' % (
+                os.path.join(path_prefixes[deck],item,line,'index.html'),line)
+        print "</ul>"
+    
+    print "</body></html>"
+
+    sys.stdout.close()
+    # XXX remove lockfile
+    os.rename(destfile_tmp,destfile)
+
+def fork_deck_child(deck):
+    pid = os.fork()
+    if pid:
+        return pid
+    # now we're in the child, so clear signals
+    signal.signal(signal.SIGCHLD,signal.SIG_DFL)
+    process_deck(deck)
+    sys.exit(0)
+
+def sigchld_handler(signum,frame):
+    while True:
+        pid,status = os.waitpid(0,os.WNOHANG)
+        if not pid:
+            return
+        try:
+            pidlist.remove(pid)
+        except ValueError:
+            print >> sys.stderr, "pid %d not a known child"
+
+def main(sys_argv):
+    signal.signal(signal.SIGCHLD,sigchld_handler)
+    orig_stdout = sys.stdout
+    decks = sys_argv[1:]
+    if not decks:
+        decks = path_prefixes.keys()
+    while decks or pidlist:
+        if len(pidlist) >= max_children or not decks:
+            # all busy or no work to do, so wait
+            signal.pause()
+        else:
+            pidlist.append(fork_deck_child(decks.pop()))
+
+if __name__ == '__main__':
+    main(sys.argv)

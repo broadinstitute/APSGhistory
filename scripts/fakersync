@@ -1,0 +1,10 @@
+#!/util/bin/python
+
+import random,time,sys,socket
+
+import os
+
+sleeptime = random.randint(4,7)
+time.sleep(sleeptime)
+
+print sleeptime,socket.gethostname(),sys.argv

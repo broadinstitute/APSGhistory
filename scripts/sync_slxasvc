@@ -1,0 +1,5 @@
+#!/bin/sh
+
+env LD_LIBRARY_PATH=/util/oracle/lib \
+    ORACLE_HOME=/util/oracle \
+ /util/bin/python /broad/tools/scripts/sync_slxasvc.py "$@"

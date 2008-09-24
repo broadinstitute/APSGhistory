@@ -1,0 +1,39 @@
+#!/bin/sh
+
+BIN32='/broad/tools/bin/i686'
+BIN64='/broad/tools/bin/x86_64'
+LOG='/broad/tools/var/log/tools.log'
+
+prog=${0##*/}
+
+##
+## Log application access
+##
+applog () {
+  echo $(date "+%b %e %H:%M:%S %Z %Y") $HOSTNAME\($UID\): $@ >> $LOG
+}
+
+case $(arch) in
+  "x86_64")
+    if [ -x $BIN64/$prog ] ; then
+      applog $prog\("x86_64"\)
+      exec $BIN64/$prog "$@"
+    elif [ -x $BIN32/$prog ] ; then
+      applog $prog\("i686"\)
+      exec $BIN32/$prog "$@"
+    else
+      echo "$prog: Command not found for this architecture."
+    fi
+  ;;
+  "i686")
+    if [ -x $BIN32/$prog ] ; then
+      applog $prog\("i686"\)
+      exec $BIN32/$prog "$@"
+    else
+      echo "$prog: Command not found for this architecture."
+    fi
+  ;;
+  * )
+    echo "Unrecognized architecture: $(arch)"
+  ;;
+esac

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# don't run during maint window
+WKDY=`date +%w`
+HOUR=`date +%H`
+
+if [ "x$WKDY" = "x0" -a $HOUR -gt 17 ]; then
+   exit 0
+fi
+
+LOGDIR=/seq/solexaproc/synclogs
+YYYYMM=`date +%Y%m`
+DECK=$1
+
+env PATH=/usr/local/bin:$PATH \
+    LD_LIBRARY_PATH=/oracle/apps/oracle/product/101/lib \
+    ORACLE_HOME=/oracle/apps/oracle/product/101 \
+ /usr/local/bin/python /broad/tools/scripts/slxaincr-isi.py "$@" >> $LOGDIR/$DECK.incr.$YYYYMM 2>&1

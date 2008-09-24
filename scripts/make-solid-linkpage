@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+
+import os,sys
+from subprocess import *
+
+solid_results_dir='/seq/solid_results'
+
+skipdirs = [ 'basecalls', 'jobs' ]
+
+path_prefixes = { 'ab-saa' : 'Solid0048',
+                  'ab-sab' : 'Solid0038',
+                  'ab-sac' : 'Solid0060',
+                  }
+
+orig_stdout = sys.stdout
+
+decks = sys.argv[1:]
+
+if not decks:
+    decks = path_prefixes.keys()
+
+for deck in decks:
+    deck_dir = os.path.join(solid_results_dir,deck)
+    deck_subdir = os.path.join(deck_dir,path_prefixes[deck])
+    destfile = os.path.join(deck_dir,'index.html')
+    destfile_tmp = destfile + '.tmp'
+    retcode = call(['/usr/bin/rsync','-a',"%s::results/" % deck,
+                    os.path.join(deck_dir,'')])
+    if retcode != 0:
+        print >> sys.stderr, "rsync error on deck %s: retval %d" % (
+            deck,retcode)
+    sys.stdout = open(destfile_tmp,'w')
+    print """<html><head><title>SOLiD Results for %s</title></head>
+<body><h1>SOLiD Results for %s</h1>
+""" % (deck.upper(),deck.upper())
+
+    print '<h3><a href="%s">QC reports</a></h3>' % \
+          os.path.join(path_prefixes[deck],"qcreport/index.htm")
+    
+    topdirs = {}
+    
+    for root,dirs,files in os.walk(deck_subdir):
+        for skipdir in skipdirs:
+            try:
+                dirs.remove(skipdir)
+            except ValueError:
+                pass
+        if 'index.html' in files:
+            myroot = root[len(deck_subdir):].lstrip(os.path.sep)
+            if len(myroot) == 0:
+                continue
+            topdir,rest = myroot.split(os.path.sep,1)
+            topdirs.setdefault(topdir,[]).append(rest)
+
+    for item in reversed(sorted(topdirs)):
+        print "<h3>%s</h3><ul>" % item
+        for line in sorted(topdirs[item]):
+            print '<li><a href="%s">%s</a>' % (
+                os.path.join(path_prefixes[deck],item,line,'index.html'),line)
+        print "</ul>"
+    
+    print "</body></html>"
+
+    sys.stdout.close()
+
+    os.rename(destfile_tmp,destfile)

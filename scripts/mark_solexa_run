@@ -1,0 +1,38 @@
+#!/util/bin/python
+
+import sys
+
+sys.path.append('/broad/tools/lib/python2.4/site-packages/')
+import os,sys
+
+if not 'ORACLE_HOME' in os.environ:
+    os.environ['ORACLE_HOME'] = '/util/oracle'
+
+import cx_Oracle
+
+validstates = ['complete','ignore','pending']
+
+orcl = cx_Oracle.connect('slxasync/c0piiRn2pr@seqprod')
+curs = orcl.cursor()
+
+if len(sys.argv) > 2:
+    state = sys.argv[1].lower()
+    #run = sys.argv[2].upper()
+    run = sys.argv[2]
+else:
+    sys.exit('must provide run state and run name on command line')
+
+if state not in validstates:
+    sys.exit('state %s not a valid option: choose from %s' %
+             (state,'/'.join(validstates)))
+
+curs.execute('''UPDATE runs SET state = :rstate WHERE run_name = :rname''',
+             rstate=state,rname=run)
+if curs.rowcount == 0:
+    orcl.rollback()
+    sys.exit('run %s not found in database' % run)
+elif curs.rowcount > 1:
+    orcl.rollback()
+    sys.exit('run %s found more than once: SHOULD NOT HAPPEN' % run)
+
+orcl.commit()
