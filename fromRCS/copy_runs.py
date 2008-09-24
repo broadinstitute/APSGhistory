@@ -339,10 +339,14 @@ def main():
     if not os.path.exists(mirrpath):
         os.makedirs(mirrpath)
     while True:
+        curr_time = datetime.utcnow()
         already_started = False
         (start_ok,stop_now,
          next_check,log_mtime) = check_deck(deck,basedir)
         pidcheck = check_pid(pid)
+        # too soon to run another rsync?
+        if last_start + timedelta(seconds=next_check) > curr_time:
+            start_ok = False
         logmsg('deck %s, start %s, stop %s, next %s, pid %s, chk %s' % 
                (deck, start_ok, stop_now,next_check,pid,pidcheck))
         if pidcheck == True:
