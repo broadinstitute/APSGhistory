@@ -320,7 +320,7 @@ def start_rsync(deck,run_srcpath,mirrpath):
                       mirrpath])
     last_start = datetime.utcnow()
     logmsg('started rsync of %s: pid %s at %s' %
-           (rundir,pid,last_start.ctime()))
+           (run_srcpath,pid,last_start.ctime()))
     set_run_status(last_run,'syncing',last_sync=last_start)
     return (pid,last_start)
 
