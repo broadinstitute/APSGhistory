@@ -65,7 +65,7 @@ def check_cycles(rundir,cycles_already_done,cycles_expected):
     for cycle_type in ['C','D']:
         if cycles_done[cycle_type] >= cycles_needed[cycle_type]:
             cycles_completed[cycle_type] = (cycles_done[cycle_type],True)
-            break
+            continue
         for scantuple in sorted(scandirs[cycle_type]):
             (cycle,scandir) = scantuple
             try:
