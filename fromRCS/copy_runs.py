@@ -127,9 +127,8 @@ def update_run_info(deck,rundir,logfile,log_change):
     if result:
         lastlogdate = result[0]
     else:
-        lastlogdate = None
-    # the "if not" is to cover None return, which would break comparison
-    if not lastlogdate or lastlogdate < log_change:
+        lastlogdate = datetime.utcfromtimestamp(0)
+    if lastlogdate < log_change:
         curs.execute("""MERGE INTO runs r USING dual ON (r.run_name = :rname)
         WHEN matched THEN
         UPDATE SET log_last_changed = :mtime, log_currfile = :logcurr
