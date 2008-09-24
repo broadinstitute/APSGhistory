@@ -10,7 +10,7 @@ from datetime import datetime,timedelta
 from subprocess import *
 
 fromaddr = 'apsg@broad.mit.edu'
-toaddr = 'ckd@broad.mit.edu'
+toaddr = 'solexa-image-expiry@broad.mit.edu'
 
 utc = pytz.utc
 local = pytz.timezone('US/Eastern')
