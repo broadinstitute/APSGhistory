@@ -1,15 +1,15 @@
-#!/util/bin/python
+#!/usr/local/bin/python
 
-import sys
+import os
 
-sys.path.append('/broad/tools/lib/python2.4/site-packages/')
+os.environ['ORACLE_HOME'] = '/oracle/apps/oracle/product/101'
+os.environ['LD_LIBRARY_PATH'] = '/oracle/apps/oracle/product/101/lib'
+os.environ['PATH'] = '/usr/local/bin:%s' % os.environ['PATH']
 
-import cx_Oracle,errno,os,re,signal,socket,stat,time
+import cx_Oracle,errno,re,signal,socket,stat,sys,time
 from datetime import datetime,timedelta
 
-os.environ['PATH'] = '/usr/local/bin:' + os.environ['PATH']
-
-solexa_sw_dir = '/zpool1/ckdtest/SolexaPipeline-0.2.2.4'
+solexa_sw_dir = '/broad/tools/solexa/src/SolexaPipeline-0.2.2.4'
 
 analysis_dest = '/broad/solexaproc'
 analysis_suffix = 'analyzed'
