@@ -2,8 +2,11 @@
 
 import os,tarfile
 
-downloads_dir = '/broad/test/apsg/download'
-unpack_dir = '/broad/test/apsg/unpack'
+downloads_dir = '/broad/data/blastdb/download'
+unpack_dir = '/broad/data/blastdb/unpack'
+semaphore_file = os.path.join(downloads_dir,'.unpack_done')
+
+os.spawnl(os.P_WAIT,'/bin/rm','-rf',unpack_dir);
 
 tarfiles = sorted(os.listdir(downloads_dir))
 
@@ -21,3 +24,7 @@ for file in tarfiles:
     for member in tar.getmembers():
         tar.extract(member,dstpath)
     tar.close()
+
+sem = open(semaphore_file,'w')
+sem.write('Unpack completed\n')
+sem.close()
