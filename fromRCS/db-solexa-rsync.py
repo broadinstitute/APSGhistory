@@ -226,7 +226,7 @@ def main():
         os.makedirs(mirrpath)
     while True:
         (start_ok,stop_now,
-         next_check,log_mtime) = check_deck(deck, basedir)
+         next_check,log_mtime) = check_deck(deck)
         pidcheck = check_pid(pid)
         logmsg('deck %s, start %s, stop %s, next %s, pid %s, chk %s' % 
                (deck, start_ok, stop_now,next_check,pid,pidcheck))
