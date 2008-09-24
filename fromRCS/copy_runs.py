@@ -1,6 +1,10 @@
 #!/util/bin/python
 
-import cx_Oracle,os,signal,socket,sys,time
+import sys
+
+sys.path.append('/broad/tools/lib/python2.4/site-packages/')
+
+import cx_Oracle,os,signal,socket,time
 import xml.sax.handler
 from datetime import datetime,timedelta
 
