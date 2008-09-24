@@ -63,6 +63,9 @@ def check_cycles(rundir,cycles_already_done,cycles_expected):
     # across each of the directories and remove files that we find exist.
     # after that, if anything is left we are missing a file.
     for cycle_type in ['C','D']:
+        if cycles_done[cycle_type] >= cycles_needed[cycle_type]:
+            cycles_completed[cycle_type] = (cycles_done[cycle_type],True)
+            break
         for scantuple in sorted(scandirs[cycle_type]):
             (cycle,scandir) = scantuple
             try:
