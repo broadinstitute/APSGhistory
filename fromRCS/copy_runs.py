@@ -263,6 +263,7 @@ def get_log_mtime(run):
     return datetime.utcfromtimestamp(0)
 
 def write_exclude_file(destpath,rundir):
+    max_cycle = 0
     run = os.path.basename(rundir)
     curs.execute("SELECT last_sync_start FROM runs WHERE run_name = :rname",
                  rname=run)
@@ -280,7 +281,10 @@ def write_exclude_file(destpath,rundir):
         for cycle in cycle_times.get(run,[]):
             if cycle_times[run][cycle] < lastsync:
                 excl.write('C%d.1/\nD%d.1/\n' % (cycle,cycle))
+                if max_cycle < cycle:
+                    max_cycle = cycle
     excl.close()
+    curs.execute("UPDATE runs SET last_cycle_copied = :lc WHERE run_name = :rname",lc=max_cycle,rname=run)
     return excludepath
 
 def main():
