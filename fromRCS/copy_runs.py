@@ -80,6 +80,8 @@ class LogHandler(xml.sax.handler.ContentHandler):
                     self.start_ok = False
                 elif solution in [3, 4]:
                     self.in_gap = False
+            else:
+                self.start_ok = True
         if self.in_gap:
             self.must_stop = False
             self.next_check = 5 * 60
