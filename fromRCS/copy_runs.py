@@ -91,7 +91,7 @@ def run_status(logfile):
     return (handler.start_ok, handler.must_stop,
             handler.next_check, handler.deck_state)
 
-def update_run_info(deck,rundir,logpath,log_mtime):
+def update_run_info(deck,rundir,logfile,log_mtime):
     run_name = os.path.basename(rundir)
     log_change = datetime.utcfromtimestamp(log_mtime)
     curs.execute("""SELECT log_last_changed FROM runs
@@ -111,7 +111,7 @@ def update_run_info(deck,rundir,logpath,log_mtime):
         INSERT (run_name, deck_name, run_sourcepath, log_currfile,
                 log_last_changed, state)
         VALUES (:rname,:dname,:rpath,:logcurr, :mtime,:state)""",
-                     rname=run_name,dname=deck,rpath=rundir, logcurr=logpath,
+                     rname=run_name,dname=deck,rpath=rundir, logcurr=logfile,
                      mtime=log_change,state='pending')
 
 def check_deck(deck,basedir):
@@ -140,7 +140,7 @@ def check_deck(deck,basedir):
                 if foundconv:
                     rundir = dirname[len(logpath):]
                     mtime = os.path.getmtime(path)
-                    update_run_info(deck,rundir,logpath,mtime)
+                    update_run_info(deck,rundir,path,mtime)
                     if mtime > newest['time']:
                         newest['time'] = mtime
                         newest['path'] = path
