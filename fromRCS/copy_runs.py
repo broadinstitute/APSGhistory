@@ -169,10 +169,15 @@ def check_deck(deck,basedir):
                         newest['name'] = os.path.basename(rundir)
     # commit all the run status updates
     orcl.commit()
-    logmsg('parsing logfile %s, mtime %s' % (newest['path'],
-                                             newest['time'].ctime()))
-    (can_start, must_stop,
-     next_check_secs, deck_state) = run_status(newest['path'])
+    if newest['path']:
+        logmsg('parsing logfile %s, mtime %s' % (newest['path'],
+                                                 newest['time'].ctime()))
+        (can_start, must_stop,
+         next_check_secs, deck_state) = run_status(newest['path'])
+    else:
+        logmsg('no logfiles found')
+        (can_start, must_stop,
+         next_check_secs, deck_state) = (True, False, 600, 'idle')
     # update deck state in database
     this_check = datetime.utcnow()
     next_check = this_check + timedelta(seconds=next_check_secs)
