@@ -21,6 +21,7 @@ make_args = ['-j5']
 cycle_regex = re.compile('/C1-(\d+)_Firecrest')
 
 sequence_gid = 52
+umask_val = 002
 
 # oracle connection string
 oraconn = 'slxasync/c0piiRn2pr@seqprod'
@@ -207,6 +208,7 @@ def main():
         deck = sys.argv[1].upper()
     else:
         sys.exit('must provide deck on command line')
+    os.umask(umask_val)
     (xferbase, deckstate) = get_deckinfo(deck)
     run = lock_eligible_run(get_runlist(deck))
     (analysis_dir,run_state,last_copied) = get_runinfo(run)
