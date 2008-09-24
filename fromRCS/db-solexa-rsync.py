@@ -57,6 +57,7 @@ class LogHandler(xml.sax.handler.ContentHandler):
                 elif solution in [3, 4]:
                     self.in_gap = False
         if self.in_gap:
+            self.must_stop = False
             self.next_check = 5 * 60
         elif name == 'INCOMPLETE' or name == 'PARTIAL_SAFE_STATE':
             # run stopped
