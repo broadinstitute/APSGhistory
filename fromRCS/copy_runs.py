@@ -152,6 +152,11 @@ def update_run_info(deck,rundir,logfile,log_change):
         curs.execute("""UPDATE runs SET state = 'pending'
                         WHERE runs.run_name = :rname AND state = 'complete'""",
                      rname=run_name);
+    if run_name.endswith('SERVICE'):
+        # mark the run ignore unconditionally
+        curs.execute("""UPDATE runs SET state = 'ignore'
+                        WHERE runs.run_name = :rname""",
+                     rname=run_name);
 
 def check_deck(deck,basedir):
     logpath = os.path.join(basedir,logdir)
