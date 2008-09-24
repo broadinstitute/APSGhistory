@@ -317,13 +317,14 @@ def main():
                 log_mtime = get_log_mtime(last_run)
                 if exit_status == 0 and last_start > log_mtime:
                     logmsg('rsync completed and no log change since start')
-                    set_run_status(rundir,'complete')
+                    set_run_status(last_run,'complete')
                     stamp = open(os.path.join(mirrpath,
                                               os.path.basename(rundir),
                                               stampfile),'w')
-                    stamp.write('\n'.join(['Run completed at %s',
-                                          'rsync of %s started at %s',
-                                          'last logfile change at %s'])
+                    stamp.write('\n'.join(['Run completed at %s (local)',
+                                           'rsync of %s started at %s UTC',
+                                           'last logfile change at %s UTC',
+                                           ''])
                                 % (time.ctime(),
                                    rundir,last_start.ctime(),
                                    log_mtime.ctime()))
