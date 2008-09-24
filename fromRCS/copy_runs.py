@@ -281,9 +281,9 @@ def write_exclude_file(rundir_path):
     (C_cycles, D_cycles, is_complete) = update_cycle_count(rundir_path)
     excludepath = os.path.join(rundir_path,excludefile)
     excl = open(excludepath,'w')
-    for cycle in range(1,C_cycle+1):
+    for cycle in range(1,C_cycles+1):
         excl.write('C%d.1/\n' % cycle)
-    for cycle in range(1,D_cycle+1):
+    for cycle in range(1,D_cycles+1):
         excl.write('D%d.1/\n' % cycle)
     excl.close()
     return excludepath
