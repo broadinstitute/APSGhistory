@@ -328,6 +328,9 @@ def main():
                                    rundir,last_start.ctime(),
                                    log_mtime.ctime()))
                     stamp.close()
+                elif exit_status != 0:
+                    # failed; set run back to pending and unsynced
+                    set_run_status(last_run,'pending',last_sync=datetime.utcfromtimestamp(0))
             if start_ok:
                 rundir = find_eligible_run(deck)
                 if not rundir:
