@@ -180,9 +180,8 @@ def check_deck(deck,basedir):
     if not newest['name'] in cycle_times:
         cycle_times[newest['name']] = {}
     # xrange will give 1-(last-1), so we won't get the partial cycle
-    mtime_utcdt = datetime.utcfromtimestamp(newest['time'])
     for cyc in xrange(1,last_cycle):
-        cycle_times[newest['name']].setdefault(cyc, mtime_utcdt)
+        cycle_times[newest['name']].setdefault(cyc, newest['time'])
     # update deck state in database
     this_check = datetime.utcnow()
     next_check = this_check + timedelta(seconds=next_check_secs)
