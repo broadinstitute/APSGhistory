@@ -3,7 +3,7 @@
 from glob import glob
 from re   import search
 
-class SolexaRun():
+class SolexaRun:
 	"data and images from a Solexa sequencer run"
 
 	def __init__(self, name, deck = None, images = None, data = None):
