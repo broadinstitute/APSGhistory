@@ -1,159 +1,32 @@
 #!/usr/bin/env python
 
-# SELECT deck_name,RUN_NAME,images_expire from runs where sys_extract_utc(systimestamp)>images_Expire order by deck_name,images_expire
+from glob import glob
+from re   import search
 
-import site
-site.addsitedir('/broad/tools/lib/python2.4/site-packages/')
+class SolexaRun():
+	"data and images from a Solexa sequencer run"
 
-import os,sys,cx_Oracle,pytz,re
-from datetime import datetime,timedelta
-from subprocess import *
+	def __init__(self, name, deck = None, images = None, data = None):
+	
+		def infer_deck(name):
+			return search('^(.*?)_(.*?)_(.*?)_(.*)$', name).group(2)
+	
+		def infer_images(deck, name):
+			return glob("/slxa/%s_images/transfer/mirror/%s" % (deck, name))
+			
+		def infer_data(deck, name):
+			return glob("/seq/solexaproc/%s/analyzed/%s"     % (deck, name))
+			
+		self.name   = name
+		self.deck   = deck   or infer_deck(name)
+		self.data   = data   or infer_data(deck, name)
+		self.images = images or infer_images(deck, name)
+		
+	def status(self):
+		return self.__dict__
 
-fromaddr = 'apsg@broad.mit.edu'
-toaddr = 'solexa-image-expiry@broad.mit.edu'
+if __name__ == "__main__":
 
-expire_days = 14
-notice_days = 6
+	from sys import argv
 
-utc = pytz.utc
-local = pytz.timezone('US/Eastern')
-output_fmt = '%Y-%m-%d %H:%M:%S %Z%z'
-
-now = datetime.utcnow()
-
-countObject = '/prodinfo/prodapps/fobjectClient/countObject'
-
-fobj_name_re = re.compile('^(\d+).*FC(.*)$')
-fobj_results_re = re.compile('^Total objects found: (\d+); Total size: (\d+)$')
-
-sendmail = '/usr/sbin/sendmail'
-
-def fobjectname(run):
-    'Returns fobject server name for RUN.'
-    # get trailing numbers, then leading numbers. then sanity-check length.
-    try:
-        (date,flowcell) = fobj_name_re.search(run).group(1,2)
-        fobj_name = flowcell + date
-        if len(fobj_name) < 10:
-            return None
-        return fobj_name
-    except AttributeError:
-        return None
-
-ocsfile = '/broad/tools/etc/slxasync-connectstring'
-def OracleConnectString(ocsfile):
-    'Read an Oracle connect string from OCSFILE.'
-    fp = open(ocsfile)
-    ocs = fp.readline().strip()
-    fp.close()
-    if not '/' in ocs or not '@' in ocs:
-        sys.exit("%s doesn't look like an Oracle connect string (from %s)"
-                 % (ocs,ocsfile))
-    return ocs
-
-# from http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/137270
-def ResultIter(cursor, arraysize=1000):
-    'An iterator that uses fetchmany to keep memory usage down'
-    while True:
-        results = cursor.fetchmany(arraysize)
-        if not results:
-            break
-        for result in results:
-            yield result
-
-def check_run(run):
-    try:
-        objcount = Popen([countObject,'-type','solimg','-runid',
-                          fobjectname(run)],stdout=PIPE).stdout
-        line = objcount.readline()
-        (objs,size) = map(int,fobj_results_re.search(line).group(1,2))
-        if not (objs > 0 and size > 0):
-            print run,"has NO fobject server data - skipping"
-            return False
-        if objs < 576:
-            print run,"SHOULD BE CHECKED:",objs,"objects, size",size
-        update.execute("""UPDATE runs
-        SET image_expiry_notice_sent = :rightnow
-        WHERE run_name = :rname""",rightnow=now,rname=run)
-        orcl.commit()
-        return True
-    except:
-        print "couldn't check fobject server"
-        return False
-
-def remove_run(run):
-    'Move a run to the remove directory - local cron jobs will remove later'
-    print "remove run",run
-
-orcl = cx_Oracle.connect(OracleConnectString(ocsfile))
-curs = orcl.cursor()
-update = orcl.cursor()
-
-def main(sys_argv):
-    sendmail_fd = Popen([sendmail,'-t'],stdin=PIPE).stdin
-    save_stdout = sys.stdout
-    sys.stdout = sendmail_fd
-    print "From:",fromaddr
-    print "To:",toaddr
-    print "Subject: Solexa image data to be deleted"
-    print
-    print "The following runs will be deleted in 6 days."
-    print "To change the expiry date of any of these runs, go to"
-    print "http://apsg.broad.mit.edu/solexa/runstatusdetail.php"
-    print "and enter the appropriate run name; this will return a page"
-    print "that allows you to move the expiry date into the future."
-    # find runs we've already notified for >6 days ago and move them away
-    curs.execute("""SELECT deck_name,RUN_NAME from runs
-    where sys_extract_utc(systimestamp)>images_Expire
-    and state != 'ignore'
-    and image_expiry_notice_sent + %d <
-    sys_extract_utc(systimestamp)
-    order by deck_name,images_expire""" % notice_days)
-    for row in ResultIter(curs):
-        (deck,run) = row
-        runpath = os.path.join('/slxa',deck,'transfer/mirror',run)
-        deletepath = os.path.join('/slxa',deck,'transfer/deleting',run)
-        if not os.path.exists(runpath):
-            continue
-        try:
-            os.renames(runpath,deletepath)
-        except:
-            print 'rename failed for',runpath
-    # update the expire dates if needed
-    update.execute("""UPDATE runs
-    SET images_expire = CASE WHEN log_last_changed > last_sync_start
-    THEN log_last_changed
-    ELSE last_sync_start END + %d
-    WHERE images_expire is null
-    AND (log_last_changed < sysdate -14 and
-    last_sync_start < sysdate -14)""" % expire_days)
-    orcl.commit()
-    curs.execute("""SELECT deck_name,RUN_NAME,images_expire from runs
-    where sys_extract_utc(systimestamp)>images_Expire
-    and state != 'ignore'
-    order by deck_name,images_expire""")
-
-    last_deck = ''
-
-    for row in ResultIter(curs):
-        (deck,run,expiry) = row
-        runpath = os.path.join('/slxa',deck,'transfer/mirror',run)
-        if not os.path.exists(runpath):
-            continue
-        if os.path.islink(runpath):
-            print run,'symlinked elsewhere'
-            continue
-        expiry = expiry.replace(tzinfo=utc)
-        if deck != last_deck:
-            runs_this_deck = 1
-            print
-            print deck,"-" * 30
-            last_deck = deck
-        if runs_this_deck > 4:
-            continue
-        if check_run(run):
-            runs_this_deck = runs_this_deck + 1
-            print run, "expired at", expiry.astimezone(local)
-
-if __name__ == '__main__':
-    main(sys.argv[1:])
+	print [ SolexaRun(run_id).status() for run_id in argv[1:] ]
