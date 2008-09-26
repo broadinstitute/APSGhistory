@@ -41,6 +41,7 @@ class SolexaRun:
 		recipe.close
 		
 		self.cycles = no_cycles
+		if (self.cycles == None): print "unable to determine number of cycles for %s" % name
 		self.paired = (read_type == "Paired End")
 
 	def analysis_pending(self):
@@ -53,6 +54,11 @@ class SolexaRun:
 
 			cycles = int(match.group(1))
 
+			# if we couldn't figure out how many cycles, assume everything is relevant
+			if (self.cycles == None): return True
+			if (cycles == None):
+				print "could not identify number of cycles for %s" % name
+				return False
 			if (cycles == self.cycles):                       return True
 			if (cycles == self.cycles * 2) and (self.paired): return True
 		
