@@ -2,7 +2,9 @@ These scripts and template files set up a Moc OS X workstation to use
 ssh tunnels to reach the VNC server on the SOLiD machines. These setup
 scripts and the resulting tunnels assume that you have a working
 passwordless ssh setup to gold.broad.mit.edu. If that is not the case,
-you should set that up before proceeding. They do the following:
+you should set that up before proceeding. The script "sshconfig.sh" will
+set up passwordless ssh to gold (and all broad hosts) for you. The rest 
+of the scripts do the following:
 
   - (setup.py) Create an sshkey pair for each SOLiD/service
   - (setup.py) Create a plist file for each launchd listener
@@ -12,6 +14,7 @@ you should set that up before proceeding. They do the following:
 
 To use, do: 
 
+  - sshconfig.sh (optional, to set up passwordless ssh to broad hosts)
   - setup.py
   - installkeys.sh
   - loadservices.sh
