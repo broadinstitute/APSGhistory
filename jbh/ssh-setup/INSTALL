@@ -1,0 +1,22 @@
+These scripts and template files set up a Moc OS X workstation to use
+ssh tunnels to reach the VNC server on the SOLiD machines. These setup
+scripts and the resulting tunnels assume that you have a working
+passwordless ssh setup to gold.broad.mit.edu. If that is not the case,
+you should set that up before proceeding. They do the following:
+
+  - (setup.py) Create an sshkey pair for each SOLiD/service
+  - (setup.py) Create a plist file for each launchd listener
+  - (installkeys.sh) Copy keys to gateway host (gold)
+  - (loadservices.sh) Load/start services in launchd
+  - (remove.sh) Crudely, very crudely, uninstall these services
+
+To use, do: 
+
+  - setup.py
+  - installkeys.sh
+  - loadservices.sh
+  - open solids.html and test a few connections.
+
+
+
+

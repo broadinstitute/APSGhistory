@@ -1,0 +1,901 @@
+#!/usr/local/bin/python
+#
+# $Id: runaround,v 1.321 2008/09/03 15:18:29 root Exp $
+#
+# runaround - run around all of the hosts
+#
+# The source location for this file is:
+# 
+#	tryptophan:/cfengine/bin/runaround
+#
+# Options:
+# 
+# -h host1,host2,host3,... (include hosts)
+# -H keyword (include hosts)
+# -x host1,host2,host3,... (exclude hosts)
+# -X keyword (exclude hosts)
+# -e 'command' (excute this instead of "ssh %%HOST%% ")
+# -q "" (quiet, no output except for command output -- you do need to put the "" in)
+#
+# Examples:
+#
+# runaround -H linux -X redhat -q "" -e 'echo %%HOST%%' | sort -u 
+# runaround -H linux -X redhat -q "" "uname -a" >> /tmp/RHuname.out
+#
+
+
+import sys
+import os
+import string
+import getopt
+import time
+
+#
+# Architectures:	ia64, x86_64, amd, amd64, i386, x86
+#
+# Kernel:		bigmem, bigsmp, default, enterprise
+#
+# Operating Systems:	freebsd, isilon, linux, macos, netapp, solaris, tru64
+#
+# Distributions:	debian, gentoo, redhat, sles, suse
+#
+# OS Versions:		v40d, v40f, v51, v51b,
+#			debian-3.0, gentoo-1.6.14, 
+#			redhat-2.1as, redhat-9, rhel4, rhel4as
+#			sles-8, suse-9.2, sles-9, sles-10
+#			opensuse, opensuse-10.1
+#			freebsd-4.11, freebsd-5.4, freebsd-6.1, freebsd-6.2, freebsd-7.0,
+#			netapp-7.1, netapp-7.2,
+#			osx,
+#			solaris-5.8, solaris-5.9, solaris-5.10
+#
+# Locations:		7cc, charles
+#
+# Owners:		454, annotation, apsg, assembly, cancer, chembio, core, gap, harvard,
+#                       medpop, netops, pipeline, primate, prodinfo, seq, solexa, squid,
+#                       synthematix, trace, wga
+#
+# Blade Chassis:	blades1, blades2, blades3, blades4, blades5, blades6,
+#			blades7, blades8, blades9, blades10, blades11, blades12,
+#			blades13, blades14, blades15, blades16, blades17, blades18,
+#                       blades19, blades20, blades21, blades22, blades23, blades24,
+#                       blades25, blades26, blades27, blades28, blades29, blades30,
+#                       blades31
+#
+# Applications:		backup, blade-farm, build, db, dellblades, lims, login,
+#                       lsf, mail, mascot, netbackup, nis, submission, thumper, web, xserve
+#
+# Software:		calendar, cfengine, cognos, cvs, jumpstart, opm, stats, svn
+
+quiet = 0
+
+hostspecs = {
+	#
+	# FreeBSD Systems
+	#
+	"alanine"		: ['freebsd', 'freebsd-6.2', 'i386', '7cc', 'nis', 'cfengine'],
+	"arginine"		: ['freebsd', 'freebsd-6.2', 'i386', 'charles', 'nis', 'cfengine'],
+	"asparagine"		: ['freebsd', 'freebsd-7.0', 'i386', '7cc', 'cfengine'],
+	"cysteine"		: ['freebsd', 'freebsd-6.2', 'i386', '7cc', 'cfengine'],
+	"glycine"		: ['freebsd', 'freebsd-7.0', 'i386', '7cc', 'cfengine'],
+	"glutamine"		: ['freebsd', 'freebsd-6.2', 'amd64', '7cc', 'cfengine'],
+	"methionine"		: ['freebsd', 'freebsd-7.0', 'i386', '7cc', 'cfengine'],
+	"phenylalanine"		: ['freebsd', 'freebsd-7.0', 'i386', '7cc', 'cfengine'],
+	"rubidium"		: ['freebsd', 'freebsd-6.2', 'i386', '7cc', 'cfengine'],
+	"serine"		: ['freebsd', 'freebsd-6.2', 'i386', '7cc', 'cfengine'],
+	"tryptophan"		: ['freebsd', 'freebsd-6.2', 'amd64', '7cc', 'cfengine'],
+	"tyrosine"		: ['freebsd', 'freebsd-6.2', 'i386', '7cc', 'cfengine'],
+	"valine"		: ['freebsd', 'freebsd-4.11', 'i386', '7cc', 'cfengine'],
+	"valine-new"		: ['freebsd', 'freebsd-6.2', 'amd64', '7cc', 'cfengine'],
+
+	#
+	# Debian Linux Systems
+	#
+	"surlej"	: ['linux', 'debian', 'debian-3.0', '7cc', 'harvard'],
+
+	#
+	# GenToo Linux Systems
+	#
+
+	#
+	# non-blade Red Hat Linux Systems
+	#
+	"arsenic"	: ['linux', 'redhat', 'rhel4', 'rhel4as', '7cc', 'enterprise', 'cognos'],
+	"gallium"	: ['linux', 'redhat', 'rhel4', 'rhel4as', '7cc', 'enterprise', 'cognos'],
+	"lead"		: ['linux', 'redhat', 'redhat-9', '7cc', 'bigmem'],
+	"polonium"	: ['linux', 'redhat', 'redhat-9', '7cc', 'cfengine'],
+
+	#
+	# non-blade SuSE Linux Systems
+	#
+	"actinium"	: ['linux', 'suse', 'suse-9.2', '7cc', 'medpop'],
+	"aluminum"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'chembio'],
+	"americium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc'],
+	"astatine"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'primate'],
+	"barium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"berkelium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc',],
+	"beryllium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"bismuth"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"bohrium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"calcium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"californium"	: ['linux', 'suse', 'suse', 'suse-9.2', 'x86_64', '7cc', 'cancer'],
+	"carbon"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db', 'chembio'],
+	"cerium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86', '7cc', 'chembio'],
+	#brian "cesium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86', '7cc', 'harvard'],
+	"choline"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db', 'chembio'],
+	"chromium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db', 'synthematix'],
+	"cobalt"	: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'cognos'],
+	"copper"	: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'assembly'],
+	"cdr1"		: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'amd', 'wga'],
+	"cdr2"		: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'amd', 'wga'],
+	"cdr3"		: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'amd', 'wga'],
+	"cdr4"		: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'amd', 'wga'],
+	"cdr5"		: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'amd', 'wga'],
+	"darmstadtium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	#monia "dubnium"	: ['linux', 'suse', 'sles', '7cc', 'db', 'calendar'],
+	"dysprosium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db', 'annotation'],
+	"einsteinium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"erbium"	: ['linux', 'suse', 'suse-9.2', '7cc', 'medpop'],
+	"fermium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"franciumold"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"germanium"	: ['linux', 'suse', 'suse-9.2', '7cc', 'medpop'],
+	"gold"		: ['linux', 'suse', 'suse-9.2', '7cc', 'login', 'bigsmp'],
+	"granite"	: ['linux', 'suse', 'opensuse-10.1', 'x86_64', '7cc', 'netops'],
+	"hassium"	: ['linux', 'suse', 'suse-9.2', '7cc', 'x86_64', 'cancer'],
+	"holmium"	: ['linux', 'suse', 'suse-9.2', '7cc', 'cfengine', 'medpop'],
+	"iridium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"lanthanum"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"lawrencium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"lithium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"leucine"	: ['linux', 'suse', 'sles', 'sles-9'],
+	"lysine"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'mail'],
+	"lutetium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db', 'seq'],
+	"magnesium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"manganese"	: ['linux', 'suse', 'sles', 'sles-9', 'x86', '7cc', 'db'],
+	"mead"		: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'amd'],
+	"meitnerium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db', 'gap'],
+	#brian "mendelevium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', 'charles', 'netbackup'],
+	"mercury"	: ['linux', 'suse', 'sles', 'sles-9', 'x86', '7cc', 'db'],
+	"molybdenum"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', 'charles', 'netbackup'],
+	"neodymium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86', '7cc', 'chembio'],
+	"nickel"	: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'assembly'],
+	"niobium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"nobelium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'cancer'],
+	"ora01"		: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'db', 'default'],
+	# monia - now a cname "ora02"		: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'db', 'default'],
+	"ora03"		: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'db', 'default'],
+	"ora04"		: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'db', 'default'],
+	"palladium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'backup'],
+	"pilsner"	: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'amd'],
+	"praseodymium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db', 'annotation'],
+	"proline"	: ['linux', 'suse', 'opensuse-10.1', '7cc', 'apsg'],
+	"promethium"	: ['linux', 'suse', 'sles', 'sles-10', '7cc', 'core'],
+	"protactinium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"rhodium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', 'charles', 'backup'],
+	"roentgenium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"ruthenium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', 'charles', 'backup'],
+	"rutherfordium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"scandium"	: ['linux', 'suse', 'suse-9.2', '7cc', 'medpop'],
+	"seaborgium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"selenium"	: ['linux', 'suse', 'suse-9.2', '7cc', 'harvard'],
+	"silicon"	: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'nis'],
+	"silver"	: ['linux', 'suse', 'suse-9.2', '7cc', 'login', 'bigsmp'],
+	"sodium"	: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'nis'],
+	"stout"		: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'amd'],
+	"strontium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db', 'gap'],
+	"tantalum"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"tellurium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"terbium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"thallium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"thorium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db'],
+	"thulium"	: ['linux', 'suse', 'sles', 'sles-9', 'x86', '7cc', 'harvard', 'db'],
+	"wga1"		: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'wga'],
+	"wga2"		: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'wga'],
+	"wga3"		: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'wga'],
+	"wga4"		: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'wga'],
+	"wga5"		: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'wga'],
+	"wga6"		: ['linux', 'suse', 'sles', 'sles-9', 'ia64', '7cc', 'wga'],
+	"wga7"		: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'wga'],
+	"wga8"		: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'wga'],
+	"wga9"		: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'wga'],
+	"ytterbium"	: ['linux', 'suse', 'opensuse', '7cc', 'x86_64', 'amd'],
+	"zinc"		: ['linux', 'suse', 'sles', 'sles-9', 'x86_64', '7cc', 'db', 'seq'],
+	#monia "zirconium"	: ['linux', 'suse', 'sles', '7cc', 'db', 'calendar'],
+
+	# Dell Blades
+	"dnode001"	: ['linux', 'suse', 'opensuse', 'opensuse-10.1', '7cc', 'blade-farm', 'dellblades'],
+	"dnode002"	: ['linux', 'suse', 'opensuse', 'opensuse-10.1', '7cc', 'blade-farm', 'dellblades'],
+	"dnode003"	: ['linux', 'suse', 'opensuse', 'opensuse-10.1', '7cc', 'blade-farm', 'dellblades'],
+	"dnode004"	: ['linux', 'suse', 'opensuse', 'opensuse-10.1', '7cc', 'blade-farm', 'dellblades'],
+	"dnode005"	: ['linux', 'suse', 'opensuse', 'opensuse-10.1', '7cc', 'blade-farm', 'dellblades'],
+	"dnode006"	: ['linux', 'suse', 'opensuse', 'opensuse-10.1', '7cc', 'blade-farm', 'dellblades'],
+	"dnode007"	: ['linux', 'suse', 'opensuse', 'opensuse-10.1', '7cc', 'blade-farm', 'dellblades'],
+	"dnode008"	: ['linux', 'suse', 'opensuse', 'opensuse-10.1', '7cc', 'blade-farm', 'dellblades'],
+
+	# Blade Chassis 1
+	"node001"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	"node002"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	#monia "node003"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	"node004"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	#monia "node005"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	"node006"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	"node007"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	"node008"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	"node009"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	"node010"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	"node011"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	"node012"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	"node013"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+	"node014"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades1'],
+
+	# Blade Chassis 2
+	#"node015"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blades2', 'annotation'],
+	#"node016"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blades2', 'annotation'],
+	"node017"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2'],
+	"node018"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2'],
+	"node019"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2', 'annotation'],
+	"node020"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2'],
+	"node021"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2'],
+	"node022"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2'],
+	"node023"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2'],
+	"node024"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2'],
+	"node025"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2'],
+	#monia "node026"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2'],
+	"node027"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2'],
+	"node028"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades2'],
+
+	# Blade Chassis 3
+	"node029"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	"node030"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	"node031"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	"node032"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	"node033"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	"node034"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	"node035"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	"node036"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	"node037"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	"node038"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	#monia "node039"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	"node040"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	"node041"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+	#monia "node042"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades3'],
+
+	# Blade Chassis 4
+	"node043"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node044"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node045"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node046"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node047"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node048"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node049"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node050"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	#monia "node051"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node052"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node053"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node054"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node055"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+	"node056"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades4'],
+
+	# Blade Chassis 5
+	"node057"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	"node058"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	"node059"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	"node060"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	#"node061"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	"node062"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	#"node063"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	"node064"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	"node065"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	"node066"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	#monia "node067"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	"node068"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	"node069"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+	"node070"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades5', 'bigmem'],
+
+	# Blade Chassis 6
+	"node071"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node072"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node073"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node074"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node075"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node076"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node077"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	#monia "node078"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node079"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node080"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node081"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node082"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node083"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+	"node084"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades6', 'bigmem'],
+
+	# Blade Chassis 7
+	"node085"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	"node086"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	#monia "node087"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	"node088"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	"node089"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	"node090"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	"node091"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	"node092"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	"node093"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	"node094"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	"node095"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	#"node096"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	"node097"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+	"node098"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades7', 'bigmem'],
+
+	# Blade Chassis 8 (Systems)
+	#monia "node099"	: ['linux', 'suse', 'suse-9.2', '7cc', 'backup', 'cfengine', 'blades8'],
+	"node100"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades8', 'cvs', 'svn'],
+	"node101"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades8', 'stats'],
+	"node102"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades8', 'build'],
+	"node103"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades8', 'web'],
+	"node104"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades8', 'web'],
+	"node105"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades8', 'web'],
+	"node106"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades8', 'build'],
+	"node107"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades8', 'build'],
+	"node108"	: ['linux', 'suse', 'opensuse', '7cc', 'blades8'],
+	"node109"	: ['linux', 'suse', 'opensuse', '7cc', 'blades8'],
+	"node110"	: ['linux', 'suse', 'opensuse', '7cc', 'blades8'],
+	"node111"	: ['linux', 'suse', 'opensuse', '7cc', 'blades8'],
+	"node112"	: ['linux', 'suse', 'opensuse', '7cc', 'blades8'],
+
+	# Blade Chassis 9
+	"node113"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'bigsmp', 'login'],
+	"node114"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'login'],
+	"node115"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'bigsmp', 'login'],
+	"node116"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'squid'],
+	#"node117"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'squid'],
+	#monia "node118"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'lims'],
+	"node119"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'lims'],
+	"node120"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'pipeline'],
+	"node121"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'submission'],
+	"node122"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'trace'],
+	"node123"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'trace'],
+	"node124"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo'],
+	"node125"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', 'assembly'],
+	#"node126"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades9', 'prodinfo', '454'],
+
+	# Blade Chassis 10
+	"node127"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node128"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node129"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node130"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node131"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node132"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node133"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node134"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node135"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node136"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node137"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node138"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node139"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+	"node140"	: ['linux', 'redhat', 'redhat-9', '7cc', 'prodinfo', 'blades10', 'bigmem'],
+
+	# Blade Chassis 11
+	"node141"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node142"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node143"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node144"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node145"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node146"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node147"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node148"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node149"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node150"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node151"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node152"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node153"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+	"node154"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades11', 'bigmem'],
+
+	# Blade Chassis 12
+	"node155"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node156"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node157"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node158"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node159"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node160"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node161"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	#brian "node162"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node163"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node164"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node165"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node166"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node167"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+	"node168"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades12', 'x86_64'],
+
+	# Blade Chassis 13
+	"node169"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades13', 'x86_64'],
+	"node170"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades13', 'x86_64'],
+	"node171"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades13', 'x86_64'],
+	"node172"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades13', 'x86_64'],
+	"node173"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades13', 'x86_64'],
+	"node174"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades13', 'bigmem'],
+	"node175"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades13', 'bigmem'],
+	"node176"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades13', 'bigmem'],
+	"node177"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades13', 'bigmem'],
+	"node178"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades13', 'x86_64'],
+	"node179"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades13', 'bigmem'],
+	"node180"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades13', 'bigmem'],
+	"node181"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades13', 'bigmem'],
+	"node182"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades13', 'bigmem'],
+
+	# Blade Chassis 14
+	"node183"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node184"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node185"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node186"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node187"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node188"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node189"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node190"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node191"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node192"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node193"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node194"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node195"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+	"node196"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades14', 'bigmem'],
+
+	# Blade Chassis 15
+	"node201"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node202"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node203"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node204"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node205"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node206"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node207"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node208"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node209"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node210"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node211"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node212"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node213"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+	"node214"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades15', 'bigmem'],
+
+	# Blade Chassis 16
+	"node215"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades16', 'x86_64', 'prodinfo'],
+	"node216"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades16', 'x86_64', 'prodinfo'],
+	"node217"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades16', 'x86_64', 'prodinfo', 'cancer'],
+	"node218"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades16', 'default', 'mascot'],
+	"node219"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades16', 'prodinfo', '454'],
+	"node220"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades16', 'prodinfo', '454'],
+	"node221"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades16', 'prodinfo', '454'],
+	"node222"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades16', 'prodinfo', 'assembly'],
+	"node223"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades16', 'prodinfo', 'assembly'],
+	"node224"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades16', 'x86_64', 'prodinfo', '454'],
+	"node225"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades16', 'x86_64', 'prodinfo', 'solexa'],
+	"node226"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades16', 'x86_64', 'prodinfo', 'solexa'],
+	"node227"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades16', 'x86_64', 'prodinfo'],
+	"node228"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades16', 'x86_64', 'prodinfo'],
+
+	# Blade Chassis 17
+	"node229"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	#brian "node230"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node231"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node232"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node233"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node234"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node235"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node236"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node237"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node238"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node239"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node240"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node241"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+	"node242"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades17', 'bigmem'],
+
+	# Blade Chassis 18
+	"node243"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades18', 'bigmem'],
+	"node244"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades18', 'bigmem'],
+	"node245"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades18', 'bigmem'],
+	"node246"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades18', 'bigmem'],
+	"node247"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades18', 'bigmem'],
+	"node248"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades18', 'bigmem'],
+	"node249"	: ['linux', 'redhat', 'redhat-9', '7cc', 'blade-farm', 'blades18', 'bigmem'],
+	"node250"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades18', 'x86_64'],
+	"node251"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades18', 'x86_64'],
+	"node252"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades18', 'x86_64'],
+	"node253"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades18', 'x86_64'],
+	"node254"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades18', 'x86_64'],
+	"node255"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades18', 'x86_64'],
+	"node256"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades18', 'x86_64'],
+
+	# Blade Chassis 19
+	"node257"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades19', 'x86_64', 'amd'],
+	"node258"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blades19', 'x86_64', 'amd'],
+	"node259"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+	"node260"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+	"node261"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+	#monia "node262"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+	"node263"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+	"node264"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+	"node265"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+	"node266"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+	"node267"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+	"node268"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+	"node269"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+	"node270"	: ['linux', 'suse', 'suse-9.2', '7cc', 'blade-farm', 'blades19', 'x86_64', 'amd'],
+
+	# Blade Chassis 20
+	"node271"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node272"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node273"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node274"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node275"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node276"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node277"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node278"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node279"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node280"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node281"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node282"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node283"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+	"node284"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades20', 'x86_64', 'amd'],
+
+	# Blade Chassis 21
+	"node285"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node286"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node287"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node288"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node289"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node290"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node291"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node292"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node293"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node294"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node295"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node296"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node297"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+	"node298"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades21', 'x86_64', 'amd'],
+
+	# Blade Chassis 22
+	"node299"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node300"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node301"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node302"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node303"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node304"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node305"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node306"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node307"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node308"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node309"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node310"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node311"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+	"node312"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades22', 'x86_64', 'amd'],
+
+	# Blade Chassis 23
+	"node313"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node314"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node315"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node316"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node317"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node318"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node319"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node320"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node321"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node322"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node323"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node324"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node325"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+	"node326"       : ['linux', 'suse', 'sles', 'sles-9', '7cc', 'blade-farm', 'blades23', 'x86_64', 'amd'],
+
+	# Blade Chassis 24
+	"node327"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node328"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node329"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node330"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node331"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node332"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node333"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node334"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node335"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node336"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node337"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node338"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node339"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+	"node340"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades24', 'x86_64', 'amd'],
+
+	# Blade Chassis 25
+	"node341"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node342"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node343"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node344"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node345"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node346"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node347"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node348"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node349"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node350"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node351"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node352"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node353"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+	"node354"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades25', 'x86_64', 'amd'],
+
+	# Blade Chassis 26
+	"node355"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node356"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node357"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node358"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node359"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node360"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node361"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node362"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node363"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node364"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node365"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node366"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node367"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+	"node368"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades26', 'x86_64', 'amd'],
+
+	# Blade Chassis 27
+	"node369"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	"node370"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	"node371"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	"node372"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	"node373"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	#brian "node374"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	#monia "node375"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	"node376"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	"node377"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	"node378"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	"node379"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	"node380"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	"node381"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+	"node382"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades27', 'x86_64', 'amd'],
+
+	# Blade Chassis 28
+	"node383"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node384"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node385"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node386"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node387"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node388"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node389"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node390"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node391"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node392"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node393"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node394"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node395"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+	"node396"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades28', 'x86_64', 'amd'],
+
+	# Blade Chassis 29
+	"node397"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node398"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node399"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node400"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node401"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node402"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	#brian "node403"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node404"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node405"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node406"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node407"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node408"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node409"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+	"node410"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades29', 'x86_64', 'amd'],
+
+	# Blade Chassis 30
+	"node411"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node412"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node413"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node414"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node415"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node416"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node417"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node418"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node419"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node420"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node421"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node422"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node423"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+	"node424"	: ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades30', 'x86_64', 'amd'],
+
+	# Blade Chassis 31
+        "node425"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        #brian "node426"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node427"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node428"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node429"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node430"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node431"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node432"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node433"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node434"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node435"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node436"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node437"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+        "node438"       : ['linux', 'suse', 'opensuse', '7cc', 'blade-farm', 'blades31', 'x86_64', 'amd'],
+
+
+	#
+	# Solaris Systems
+	#
+	"cadmium"	: ['solaris', 'solaris-5.9', '7cc', 'cfengine', 'cognos'],
+	"osmium"	: ['solaris', 'solaris-5.8', '7cc', 'cfengine', 'db', 'opm'],
+	"sunexa01"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa02"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa03"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa04"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa05"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa06"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa07"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa08"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa09"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa10"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa11"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa12"	: ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa13"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa14"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa15"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa16"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa17"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa18"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa19"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa20"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa21"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa22"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa23"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa24"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa25"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa26"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"sunexa27"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper01"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper02"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper03"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper04"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper05"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper06"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper07"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper08"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper09"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper10"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper11"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+	"thumper12"      : ['solaris', 'solaris-5.10', '7cc', 'cfengine', 'thumper'],
+
+	#
+	# Mac Systems
+	##
+	"antimony"	: ['macos', 'osx', '7cc', 'xserve'],
+	"empire"	: ['macos', 'osx', '7cc', 'xserve'],
+	"europium"	: ['macos', 'osx', '7cc', 'xserve'],
+	"gadolinium"	: ['macos', 'osx', '7cc', 'xserve'],
+	#"curium"	: ['macos', 'osx', '7cc', 'xserve'],
+	"fmserver"	: ['macos', 'osx', 'charles'],
+	"hafnium"	: ['macos', 'osx', '7cc', 'xserve'],
+	#"jonagold"	: ['macos', 'osx', '7cc', 'xserve'],
+	#"liberty"	: ['macos', 'osx', '7cc', 'xserve'],
+	#"redjonathan"	: ['macos', 'osx', '7cc', 'xserve'],
+	#"rome"		: ['macos', 'osx', '7cc', 'xserve'],
+	"samarium"	: ['macos', 'osx', '7cc', 'xserve'],
+
+	#
+	# NetApp Filers
+	#
+	"bromine"	: ['netapp', 'netapp-7.2', '7cc'],
+	"helium"	: ['netapp', 'netapp-7.1', '7cc'],
+	"hydrogen"	: ['netapp', 'netapp-7.1', '7cc'],
+	"krypton"	: ['netapp', 'netapp-7.1', '7cc'],
+	"neon"		: ['netapp', 'netapp-7.1', '7cc'],
+	"oxygen"	: ['netapp', 'netapp-7.1', '7cc'],
+	"radon"		: ['netapp', 'netapp-7.1', '7cc'],
+	"xenon"		: ['netapp', 'netapp-7.2', '7cc'],
+
+	# 
+	# Isilon Cluster Nodes
+	#
+	"iodine01"	: ['isilon', '7cc'],
+	"iodine02"	: ['isilon', '7cc'],
+	"iodine03"	: ['isilon', '7cc'],
+	"iodine04"	: ['isilon', '7cc'],
+	"iodine05"	: ['isilon', '7cc'],
+	"iodine06"	: ['isilon', '7cc'],
+	"iodine07"	: ['isilon', '7cc'],
+	"iodine08"	: ['isilon', '7cc'],
+	"iodine09"	: ['isilon', '7cc'],
+	"iodine10"	: ['isilon', '7cc'],
+	"iodine11"	: ['isilon', '7cc'],
+	"iodine12"	: ['isilon', '7cc'],
+	"iodine13"	: ['isilon', '7cc'],
+	"iodine14"	: ['isilon', '7cc'],
+	"iodine15"	: ['isilon', '7cc'],
+	"iodine16"	: ['isilon', '7cc'],
+	"iodine17"	: ['isilon', '7cc'],
+	"iodine18"	: ['isilon', '7cc'],
+	"iodine19"	: ['isilon', '7cc'],
+	"iodine20"	: ['isilon', '7cc'],
+	"iodine21"	: ['isilon', '7cc'],
+	"iodine22"	: ['isilon', '7cc'],
+	"iodine23"	: ['isilon', '7cc'],
+	"iodine24"	: ['isilon', '7cc'],
+	"iodine25"	: ['isilon', '7cc'],
+	"iodine26"	: ['isilon', '7cc'],
+	"iodine27"	: ['isilon', '7cc'],
+
+	
+	}
+
+hosts = hostspecs.keys()
+hosts.sort()
+basecmd = "ssh %%HOST%%.broad.mit.edu"
+
+opts,args = getopt.getopt(sys.argv[1:],"h:H:x:X:e:q:")
+
+# Check command line options
+for opt in opts:
+    optname,optval = opt
+
+#
+# -h host1,host2,host3,... (include hosts)
+#
+    if optname == "-h":
+      	hosts = string.split(optval,",")
+
+#
+# -H keyword (include hosts)
+#
+    elif optname == "-H":
+        newhosts = []
+	for host in hosts:
+	    if hostspecs[host].count(optval):
+                newhosts.append(host)
+        hosts = newhosts
+
+#
+# -x host1,host2,host3,... (exclude hosts)
+#
+    elif optname == "-x":
+        removehosts = string.split(optval,",")
+        for rmhost in removehosts:
+            try:
+                hosts.remove(rmhost)
+            except ValueError:
+                continue
+
+#
+# -X keyword (exclude hosts)
+#
+    elif optname == "-X":
+        removehosts = []
+        for host in hosts:
+            if hostspecs[host].count(optval):
+                removehosts.append(host)
+        for rmhost in removehosts:
+            try:
+                hosts.remove(rmhost)
+            except ValueError:
+                continue
+#
+# -e 'command' (excute this instead of "ssh %%HOST%% ")
+#
+    elif optname == "-e":
+        basecmd = optval
+
+#
+# -q (quiet, no output except for command output)
+#
+    elif optname == "-q":
+	quiet = 1 
+
+    else:
+        # should never be reached, unless option list is out of sync
+        print "illegal option", optname
+
+# bug fix - if you use -e you can get a null argument otherwise
+if args:
+    cmd = basecmd + " '" + string.join(args," ") + "'"
+else:
+    cmd = basecmd
+
+for host in hosts:
+    mycmd = string.replace(cmd,"%%HOST%%",host)
+    # work around cron's handling of percent signs
+    mycmd = string.replace(mycmd,"@@HOST@@",host)
+    if quiet != 1:
+	 print "-->",host,"starting run",time.strftime("(%Y%m%d-%H:%M:%S):"),mycmd
+    sys.stdout.flush()                  # clear buffer before system call
+    os.system(mycmd)
+    if quiet != 1:
+    	print "<--",host,"ending run"
+    print ""
