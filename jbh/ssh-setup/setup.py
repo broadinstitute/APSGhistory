@@ -55,24 +55,24 @@ def createSshKey(label):
         p = os.popen(sshcommand).readline()
         if p != '':
             print "Error creating key: " + p
+        # Add command section to public half of key
+        pub_fname = filepath + ".pub"
+        pub_file = open(pub_fname, 'r')
+
+        # Read the key    
+        key = pub_file.readline()
+        pub_file.close()
+        (target, port) = label.split('_')
+        values = {'target' : target, 'port' : port}
+        keycmd = 'command="netcat %(target)s %(port)s",no-X11-forwarding,no-agent-forwarding,no-port-forwarding ' % values
+
+        # Write command+key back into file    
+        pub_file = open(pub_fname, 'w')
+        pub_file.write(keycmd + key)    
+        pub_file.close()
     else:
-        print "Key " + filepath + " exists, should you really be running setup?"
-
-    # Add command section to public half of key
-    pub_fname = filepath + ".pub"
-    pub_file = open(pub_fname, 'r')
-
-    # Read the key    
-    key = pub_file.readline()
-    pub_file.close()
-    (target, port) = label.split('_')
-    values = {'target' : target, 'port' : port}
-    keycmd = 'command="netcat %(target)s %(port)s",no-X11-forwarding,no-agent-forwarding,no-port-forwarding ' % values
-
-    # Write command+key back into file    
-    pub_file = open(pub_fname, 'w')
-    pub_file.write(keycmd + key)    
-    pub_file.close()
+        print "Key " + filepath + " exists, should you really be running setup again?"
+	sys.exit(1)
 
     return (filepath, label)
 
