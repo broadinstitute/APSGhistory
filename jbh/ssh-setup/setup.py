@@ -26,7 +26,7 @@ def createService(targethost, port, localport):
 
     for line in plist_tmpl:
         t = Template(line)
-        plist.write(t.substitute(label=label, user=username, port=localport, sshdir=sshpath, sshkey=sshkeyfile))
+        plist.write(t.substitute(label=label, user=username, port=localport, sshdir=sshdir, sshkey=sshkeyfile))
 
     # Load service
     # sys.stdout.write(os.popen("launchctl load " + plist_fname).readline())
