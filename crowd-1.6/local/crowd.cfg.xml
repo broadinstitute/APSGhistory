@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<application-configuration>
+  <setupStep>complete</setupStep>
+  <setupType>install.new</setupType>
+  <buildNumber>390</buildNumber>
+  <properties>
+    <property name="crowd.server.id">BI4Y-3POY-4I0G-1A5V</property>
+    <property name="hibernate.c3p0.acquire_increment">1</property>
+    <property name="hibernate.c3p0.idle_test_period">100</property>
+    <property name="hibernate.c3p0.max_size">15</property>
+    <property name="hibernate.c3p0.max_statements">0</property>
+    <property name="hibernate.c3p0.min_size">0</property>
+    <property name="hibernate.c3p0.timeout">30</property>
+    <property name="hibernate.connection.driver_class">org.hsqldb.jdbcDriver</property>
+    <property name="hibernate.connection.password"></property>
+    <property name="hibernate.connection.url">jdbc:hsqldb:/local/crowd-1.6/database/defaultdb</property>
+    <property name="hibernate.connection.username">sa</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
+    <property name="hibernate.setup">true</property>
+    <property name="license">AAABCA0ODAoPeNptkFtLw0AQhd/3Vyz4vCGbipjAQptNwEgu1lZE8WWTjLrQbMJeov33Nm2KIn2cM +ec+Zirolf4XihMA0yvoyCM/BDzzRYHvh+iBEyj5WBlrxjX/Vf7FuF0FDsnJgk1k+SJxsoRmNUOE NdwXCXCApsqiE8JXSDeK3vwlaIDJtp6WetetF4nrQetm3ty2YAysN0PcPTxqijSR56t8nM8LYTcX cj/Ip0oDjZlQQnVQPo9SL3/gxMQGqBKfwglzSkST104U8ZK6yygDegRdJaweFG+kHi9XpGb/PaVP Pt38Yxauq4GXb0/GdCGEYpm9kMoz5LzdPn2g9PNpzDw/0U/EBiB7DAsAhRY5DkwZpjiD+p08kRf3 dI+yG6aMwIUbhlJs1XETCoPYrGs5ooor++jdH4=X02dh</property>
+  </properties>
+</application-configuration>
