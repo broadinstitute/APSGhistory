@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:plugin="http://atlassian.com/schema/spring/plugin"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://atlassian.com/schema/spring/plugin http://atlassian.com/schema/spring/plugin.xsd">
+
+    <!-- bootstrap -->
+
+    <bean id="homeLocator" class="com.atlassian.config.DefaultHomeLocator" plugin:available="true">
+        <property name="configFileName"   value="crowd.cfg.xml"/>
+        <property name="initPropertyName" value="crowd.home"/>
+        <property name="propertiesFile"   value="crowd-init.properties"/>
+    </bean>
+
+    <bean id="applicationConfig" class="com.atlassian.config.ApplicationConfig">
+        <property name="configurationPersister">
+            <bean class="com.atlassian.config.xml.DefaultDom4jXmlConfigurationPersister"/>
+        </property>
+    </bean>
+
+    <bean id="setupPersister" class="com.atlassian.crowd.console.setup.CrowdSetupPersister">
+        <property name="applicationConfig">
+            <ref local="applicationConfig"/>
+        </property>
+    </bean>
+
+    <bean id="bootstrapManager" class="com.atlassian.crowd.manager.bootstrap.CrowdBootstrapManagerImpl">
+        <property name="homeLocator">
+            <ref local="homeLocator"/>
+        </property>
+        <property name="setupPersister">
+            <ref local="setupPersister"/>
+        </property>
+        <property name="applicationConfig">
+            <ref local="applicationConfig"/>
+        </property>
+        <property name="hibernateConfig">
+            <ref local="hibernateConfig"/>
+        </property>
+        <property name="hibernateConfigurator">
+            <ref local="hibernateConfigurator"/>
+        </property>
+        <property name="mappingResources">
+            <ref local="mappingResources"/>
+        </property>
+    </bean>
+
+
+    <!-- database -->
+
+    <bean id="hibernateConfig" class="com.atlassian.config.db.HibernateConfig">
+        <property name="applicationConfig">
+            <ref local="applicationConfig"/>
+        </property>
+    </bean>
+
+    <bean id="hibernateConfigurator" class="com.atlassian.crowd.console.setup.DefaultHibernateConfigurator">
+        <property name="setupPersister">
+            <ref local="setupPersister"/>
+        </property>
+    </bean>
+
+    <bean id="schemaHelper" class="com.atlassian.crowd.util.persistence.hibernate.SchemaHelper">
+        <property name="mappingResources" ref="mappingResources"/>
+        <property name="hibernateConfig" ref="hibernateConfig"/>
+    </bean>
+
+    <bean id="mappingResources" class="com.atlassian.crowd.util.persistence.hibernate.MappingResources">
+        <property name="configLocation" value="classpath:hibernate.cfg.xml"/>
+    </bean>
+
+    <!-- license -->
+    <bean id="sidManager" class="com.atlassian.license.DefaultSIDManager"/>
+    <bean id="crowdLicenseManager" class="com.atlassian.crowd.manager.license.CrowdLicenseManagerImpl"/>    
+</beans>

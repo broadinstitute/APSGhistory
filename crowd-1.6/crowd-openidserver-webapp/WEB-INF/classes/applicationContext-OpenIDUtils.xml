@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean id="i18nHelper" class="com.atlassian.crowd.util.I18nHelperImpl" autowire="byName"/>
+    <bean id="resetableHiLoGeneratorHelper" class="com.atlassian.crowd.util.persistence.hibernate.ResetableHiLoGeneratorHelper" autowire="byName"/>
+    <bean id="principalHelper" class="com.atlassian.crowd.integration.util.SOAPPrincipalHelper" autowire="byType"/>
+    <bean id="profileAttributesHelper" class="com.atlassian.crowd.openid.server.util.ProfileAttributesHelper" autowire="byType"/>
+    <bean id="propertyUtils" class="com.atlassian.crowd.integration.util.PropertyUtils"/>
+
+</beans>

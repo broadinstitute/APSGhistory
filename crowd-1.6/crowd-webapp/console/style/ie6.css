@@ -1,0 +1,41 @@
+* html body
+{
+	width: expression(document.documentElement.clientWidth < 960 ? "960px" : "auto");
+}
+
+#menu {height: 2.2em;}
+
+#menu li {float: left; font-weight: bold; margin: 0 25px 0 0; position: relative; top: 1px;}
+
+#sub-menu {left: -200px;}
+
+#menu fieldset {display: inline;}
+    #menu input {position: relative; top: 2px;}
+
+#sub-menu {background: #EBF1F7; border: 1px solid #BBD0E5; border-bottom: none; color: #036; float: left; list-style: none; margin: 15px 13px 0 13px; padding: 0; width: 170px;}
+
+#content {margin: 0 0 0 200px; width: 790px;}
+    
+    
+.crowdForm .fieldArea label.fieldLabelArea {left: 17em; margin: 0; top: 0;}
+.tabContent .crowdForm .fieldArea label.fieldLabelArea {left: 0;}
+.static .crowdForm .fieldArea label.fieldLabelArea {left: 17em;}
+
+.crowdForm .fieldLabelArea .required {left: 12em;}
+
+.tabs span.tab {float: left;}
+
+.tabs li.on {position: static;}
+
+.tabs a, .tabs span.tab
+{
+	display: block;
+	padding: 7px 11px 5px 11px;
+	background-image: url(../images/tab_right.gif);
+	background-repeat: no-repeat;
+	background-position: 100% 0;
+	color: #666666;
+	text-decoration: none;
+}
+
+.crowdForm .formTable {margin: 3px -3px 15px 4px;}

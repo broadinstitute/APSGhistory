@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:plugin="http://atlassian.com/schema/spring/plugin"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+       http://atlassian.com/schema/spring/plugin http://atlassian.com/schema/spring/plugin.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.4.xsd">
+
+    <!-- Creates spring security's filter chain -->
+<!--    <security:http auto-config="false" entry-point-ref="crowdAuthenticationProcessingFilterEntryPoint">
+    </security:http> -->
+
+    <bean id="springSecurityFilterChain" class="org.springframework.security.util.FilterChainProxy">
+        <property name="filterInvocationDefinitionSource">
+            <value>
+                CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+                PATTERN_TYPE_APACHE_ANT
+                /services/**=#NONE#
+                /console/decorator/**=#NONE#
+                /console/images/**=#NONE#
+                /console/style/**=#NONE#
+                /template/**=#NONE#
+                /**=httpSessionContextIntegrationFilter,logoutFilter,authenticationProcessingFilter,securityContextHolderAwareRequestFilter,anonymousProcessingFilter,exceptionTranslationFilter,filterInvocationInterceptor,changePasswordFilter
+            </value>
+        </property>
+    </bean>
+
+
+    <!-- session context -->
+    <bean id="httpSessionContextIntegrationFilter" class="org.springframework.security.context.HttpSessionContextIntegrationFilter"/>
+
+    <bean id="crowdAuthenticationProcessingFilterEntryPoint" class="org.springframework.security.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+		<property name="loginFormUrl" value="/console/login.action"/>
+	</bean>
+
+    <!-- logout -->
+    <bean id="logoutFilter" class="org.springframework.security.ui.logout.LogoutFilter">
+        <security:custom-filter position="LOGOUT_FILTER"/>
+        <constructor-arg value="/console/login.action"/>
+        <constructor-arg>
+            <list>
+                <ref bean="crowdLogoutHandler"/>
+                <bean class="org.springframework.security.ui.logout.SecurityContextLogoutHandler"/>
+            </list>
+        </constructor-arg>
+        <property name="filterProcessesUrl" value="/console/logoff.action"/>
+    </bean>
+
+    <bean id="crowdLogoutHandler" class="com.atlassian.crowd.integration.springsecurity.CrowdLogoutHandler">
+        <property name="httpAuthenticator" ref="httpAuthenticator"/>
+    </bean>
+
+    <!-- authentication -->
+<!--    <security:authentication-manager alias="authenticationManager"/>  -->  <!-- make the authentication manager reference available -->
+
+    <bean id="authenticationProcessingFilter" class="com.atlassian.crowd.integration.springsecurity.CrowdSSOAuthenticationProcessingFilter">
+        <security:custom-filter position="AUTHENTICATION_PROCESSING_FILTER"/>
+        <property name="httpAuthenticator" ref="httpAuthenticator"/>
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="filterProcessesUrl" value="/console/j_security_check"/>
+        <property name="authenticationFailureUrl" value="/console/login.action?error=true"/>
+        <property name="defaultTargetUrl" value="/console/defaultstartpage.action"/>
+        <property name="requestToApplicationMapper" ref="requestToApplicationMapper"/>
+    </bean>
+
+    <bean id="requestToApplicationMapper" class="com.atlassian.crowd.integration.springsecurity.RequestToApplicationMapper" plugin:available="true">
+        <constructor-arg ref="clientProperties"/>
+    </bean>
+
+    <bean id="authenticationManager" class="com.atlassian.crowd.integration.springsecurity.DynamicProviderManager" plugin:available="true">
+        <property name="providers">
+            <list>
+                <ref local="crowdAuthenticationProvider"/>
+                <ref local="anonymousAuthenticationProvider"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="crowdAuthenticationProvider" class="com.atlassian.crowd.integration.springsecurity.RemoteCrowdAuthenticationProvider">
+        <security:custom-authentication-provider />
+        <constructor-arg ref="crowdAuthenticationManager"/>
+        <constructor-arg ref="httpAuthenticator"/>
+        <constructor-arg ref="crowdUserDetailsService"/>
+    </bean>
+
+    <bean id="crowdUserDetailsService" class="com.atlassian.crowd.integration.springsecurity.user.CrowdUserDetailsServiceImpl" plugin:available="true">
+        <property name="authenticationManager" ref="crowdAuthenticationManager"/>
+        <property name="groupMembershipManager" ref="crowdGroupMembershipManager"/>
+        <property name="userManager" ref="crowdUserManager"/>
+        <property name="authorityPrefix" value="ROLE_"/>
+        <property name="authoritySuffix" value="ADMIN"/>
+    </bean>
+
+    <bean id="anonymousAuthenticationProvider" class="org.springframework.security.providers.anonymous.AnonymousAuthenticationProvider">
+        <property name="key" value="anonymous"/>
+    </bean>
+
+    <!-- security context -->
+    <bean id="securityContextHolderAwareRequestFilter" class="org.springframework.security.wrapper.SecurityContextHolderAwareRequestFilter"/>
+
+    <!-- anonymous user -->
+    <bean id="anonymousProcessingFilter" class="org.springframework.security.providers.anonymous.AnonymousProcessingFilter">
+        <property name="key" value="anonymous"/>
+        <property name="userAttribute" value="anonymous,ROLE_ANONYMOUS"/>
+    </bean>
+
+    <!-- exception translation -->
+    <bean id="exceptionTranslationFilter" class="org.springframework.security.ui.ExceptionTranslationFilter">
+
+        <!-- when anonymous users try to access a secure page -->
+        <property name="authenticationEntryPoint">
+            <bean class="org.springframework.security.ui.webapp.AuthenticationProcessingFilterEntryPoint">
+                <property name="loginFormUrl" value="/console/login.action"/>
+                <property name="forceHttps" value="false"/>
+            </bean>
+        </property>
+
+        <!-- when authenticated users with insufficient privilige try to access a secure page -->
+        <property name="accessDeniedHandler">
+            <bean class="org.springframework.security.ui.AccessDeniedHandlerImpl">
+                <property name="errorPage" value="/console/accessdenied.action"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- authorisation -->
+    <bean id="filterInvocationInterceptor" class="org.springframework.security.intercept.web.FilterSecurityInterceptor">
+        <property name="authenticationManager" ref="authenticationManager"/>
+        <property name="accessDecisionManager" ref="accessDecisionManager"/>
+        <property name="objectDefinitionSource">
+            <value>
+                CONVERT_URL_TO_LOWERCASE_BEFORE_COMPARISON
+                PATTERN_TYPE_APACHE_ANT
+                /console/secure/**=ROLE_ADMIN
+                /console/user/**=IS_AUTHENTICATED_FULLY
+                /console/plugin/secure/**=IS_AUTHENTICATED_FULLY
+            </value>
+        </property>
+    </bean>
+
+    <bean id="accessDecisionManager" class="org.springframework.security.vote.AffirmativeBased">
+        <property name="allowIfAllAbstainDecisions" value="false"/>
+        <property name="decisionVoters">
+            <list>
+                <bean class="org.springframework.security.vote.RoleVoter"/>
+                <bean class="org.springframework.security.vote.AuthenticatedVoter"/>
+            </list>
+        </property>
+    </bean>
+
+</beans>

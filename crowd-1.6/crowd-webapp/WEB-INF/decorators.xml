@@ -1,0 +1,18 @@
+<decorators>
+    <decorator name="error" page="/console/decorator/simple.jsp">
+        <pattern>/console/error/*</pattern>
+    </decorator>
+    <decorator name="license" page="/console/decorator/simple.jsp">
+        <pattern>/console/license*</pattern>
+    </decorator>
+    <decorator name="none" page="/console/decorator/none.jsp">
+        <pattern>/console/plugin/secure/saml/*</pattern>
+    </decorator>
+    <decorator name="main" page="/console/decorator/default.jsp">
+        <pattern>/*</pattern>
+    </decorator>
+
+    <!-- cross-product decorators provided for plugins -->
+    <decorator name="atl.general" page="default.jsp"/>
+    <decorator name="atl.admin" page="default.jsp"/>
+</decorators>

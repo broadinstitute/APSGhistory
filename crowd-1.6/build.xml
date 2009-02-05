@@ -1,0 +1,79 @@
+<project name="Crowd deployment assistant." default="assistant" basedir=".">
+    <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask"/>
+
+    <target name="init">
+
+        <!-- directories -->
+        <property name="etc" value="etc"/>
+        <property name="demo" value="demo-webapp"/>
+        <property name="crowd" value="crowd-webapp"/>
+        <property name="openidserver" value="crowd-openidserver-webapp"/>
+
+        <!-- This value is set dynamically via the crowd-maven-plugin -->
+        <property name="tomcat" value="apache-tomcat"/>
+        <property file="build.properties"/>
+
+    </target>
+
+    <target name="assistant" depends="init" description="Configures the console and demo applications">
+
+        <!-- This will set Tomcat's HTTP Connector and SHUTDOWN ports -->
+        <echo>Changing Tomcat's connector port to ${crowd.tomcat.connector.port}</echo>
+        <xmltask source="${tomcat}/conf/server.xml" dest="${tomcat}/conf/server.xml">
+            <replace path="/Server/Service/Connector/@port" withText="${crowd.tomcat.connector.port}"/>
+        </xmltask>
+
+        <echo>Changing Tomcat's shutdown port to ${crowd.tomcat.shutdown.port}</echo>
+        <xmltask source="${tomcat}/conf/server.xml" dest="${tomcat}/conf/server.xml">
+            <replace path="/Server/@port" withText="${crowd.tomcat.shutdown.port}"/>
+        </xmltask>
+
+        <!-- configure the Crowd console application -->
+        <echo message="Configuring the Crowd Console"/>
+        <echo message="Updating crowd.properties: ${crowd}/WEB-INF/classes"/>
+
+        <!-- try copy the crowd.properties it doesn't exist (ie. preserve password if a crowd.properties already exists) -->
+        <copy file="${etc}/crowd.properties" todir="${crowd}/WEB-INF/classes" overwrite="false"/>
+
+        <!-- replace the url values with those from the build.properties file -->
+        <propertyfile file="${crowd}/WEB-INF/classes/crowd.properties">
+            <entry key="crowd.server.url" value="${crowd.url}/services/"/>
+            <entry key="application.login.url" value="${crowd.url}/"/>
+        </propertyfile>
+
+        <!-- configure the Demo application -->
+        <echo message="Configuring the Demo application"/>
+        <echo message="Updating crowd.properties: ${demo}/WEB-INF/classes"/>
+
+        <!-- try copy the crowd.properties it doesn't exist (ie. preserve password if a crowd.properties already exists) -->
+        <copy file="${etc}/demo.properties" tofile="${demo}/WEB-INF/classes/crowd.properties" overwrite="false"/>
+
+        <!-- replace the url values with those from the build.properties file -->
+        <propertyfile file="${demo}/WEB-INF/classes/crowd.properties">
+            <entry key="crowd.server.url" value="${crowd.url}/services/"/>
+            <entry key="application.login.url" value="${demo.url}"/>
+        </propertyfile>
+
+        <!-- configure the OpenID server application -->
+        <echo message="Configuring the OpenID server application"/>
+        <echo message="Updating crowd.properties: ${openidserver}/WEB-INF/classes"/>
+
+        <!-- try copy the crowd.properties it doesn't exist (ie. preserve password if a crowd.properties already exists) -->
+        <copy file="${etc}/openidserver.properties" tofile="${openidserver}/WEB-INF/classes/crowd.properties" overwrite="false"/>
+
+        <!-- replace the url values with those from the build.properties file -->
+        <propertyfile file="${openidserver}/WEB-INF/classes/crowd.properties">
+            <entry key="crowd.server.url" value="${crowd.url}/services/"/>
+            <entry key="application.login.url" value="${openidserver.url}"/>
+        </propertyfile>
+
+        <!-- configure the OpenID server hibernate system -->
+        <echo message="Configuring the OpenID hibernate configuration"/>
+        <echo message="Updating the HibernateDialect and TransactionFactory in ${openidserver}/WEB-INF/classes/jdbc.properties"/>
+        <propertyfile file="${openidserver}/WEB-INF/classes/jdbc.properties">
+            <entry key="hibernate.dialect" value="${hibernate.dialect}"/>
+            <entry key="hibernate.transaction.factory_class" value="${hibernate.transaction.factory_class}"/>
+        </propertyfile>
+
+    </target>
+</project>

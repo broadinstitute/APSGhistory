@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="com.atlassian.crowd.openid.server.model.property.Property" table="SERVERPROPERTY">
+        <id name="ID" column="ID" type="long" unsaved-value="-1">
+            <generator class="com.atlassian.crowd.util.persistence.hibernate.ResettableTableHiLoGenerator"/>
+        </id>
+
+        <property name="name" column="NAME" type="long" unique="true"/>
+
+        <property name="value" column="VALUE" type="string"/>
+
+    </class>
+</hibernate-mapping>

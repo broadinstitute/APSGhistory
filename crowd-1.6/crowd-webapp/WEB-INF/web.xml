@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="CrowdWebApp" version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+    <display-name>Atlassian Crowd - Single Sign-On, Simplified.</display-name>
+
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            classpath:/applicationContext-CrowdEncryption.xml,
+            classpath:/applicationContext-CrowdManagers.xml,
+            classpath:/applicationContext-CrowdMappers.xml,
+            classpath:/applicationContext-CrowdPersistence.xml,
+            classpath:/applicationContext-CrowdDAO.xml,
+            classpath:/applicationContext-CrowdScheduler.xml,
+            classpath:/applicationContext-CrowdUpgrader.xml,
+            classpath:/applicationContext-CrowdUtils.xml,
+            classpath:/applicationContext-CrowdImporter.xml,
+            classpath:/applicationContext-CrowdWeb.xml,
+            classpath:/applicationContext-CrowdPlugins.xml,
+            classpath:/applicationContext-CrowdSecurity.xml,
+            classpath:/applicationContext-CrowdConsoleClient.xml
+        </param-value>
+    </context-param>
+
+    <!-- ============ Filters ============== -->
+    <filter>
+        <filter-name>consistencySOAP</filter-name>
+        <filter-class>com.atlassian.johnson.filters.JohnsonSoapFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>consistency</filter-name>
+        <filter-class>com.atlassian.johnson.filters.JohnsonFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>licenceFilter</filter-name>
+        <filter-class>com.atlassian.crowd.console.filter.CrowdDelegatingFilterProxy</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>CrowdEncodingFilter</filter-name>
+        <filter-class>com.atlassian.crowd.servlet.filter.CrowdEncodingFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>gzipFilter</filter-name>
+        <filter-class>com.atlassian.crowd.console.filter.CrowdDelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetFilterLifecycle</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>filter-plugin-dispatcher-after-encoding</filter-name>
+        <filter-class>com.atlassian.crowd.plugin.servlet.filter.ServletFilterModuleContainerFilter</filter-class>
+        <init-param>
+            <param-name>location</param-name>
+            <param-value>after-encoding</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>filter-plugin-dispatcher-before-login</filter-name>
+        <filter-class>com.atlassian.crowd.plugin.servlet.filter.ServletFilterModuleContainerFilter</filter-class>
+        <init-param>
+            <param-name>location</param-name>
+            <param-value>before-login</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>securityFilter</filter-name>
+        <filter-class>com.atlassian.crowd.console.filter.CrowdDelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetBeanName</param-name>
+            <param-value>springSecurityFilterChain</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>webwork-cleanup</filter-name>
+        <filter-class>com.opensymphony.webwork.dispatcher.ActionContextCleanUp</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>filter-plugin-dispatcher-before-decoration</filter-name>
+        <filter-class>com.atlassian.crowd.plugin.servlet.filter.ServletFilterModuleContainerFilter</filter-class>
+        <init-param>
+            <param-name>location</param-name>
+            <param-value>before-decoration</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>sitemesh</filter-name>
+        <filter-class>com.opensymphony.module.sitemesh.filter.PageFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>webwork</filter-name>
+        <filter-class>com.opensymphony.webwork.dispatcher.FilterDispatcher</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>requestcache</filter-name>
+        <filter-class>com.atlassian.crowd.plugin.web.filter.RequestCacheThreadLocalFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>sessioninview</filter-name>
+        <filter-class>com.atlassian.crowd.console.filter.CrowdOpenSessionInViewFilter</filter-class>
+    </filter>
+
+    <filter>
+        <filter-name>filter-plugin-dispatcher-before-dispatch</filter-name>
+        <filter-class>com.atlassian.crowd.plugin.servlet.filter.ServletFilterModuleContainerFilter</filter-class>
+        <init-param>
+            <param-name>location</param-name>
+            <param-value>before-dispatch</param-value>
+        </init-param>
+    </filter>
+
+    <!-- ============ Filter Mappings ============== -->
+
+    <!-- These patterns can handle a HTML message -->
+    <filter-mapping>
+        <filter-name>consistencySOAP</filter-name>
+        <url-pattern>/services/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>consistency</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>CrowdEncodingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>licenceFilter</filter-name>
+        <url-pattern>/console/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>gzipFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>sessioninview</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>securityFilter</filter-name>
+        <url-pattern>/console/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>webwork-cleanup</filter-name>
+        <url-pattern>/console/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>/console/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>sitemesh</filter-name>
+        <url-pattern>/index.jsp</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>webwork</filter-name>
+        <url-pattern>/console/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+        <dispatcher>FORWARD</dispatcher>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>requestcache</filter-name>
+        <url-pattern>*.action</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>requestcache</filter-name>
+        <url-pattern>*.ftl</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>requestcache</filter-name>
+        <url-pattern>/plugins/servlet/*</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>requestcache</filter-name>
+        <url-pattern>/s/*</url-pattern>
+    </filter-mapping>
+
+    <!-- ============ Listeners ============== -->
+    <!-- Loads the Bootstrap context for minimal app startup -->
+    <listener>
+        <listener-class>com.atlassian.crowd.console.listener.BootstrapLoaderListener</listener-class>
+    </listener>
+
+    <!-- Loads the Spring servlet context if / when the app has been setup -->
+    <listener>
+        <listener-class>com.atlassian.crowd.console.listener.CrowdContextLoaderListener</listener-class>
+    </listener>
+
+    <!-- Upgrade runner for Crowd -->
+    <listener>
+        <listener-class>com.atlassian.crowd.console.listener.UpgradeListener</listener-class>
+    </listener>
+
+    <servlet>
+        <display-name>XFire Servlet</display-name>
+        <servlet-name>XFireServlet</servlet-name>
+        <servlet-class>org.codehaus.xfire.spring.XFireSpringServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>XFireServlet</servlet-name>
+        <url-pattern>/services/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>servlet-module-container-servlet</servlet-name>
+        <servlet-class>com.atlassian.crowd.plugin.web.servlet.ServletModuleContainerServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>servlet-module-container-servlet</servlet-name>
+        <url-pattern>/plugins/servlet/*</url-pattern>
+    </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+    <error-page>
+        <error-code>500</error-code>
+        <location>/console/500.jsp</location>
+    </error-page>
+
+</web-app>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.0//EN" "http://www.opensymphony.com/xwork/xwork-1.0.dtd">
+<xwork>
+
+    <include file="webwork-default.xml"/>
+    
+    <package name="default" extends="webwork-default">
+        <result-types>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletDispatcherResult" name="dispatcher"/>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletRedirectResult" name="redirect"/>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletActionRedirectResult" name="redirect-action"/>
+        </result-types>
+
+        <interceptors>
+            <interceptor name="static-params" class="com.opensymphony.xwork.interceptor.StaticParametersInterceptor"/>
+            <interceptor name="params" class="com.atlassian.xwork12.interceptors.SafeParametersInterceptor"/>
+            <interceptor name="servlet" class="com.opensymphony.webwork.interceptor.ServletConfigInterceptor"/>
+
+            <interceptor-stack name="defaultStack">
+                <interceptor-ref name="static-params"/>
+                <interceptor-ref name="params"/>
+                <interceptor-ref name="servlet"/>
+            </interceptor-stack>
+
+        </interceptors>
+    </package>
+
+    <!-- Unsecure Console Actions -->
+    <package name="crowd-default" extends="default" namespace="/console">
+
+        <action name="login" class="com.atlassian.crowd.security.demo.action.Login" >
+            <result name="input" type="dispatcher">/login.jsp</result>
+            <result name="success" type="redirect">/secure/console/console.action</result>
+        </action>
+
+        <action name="logoff" class="com.atlassian.crowd.security.demo.action.Logoff" >
+            <result name="success" type="redirect">/console/login.action</result>
+        </action>
+
+        <action name="resetpassword" class="com.atlassian.crowd.security.demo.action.ResetPassword">
+            <result name="input">/resetpassword.jsp</result>
+            <result name="success" type="redirect">/console/login.action</result>
+        </action>
+
+        <action name="baseaction" class="com.atlassian.crowd.security.demo.action.BaseAction"/>
+
+    </package>
+
+    <!-- ==================== Console Actions ==================== -->
+    <package name="console" extends="crowd-default" namespace="/secure/console">
+
+        <action name="console" class="com.atlassian.crowd.security.demo.action.Console">
+            <result name="success" type="dispatcher">/secure/index.jsp</result>
+        </action>
+
+    </package>
+
+
+    <!-- ==================== Principal Actions ==================== -->
+    <package name="principal" extends="crowd-default" namespace="/secure/principal">
+
+        <action name="browseprincipals" class="com.atlassian.crowd.security.demo.action.principal.BrowsePrincipals">
+            <result name="success">/secure/principal/browse_principals.jsp</result>
+        </action>
+
+        <action name="viewprincipal" class="com.atlassian.crowd.security.demo.action.principal.ViewPrincipal" method="default">
+            <result name="success">/secure/principal/view_principal.jsp</result>
+        </action>
+
+        <action name="updateprincipal" class="com.atlassian.crowd.security.demo.action.principal.UpdatePrincipal" method="default">
+            <result name="input">/secure/principal/view_principal.jsp</result>
+            <result name="success">/secure/principal/view_principal.jsp</result>
+        </action>
+
+        <action name="removeprincipal" class="com.atlassian.crowd.security.demo.action.principal.RemovePrincipal" method="default">
+            <result name="input">/secure/principal/remove_principal.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">browseprincipals</param>
+                <param name="namespace">/secure/principal</param>
+            </result>
+        </action>
+
+        <action name="addprincipal" class="com.atlassian.crowd.security.demo.action.principal.AddPrincipal" method="default">
+            <result name="input">/secure/principal/add_principal.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewprincipal</param>
+                <param name="namespace">/secure/principal</param>
+                <param name="name">${name}</param>
+            </result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Group Actions ==================== -->
+    <package name="group" extends="crowd-default" namespace="/secure/group">
+
+        <action name="browsegroups" class="com.atlassian.crowd.security.demo.action.group.BrowseGroups">
+            <result name="success">/secure/group/browse_groups.jsp</result>
+        </action>
+
+        <action name="addgroup" class="com.atlassian.crowd.security.demo.action.group.AddGroup" method="default">
+            <result name="input">/secure/group/add_group.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewgroup</param>
+                <param name="namespace">/secure/group</param>
+                <param name="name">${name}</param>
+            </result>
+        </action>
+
+        <action name="removegroup" class="com.atlassian.crowd.security.demo.action.group.RemoveGroup" method="default">
+            <result name="input">/secure/group/remove_group.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">browsegroups</param>
+                <param name="namespace">/secure/group</param>
+            </result>
+        </action>
+
+        <action name="viewgroup" class="com.atlassian.crowd.security.demo.action.group.ViewGroup" method="default">
+            <result name="success">/secure/group/view_group.jsp</result>
+        </action>
+
+        <action name="updategroup" class="com.atlassian.crowd.security.demo.action.group.UpdateGroup">
+            <result name="error">/secure/group/view_group.jsp</result>
+            <result name="success">/secure/group/view_group.jsp</result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Role Actions ==================== -->    
+    <package name="role" extends="crowd-default" namespace="/secure/role">
+
+        <action name="addrole" class="com.atlassian.crowd.security.demo.action.role.AddRole" method="default">
+            <result name="input">/secure/role/add_role.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewrole</param>
+                <param name="namespace">/secure/role</param>
+                <param name="name">${name}</param>
+            </result>
+
+        </action>
+
+        <action name="browseroles" class="com.atlassian.crowd.security.demo.action.role.BrowseRoles" >
+            <result name="success">/secure/role/browse_roles.jsp</result>
+        </action>
+
+        <action name="removerole" class="com.atlassian.crowd.security.demo.action.role.RemoveRole" method="default">
+            <result name="input">/secure/role/remove_role.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">browseroles</param>
+                <param name="namespace">/secure/role</param>
+            </result>
+        </action>
+
+        <action name="viewrole" class="com.atlassian.crowd.security.demo.action.role.ViewRole" method="default">
+            <result name="success">/secure/role/view_role.jsp</result>            
+        </action>
+
+    </package>
+
+</xwork>

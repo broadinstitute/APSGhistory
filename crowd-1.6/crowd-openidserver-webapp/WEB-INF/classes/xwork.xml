@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.0//EN" "http://www.opensymphony.com/xwork/xwork-1.0.dtd">
+<xwork>
+
+    <include file="webwork-default.xml"/>
+
+    <include file="config-browser.xml"/>
+
+    <package name="default" extends="webwork-default">
+        <result-types>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletDispatcherResult" name="dispatcher"/>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletRedirectResult" name="redirect"/>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletActionRedirectResult"
+                         name="redirect-action"/>
+            <result-type class="com.opensymphony.xwork.ActionChainResult" name="chain"/>
+        </result-types>
+
+        <interceptors>
+            <interceptor name="chain" class="com.opensymphony.xwork.interceptor.ChainingInterceptor"/>
+            <interceptor name="static-params" class="com.opensymphony.xwork.interceptor.StaticParametersInterceptor"/>
+            <interceptor name="params" class="com.atlassian.xwork12.interceptors.SafeParametersInterceptor"/>
+            <interceptor name="servlet" class="com.opensymphony.webwork.interceptor.ServletConfigInterceptor"/>
+
+            <interceptor-stack name="defaultStack">
+                <interceptor-ref name="chain"/>
+                <interceptor-ref name="static-params"/>
+                <interceptor-ref name="params"/>
+                <interceptor-ref name="servlet"/>
+            </interceptor-stack>
+
+        </interceptors>
+    </package>
+
+
+    <package name="openidadmin" extends="default">
+
+        <interceptors>
+            <interceptor name="admincheck"
+                         class="com.atlassian.crowd.openid.server.interceptor.AdminActionInterceptor"/>
+
+            <interceptor-stack name="adminStack">
+                <interceptor-ref name="admincheck"/>
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+
+        </interceptors>
+
+        <default-interceptor-ref name="adminStack"/>
+
+        <global-results>
+            <result name="accessdenied" type="redirect">/secure/accessdenied.jsp</result>
+        </global-results>
+
+    </package>
+
+
+    <!-- Unsecure Console Actions -->
+    <package name="crowd-default" extends="default" namespace="/">
+
+        <action name="login" class="com.atlassian.crowd.openid.server.action.Login">
+            <result name="input" type="dispatcher">/login.jsp</result>
+            <result name="success" type="redirect">/secure/console/console.action</result>
+        </action>
+
+        <action name="logoff" class="com.atlassian.crowd.openid.server.action.Logoff">
+            <result name="success" type="redirect">/login.action</result>
+        </action>
+
+        <action name="forgottenpassword" class="com.atlassian.crowd.openid.server.action.ForgottenPassword">
+            <result name="input" type="dispatcher">/forgottenpassword.jsp</result>
+            <result name="error" type="dispatcher">/forgottenpassword.jsp</result>
+            <result name="success" type="dispatcher">/forgottenpassword_complete.jsp</result>
+        </action>
+
+        <action name="baseaction" class="com.atlassian.crowd.openid.server.action.BaseAction"/>
+
+    </package>
+
+    <!-- ==================== Console Actions ==================== -->
+
+    <package name="console" extends="crowd-default" namespace="/secure/console">
+
+        <action name="console" class="com.atlassian.crowd.openid.server.action.Console">
+            <!--<result name="success" type="dispatcher">/secure/index.jsp</result>-->
+            <result name="success" type="redirect">/secure/profile/viewidentity.action</result>
+        </action>
+
+    </package>
+
+    <package name="users" extends="crowd-default" namespace="/users">
+
+        <action name="viewpublicidentity" class="com.atlassian.crowd.openid.server.action.ViewPublicIdentity">
+            <result name="success" type="dispatcher">/view_identity.jsp</result>
+            <result name="error" type="dispatcher">/error.jsp</result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Secure Actions ==================== -->
+
+    <package name="secure" extends="crowd-default" namespace="/secure/interaction">
+        <action name="allowauthentication"
+                class="com.atlassian.crowd.openid.server.action.secure.interaction.AllowAuthentication">
+            <result name="input" type="dispatcher">/secure/interaction/allow_authentication.jsp</result>
+            <result name="error" type="dispatcher">/secure/interaction/error.jsp</result>
+            <result name="success" type="dispatcher">/server.openid</result>
+        </action>
+
+        <action name="editallowalways"
+                class="com.atlassian.crowd.openid.server.action.secure.interaction.EditAllowAlways">
+            <result name="input" type="dispatcher">/secure/interaction/edit_allow_always.jsp</result>
+        </action>
+
+        <action name="viewauthrecord"
+                class="com.atlassian.crowd.openid.server.action.secure.interaction.ViewAuthRecord">
+            <result name="success" type="dispatcher">/secure/interaction/view_auth_record.jsp</result>
+        </action>
+    </package>
+
+    <package name="profile" extends="crowd-default" namespace="/secure/profile">
+        <action name="editprofiles" class="com.atlassian.crowd.openid.server.action.secure.profile.EditProfiles">
+            <result name="input" type="dispatcher">/secure/profile/edit_profiles.jsp</result>
+        </action>
+
+        <action name="viewidentity" class="com.atlassian.crowd.openid.server.action.secure.profile.ViewIdentity">
+            <result name="success" type="dispatcher">/view_identity.jsp</result>
+        </action>
+
+        <action name="changepassword" class="com.atlassian.crowd.openid.server.action.secure.profile.ChangePassword">
+            <result name="input" type="dispatcher">/secure/profile/changepassword.jsp</result>
+            <result name="success" type="dispatcher">/secure/profile/changepassword.jsp</result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Administrator Actions ==================== -->
+
+    <package name="admin" extends="openidadmin" namespace="/secure/admin">
+
+        <action name="viewoptions" class="com.atlassian.crowd.openid.server.action.secure.admin.GeneralOptions"
+                method="default">
+            <result name="input" type="dispatcher">/secure/admin/generaloptions.jsp</result>
+            <result name="success" type="dispatcher">/secure/admin/generaloptions.jsp</result>
+        </action>
+
+        <action name="updateoptions" class="com.atlassian.crowd.openid.server.action.secure.admin.GeneralOptions"
+                method="update">
+            <result name="input" type="dispatcher">/secure/admin/generaloptions.jsp</result>
+            <result name="success" type="dispatcher">/secure/admin/generaloptions.jsp</result>
+        </action>
+
+        <action name="viewtrustrelationships"
+                class="com.atlassian.crowd.openid.server.action.secure.admin.WhiteAndBlacklist" method="default">
+            <result name="input" type="dispatcher">/secure/admin/whiteandblacklist.jsp</result>
+            <result name="success" type="redirect">/secure/admin/viewtrustrelationships.action</result>
+        </action>
+
+        <action name="updatetrustrelationships"
+                class="com.atlassian.crowd.openid.server.action.secure.admin.WhiteAndBlacklist" method="update">
+            <result name="input" type="dispatcher">/secure/admin/whiteandblacklist.jsp</result>
+            <result name="success" type="redirect">/secure/admin/viewtrustrelationships.action</result>
+        </action>
+
+        <action name="addtrustrelationshiphost"
+                class="com.atlassian.crowd.openid.server.action.secure.admin.WhiteAndBlacklist" method="addAddress">
+            <result name="input" type="dispatcher">/secure/admin/whiteandblacklist.jsp</result>
+            <result name="success" type="redirect">/secure/admin/viewtrustrelationships.action</result>
+        </action>
+
+        <action name="removetrustlreationshiphost"
+                class="com.atlassian.crowd.openid.server.action.secure.admin.WhiteAndBlacklist" method="removeAddress">
+            <result name="input" type="dispatcher">/secure/admin/whiteandblacklist.jsp</result>
+            <result name="success" type="redirect">/secure/admin/viewtrustrelationships.action</result>
+        </action>
+
+        <action name="crowdserver"
+                class="com.atlassian.crowd.openid.server.action.secure.admin.CrowdServer">
+            <result name="success" type="dispatcher">/secure/admin/crowdserver.jsp</result>
+        </action>
+
+    </package>
+
+
+</xwork>

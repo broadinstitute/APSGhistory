@@ -1,0 +1,339 @@
+<atlassian-plugin name='Crowd Main Navigation' key='crowd.sections.global' system='true'>
+    <plugin-info>
+        <description>This library includes the main navigation options for Crowd and should never be disabled.
+        </description>
+        <vendor name="Atlassian Software Systems" url="http://www.atlassian.com"/>
+        <version>1.0</version>
+    </plugin-info>
+
+
+    <!-- Header Items -->
+    <web-section key="topnav" name="Top Navigation" location="navigation.top" weight="90">
+        <label key="websections.navigation.top"/>
+    </web-section>
+
+    <web-item key="applications" name="Browse Application" section="topnav" weight="10">
+        <label key="menu.application.label"/>
+        <link linkId="topnavBrowseApplication">/console/secure/application/browse.action</link>
+    </web-item>
+
+    <web-item key="users" name="Browse Users" section="topnav" weight="20">
+        <label key="menu.principal.label"/>
+        <link linkId="topnavBrowseUsers">/console/secure/user/browse.action</link>
+    </web-item>
+
+    <web-item key="groups" name="Browse Groups" section="topnav" weight="30">
+        <label key="menu.group.label"/>
+        <link linkId="topnavBrowseGroups">/console/secure/group/browse.action</link>
+    </web-item>
+
+    <web-item key="roles" name="Browse Roles" section="topnav" weight="40">
+        <label key="menu.role.label"/>
+        <link linkId="topnavBrowseRoles">/console/secure/role/browse.action</link>
+    </web-item>
+
+    <web-item key="directories" name="Browse Directories" section="topnav" weight="50">
+        <label key="menu.directory.label"/>
+        <link linkId="topnavBrowseDirectory">/console/secure/directory/browse.action</link>
+    </web-item>
+
+    <web-item key="administration" name="Administration" section="topnav" weight="60">
+        <label key="administration.label"/>
+        <link linkId="topnavBrowseAdministration">/console/secure/admin/general.action</link>
+    </web-item>
+
+
+    <!-- Application Components -->
+    <web-section key="applicationnav" name="Applications Navigation" location="left" weight="90">
+        <label key="websections.application.left"/>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.section</param>
+            <param name="propertyValues">applications</param>
+        </condition>
+    </web-section>
+
+    <web-item key="browse" name="Search Application" section="applicationnav" weight="10">
+        <label key="menu.browseapplications.label"/>
+        <link linkId="browse-application">/console/secure/application/browse.action</link>
+    </web-item>
+
+    <web-item key="add" name="Add Application" section="applicationnav" weight="20">
+        <label key="menu.addapplication.label"/>
+        <link linkId="add-application">/console/secure/application/addapplicationdetails.action</link>
+    </web-item>
+
+    <web-item key="remove" name="Remove Application" section="applicationnav" weight="30">
+        <label key="menu.removeapplication.label"/>
+        <link linkId="remove-application">/console/secure/application/remove.action?ID=${ID}</link>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.ParametersExistCondition">
+            <param name="parameters">ID</param>
+        </condition>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.PermanentApplicationCondition">
+            <param name="applicationIDKey">ID</param>
+        </condition>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.pagename</param>
+            <param name="propertyValues">view,remove</param>
+        </condition>
+    </web-item>
+
+    <!-- User components -->
+    <web-section key="usernav" name="User Navigation" location="left" weight="90">
+        <label key="websections.user.left"/>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.section</param>
+            <param name="propertyValues">users,dataimport</param>
+        </condition>
+    </web-section>
+
+    <web-item key="browseuser" name="Search Users" section="usernav" weight="10">
+        <label key="menu.browseprincipal.label"/>
+        <link linkId="browse-principals">/console/secure/user/browse.action</link>
+    </web-item>
+
+    <web-item key="adduser" name="Add User" section="usernav" weight="20">
+        <label key="menu.addprincipal.label"/>
+        <link linkId="add-principal">/console/secure/user/add.action</link>
+    </web-item>
+
+    <web-item key="dataimport" name="Data Import" section="usernav" weight="30">
+        <label key="menu.importtype.label"/>
+        <link linkId="import-principals">/console/secure/dataimport/importtype.action</link>
+    </web-item>
+
+    <web-item key="resetpassword" name="Reset User Password" section="usernav" weight="40">
+        <label key="menu.resetpassword.label"/>
+        <link linkId="reset-password-principal">/console/secure/user/resetpassword.action?directoryID=${directoryID}&amp;name=${name?url}</link>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.ParametersExistCondition">
+            <param name="parameters">directoryID,name</param>
+        </condition>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.pagename</param>
+            <param name="propertyValues">viewuser,resetpassword,removeuser</param>
+        </condition>
+    </web-item>
+
+    <web-item key="removeuser" name="Remove User" section="usernav" weight="41">
+        <label key="menu.removeprincipal.label"/>
+        <link linkId="remove-principal">/console/secure/user/remove.action?directoryID=${directoryID}&amp;name=${name?url}</link>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.ParametersExistCondition">
+            <param name="parameters">directoryID,name</param>
+        </condition>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.pagename</param>
+            <param name="propertyValues">viewuser,removeuser,resetpassword</param>
+        </condition>
+    </web-item>
+
+    <!-- Group Components -->
+    <web-section key="groupnav" name="Group Navigation" location="left" weight="90">
+        <label key="websections.group.left"/>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.section</param>
+            <param name="propertyValues">groups</param>
+        </condition>
+    </web-section>
+
+    <web-item key="browsegroup" name="Search Groups" section="groupnav" weight="10">
+        <label key="menu.browsegroups.label"/>
+        <link linkId="browse-groups">/console/secure/group/browse.action</link>
+    </web-item>
+
+    <web-item key="addgroup" name="Add Group" section="groupnav" weight="20">
+        <label key="menu.addgroup.label"/>
+        <link linkId="add-group">/console/secure/group/add.action</link>
+    </web-item>
+
+    <web-item key="removegroup" name="Remove Group" section="groupnav" weight="30">
+        <label key="menu.removegroup.label"/>
+        <link linkId="remove-group">/console/secure/group/remove.action?directoryID=${directoryID}&amp;name=${name?url}</link>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.pagename</param>
+            <param name="propertyValues">viewgroup,removegroup</param>
+        </condition>
+    </web-item>
+
+    <web-item key="removegroup.members" name="Remove Group From Members Tab" section="groupnav" weight="31">
+        <label key="menu.removegroup.label"/>
+        <link linkId="remove-group">/console/secure/group/remove.action?directoryID=${directoryID}&amp;name=${groupName?url}</link>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.pagename</param>
+            <param name="propertyValues">viewgroupmembers,viewgroupnestedusers</param>
+        </condition>
+    </web-item>
+
+    <!-- Role Components -->
+    <web-section key="rolenav" name="Role Navigation" location="left" weight="90">
+        <label key="websections.role.left"/>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.section</param>
+            <param name="propertyValues">roles</param>
+        </condition>
+    </web-section>
+
+    <web-item key="browserole" name="Search Roles" section="rolenav" weight="10">
+        <label key="menu.browseroles.label"/>
+        <link linkId="browse-roles">/console/secure/role/browse.action</link>
+    </web-item>
+
+    <web-item key="addrole" name="Add role" section="rolenav" weight="20">
+        <label key="menu.addrole.label"/>
+        <link linkId="add-role">/console/secure/role/add.action</link>
+    </web-item>
+
+    <web-item key="removerole" name="Remove Role" section="rolenav" weight="30">
+        <label key="menu.removerole.label"/>
+        <link linkId="remove-role">/console/secure/role/remove.action?directoryID=${directoryID}&amp;name=${name?url}</link>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.pagename</param>
+            <param name="propertyValues">viewrole,removerole</param>
+        </condition>
+    </web-item>
+
+    <web-item key="removerole.members" name="Remove Role From Members Tab" section="rolenav" weight="31">
+        <label key="menu.removerole.label"/>
+        <link linkId="remove-role">/console/secure/role/remove.action?directoryID=${directoryID}&amp;name=${roleName?url}</link>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.pagename</param>
+            <param name="propertyValues">viewroleusers,removerole</param>
+        </condition>
+    </web-item>
+
+    <!-- Directory Components -->
+    <web-section key="directorynav" name="Directory Navigation" location="left" weight="90">
+        <label key="websections.directory.left"/>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.section</param>
+            <param name="propertyValues">directories</param>
+        </condition>
+    </web-section>
+
+    <web-item key="browsedirectory" name="Search Directories" section="directorynav" weight="10">
+        <label key="menu.browsedirectories.label"/>
+        <link linkId="browse-directories">/console/secure/directory/browse.action</link>
+    </web-item>
+
+    <web-item key="adddirectory" name="Add Directory" section="directorynav" weight="20">
+        <label key="menu.adddirectory.label"/>
+        <link linkId="add-directory">/console/secure/directory/create.action</link>
+    </web-item>
+
+    <web-item key="userdataimport" name="Data Import" section="usernav" weight="30">
+        <label key="menu.importtype.label"/>
+        <link linkId="import-users">/console/secure/dataimport/importtype.action?directoryID=${ID}</link>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.ParametersExistCondition">
+            <param name="parameters">ID</param>
+        </condition>
+    </web-item>
+
+    <web-item key="removedirectory" name="Remove Directory" section="directorynav" weight="40">
+        <label key="menu.removedirectory.label"/>
+        <link linkId="remove-directory">/console/secure/directory/remove.action?ID=${ID}</link>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.ParametersExistCondition">
+            <param name="parameters">ID</param>
+        </condition>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.pagename</param>
+            <param name="propertyValues">view,remove</param>
+        </condition>
+    </web-item>
+
+    <!-- Administration Components -->
+    <web-section key="administrationnav" name="Administration Navigation" location="left" weight="90">
+        <label key="websections.administration.left"/>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.section</param>
+            <param name="propertyValues">administration,sessions</param>
+        </condition>
+    </web-section>
+
+    <web-item key="general" name="General Admin" section="administrationnav" weight="10">
+        <label key="menu.general.label"/>
+        <link linkId="general-admin">/console/secure/admin/general.action</link>
+    </web-item>
+
+    <web-item key="licensing" name="Licensing Admin" section="administrationnav" weight="20">
+        <label key="menu.licensing.label"/>
+        <link linkId="licensing-admin">/console/secure/admin/licensing.action</link>
+    </web-item>
+
+    <web-item key="mailserver" name="Mail Server Admin" section="administrationnav" weight="30">
+        <label key="menu.mailserver.label"/>
+        <link linkId="mailserver-admin">/console/secure/admin/mailserver.action</link>
+    </web-item>
+
+    <web-item key="mailtemplate" name="Mail Template Admin" section="administrationnav" weight="40">
+        <label key="menu.mailtemplate.label"/>
+        <link linkId="mail-template-admin">/console/secure/admin/mailtemplate.action</link>
+    </web-item>
+
+    <web-item key="sessionconfig" name="Session Config" section="administrationnav" weight="50">
+        <label key="menu.sessionconfig.label"/>
+        <link linkId="session-config-admin">/console/secure/admin/sessionconfig.action</link>
+    </web-item>
+
+    <web-item key="sessions" name="Browse Sessions" section="administrationnav" weight="60">
+        <label key="menu.session.label"/>
+        <link linkId="session-browse-admin">/console/secure/session/browseapplicationsessions.action</link>
+    </web-item>
+
+    <web-item key="trustedproxies" name="Trusted Proxy Servers" section="administrationnav" weight="70">
+        <label key="menu.trustedproxies.label"/>
+        <link linkId="trusted-proxy-admin">/console/secure/admin/viewtrustedproxies.action</link>
+    </web-item>
+
+    <web-item key="systeminfo" name="System Information" section="administrationnav" weight="80">
+        <label key="menu.info.label"/>
+        <link linkId="system-info-admin">/console/secure/admin/systeminfo.action</link>
+    </web-item>
+
+    <web-item key="backup" name="Backup" section="administrationnav" weight="90">
+        <label key="menu.backup.label"/>
+        <link linkId="backup-admin">/console/secure/admin/backup.action</link>
+    </web-item>
+
+    <web-item key="restore" name="Restore" section="administrationnav" weight="100">
+        <label key="menu.restore.label"/>
+        <link linkId="restore-admin">/console/secure/admin/restore.action</link>
+    </web-item>
+
+    <web-item key="logging_profiling" name="Logging &amp; Profiling" section="administrationnav" weight="110">
+        <label key="menu.loggingprofiling.label"/>
+        <link linkId="loggin-profiling-admin">/console/secure/admin/loggingProfiling.action</link>
+    </web-item>
+
+    <!-- User Console Components -->
+    <web-section key="userconsolenav" name="User Console Navigation" location="left" weight="90">
+        <label key="websections.userconsole.left"/>
+        <condition class="com.atlassian.crowd.plugin.web.conditions.SitemeshPropertiesCondition">
+            <param name="propertyName">meta.section</param>
+            <param name="propertyValues">user.console</param>
+        </condition>
+    </web-section>
+
+    <web-item key="editprofile" name="Edit Profile" section="userconsolenav" weight="10">
+        <label key="menu.user.console.editprofile.label"/>
+        <link linkId="edit-profile">/console/user/viewprofile.action</link>
+    </web-item>
+
+    <web-item key="changepassword" name="Change Password" section="userconsolenav" weight="20">
+        <label key="menu.user.console.changepassword.label"/>
+        <link linkId="change-password">/console/user/viewchangepassword.action</link>
+    </web-item>
+
+    <web-item key="viewgroups" name="View Groups" section="userconsolenav" weight="30">
+        <label key="menu.user.console.viewgroups.label"/>
+        <link linkId="view-groups">/console/user/viewgroups.action</link>
+    </web-item>
+
+    <web-item key="viewroles" name="View Roles" section="userconsolenav" weight="40">
+        <label key="menu.user.console.viewroles.label"/>
+        <link linkId="view-roles">/console/user/viewroles.action</link>
+    </web-item>
+
+    <web-item key="viewapplications" name="View Applications" section="userconsolenav" weight="50">
+        <label key="menu.user.console.viewapplications.label"/>
+        <link linkId="view-applications">/console/user/viewapplications.action</link>
+    </web-item>
+
+</atlassian-plugin>

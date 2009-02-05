@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Server port="8020" shutdown="SHUTDOWN">
+
+    <Service name="Catalina">
+
+        <Connector acceptCount="100" connectionTimeout="20000" disableUploadTimeout="true" enableLookups="false" maxHttpHeaderSize="8192" maxSpareThreads="75" maxThreads="150" minSpareThreads="25" port="8095" redirectPort="8443" useBodyEncodingForURI="true"/>
+
+        <Engine defaultHost="localhost" name="Catalina">
+            <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true"/>
+        </Engine>
+
+        <!-- To connect to an external web server (typically Apache) -->
+        <!-- Define an AJP 1.3 Connector on port 8009 -->
+        <!--
+            <Connector port="8009" enableLookups="false" redirectPort="8443" protocol="AJP/1.3" />
+        -->
+    </Service>
+
+    <Listener className="org.apache.catalina.mbeans.ServerLifecycleListener"/>
+    <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"/>
+    <Listener className="org.apache.catalina.storeconfig.StoreConfigLifecycleListener"/>
+
+</Server>

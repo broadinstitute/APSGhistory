@@ -1,0 +1,1031 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.1.1//EN" "http://www.opensymphony.com/xwork/xwork-1.1.1.dtd">
+<xwork>
+
+    <include file="webwork-default.xml"/>
+
+    <!--<include file="config-browser.xml"/>-->
+
+    <package name="default" extends="webwork-default">
+        <result-types>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletDispatcherResult" name="dispatcher"/>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletRedirectResult" name="redirect"/>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletActionRedirectResult"
+                         name="redirect-action"/>
+            <result-type class="com.opensymphony.xwork.ActionChainResult" name="chain"/>
+        </result-types>
+
+        <interceptors>
+
+            <!-- Generic Webwork Interceptors -->
+            <interceptor name="chain" class="com.opensymphony.xwork.interceptor.ChainingInterceptor"/>
+            <interceptor name="static-params" class="com.opensymphony.xwork.interceptor.StaticParametersInterceptor"/>
+            <interceptor name="params" class="com.atlassian.xwork12.interceptors.SafeParametersInterceptor"/>
+            <interceptor name="servlet" class="com.opensymphony.webwork.interceptor.ServletConfigInterceptor"/>
+
+            <!-- Crowd Specific Interceptors -->
+            <interceptor name="transaction"
+                         class="com.atlassian.crowd.console.interceptor.CrowdXWorkTransactionInterceptor"/>
+            <interceptor name="setup" class="com.atlassian.crowd.console.interceptor.SetupCheckInterceptor"/>
+
+            <interceptor-stack name="defaultStack">
+                <interceptor-ref name="transaction"/>
+                <interceptor-ref name="chain"/>
+                <interceptor-ref name="static-params"/>
+                <interceptor-ref name="params"/>
+                <interceptor-ref name="servlet"/>
+                <interceptor-ref name="servlet-config"/>
+            </interceptor-stack>
+
+            <!-- stack for the setup process -->
+            <interceptor-stack name="setupStack">
+                <interceptor-ref name="setup"/>
+                <interceptor-ref name="transaction"/>
+                <interceptor-ref name="chain"/>
+                <interceptor-ref name="static-params"/>
+                <interceptor-ref name="params"/>
+                <interceptor-ref name="servlet"/>
+                <interceptor-ref name="servlet-config"/>
+            </interceptor-stack>
+
+        </interceptors>
+    </package>
+
+    <!-- ==================== Error Actions ==================== -->
+
+    <package name="error" extends="default" namespace="/console/error">
+        <action name="error" class="com.atlassian.crowd.console.action.error.ErrorAction">
+            <result name="error">/console/error.jsp</result>
+        </action>
+    </package>
+
+
+    <!-- =================== Bootstrap Actions ==================== -->
+    <package name="bootstrap" extends="default" namespace="/bootstrap">
+
+        <default-interceptor-ref name="setupStack"/>
+
+        <global-results>
+            <result name="alreadySetup">/console/setup/alreadysetup.jsp</result>
+        </global-results>
+
+    </package>
+
+
+    <!-- ==================== Setup Actions ==================== -->
+    <package name="setup" extends="bootstrap" namespace="/console/setup">
+
+        <!-- setup flow is managed by CrowdSetupPersister -->
+        <global-results>
+            <result name="select-setup-step" type="redirect-action">
+                <param name="actionName">selectsetupstep</param>
+            </result>
+        </global-results>
+
+        <action name="selectsetupstep" class="com.atlassian.crowd.console.action.setup.SelectSetupStep">
+            <result name="success" type="redirect">${currentStep}</result>
+            <result name="checklist">/console/setup/checklist.jsp</result>
+        </action>
+
+        <action name="setuplicense" class="com.atlassian.crowd.console.action.setup.License" method="default">
+            <result name="error">/console/setup/license.jsp</result>
+            <result name="input">/console/setup/license.jsp</result>
+        </action>
+
+        <action name="installtype" class="com.atlassian.crowd.console.action.setup.Installation" method="default">
+            <result name="error">/console/setup/installation.jsp</result>
+            <result name="input">/console/setup/installation.jsp</result>
+        </action>
+
+        <action name="setupdatabase" class="com.atlassian.crowd.console.action.setup.Database" method="default">
+            <result name="input">/console/setup/database.jsp</result>
+            <result name="error">/console/setup/database.jsp</result>
+        </action>
+
+        <action name="legacycheck" class="com.atlassian.crowd.console.action.setup.LegacyDatabaseCheck" method="default">
+            <result name="error">/console/setup/legacycheck.jsp</result>            
+        </action>
+
+        <action name="setupimport" class="com.atlassian.crowd.console.action.setup.Import" method="default">
+            <result name="error">/console/setup/import.jsp</result>
+            <result name="input">/console/setup/import.jsp</result>
+        </action>
+
+        <action name="setupoptions" class="com.atlassian.crowd.console.action.setup.Options" method="default">
+            <result name="error">/console/setup/options.jsp</result>
+            <result name="input">/console/setup/options.jsp</result>
+        </action>
+
+        <action name="mailserver" class="com.atlassian.crowd.console.action.setup.MailServer" method="default">
+            <result name="error">/console/setup/mailserver.jsp</result>
+            <result name="input">/console/setup/mailserver.jsp</result>
+        </action>
+
+        <action name="directoryinternalsetup" class="com.atlassian.crowd.console.action.setup.DirectoryInternal"
+                method="default">
+            <result name="error">/console/setup/directory_internal.jsp</result>
+            <result name="input">/console/setup/directory_internal.jsp</result>
+        </action>
+
+        <action name="defaultadministrator" class="com.atlassian.crowd.console.action.setup.DefaultAdministrator"
+                method="default">
+            <result name="error">/console/setup/default_administrator.jsp</result>
+            <result name="input">/console/setup/default_administrator.jsp</result>
+        </action>
+
+        <action name="integration" class="com.atlassian.crowd.console.action.setup.Integration" method="default">
+            <result name="input">/console/setup/integration.jsp</result>
+        </action>
+
+        <action name="finishsetup" class="com.atlassian.crowd.console.action.setup.Complete">
+            <result name="success" type="dispatcher">/console/setup_complete.jsp</result>
+            <result name="error" type="dispatcher">/console/setup_complete.jsp</result>
+            <result name="fatal" type="redirect-action">
+                <param name="actionName">error</param>
+                <param name="namespace">/console/error</param>
+            </result>            
+        </action>
+
+    </package>
+
+    <!-- ==================== Unsecure Console Actions ==================== -->
+    <package name="crowd-default" extends="default" namespace="/console">
+
+        <action name="defaultstartpage" class="com.atlassian.crowd.console.action.DefaultStartPage">
+            <result name="admin" type="redirect-action">
+                <param name="actionName">console</param>
+                <param name="namespace">/console/secure</param>
+            </result>
+            <result name="user" type="redirect-action">
+                <param name="actionName">viewprofile</param>
+                <param name="namespace">/console/user</param>
+            </result>
+            <result name="login" type="redirect-action">
+                <param name="actionName">login</param>
+            </result>
+        </action>
+
+        <action name="accessdenied" class="com.atlassian.crowd.console.action.AccessDenied">
+            <result name="success">/console/accessdenied.jsp</result>
+        </action>
+
+        <action name="license" class="com.atlassian.crowd.console.action.License" method="default">
+            <result name="success" type="redirect">/console/secure/console.action</result>
+            <result name="input" type="dispatcher">/console/license.jsp</result>
+            <result name="error" type="dispatcher">/console/license.jsp</result>
+        </action>
+
+        <action name="login" class="com.atlassian.crowd.console.action.Login">
+            <result name="input" type="dispatcher">/console/login.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">defaultstartpage</param>
+            </result>
+        </action>
+
+        <!-- 'logoff.action' is processed by Spring Security's logout filter -->
+
+        <action name="forgottenpassword" class="com.atlassian.crowd.console.action.ForgottenPassword">
+            <result name="input" type="dispatcher">/console/forgottenpassword.jsp</result>
+            <result name="error" type="dispatcher">/console/forgottenpassword.jsp</result>
+            <result name="success" type="dispatcher">/console/forgottenpassword_complete.jsp</result>
+        </action>
+
+        <action name="baseaction" class="com.atlassian.crowd.console.action.BaseAction"/>
+
+    </package>
+
+    <!-- ==================== User Console Actions ==================== -->
+    <package name="userconsole" extends="crowd-default" namespace="/console/user">
+
+        <action name="viewprofile" class="com.atlassian.crowd.console.action.user.EditProfile" method="default">
+            <result name="input" type="dispatcher">/console/user/editprofile.jsp</result>
+        </action>
+
+        <action name="updateprofile" class="com.atlassian.crowd.console.action.user.EditProfile" method="update">
+            <result name="input" type="dispatcher">/console/user/editprofile.jsp</result>
+            <result name="success" type="dispatcher">/console/user/editprofile.jsp</result>
+        </action>
+
+        <action name="viewchangepassword" class="com.atlassian.crowd.console.action.user.ChangePassword" method="default">
+            <result name="input" type="dispatcher">/console/user/changepassword.jsp</result>
+        </action>
+
+        <action name="changepassword" class="com.atlassian.crowd.console.action.user.ChangePassword" method="update">
+            <result name="input" type="dispatcher">/console/user/changepassword.jsp</result>
+            <result name="success" type="dispatcher">/console/user/changepassword.jsp</result>
+        </action>
+
+        <action name="viewgroups" class="com.atlassian.crowd.console.action.user.ViewGroups" method="default">
+            <result name="success" type="dispatcher">/console/user/viewgroups.jsp</result>
+        </action>
+
+        <action name="viewroles" class="com.atlassian.crowd.console.action.user.ViewRoles" method="default">
+            <result name="success" type="dispatcher">/console/user/viewroles.jsp</result>
+        </action>
+
+        <action name="viewapplications" class="com.atlassian.crowd.console.action.user.ViewApplications" method="default">
+            <result name="success" type="dispatcher">/console/user/viewapplications.jsp</result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Admin Console Actions ==================== -->
+    <package name="console" extends="crowd-default" namespace="/console/secure">
+
+        <action name="console" class="com.atlassian.crowd.console.action.Console">
+            <result name="success">/console/secure/index.jsp</result>
+        </action>
+
+        <action name="changepassword" class="com.atlassian.crowd.console.action.ChangePassword">
+            <result name="input" type="dispatcher">/console/secure/changepassword.jsp</result>
+            <result name="success" type="dispatcher">/console/secure/changepassword.jsp</result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Options Actions ==================== -->
+    <package name="admin" extends="console" namespace="/console/secure/admin">
+
+        <action name="systeminfo" class="com.atlassian.crowd.console.action.options.SystemInfo">
+            <result name="success" type="dispatcher">/console/secure/admin/view_systeminfo.jsp</result>
+        </action>
+
+        <action name="general" class="com.atlassian.crowd.console.action.options.UpdateGeneral" method="default">
+            <result name="input" type="dispatcher">/console/secure/admin/general.jsp</result>
+            <result name="success" type="dispatcher">/console/secure/admin/general.jsp</result>
+        </action>
+
+        <action name="licensing" class="com.atlassian.crowd.console.action.options.UpdateLicensing" method="default">
+            <result name="input" type="dispatcher">/console/secure/admin/licensing.jsp</result>
+            <result name="success" type="dispatcher">/console/secure/admin/licensing.jsp</result>
+        </action>
+
+        <action name="mailserver" class="com.atlassian.crowd.console.action.options.UpdateMailServer" method="default">
+            <result name="input" type="dispatcher">/console/secure/admin/mailserver.jsp</result>
+            <result name="success" type="dispatcher">/console/secure/admin/mailserver.jsp</result>
+        </action>
+
+        <action name="mailtemplate" class="com.atlassian.crowd.console.action.options.UpdateMailTemplate"
+                method="default">
+            <result name="input" type="dispatcher">/console/secure/admin/mailtemplate.jsp</result>
+            <result name="success" type="dispatcher">/console/secure/admin/mailtemplate.jsp</result>
+        </action>
+
+        <action name="sessionconfig" class="com.atlassian.crowd.console.action.options.UpdateSessionConfig"
+                method="default">
+            <result name="input" type="dispatcher">/console/secure/admin/sessionconfig.jsp</result>
+            <result name="success" type="dispatcher">/console/secure/admin/sessionconfig.jsp</result>
+        </action>
+
+        <action name="viewtrustedproxies" class="com.atlassian.crowd.console.action.admin.ViewTrustedProxies"
+                method="default">
+            <result name="input" type="dispatcher">/console/secure/admin/trusted_proxies.jsp</result>
+            <result name="success" type="dispatcher">/console/secure/admin/trusted_proxies.jsp</result>
+        </action>
+
+        <action name="updatetrustedproxies" class="com.atlassian.crowd.console.action.admin.UpdateTrustedProxies">
+            <result name="input" type="dispatcher">/console/secure/admin/trusted_proxies.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewtrustedproxies</param>
+                <param name="namespace">/console/secure/admin</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="systeminfo" class="com.atlassian.crowd.console.action.options.SystemInfo">
+            <result name="success">/console/secure/admin/view_systeminfo.jsp</result>
+        </action>
+
+        <action name="backup" class="com.atlassian.crowd.console.action.admin.Backup" method="default">
+            <result name="input">/console/secure/admin/backup.jsp</result>
+            <result name="error">/console/secure/admin/backup.jsp</result>
+            <result name="success">/console/secure/admin/backup.jsp</result>
+            <result name="login">/console/login.jsp</result>
+        </action>
+
+        <action name="restore" class="com.atlassian.crowd.console.action.admin.Backup" method="default">
+            <result name="input">/console/secure/admin/restore.jsp</result>
+            <result name="error">/console/secure/admin/restore.jsp</result>
+            <result name="success">/console/secure/admin/restore.jsp</result>
+            <result name="login">/console/login.jsp</result>
+        </action>
+
+        <action name="loggingProfiling" class="com.atlassian.crowd.console.action.options.UpdateLoggingProfiling" method="default">
+            <result name="success" type="dispatcher">/console/secure/admin/logging_profiling.jsp</result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Application Actions ==================== -->
+    <package name="application" extends="console" namespace="/console/secure/application">
+
+        <action name="browse" class="com.atlassian.crowd.console.action.application.BrowseApplications">
+            <result name="success">/console/secure/application/browse_applications.jsp</result>
+        </action>
+
+        <action name="view" class="com.atlassian.crowd.console.action.application.ViewApplication" method="default">
+            <result name="success">/console/secure/application/view_application.jsp</result>
+            <result name="jira">/console/secure/application/view_application.jsp</result>
+            <result name="confluence">/console/secure/application/view_application.jsp</result>
+            <result name="bamboo">/console/secure/application/view_application.jsp</result>
+            <result name="fisheye">/console/secure/application/view_application.jsp</result>
+            <result name="error">/console/secure/application/view_application.jsp</result>
+        </action>
+
+        <action name="add" class="com.atlassian.crowd.console.action.application.AddApplication" method="default">
+            <result name="input">/console/secure/application/add_application.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/application</param>
+                <param name="ID">${ID}</param>
+            </result>
+        </action>
+
+
+        <!-- Application Setup Wizard -->
+        <action name="addapplicationdetails" class="com.atlassian.crowd.console.action.application.AddApplicationDetails">
+            <result name="input">/console/secure/application/add_application_details.jsp</result>
+            <result name="error">/console/secure/application/add_application_details.jsp</result>
+            <result name="cancel" type="redirect-action">
+                <param name="namespace">/console/secure/application</param>
+                <param name="actionName">browse</param>
+            </result>
+            <result name="connectiondetails" type="redirect-action">
+                <param name="namespace">/console/secure/application</param>
+                <param name="actionName">addapplicationconnectiondetails</param>
+            </result>
+        </action>
+
+        <action name="addapplicationconnectiondetails" class="com.atlassian.crowd.console.action.application.AddApplicationConnectionDetails">
+            <result name="input">/console/secure/application/add_application_connection_details.jsp</result>
+            <result name="error">/console/secure/application/add_application_connection_details.jsp</result>
+            <result name="start" type="redirect-action">
+                <param name="namespace">/console/secure/application</param>
+                <param name="actionName">addapplicationdetails</param>
+            </result>
+            <result name="directorydetails" type="redirect-action">
+                <param name="namespace">/console/secure/application</param>
+                <param name="actionName">addapplicationdirectorydetails</param>
+            </result>
+        </action>
+
+        <action name="addapplicationdirectorydetails" class="com.atlassian.crowd.console.action.application.AddApplicationDirectoryDetails">
+            <result name="input">/console/secure/application/add_application_directory_details.jsp</result>
+            <result name="error">/console/secure/application/add_application_directory_details.jsp</result>
+            <result name="start" type="redirect-action">
+                <param name="namespace">/console/secure/application</param>
+                <param name="actionName">addapplicationdetails</param>
+            </result>
+            <result name="authorisationdetails" type="redirect-action">
+                <param name="namespace">/console/secure/application</param>
+                <param name="actionName">addapplicationauthorisationdetails</param>
+            </result>
+        </action>
+
+        <action name="addapplicationauthorisationdetails" class="com.atlassian.crowd.console.action.application.AddApplicationAuthorisationDetails">
+            <result name="input">/console/secure/application/add_application_authorisation_details.jsp</result>
+            <result name="error">/console/secure/application/add_application_authorisation_details.jsp</result>
+            <result name="start" type="redirect-action">
+                <param name="namespace">/console/secure/application</param>
+                <param name="actionName">addapplicationdetails</param>
+            </result>
+            <result name="confirmationdetails" type="redirect-action">
+                <param name="namespace">/console/secure/application</param>
+                <param name="actionName">addapplicationconfirmation</param>
+            </result>
+        </action>
+
+        <action name="addapplicationconfirmation" class="com.atlassian.crowd.console.action.application.AddApplicationConfirmation">
+            <result name="input">/console/secure/application/add_application_confirmation.jsp</result>
+            <result name="error">/console/secure/application/add_application_confirmation.jsp</result>
+            <result name="start" type="redirect-action">
+                <param name="namespace">/console/secure/application</param>
+                <param name="actionName">addapplicationdetails</param>
+            </result>
+            <result name="success" type="redirect-action">
+                <param name="namespace">/console/secure/application</param>
+                <param name="actionName">view</param>
+                <param name="ID">${ID}</param>
+            </result>
+        </action>
+
+        <action name="remove" class="com.atlassian.crowd.console.action.application.RemoveApplication" method="default">
+            <result name="success" type="redirect-action">
+                <param name="actionName">browse</param>
+                <param name="namespace">/console/secure/application</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+            <result name="input" type="dispatcher">/console/secure/application/remove_application.jsp</result>
+        </action>
+
+        <action name="update" class="com.atlassian.crowd.console.action.application.UpdateApplication">
+            <result name="input" type="dispatcher">/console/secure/application/view_application.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/application</param>
+                <param name="tab">${tab}</param>
+                <param name="ID">${ID}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="updatedirectory" class="com.atlassian.crowd.console.action.application.UpdateDirectories">
+            <result name="input">/console/secure/application/view_application.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/application</param>
+                <param name="tab">${tab}</param>
+                <param name="ID">${ID}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="updategroups" class="com.atlassian.crowd.console.action.application.UpdateGroups"
+                method="default">
+            <result name="input">/console/secure/application/view_application.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/application</param>
+                <param name="tab">${tab}</param>
+                <param name="ID">${ID}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="updateaddresses" class="com.atlassian.crowd.console.action.application.UpdateAddresses"
+                method="default">
+            <result name="input">/console/secure/application/view_application.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/application</param>
+                <param name="tab">${tab}</param>
+                <param name="ID">${ID}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="updatePermissions" class="com.atlassian.crowd.console.action.application.UpdatePermissions">
+            <result name="input">/console/secure/application/view_application.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/application</param>
+                <param name="tab">${tab}</param>
+                <param name="directoryId">${directoryId}</param>
+                <param name="ID">${ID}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Principal (User) Actions ==================== -->
+    <package name="user" extends="console" namespace="/console/secure/user">
+
+        <action name="browse" class="com.atlassian.crowd.console.action.principal.BrowsePrincipals">
+            <result name="success">/console/secure/principal/browse_principals.jsp</result>
+        </action>
+
+        <action name="view" class="com.atlassian.crowd.console.action.principal.ViewPrincipal" method="default">
+            <result name="success">/console/secure/principal/view_principal.jsp</result>
+        </action>
+
+        <action name="update" class="com.atlassian.crowd.console.action.principal.UpdatePrincipal" method="default">
+            <result name="input">/console/secure/principal/view_principal.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/user</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="name">${name}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="updateattributes" class="com.atlassian.crowd.console.action.principal.UpdateAttributes">
+            <result name="input">/console/secure/principal/view_principal.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/user</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="name">${name}</param>
+                <param name="tab">${tab}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="remove" class="com.atlassian.crowd.console.action.principal.RemovePrincipal" method="default">
+            <result name="input">/console/secure/principal/remove_principal.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">browse</param>
+                <param name="namespace">/console/secure/user</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="add" class="com.atlassian.crowd.console.action.principal.AddPrincipal" method="default">
+            <result name="input">/console/secure/principal/add_principal.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/user</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="name">${name}</param>
+            </result>
+        </action>
+
+        <action name="updategroups" class="com.atlassian.crowd.console.action.principal.UpdateGroups" method="default">
+            <result name="input">/console/secure/principal/view_principal.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/user</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="name">${name}</param>
+                <param name="tab">${tab}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="updateroles" class="com.atlassian.crowd.console.action.principal.UpdateRoles" method="default">
+            <result name="input">/console/secure/principal/view_principal.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/user</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="name">${name}</param>
+                <param name="tab">${tab}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="resetpassword" class="com.atlassian.crowd.console.action.principal.ResetPassword"
+                method="default">
+            <result name="input">/console/secure/principal/reset_password.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/user</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="name">${name}</param>
+                <param name="tab">${tab}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+
+        </action>
+
+    </package>
+
+    <!-- ==================== Group Actions ==================== -->
+    <package name="group" extends="console" namespace="/console/secure/group">
+
+        <action name="browse" class="com.atlassian.crowd.console.action.group.BrowseGroups">
+            <result name="success">/console/secure/group/browse_groups.jsp</result>
+        </action>
+
+        <action name="add" class="com.atlassian.crowd.console.action.group.AddGroup" method="default">
+            <result name="input">/console/secure/group/add_group.jsp</result>
+
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/group</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="name">${name}</param>
+            </result>
+        </action>
+
+        <action name="remove" class="com.atlassian.crowd.console.action.group.RemoveGroup" method="default">
+            <result name="input">/console/secure/group/remove_group.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">browse</param>
+                <param name="namespace">/console/secure/group</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="view" class="com.atlassian.crowd.console.action.group.ViewGroup" method="default">
+            <result name="success">/console/secure/group/view_group.jsp</result>
+        </action>
+
+        <action name="viewmembers" class="com.atlassian.crowd.console.action.group.ViewGroupMembers">
+            <result name="success">/console/secure/group/view_group_members.jsp</result>
+            <result name="error">/console/secure/group/view_group_members.jsp</result>
+        </action>
+
+        <action name="updatemembers" class="com.atlassian.crowd.console.action.group.UpdateGroupMembers">
+            <result name="error">/console/secure/group/view_group_members.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewmembers</param>
+                <param name="namespace">/console/secure/group</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="groupName">${parentGroup}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="viewnestedusers" class="com.atlassian.crowd.console.action.group.ViewGroupNestedPrincipals">
+            <result name="success">/console/secure/group/view_group_nested_principals.jsp</result>
+            <result name="error">/console/secure/group/view_group_nested_principals.jsp</result>
+        </action>
+
+        <action name="update" class="com.atlassian.crowd.console.action.group.UpdateGroup" method="default">
+            <result name="input">/console/secure/group/view_group.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/group</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="name">${name}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Role Actions ==================== -->
+    <package name="role" extends="console" namespace="/console/secure/role">
+
+        <action name="add" class="com.atlassian.crowd.console.action.role.AddRole" method="default">
+            <result name="input">/console/secure/role/add_role.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/role</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="name">${name}</param>
+            </result>
+        </action>
+
+        <action name="browse" class="com.atlassian.crowd.console.action.role.BrowseRoles">
+            <result name="success">/console/secure/role/browse_roles.jsp</result>
+        </action>
+
+        <action name="remove" class="com.atlassian.crowd.console.action.role.RemoveRole" method="default">
+            <result name="input">/console/secure/role/remove_role.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">browse</param>
+                <param name="namespace">/console/secure/role</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="update" class="com.atlassian.crowd.console.action.role.UpdateRole" method="default">
+            <result name="input">/console/secure/role/view_role.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">view</param>
+                <param name="namespace">/console/secure/role</param>
+                <param name="directoryID">${directoryID}</param>
+                <param name="name">${name}</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+        </action>
+
+        <action name="view" class="com.atlassian.crowd.console.action.role.ViewRole" method="default">
+            <result name="success">/console/secure/role/view_role.jsp</result>
+        </action>
+
+        <action name="viewusers" class="com.atlassian.crowd.console.action.role.ViewRolePrincipals">
+            <result name="success">/console/secure/role/view_role_principals.jsp</result>
+            <result name="error">/console/secure/role/view_role_principals.jsp</result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Session Actions ==================== -->
+    <package name="session" extends="console" namespace="/console/secure/session">
+
+        <action name="browseapplicationsessions"
+                class="com.atlassian.crowd.console.action.session.BrowseApplicationSessions">
+            <result name="success">/console/secure/session/browse_applicationsessions.jsp</result>
+        </action>
+
+        <action name="browseusersessions" class="com.atlassian.crowd.console.action.session.BrowsePrincipalSessions">
+            <result name="success">/console/secure/session/browse_principalsessions.jsp</result>
+        </action>
+
+        <action name="removeusersession" class="com.atlassian.crowd.console.action.session.RemoveSession"
+                method="removePrincipalSession">
+            <result name="success" type="redirect">/console/secure/session/browseusersessions.action</result>
+        </action>
+
+        <action name="removesessionapplication" class="com.atlassian.crowd.console.action.session.RemoveSession"
+                method="removeApplicationSession">
+            <result name="success" type="redirect">/console/secure/session/browseapplicationsessions.action</result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Directory Actions ==================== -->
+    <package name="directory" extends="console" namespace="/console/secure/directory">
+
+        <action name="browse" class="com.atlassian.crowd.console.action.directory.BrowseDirectories">
+            <result name="success">/console/secure/directory/browse_directories.jsp</result>
+        </action>
+
+        <action name="create" class="com.atlassian.crowd.console.action.directory.CreateDirectory" method="default">
+            <result name="input">/console/secure/directory/add_directoryselector.jsp</result>
+        </action>
+
+        <!-- ============== Start Internal Directory Actions ============== -->
+
+        <action name="createinternal" class="com.atlassian.crowd.console.action.directory.CreateInternal"
+                method="default">
+            <result name="input">/console/secure/directory/add_directoryinternal.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewinternal</param>
+                <param name="namespace">/console/secure/directory</param>
+                <param name="ID">${ID}</param>
+            </result>
+        </action>
+
+        <action name="viewinternal" class="com.atlassian.crowd.console.action.directory.ViewInternal" method="default">
+            <result name="success">/console/secure/directory/view_internal_general.jsp</result>
+        </action>
+
+        <action name="updateinternal" class="com.atlassian.crowd.console.action.directory.UpdateInternal">
+            <result name="input">/console/secure/directory/view_internal_general.jsp</result>
+            <result name="error">/console/secure/directory/view_internal_general.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewinternal</param>
+                <param name="namespace">/console/secure/directory</param>
+                <param name="ID">${ID}</param>
+            </result>
+        </action>
+
+        <action name="updateinternalconfiguration"
+                class="com.atlassian.crowd.console.action.directory.UpdateInternalConfiguration">
+            <result name="input">/console/secure/directory/view_internal_configuration.jsp</result>
+            <result name="error">/console/secure/directory/view_internal_configuration.jsp</result>
+            <result name="success">/console/secure/directory/view_internal_configuration.jsp</result>
+        </action>
+
+        <action name="updateinternalpermissions"
+                class="com.atlassian.crowd.console.action.directory.UpdateInternalPermissions">
+            <result name="input">/console/secure/directory/view_internal_permissions.jsp</result>
+            <result name="error">/console/secure/directory/view_internal_permissions.jsp</result>
+            <result name="success">/console/secure/directory/view_internal_permissions.jsp</result>
+        </action>
+        <!-- ============== End Internal Directory Actions ============== -->
+
+        <!-- ============== Start Connector Directory Actions ============== -->
+        <action name="createconnector" class="com.atlassian.crowd.console.action.directory.CreateConnector"
+                method="default">
+            <result name="input">/console/secure/directory/add_directoryconnector.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewconnector</param>
+                <param name="namespace">/console/secure/directory</param>
+                <param name="ID">${ID}</param>
+            </result>
+        </action>
+
+        <action name="viewconnector" class="com.atlassian.crowd.console.action.directory.ViewConnector"
+                method="default">
+            <result name="success">/console/secure/directory/view_connector_general.jsp</result>
+        </action>
+
+        <action name="updateconnector" class="com.atlassian.crowd.console.action.directory.UpdateConnector">
+            <result name="input">/console/secure/directory/view_connector_general.jsp</result>
+            <result name="error">/console/secure/directory/view_connector_general.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewconnector</param>
+                <param name="namespace">/console/secure/directory</param>
+                <param name="ID">${ID}</param>
+            </result>
+        </action>
+
+        <action name="flushconnectorcache" class="com.atlassian.crowd.console.action.directory.FlushConnectorCache">
+            <result name="error">/console/secure/directory/view_connector_general.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewconnector</param>
+                <param name="namespace">/console/secure/directory</param>
+                <param name="ID">${ID}</param>
+            </result>
+        </action>
+
+        <action name="updateconnectorconnection" class="com.atlassian.crowd.console.action.directory.UpdateConnectorConnection">
+            <result name="input">/console/secure/directory/view_connector_connection.jsp</result>
+            <result name="error">/console/secure/directory/view_connector_connection.jsp</result>
+            <result name="success">/console/secure/directory/view_connector_connection.jsp</result>
+        </action>
+
+        <action name="updateconnectorconfiguration" class="com.atlassian.crowd.console.action.directory.UpdateConnectorConfiguration">
+            <result name="input">/console/secure/directory/view_connector_configuration.jsp</result>
+            <result name="error">/console/secure/directory/view_connector_configuration.jsp</result>
+            <result name="success">/console/secure/directory/view_connector_configuration.jsp</result>
+        </action>
+
+        <action name="updateconnectorpermissions"
+                class="com.atlassian.crowd.console.action.directory.UpdateConnectorPermissions">
+            <result name="input">/console/secure/directory/view_connector_permissions.jsp</result>
+            <result name="error">/console/secure/directory/view_connector_permissions.jsp</result>
+            <result name="success">/console/secure/directory/view_connector_permissions.jsp</result>
+        </action>
+        <!-- ============== End Connector Directory Actions ============== -->
+
+        <!-- ============== Start Delegated Directory Actions ============== -->
+        <action name="createdelegated" class="com.atlassian.crowd.console.action.directory.CreateDelegated" method="default">
+            <result name="input">/console/secure/directory/add_directorydelegated.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewdelegated</param>
+                <param name="namespace">/console/secure/directory</param>
+                <param name="ID">${ID}</param>
+            </result>
+        </action>
+
+        <action name="viewdelegated" class="com.atlassian.crowd.console.action.directory.ViewDelegated" method="default">
+            <result name="success">/console/secure/directory/view_delegated_general.jsp</result>
+        </action>
+
+        <action name="updatedelegated" class="com.atlassian.crowd.console.action.directory.UpdateDelegated">
+            <result name="input">/console/secure/directory/view_delegated_general.jsp</result>
+            <result name="error">/console/secure/directory/view_delegated_general.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewdelegated</param>
+                <param name="namespace">/console/secure/directory</param>
+                <param name="ID">${ID}</param>
+            </result>
+        </action>
+
+        <action name="updatedelegatedconnection" class="com.atlassian.crowd.console.action.directory.UpdateDelegatedConnection">
+            <result name="input">/console/secure/directory/view_delegated_connection.jsp</result>
+            <result name="error">/console/secure/directory/view_delegated_connection.jsp</result>
+            <result name="success">/console/secure/directory/view_delegated_connection.jsp</result>
+        </action>
+
+        <action name="updatedelegatedconfiguration" class="com.atlassian.crowd.console.action.directory.UpdateDelegatedConfiguration">
+            <result name="input">/console/secure/directory/view_delegated_configuration.jsp</result>
+            <result name="error">/console/secure/directory/view_delegated_configuration.jsp</result>
+            <result name="success">/console/secure/directory/view_delegated_configuration.jsp</result>
+        </action>
+
+        <action name="updatedelegatedpermissions"
+                class="com.atlassian.crowd.console.action.directory.UpdateDelegatedPermissions">
+            <result name="input">/console/secure/directory/view_delegated_permissions.jsp</result>
+            <result name="error">/console/secure/directory/view_delegated_permissions.jsp</result>
+            <result name="success">/console/secure/directory/view_delegated_permissions.jsp</result>
+        </action>
+        <!-- ============== End Delegated Directory Actions ============== -->
+
+        <!-- ============== Start Custom Directory Actions ============== -->
+        <action name="createcustom" class="com.atlassian.crowd.console.action.directory.CreateCustom" method="default">
+            <result name="input">/console/secure/directory/add_directorycustom.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewcustom</param>
+                <param name="namespace">/console/secure/directory</param>
+                <param name="ID">${ID}</param>
+                <param name="tab">${tab}</param>
+            </result>
+        </action>
+
+        <action name="viewcustom" class="com.atlassian.crowd.console.action.directory.ViewCustom" method="default">
+            <result name="success">/console/secure/directory/view_custom_general.jsp</result>
+        </action>
+
+        <action name="updatecustom" class="com.atlassian.crowd.console.action.directory.UpdateCustom">
+            <result name="input">/console/secure/directory/view_custom_general.jsp</result>
+            <result name="error">/console/secure/directory/view_custom_general.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">viewcustom</param>
+                <param name="namespace">/console/secure/directory</param>
+                <param name="ID">${ID}</param>
+            </result>
+        </action>
+
+        <action name="updatecustomattributes" class="com.atlassian.crowd.console.action.directory.UpdateCustomAttributes">
+            <result name="input">/console/secure/directory/view_custom_attributes.jsp</result>
+            <result name="error">/console/secure/directory/view_custom_attributes.jsp</result>
+            <result name="success">/console/secure/directory/view_custom_attributes.jsp</result>
+        </action>
+
+        <action name="updatecustompermissions"
+                class="com.atlassian.crowd.console.action.directory.UpdateCustomPermissions">
+            <result name="input">/console/secure/directory/view_custom_permissions.jsp</result>
+            <result name="error">/console/secure/directory/view_custom_permissions.jsp</result>
+            <result name="success">/console/secure/directory/view_custom_permissions.jsp</result>
+        </action>
+        <!-- ============== End Custom Directory Actions ============== -->
+
+        <action name="testConfiguration" class="com.atlassian.crowd.console.action.directory.CreateConnector"
+                method="testConfiguration">
+            <result name="success">/console/secure/directory/add_directoryconnector.jsp</result>
+        </action>
+
+        <action name="testPrincipalSearch" class="com.atlassian.crowd.console.action.directory.CreateConnector"
+                method="testPrincipalSearch">
+            <result name="success">/console/secure/directory/add_directoryconnector.jsp</result>
+        </action>
+
+        <action name="testGroupSearch" class="com.atlassian.crowd.console.action.directory.CreateConnector"
+                method="testGroupSearch">
+            <result name="success">/console/secure/directory/add_directoryconnector.jsp</result>
+        </action>
+
+        <action name="testRoleSearch" class="com.atlassian.crowd.console.action.directory.CreateConnector"
+                method="testRoleSearch">
+            <result name="success">/console/secure/directory/add_directoryconnector.jsp</result>
+        </action>
+
+        <action name="remove" class="com.atlassian.crowd.console.action.directory.RemoveDirectory" method="default">
+            <result name="input">/console/secure/directory/remove_directory.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="actionName">browse</param>
+                <param name="namespace">/console/secure/directory</param>
+                <param name="updateSuccessful">true</param>
+            </result>
+
+        </action>
+
+    </package>
+
+    <!-- ==================== Data Import Actions ==================== -->
+    <package name="dataimport" extends="console" namespace="/console/secure/dataimport">
+
+        <action name="importtype" class="com.atlassian.crowd.console.action.dataimport.ImportType" method="default">
+            <result name="input">/console/secure/dataimport/import_options.jsp</result>
+        </action>
+
+        <!-- CSV Import process -->
+        <action name="importcsv" class="com.atlassian.crowd.console.action.dataimport.ImportCsv">
+            <result name="input">/console/secure/dataimport/import_csv.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="namespace">/console/secure/dataimport</param>
+                <param name="actionName">csvmapping</param>
+                <param name="method">default</param>
+            </result>
+            <result name="error">/console/secure/dataimport/import_csv.jsp</result>
+        </action>
+
+        <action name="csvmapping" class="com.atlassian.crowd.console.action.dataimport.CsvMapping">
+            <result name="input">/console/secure/dataimport/csv_mapping.jsp</result>
+            <result name="error">/console/secure/dataimport/csv_mapping.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="namespace">/console/secure/dataimport</param>
+                <param name="actionName">csvconfirm</param>
+                <param name="method">default</param>
+            </result>
+        </action>
+
+        <action name="csvconfirm" class="com.atlassian.crowd.console.action.dataimport.CsvConfirmation">
+            <result name="input">/console/secure/dataimport/csv_confirmation.jsp</result>
+            <result name="error">/console/secure/dataimport/csv_confirmation.jsp</result>
+            <result name="success">/console/secure/dataimport/csv_success.jsp</result>
+        </action>
+
+        <!-- Atlassian Importer for Confluence and JIRA -->
+        <action name="importatlassian" class="com.atlassian.crowd.console.action.dataimport.AtlassianImporter"
+                method="default">
+            <result name="input">/console/secure/dataimport/import_atlassian.jsp</result>
+            <result name="error">/console/secure/dataimport/import_atlassian.jsp</result>
+            <result name="success">/console/secure/dataimport/import_atlassian_success.jsp</result>
+        </action>
+
+        <!-- JIVE Importer -->
+        <action name="importjive" class="com.atlassian.crowd.console.action.dataimport.ImportJive" method="default">
+            <result name="input">/console/secure/dataimport/import_jive.jsp</result>
+            <result name="success">/console/secure/dataimport/import_jive_success.jsp</result>
+        </action>
+
+        <!-- Directory Importer -->
+        <action name="importdirectory" class="com.atlassian.crowd.console.action.dataimport.DirectoryImporter">
+            <result name="input">/console/secure/dataimport/import_directory.jsp</result>
+            <result name="error">/console/secure/dataimport/import_directory.jsp</result>
+            <result name="success" type="redirect-action">
+                <param name="namespace">/console/secure/dataimport</param>
+                <param name="actionName">directoryconfirmation</param>
+            </result>
+        </action>
+
+        <action name="directoryconfirmation"
+                class="com.atlassian.crowd.console.action.dataimport.DirectoryConfirmation">
+            <result name="input">/console/secure/dataimport/directory_confirmation.jsp</result>
+            <result name="error">/console/secure/dataimport/directory_confirmation.jsp</result>
+            <result name="success">/console/secure/dataimport/directory_success.jsp</result>
+        </action>
+
+    </package>
+
+    <!-- ==================== Administration Actions ==================== -->
+    <package name="administration" extends="console" namespace="/console/secure/admin">
+
+        <action name="backup" class="com.atlassian.crowd.console.action.admin.Backup" method="default">
+            <result name="input">/console/secure/admin/backup.jsp</result>
+            <result name="error">/console/secure/admin/backup.jsp</result>
+            <result name="success">/console/secure/admin/backup.jsp</result>
+            <result name="login">/console/login.jsp</result>
+        </action>
+
+        <!-- These will be implemented after 1.0 -->
+        <!--<action name="administer" class="com.atlassian.crowd.console.action.admin.Administer" method="default">-->
+        <!--<result name="success">/console/secure/admin/browse_admin.jsp</result>-->
+        <!--</action>-->
+
+        <!--<action name="export" class="com.atlassian.crowd.console.action.admin.Export">-->
+        <!--<result name="input">/console/secure/admin/export_admin.jsp</result>-->
+        <!--<result name="success">/console/secure/admin/export_admin.jsp</result>-->
+        <!--</action>-->
+
+        <!--<action name="import" class="com.atlassian.crowd.console.action.admin.Import">-->
+        <!--<result name="input">/console/secure/admin/import_admin.jsp</result>-->
+        <!--<result name="success">/console/secure/admin/import_admin.jsp</result>-->
+        <!--</action>-->
+
+    </package>
+
+
+</xwork>

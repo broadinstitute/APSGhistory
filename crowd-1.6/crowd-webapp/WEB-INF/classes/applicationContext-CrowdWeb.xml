@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <!--<aop:config proxy-target-class="true" />-->
+
+    <!-- license check filter -->
+    <bean id="licenceFilter" class="com.atlassian.crowd.console.filter.LicenceFilter">
+        <property name="crowdLicenseManager" ref="crowdLicenseManager" />
+    </bean>
+
+    <!-- gzip filter -->
+    <bean id="crowdGzipFilterIntegration" class="com.atlassian.crowd.console.filter.CrowdGzipFilterIntegration" autowire="byName"/>
+    <bean id="gzipFilter" class="com.atlassian.gzipfilter.GzipFilter">
+        <constructor-arg ref="crowdGzipFilterIntegration"/>
+    </bean>
+
+    <!-- change password filter -->
+    <bean id="changePasswordFilter" class="com.atlassian.crowd.console.filter.ChangePasswordFilter">
+        <constructor-arg index="0" value="/console/user/viewchangepassword.action"/>
+        <constructor-arg index="1">
+            <list>
+                <value type="java.lang.String">/console/user/changepassword.action</value>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="2" ref="i18nHelper" />
+    </bean>
+
+
+    <!-- Webwork Actions -->
+    <bean id="CrowdFreemarkerManager" class="com.opensymphony.webwork.views.freemarker.FreemarkerManager" />
+
+    <!--<bean id="addprincipal" class="com.atlassian.crowd.console.action.principal.AddPrincipal" scope="prototype"/>-->
+
+
+</beans>

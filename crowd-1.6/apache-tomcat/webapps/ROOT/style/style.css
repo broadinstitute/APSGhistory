@@ -1,0 +1,133 @@
+body {
+    font-family: Optima, Verdana, Arial, sans-serif;
+    font-size: 12px;
+    background-repeat: no-repeat;
+    margin: 0 0 0 0;
+    padding-right: 0px;
+    background-color: rgb( 255, 255, 255 );
+    text-align: center;
+}
+
+div.header {
+    height: 70px;
+    margin: 0 0 0 0;
+    background-repeat: no-repeat;
+    background-position: bottom left;
+}
+
+div.header div.logo {
+    position: absolute;
+    float: left;
+    left: 10px;
+}
+
+div.gmenu {
+    background-repeat: no-repeat;
+    margin: 0 0 0 0;
+    color: #2c689a;
+    text-transform: uppercase;
+    font-size: 8pt;
+}
+
+div.container {
+    position: relative;
+    width: 770px;
+    margin: 0 auto;
+    padding-bottom: 25px;
+    text-align: left;
+}
+
+.contentMain {
+    margin-left: 20px;
+    display: inline;
+    clear: both;
+    float: left;
+    margin-top: 5px;
+    width: 460px;
+}
+
+.contentSub {
+    float: right;
+    right: 0px;
+    top: 0px;
+    display: inline;
+    width: 270px;
+}
+
+.panel {
+    margin-top: 0px;
+    padding-bottom: 0px;
+    background-repeat: no-repeat;
+    background-position: bottom left;
+}
+
+.panelTop {
+    padding: 10px 15px 0 10px;
+    background-repeat: no-repeat;
+}
+
+
+h2 {
+    clear: both;
+    border-bottom: solid thin rgb( 207, 207, 207 );
+    color: #6b6b6b;
+    font-size: 16px;
+    font-family: Optima, Verdana, Arial, sans-serif;
+    text-decoration: none;
+    text-transform: uppercase;
+    margin-top:5px;
+}
+
+h3 {
+    clear: both;
+    border-bottom: solid thin rgb( 207, 207, 207 );
+    color: #6b6b6b;
+    font-size: 14px;
+    font-family: Optima, Verdana, Arial, sans-serif;
+    text-decoration: none;
+}
+
+img {
+    border: 0px;
+}
+
+a:active, a:link, a:visited {
+    font-size: 11px;
+    font-family: Optima, Verdana, Arial, sans-serif;
+    font-weight: bold;
+    color: #3C78B5;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #295580;
+    font-size: 11px;
+    font-family: Optima, Verdana, Arial, sans-serif;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+div.contentlogo {
+    text-align: center;
+    background-color: rgb( 229, 229, 229 );
+    border: solid thin rgb( 207, 207, 207 );
+    margin: 0 0 0 0;
+}
+
+div.contentlogo img {
+    vertical-align: bottom;
+}
+
+input.button {
+    width: 85px;
+}
+
+ul {
+    list-style-type: disc;
+    padding-left: 10px;
+    margin-left: 10px;
+}
+
+li {
+    padding-bottom: 5px;
+}

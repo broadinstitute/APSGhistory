@@ -1,0 +1,8 @@
+<decorators>
+    <decorator name="none">
+        <pattern>/server.openid</pattern>
+    </decorator>
+    <decorator name="panels" page="/decorator/default.jsp">
+        <pattern>/*</pattern>
+    </decorator>
+</decorators>

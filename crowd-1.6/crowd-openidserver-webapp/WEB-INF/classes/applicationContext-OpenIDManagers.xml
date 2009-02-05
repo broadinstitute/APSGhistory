@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <!-- An abstract template for a class requiring transactions  -->
+    <bean id="txReadWriteProxy" class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+          abstract="true">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="transactionAttributes">
+            <props>
+                <prop key="*">PROPAGATION_REQUIRED</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="userManager" parent="txReadWriteProxy">
+        <property name="target">
+            <bean class="com.atlassian.crowd.openid.server.manager.user.UserManagerGeneric" autowire="byType"/>
+        </property>
+    </bean>
+
+    <bean id="profileManager" parent="txReadWriteProxy">
+        <property name="target">
+            <bean class="com.atlassian.crowd.openid.server.manager.profile.ProfileManagerGeneric" autowire="byType"/>
+        </property>
+    </bean>
+
+    <bean id="siteManager" parent="txReadWriteProxy">
+        <property name="target">
+            <bean class="com.atlassian.crowd.openid.server.manager.site.SiteManagerGeneric" autowire="byName"/>
+        </property>
+    </bean>
+
+    <bean id="openIDPropertyManager" parent="txReadWriteProxy">
+        <property name="target">
+            <bean class="com.atlassian.crowd.openid.server.manager.property.OpenIDPropertyManagerGeneric" autowire="byType">
+                <property name="defaultProperties">
+                    <props>
+                        <prop key="adminGroup">crowd-administrators</prop>
+                        <prop key="enableReplyingPartyLocalhostMode">true</prop>
+                        <prop key="enableCheckImmediateMode">true</prop>
+                        <prop key="enableStatelessMode">true</prop>
+                        <prop key="trustRelationshipRestrictionType">0</prop>
+                    </props>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="openIDAuthenticationManager" parent="txReadWriteProxy">
+        <property name="target">
+            <bean class="com.atlassian.crowd.openid.server.manager.openid.OpenIDAuthenticationManagerGeneric" autowire="byName"/>
+        </property>
+    </bean>
+
+</beans>

@@ -1,0 +1,66 @@
+<johnson-config>
+
+    <!-- This class determines if Crowd has been setup and what is determined to be a setup path -->
+    <setupconfig class="com.atlassian.crowd.console.johnson.CrowdJohnsonSetupConfig"/>
+
+    <!-- Johnson will redirect to this page if Crowd has not been setup-->
+    <setup>
+        <path>/console/setup/selectsetupstep.action</path>
+    </setup>
+
+    <error>
+        <path>/console/error/error.action</path>
+    </error>
+
+    <ignore>
+        <path>/console/error/*</path>
+        <path>/console/js/*</path>
+        <path>/console/style/*</path>
+        <path>/console/images/*</path>
+        <path>/console/license*</path>
+        <path>*.ico</path>
+    </ignore>
+
+    <eventlevels>
+        <eventlevel key="fatal">
+            <description>Fatal</description>
+        </eventlevel>
+        <eventlevel key="error">
+            <description>Error</description>
+        </eventlevel>
+        <eventlevel key="warning">
+            <description>Warning</description>
+        </eventlevel>
+    </eventlevels>
+
+    <eventtypes>
+        <eventtype key="bootstrap">
+            <description>Bootstrap</description>
+        </eventtype>
+        <eventtype key="database">
+            <description>Database</description>
+        </eventtype>
+        <eventtype key="upgrade">
+            <description>Upgrade</description>
+        </eventtype>
+        <eventtype key="export">
+            <description>Data Export</description>
+        </eventtype>
+        <eventtype key="import">
+            <description>Data Import</description>
+        </eventtype>
+        <eventtype key="setup">
+            <description>Setup</description>
+        </eventtype>
+        <eventtype key="license-inconsistency">
+            <description>License Inconsistency</description>
+        </eventtype>
+        <eventtype key="license-too-old">
+            <description>License Too Old For Build</description>
+        </eventtype>
+        <eventtype key="restart">
+            <description>Restart Needed</description>
+        </eventtype>
+    </eventtypes>
+
+</johnson-config>

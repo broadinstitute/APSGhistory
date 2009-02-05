@@ -1,0 +1,431 @@
+/* Form related styles */
+
+/*.blueButton*/
+/*{*/
+    /*background-color: #69c;*/
+    /*color: #fff;*/
+    /*font-weight: bold;*/
+    /*height: 22px;*/
+    /*width: 80px;*/
+/*}*/
+
+img.iconButton
+{
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+table.attributeTable
+{
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-bottom: 15px;
+    margin-top: 5px;
+    width: 770px;
+}
+
+tr.attributeRow
+{
+    background-color: #fff;
+    vertical-align: middle;
+    padding: 2px;
+
+}
+
+td.attributeCell
+{
+    border-left: none;
+    border-right: none;
+    padding: 2px;
+    margin-bottom: 2px;
+}
+
+td.attributeCellFirst
+{
+    border-left: none;
+    border-right: none;
+    padding: 2px;
+    padding-left: 8px;
+    margin-bottom: 2px;
+}
+
+tr.attributePlainRow
+{
+    border: none;
+    background-color: #fff;
+    vertical-align: top;
+    padding: 2px;
+}
+
+td.attributePlainCell
+{
+    border-width: 0;
+    background-color: #F5F8FB;
+    border: none;
+    padding: 2px;
+}
+
+.attributeDisabled
+{
+    color: #aaa;
+}
+
+.attributeLabel
+{
+    margin-left: 5px;
+    display: inline;
+    width: 200px;
+}
+
+.attributeOptions
+{
+    margin-right: 10px;
+    display: inline;
+}
+
+input#openid_identifier
+{
+    background: url('../images/openid-login-bg.gif') no-repeat;
+    background-color: #fff;
+    background-position: 0 50%;
+    color: #000;    
+    padding-left: 20px;
+    height: 15px;
+}
+
+/* Form tags */
+optgroup
+{
+    background-color: #f7f7f7;
+    font-weight: normal;
+    color: #666;
+}
+
+optgroup option
+{
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.miniform {
+    margin-top: 15px;
+    margin-bottom: 8px;
+    margin-left: 2px;
+}
+
+/* Bamboo Form */
+.crowdForm {
+    /*display: block;*/
+    /*float: none;*/
+    /*clear: left;*/
+    clear: both;
+    border-collapse: collapse;
+    width: 100%;
+	border-top: 1px solid #BBD0E5;
+	border-bottom: 1px solid #BBD0E5;
+	padding: 0 0 0 0;
+    background-color: #F5F8FB;
+}
+
+.crowdForm .formBodyNoTop {
+    margin: 0 5px 5px 5px;
+}
+
+.crowdForm .formBody {
+    margin: 0 5px 5px 5px;
+}
+
+.crowdForm .formTitle h2 {
+    margin-bottom: 0;
+}
+
+.crowdForm .formTable {
+    float: left;
+    clear: both;
+    margin: 3px 4px 15px 4px;
+    width: 780px;
+}
+
+.tabContent .crowdForm
+{
+    /*margin-top: 50px;*/
+}
+
+#tabContainer .tabContent .crowdForm
+{
+    /*margin: 10px 5px 10px 5px;*/
+    width: 99%;
+}
+
+/* Form header */
+.crowdForm h2
+{
+    border-top: none;
+    /*margin-bottom: 15px;*/
+}
+
+/* Style for subsection*/
+.crowdForm .titleSection, .crowdForm h3 {
+    border-top: 1px solid #BBD0E5;
+    border-bottom: 1px solid #BBD0E5;
+    background-color: #EBF1F7;
+	color: #003366;
+    font-weight: bold;
+    padding: 4px 4px 4px 10px;
+    margin-bottom: 10px;
+    vertical-align: middle;
+    border-collapse: collapse;
+}
+
+.crowdForm h3.title
+{
+    border-top: none;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.crowdForm p
+{
+    margin: 10px;
+    /*margin-left: 10px;*/
+    /*margin-right: 10px;*/
+    /*margin-bottom: 5px;*/
+}
+
+/* Used for field label separtion e.g. OR */
+.crowdForm .sectionSubHeader {
+    font-weight: bold;
+    font-style: italic;
+}
+
+/* Sub area h1 */
+.crowdForm .crowdForm h1 {
+    font-size: 16px;
+}
+
+.crowdForm .descriptionSection {
+    padding: 4px;
+    margin-left: 1em;
+    margin-top: -8px;
+    margin-bottom: 10px;
+    border: none;
+}
+
+.crowdForm .formFooter {
+    clear: both;
+    padding: 5px 5px 5px 5px;
+    border-top: 1px solid #BBD0E5;
+	background-color: #EBF1F7;
+}
+
+.crowdForm .formFooter.wizardFooter {
+    text-align: right;
+}
+
+.formFooter.centerText {
+    text-align: center;
+}
+
+.crowdForm .formFooter.wizardFooter #cancelButton{
+    margin-left: 10px;
+}
+
+
+.crowdForm .fieldAreaError{
+}
+
+.crowdForm .fieldArea .errorBox {
+    color: #cc0000;
+    font-weight: bold;
+    padding-bottom: 5px;
+}
+
+.crowdForm .fieldArea {
+    clear: left;
+    margin: 0 0 0 13px;
+	padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+.crowdForm .fieldArea label.fieldLabelArea, .crowdForm .fieldArea .firstColumn {
+	display: inline;
+	position: relative;
+	float: left;
+	margin-top: 0.15em;
+	padding: 0 0 5px 0;
+}
+
+.crowdForm .fieldArea .fieldValueArea
+{
+}
+
+.fieldDescription {
+	margin: 3px 0 0 0;
+	padding: 0 0 5px 0;
+	font-size: 90%;
+	color: #7F7F7F;
+}
+
+
+/* Special styles for checlbox*/
+
+.crowdForm label.labelForCheckbox, .crowdForm .checkboxArea .fieldDescription {
+    float: none;
+    display: block;
+    padding: 0px;
+    margin-bottom: 5px;
+    text-align: left;
+}
+
+.crowdForm .checkboxLabel {
+}
+
+.crowdForm .checkboxErrorLabel {
+    color: red;
+}
+
+.crowdForm span.required {
+    color: red;
+}
+
+.crowdForm .fieldLabelArea .required
+{
+	position: absolute;
+	top: 0;
+	height: 8px;
+	margin: 0 0 0 -4px;
+    vertical-align: top;
+}
+
+.crowdForm .formFooter .buttons
+{
+    /*margin-left: 30%;*/
+}
+
+input.textField, textarea.textField
+{
+	width: 85%;
+	border: 1px #bbbbbb solid;
+	padding: 3px;
+}
+
+input.textField:focus, textarea.textField:focus
+{
+	border: 1px #BBD0E5 solid;
+}
+
+/* Width Styles. Standard is a 13em column and the narrow one is a 6em column */
+
+/* A style for use when there is no first column*/
+.crowdForm .fieldArea {
+	padding-left: 14em;
+}
+
+.crowdForm .fieldArea label.fieldLabelArea, .crowdForm .fieldArea .firstColumn {
+	left: -14em;
+	width: 13em;
+	margin-right: -13em;
+}
+
+.crowdForm .fieldLabelArea .required
+{
+	left: 13em;
+}
+
+.crowdForm.narrowForm .fieldArea {
+	padding-left: 7em;
+}
+
+.crowdForm.narrowForm .fieldArea label.fieldLabelArea, .crowdForm .fieldArea .firstColumn {
+	left: -7em;
+	width: 6em;
+	margin-right: -6em;
+}
+
+.crowdForm.narrowForm .fieldLabelArea .required
+{
+	left: 6em;
+}
+
+
+/* ---------------------------------------------------------------------------------------------------------- Specifics */
+.crowdForm #artifacts
+{
+    margin: 0 auto 0 auto;
+    width: auto;
+
+}
+
+/* ---------------------------------------------------------------------------------------------------------- Form end */
+
+#adminMenu
+{
+    float: left;
+    width: 170px;
+    margin-left: -15px;
+    margin-top: -10px;
+}
+
+/*********************************************/
+/* Web Menu                                  */
+/*********************************************/
+.webMenu {
+    clear: both;
+	margin: 0 15px 0 15px;
+	padding: 10px 0 90px 0;
+}
+
+.webMenuSection {
+    display: inline;
+    float: left;
+	width: 170px;
+	margin: 5px 0 0 0;
+    padding: 0;
+}
+
+.webMenuSection ul{
+    margin-top: 0;
+    padding:0;
+    list-style: none;
+}
+
+.webMenuSection li {
+    margin-left: 0;
+    margin-top: 0;
+    padding: 0;
+    background-color: #D8E4F0;
+}
+
+.webMenuSection h2 {
+    border: 0 none #FFFFFF;
+	padding: 3px 10px;
+	background-color: #EBF1F7;
+	background-repeat: no-repeat;
+	background-position: 93% 6px;
+    font-size: 100%;
+}
+
+.webMenuSection img {
+    border: 0;
+    vertical-align: middle;
+}
+
+ul.webMenuItem {
+	margin-bottom: 5px;
+    display: block;
+	color: #003366;
+	text-decoration: none;
+    list-style: none;
+}
+
+ul.webMenuItem a:hover {
+    background-color: #C4D6E9;
+}
+
+ul.webMenuItem a {
+	display: block;
+    zoom: 1;
+    padding: 5px 7px 5px 20px;
+	color: #003366;
+    text-decoration: none;
+}

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="com.atlassian.crowd.openid.server.model.profile.Profile" table="PROFILE">
+
+        <!-- entity object -->
+        
+        <id name="id" column="ID" type="long" unsaved-value="-1">
+            <generator class="com.atlassian.crowd.util.persistence.hibernate.ResettableTableHiLoGenerator"/>
+        </id>
+        <property name="createdDate" column="CREATEDDATE" type="timestamp" not-null="true" insert="true" update="false"/>
+        <property name="updatedDate" column="UPDATEDDATE" type="timestamp" not-null="true"/>
+
+        <!-- attribute mappings -->
+
+        <property name="name" column="NAME" type="string" not-null="true"/>
+
+        <!-- associations -->
+
+        <!--<many-to-one name="user" column="USER_ID" class="com.atlassian.crowd.openid.server.model.user.User" not-null="true"/>-->
+
+        <set name="attributes" lazy="true" cascade="all-delete-orphan">
+            <key column="PROFILE_ID"/>
+            <one-to-many class="com.atlassian.crowd.openid.server.model.profile.attribute.Attribute"/>
+        </set>
+
+    </class>
+</hibernate-mapping>

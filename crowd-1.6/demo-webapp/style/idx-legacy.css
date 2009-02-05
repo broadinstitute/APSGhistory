@@ -1,0 +1,41 @@
+div.container
+{
+	/*clear: both;*/
+    /*width: 800px;*/
+	/*margin: 0 auto;*/
+	/*padding-top: 15px;*/
+}
+
+.headingInfo, .headingInfo a, .headingInfo a:visited {
+    color: #036;
+}
+
+p.error {
+    color: #cc0000;
+    font-weight: bold;
+    margin: 0px 0px 5px 10px;
+    padding: 0px;
+}
+
+p.success {
+    color: green;
+    margin: 0px 0px 5px 10px;
+    padding: 0px;
+}
+
+p.subtext {
+    padding: 0px;
+    font-weight: bold;
+    font-weight: normal;
+    font-size: 8pt;
+}
+
+form select {
+    width: 265px;
+}
+
+input.button {
+    width: 85px;
+}
+
+

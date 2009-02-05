@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean id="userDAO" class="com.atlassian.crowd.openid.server.model.user.UserDAOHibernate">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <bean id="profileDAO" class="com.atlassian.crowd.openid.server.model.profile.ProfileDAOHibernate">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <bean id="attributeDAO" class="com.atlassian.crowd.openid.server.model.profile.attribute.AttributeDAOHibernate">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <bean id="siteDAO" class="com.atlassian.crowd.openid.server.model.site.SiteDAOHibernate">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <bean id="siteApprovalDAO" class="com.atlassian.crowd.openid.server.model.approval.SiteApprovalDAOHibernate">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <bean id="authRecordDAO" class="com.atlassian.crowd.openid.server.model.record.AuthRecordDAOHibernate">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <bean id="propertyDAO" class="com.atlassian.crowd.openid.server.model.property.PropertyDAOHibernate">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+    <bean id="addressRestrictionDAO" class="com.atlassian.crowd.openid.server.model.security.AddressRestrictionDAOHibernate">
+        <property name="sessionFactory" ref="sessionFactory" />
+    </bean>
+
+
+</beans>

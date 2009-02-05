@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xwork PUBLIC "-//OpenSymphony Group//XWork 1.0//EN" "http://www.opensymphony.com/xwork/xwork-1.0.dtd">
+<xwork>
+
+    <include file="webwork-default.xml"/>
+
+    <package name="default" extends="webwork-default">
+        <result-types>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletDispatcherResult" name="dispatcher"/>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletRedirectResult" name="redirect"/>
+            <result-type class="com.opensymphony.webwork.dispatcher.ServletActionRedirectResult" name="redirect-action"/>
+            <result-type class="com.opensymphony.xwork.ActionChainResult" name="chain"/>
+        </result-types>
+
+        <interceptors>
+            <interceptor name="static-params" class="com.opensymphony.xwork.interceptor.StaticParametersInterceptor"/>
+            <interceptor name="params" class="com.atlassian.xwork12.interceptors.SafeParametersInterceptor"/>
+            <interceptor name="servlet" class="com.opensymphony.webwork.interceptor.ServletConfigInterceptor"/>
+
+            <interceptor-stack name="defaultStack">
+                <interceptor-ref name="static-params"/>
+                <interceptor-ref name="params"/>
+                <interceptor-ref name="servlet"/>
+            </interceptor-stack>
+
+        </interceptors>
+    </package>
+
+    <!-- Unsecure Console Actions -->
+    <package name="crowd-openid" extends="default" namespace="/">
+
+        <action name="login" class="com.atlassian.crowd.openid.client.action.Login" >
+            <result name="input" type="dispatcher">login.jsp</result>
+            <!-- this should point to the path mapping of the the OpenIDClientServlet defined in web.xml -->
+            <result name="openid-authrequest" type="dispatcher">/login.openid</result>
+            <result name="success" type="redirect">/secure</result>
+        </action>
+
+        <action name="logoff" class="com.atlassian.crowd.openid.client.action.Logoff" >
+            <result name="success" type="redirect">login.action</result>
+        </action>
+
+        <action name="baseaction" class="com.atlassian.crowd.openid.client.action.BaseAction"/>
+
+    </package>
+
+
+    <!-- Unsecure Console Actions -->
+    <package name="secure" extends="default" namespace="/secure">
+
+        <action name="viewprofile" class="com.atlassian.crowd.openid.client.action.secure.ViewProfile" >
+            <result name="success">/secure/viewprofile.jsp</result>
+        </action>
+
+    </package>
+
+</xwork>

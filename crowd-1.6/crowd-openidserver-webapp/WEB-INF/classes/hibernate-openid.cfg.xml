@@ -1,0 +1,15 @@
+<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <mapping resource="com/atlassian/crowd/openid/server/model/user/User.hbm.xml"/>
+        <mapping resource="com/atlassian/crowd/openid/server/model/profile/Profile.hbm.xml"/>
+        <mapping resource="com/atlassian/crowd/openid/server/model/profile/attribute/Attribute.hbm.xml"/>
+        <mapping resource="com/atlassian/crowd/openid/server/model/site/Site.hbm.xml"/>
+        <mapping resource="com/atlassian/crowd/openid/server/model/approval/SiteApproval.hbm.xml"/>
+        <mapping resource="com/atlassian/crowd/openid/server/model/record/AuthRecord.hbm.xml"/>
+        <mapping resource="com/atlassian/crowd/openid/server/model/property/Property.hbm.xml"/>
+        <mapping resource="com/atlassian/crowd/openid/server/model/security/AddressRestriction.hbm.xml"/>
+    </session-factory>
+</hibernate-configuration>

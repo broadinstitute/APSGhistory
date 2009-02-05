@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:jdbc.properties"/>
+    </bean>
+
+    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="${hibernate.connection.datasource}"/>
+    </bean>
+
+
+    <bean id="bootstrapManager" class="com.atlassian.crowd.openid.server.bootstrap.DefaultBootstrapManager"/>
+
+    <!-- Schema Helper - Used to update database structure -->
+    <bean id="schemaHelper" class="com.atlassian.crowd.util.persistence.hibernate.SchemaHelper">
+        <property name="configuration">
+            <ref local="hibernateConfiguration"/>
+        </property>
+    </bean>
+
+    <!-- Transaction manager for a single Hibernate SessionFactory (alternative to JTA) -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:hibernate-openid.cfg.xml"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.transaction.factory_class">${hibernate.transaction.factory_class}</prop>
+                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+                <prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+                <prop key="hibernate.max_fetch_depth">${hibernate.max_fetch_depth}</prop>
+                <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <!-- it can be useful to disbable batching during debugging, as HSQLDB doesn't report the exact statement which fails in batch mode -->
+                <prop key="hibernate.jdbc.batch_size">${hibernate.jdbc.batch_size}</prop>
+            </props>
+        </property>
+    </bean>
+
+    <!-- Bean that will allow access to the hibernate configuration -->
+    <bean id="hibernateConfiguration" factory-bean="&amp;sessionFactory" factory-method="getConfiguration"/>
+
+</beans>

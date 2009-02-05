@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+    <!-- openid related beans -->
+    <bean id="crowdProvider" class="com.atlassian.crowd.openid.server.provider.OpenID4JavaProvider">
+        <property name="serverManager" ref="serverManager"/>
+        <property name="userInteractionURL" value="secure/interaction/allowauthentication!default.action"/>
+        <property name="openIDAuthenticationManager" ref="openIDAuthenticationManager"/>
+        <property name="openIDPropertyManager" ref="openIDPropertyManager"/>
+        <property name="httpAuthenticator" ref="httpAuthenticator"/>
+    </bean>
+
+    <bean id="serverManager" class="org.openid4java.server.ServerManager">
+        <property name="privateAssociations" ref="associationStore"/>
+        <property name="sharedAssociations" ref="associationStore"/>
+        <!-- edit this to reflect the URL of the OpenID server: -->
+        <property name="OPEndpointUrl" value="http://localhost:8087/openidserver/server"/>
+        <property name="userSetupUrl" value="http://localhost:8087/openidserver/server"/>
+    </bean>
+
+    <bean id="associationStore" class="org.openid4java.server.InMemoryServerAssociationStore" scope="prototype"/>
+
+</beans>

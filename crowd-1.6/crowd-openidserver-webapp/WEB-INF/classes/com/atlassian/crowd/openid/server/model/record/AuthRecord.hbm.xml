@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="com.atlassian.crowd.openid.server.model.record.AuthRecord" table="AUTHRECORD">
+
+        <!-- entity object -->
+
+        <id name="id" column="ID" type="long" unsaved-value="-1">
+            <generator class="com.atlassian.crowd.util.persistence.hibernate.ResettableTableHiLoGenerator"/>
+        </id>
+        <property name="createdDate" column="CREATEDDATE" type="timestamp" not-null="true" insert="true" update="false"/>
+        <property name="updatedDate" column="UPDATEDDATE" type="timestamp" not-null="true"/>
+
+        <!-- attribute mappings -->
+
+        <component name="authAction" class="com.atlassian.crowd.openid.server.model.record.AuthAction">
+            <property name="code" column="CODE" type="long" not-null="true" unique="false"/>
+        </component>
+
+        <!-- associations -->
+
+        <many-to-one name="user" class="com.atlassian.crowd.openid.server.model.user.User" column="USER_ID" not-null="true" cascade="none"/>
+        <many-to-one name="site" class="com.atlassian.crowd.openid.server.model.site.Site" column="SITE_ID" not-null="true" cascade="none"/>
+
+    </class>
+</hibernate-mapping>
+

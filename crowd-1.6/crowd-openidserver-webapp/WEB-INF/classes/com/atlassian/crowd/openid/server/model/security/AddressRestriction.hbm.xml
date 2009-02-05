@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="com.atlassian.crowd.openid.server.model.security.AddressRestriction" table="ADDRESSRESTRICTION">
+
+        <id name="id" column="ID" type="long" unsaved-value="-1">
+            <generator class="com.atlassian.crowd.util.persistence.hibernate.ResettableTableHiLoGenerator"/>
+        </id>
+
+        <property name="address" column="`ADDRESS`" type="string" not-null="true" unique="false"/>
+
+    </class>
+</hibernate-mapping>

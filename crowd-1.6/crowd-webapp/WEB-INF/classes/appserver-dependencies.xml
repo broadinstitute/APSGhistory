@@ -1,0 +1,16 @@
+<!-- this contains all the dependencies that are required to be in classpath for Crowd to start -->
+<!-- they are ones that are not included in WEB-INF/lib and are expected to be in the common/lib of the app server -->
+
+<required-dependencies>
+
+    <dependency>
+        <jar>mail-1.4.jar</jar>
+        <class>javax.mail.internet.InternetAddress</class>
+    </dependency>
+
+    <dependency>
+        <jar>jta-1.0.1B.jar</jar>
+        <class>javax.transaction.TransactionManager</class>
+    </dependency>
+    
+</required-dependencies>
