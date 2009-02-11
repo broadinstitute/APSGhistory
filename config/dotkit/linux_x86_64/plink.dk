@@ -1,0 +1,4 @@
+#c bio-tools
+#d use plink latest version
+
+dk_op -q plink-1.05

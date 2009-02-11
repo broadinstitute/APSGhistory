@@ -1,0 +1,4 @@
+#c bio-tools
+#d Add primer3
+
+dk_alter PATH /broad/tools/apps/primer3

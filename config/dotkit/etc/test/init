@@ -1,0 +1,49 @@
+#!/bin/sh
+# Dotkit initialization script.
+# option "-b" to force Bourne-shell (bash or ksh) initialization.
+# option "-c" to force C-shell (csh or tcsh) initialization.
+
+PATH=/usr/bin:/bin
+export PATH
+
+# Locate critical programs:
+swhere() {
+  test -x     /bin/$1 && { echo     /bin/$1; return 0; }
+  test -x /usr/bin/$1 && { echo /usr/bin/$1; return 0; }
+  return 1
+}
+test=`swhere test` || { echo "echo \"test not found\""; exit 1; }
+
+# ****************************************************************************
+# *** OPTIONAL ***
+# Set DK_ROOT here, if you wish, to reflect your site's installation
+# directory.  Otherwise, it is computed using the path by which init
+# was called.  (You can also set DK_ROOT before calling .../dotkit/init.)
+DK_ROOT=.
+# ****************************************************************************
+
+setDK_ROOT=
+if test -z "$DK_ROOT"; then
+  dirname=`swhere dirname` || { echo "echo \"dirname not found\""; exit 1; }
+  DK_ROOT=`$dirname $0`
+  case "$1" in
+  -b) setDK_ROOT="export DK_ROOT=\"$DK_ROOT\"" ;;
+  -c) setDK_ROOT="setenv DK_ROOT \"$DK_ROOT\"" ;;
+  *)  setDK_ROOT="$test -n \"\$shell\" && \
+      setenv DK_ROOT \"$DK_ROOT\" || \
+      export DK_ROOT=\"$DK_ROOT\"" ;;
+  esac
+fi
+
+# For this critical variable, a quick sanity check might be appreciated:
+test -d $DK_ROOT/csh ||
+{ echo "echo \"Bad value for DK_ROOT:$DK_ROOT, sorry\""; exit 1; }
+
+test -n "$setDK_ROOT" && echo "${setDK_ROOT};"
+case "$1" in
+-b) echo ". $DK_ROOT/ksh/.dk_init" ;;
+-c) echo "source $DK_ROOT/\$shell:t/.dk_init" ;;
+*)  echo "$test -n \"\$shell\" && \
+    source $DK_ROOT/\$shell:t/.dk_init || \
+    . $DK_ROOT/ksh/.dk_init" ;;
+esac

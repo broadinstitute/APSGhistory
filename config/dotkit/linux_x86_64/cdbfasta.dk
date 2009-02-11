@@ -1,0 +1,4 @@
+#c bio-tools
+#d cdbfasta v0.92 
+
+dk_alter PATH /broad/tools/Linux/x86_64/bin

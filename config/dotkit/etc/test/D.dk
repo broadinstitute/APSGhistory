@@ -1,0 +1,12 @@
+#c test
+#d D: Recursive operation of use.
+
+dk_setenv d1 D1
+echo "In D, d1=$d1 (D1 correct)"
+dk_alter d2 D2
+echo "In D, d2=$d2 (D2 correct)"
+dk_op -q E
+echo "In D, after return from E, d1=$d1, d2=$d2 (D1, D2/nil correct)"
+echo "D: _dk_rl=$_dk_rl (2)"
+echo "D: _dk_self=$_dk_self"
+echo "D: _dk_inuse=$_dk_inuse"

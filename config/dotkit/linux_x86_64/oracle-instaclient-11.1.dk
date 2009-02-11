@@ -1,0 +1,14 @@
+#c libraries
+#d Oracle InstaClient 11.1. Just enough oracle to make it work. 
+
+# Oracle foo needs libaio
+dk_op -q libaio-0.3.99
+
+# Path to Oracle Client
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/instantclient_11_1
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/instantclient_11_1
+
+# Set ORACLE_HOME 
+dk_setenv ORACLE_HOME /broad/tools/Linux/x86_64/pkgs/instantclient_11_1
+
+

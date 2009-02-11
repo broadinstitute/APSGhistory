@@ -1,0 +1,41 @@
+# DK_ROOT *must* be set before sourcing this file.
+#set +u # Allow expansion of unset variables.  Maybe needed for old bash.
+set -u # Dis-allow expansion of unset variables.
+trap '_dk_rl=-1' INT
+typeset -i _dk_rl=-1 _dk_isatty=0
+[[ -t 0 ]] && _dk_isatty=1 # 1 => stdin IS a tty.
+export _dk_rl _dk_inuse _dk_isatty
+export SYS_TYPE=${SYS_TYPE:-`$DK_ROOT/etc/systype`}
+
+if [[ -f "$DK_ROOT/etc/DK_NODE" ]]; then
+  _dk_site="$(<$DK_ROOT/etc/DK_NODE)"
+  if [[ -z "${DK_NODE:-}" ]]; then
+    export DK_NODE="$_dk_site"
+  elif [[ $DK_NODE != *$_dk_site* ]]; then
+    export DK_NODE="$DK_NODE:$_dk_site"
+  fi
+  unset _dk_site
+fi
+if [[ -n "${BASH:-}" ]]; then # A bash instance is reading this code.
+  export _dk_shell=bash
+  function _dk_print { echo "$@"; }
+  . $DK_ROOT/$_dk_shell/use # Load function definitions
+  if [[ -n ${DK_EXPORT_BASH_FNS:-} ]]; then
+    export -f _dk_use _dk_unuse dk_where dk_alter dk_setenv dk_test
+    export -f setenv _dk_spliton unsetenv unuse use alter unalter
+    export -f dk_alias dk_source dk_setdef car cdr _dk_carcdr
+    export -f _dk_print _dk_spliton _dk_use _dk_unuse _dk_uset _dk_uu
+    export -f dk_op reuse dk_rep dk_cev _dk_ccu _dk_alu _dk_aua
+  fi
+else # assume ksh
+  export _dk_shell=ksh
+  if [[ -z "${FPATH:-}" ]]; then
+    export FPATH="$DK_ROOT/$_dk_shell"
+  elif [[ $FPATH != *$DK_ROOT/$_dk_shell* ]]; then
+    export FPATH="$DK_ROOT/$_dk_shell:$FPATH"
+  fi
+  autoload use unuse dk_alter dk_setenv alter unalter dk_where
+  autoload dk_test setenv unsetenv dk_alias dk_source car cdr _dk_print
+fi
+export DK_SUBNODE="$_dk_shell/$SYS_TYPE:$_dk_shell:$SYS_TYPE:."
+[[ ${MANPATH:-} != *$DK_ROOT* ]] && export MANPATH=$DK_ROOT/man:${MANPATH:-}

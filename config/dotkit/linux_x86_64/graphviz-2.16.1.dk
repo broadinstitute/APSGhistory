@@ -1,0 +1,6 @@
+#c versioned-graphics
+#d Graphviz graphics tools v2.16.1
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/graphviz/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/graphviz/lib
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/graphviz/share/man

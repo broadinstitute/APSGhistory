@@ -1,0 +1,15 @@
+#c languages
+#d make the MPI-ified compilers/runtime available
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/gsl_gcc-4.3.2_1.12/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/gsl_gcc-4.3.2_1.12/share/man
+
+# For dynamic linking at runtime
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gsl_gcc-4.3.2_1.12/lib
+
+# For gcc
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gsl_gcc-4.3.2_1.12/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/gsl_gcc-4.3.2_1.12/include
+
+# Let pkg-config know where we are.
+dk_alter PKG_CONFIG_PATH /broad/tools/Linux/x86_64/pkgs/gsl_gcc-4.3.2_1.12/lib/pkgconfig

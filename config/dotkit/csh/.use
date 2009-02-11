@@ -1,0 +1,38 @@
+# USE
+if ( ! $?_dk_ ) goto _dk_useend
+# Update package list
+if ($?_dk_inuse) then
+  set _dk_inu = ( $_dk_inuse )
+else
+  set _dk_inu = ()
+endif
+if ($#_dk_inu > 0) then # Non-empty package list.
+  if ($_dk_pream == "Prepending") then
+    if ($_dk_inu[1] =~ ..[0-9]) then
+      if ($#_dk_inu > 1) then
+        set _dk_inu = ( $_dk_inu[1] $_dk_.$_dk_rl $_dk_inu[2-] )
+      else # Exactly one package loaded, namely '.'
+        set _dk_inu = ( $_dk_inu[1] $_dk_.$_dk_rl )
+      endif
+    else
+      set _dk_inu = ( $_dk_.$_dk_rl $_dk_inu )
+    endif
+  else # Appending
+    if ($_dk_inu[$#_dk_inu] =~ ..[0-9]) then
+      if ($#_dk_inu > 1) then
+        @ _dk_n = $#_dk_inu - 1
+        set _dk_inu = ( $_dk_inu[1-$_dk_n] $_dk_.$_dk_rl $_dk_inu[$#_dk_inu] )
+        unset _dk_n
+      else # Exactly one package loaded, namely '.'
+        set _dk_inu = ( $_dk_.$_dk_rl $_dk_inu[$#_dk_inu] )
+      endif
+    else
+      set _dk_inu = ( $_dk_inu $_dk_.$_dk_rl )
+    endif
+  endif
+else # Package list is empty.
+  set _dk_inu = ( $_dk_.$_dk_rl )
+endif
+setenv _dk_inuse "$_dk_inu"
+unset _dk_inu
+_dk_useend:

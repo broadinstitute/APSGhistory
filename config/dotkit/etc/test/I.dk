@@ -1,0 +1,20 @@
+#c test
+#d Test error handling
+
+echo ""
+
+dk_setenv X XYZ
+echo "1: dk_setenv should set X=XYZ, actual is X=$X"
+
+echo "2: Start PATH=$PATH"
+dk_alter PATH /foo/bar
+echo "2: dk_alter should add/remove /foo/bar to PATH, actual is PATH=$PATH"
+
+# This should get printed instead of "(ok)" at the end:
+setenv _dk_err "This was printed instead of (ok) because of error."
+
+dk_setenv X YYY
+echo "3: dk_setenv should not set X=YYY, actual is X=$X"
+
+dk_alter PATH /foo2/bar
+echo "4: dk_alter should not add/remove /foo2/bar to PATH, actual is PATH=$PATH"

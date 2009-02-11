@@ -1,0 +1,6 @@
+#c versioned-languages
+#d Add python v2.5.2 to path and /broad/tools PYTHONPATH
+
+dk_alter PATH /broad/tools/Linux/i686/pkgs/Python-2.5.2/bin
+dk_alter PYTHONPATH /broad/tools/Linux/i686/lib/python2.5/site-packages
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/i686/pkgs/Python-2.5.2/lib

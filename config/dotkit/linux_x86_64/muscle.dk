@@ -1,0 +1,4 @@
+#c bio-tools
+#d MUSCLE v3.6 
+
+dk_alter PATH /broad/tools/bin/x86_64

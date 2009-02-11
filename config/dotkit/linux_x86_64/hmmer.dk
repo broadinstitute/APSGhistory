@@ -1,0 +1,6 @@
+#c bio-tools
+#d hmmer suite v2.3.2  
+# hmmalign  hmmcalibrate  hmmemit   hmmindex  hmmsearch
+# hmmbuild  hmmconvert    hmmfetch  hmmpfam
+
+dk_op -q .hmmer-2.3.2

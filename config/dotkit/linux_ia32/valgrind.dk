@@ -1,0 +1,4 @@
+#c devel-tools
+#d valgrind v3.2.3  
+
+dk_alter PATH /broad/tools/Linux/i686/pkgs/valgrind/bin

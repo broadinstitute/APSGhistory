@@ -1,0 +1,13 @@
+# UNALTER
+
+if ( $#_dk_aa >= 2 ) then
+  set _dk_op="unuse"
+  if ($#_dk_aa == 3) then
+    dk_alter "$_dk_aa[1]" "$_dk_aa[2]" "$_dk_aa[3]"
+  else
+    dk_alter "$_dk_aa[1]" "$_dk_aa[2]"
+  endif
+else
+  echo "Usage: unalter VARIABLE COMPONENT [ SEPARATOR ]"
+endif
+unsetenv _dk_pream

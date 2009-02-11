@@ -1,0 +1,10 @@
+#c languages
+#d use version 10.0 of the Intel FORTRAN Compiler
+
+dk_alter PATH /broad/tools/apps/intel/ia32/fc/10.0.023/bin
+dk_alter PATH /broad/tools/apps/intel/ia32/idb/10.0.023/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/apps/intel/ia32/fc/10.0.023/lib
+dk_alter DYLD_LIBRARY_PATH /broad/tools/apps/intel/ia32/fc/10.0.023/lib
+dk_alter INTEL_LICENSE_FILE /broad/tools/apps/intel/licenses
+dk_alter MANPATH /broad/tools/apps/intel/ia32/fc/10.0.023/man
+dk_alter MANPATH /broad/tools/apps/intel/ia32/idb/10.0.023/man

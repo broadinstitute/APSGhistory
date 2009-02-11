@@ -1,0 +1,5 @@
+#c versioned-bio-tools
+#d Add perl v5 to path and /broad/tools PERL5LIB
+
+dk_alter PATH /util/bin
+dk_alter PERL5LIB /broad/tools/Linux/ia64/lib/perl5:/broad/tools/Linux/ia64/lib/perl5/site_perl

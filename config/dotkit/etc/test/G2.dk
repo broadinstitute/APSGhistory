@@ -1,0 +1,4 @@
+#c test
+#d Test return status for dk_setenv, dk_where
+
+dk_setenv X `dk_where foobar` || dk_setenv X `dk_where env1`

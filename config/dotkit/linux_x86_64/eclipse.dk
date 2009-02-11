@@ -1,0 +1,4 @@
+#c applications
+#d Eclipse IDE
+
+dk_op -q eclipse-3.4.1

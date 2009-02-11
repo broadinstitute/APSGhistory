@@ -1,0 +1,8 @@
+#c test
+#d test exit status
+
+echo ""
+echo "O begins"
+echo "$_dk_op P"
+dk_op $vflag P && echo "O: $_dk_op P succeeded" || echo "O: $_dk_op P failed"
+echo "O ends"

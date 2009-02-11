@@ -1,0 +1,4 @@
+#c bio-tools
+#d use eon chemical similarity analysis software v2.0.1
+
+dk_op -q .eon-2.0.1

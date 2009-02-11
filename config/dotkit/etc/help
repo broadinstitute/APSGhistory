@@ -1,0 +1,50 @@
+#!/bin/sh
+# help:  grep "#h" help lines for Dotkit to the screen.  Can't pass arguments,
+# so we have to ask.
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+export PATH
+
+f_dirs()
+{
+  sep=${1:-/}
+  _dk_sn="`echo $DK_SUBNODE | tr : ' '`"
+  _dk_n="`echo $HOME/.kits $DK_NODE $DK_ROOT | tr : ' '`"
+  for i in $_dk_n
+  do
+    for d in $_dk_sn
+    do test -d "$i/$d" && echo "$i$sep$d"
+    done
+  done
+}
+
+f_pkgs()
+{
+  for p in `f_dirs`
+  do
+    foo=`echo $p/*.dk`
+    test $p"/*.dk" = "$foo" && continue
+    echo $p/*.dk
+  done
+}
+
+################################################
+echo
+while true; do
+  echo "Help for which Dotkit? (To end, make no entry) -> " | tr -d '\012'
+  read dotkit
+  [ -z "$dotkit" ] && break
+  found=0
+  for dk in `f_pkgs`
+  do
+    b=`basename $dk .dk`
+    if test "$dotkit" = "$b"; then
+      echo "*** Found: $dk ***"
+      grep "#help" $dk | sed -e 's/#help//'
+      found=1
+      break
+    fi
+  done
+  test "$found" = 1 || echo "Not found: $dotkit"
+  echo ""
+done

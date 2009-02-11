@@ -1,0 +1,54 @@
+# DK_ROOT *must* be set before sourcing this file.
+@ _dk_rl = -1
+setenv _dk_shell $shell:t
+if ( ! $?SYS_TYPE ) setenv SYS_TYPE `$DK_ROOT/etc/systype`
+set _dk_cat = "/usr/bin/cat"
+if ( -x /bin/cat ) set _dk_cat = "/bin/cat"
+if ( -f "$DK_ROOT/etc/DK_NODE" ) then
+  set _dk_site = "`$_dk_cat $DK_ROOT/etc/DK_NODE`"
+  if ( ! $?DK_NODE ) then
+    setenv DK_NODE "$_dk_site"
+  else if ( "$DK_NODE" !~ *$_dk_site* ) then
+    setenv DK_NODE "${DK_NODE}:$_dk_site"
+  endif
+  unset _dk_site _dk_cat
+endif
+setenv DK_SUBNODE "$_dk_shell/${SYS_TYPE}:${_dk_shell}:${SYS_TYPE}:."
+if ( $?MANPATH ) then
+  if ( "$MANPATH" !~ *$DK_ROOT* ) setenv MANPATH $DK_ROOT/man:$MANPATH
+else
+  setenv MANPATH $DK_ROOT/man:
+endif
+set _dk_isatty=0
+set _dk_tty = "/usr/bin/tty"
+if ( -x /bin/tty ) set _dk_tty = "/bin/tty"
+$_dk_tty -s
+if ( $status == 0 ) set _dk_isatty=1
+unset _dk_tty
+# Primary aliases to select or deselect packages:
+alias use   'set _dk_s = ( unuse unalias -q \!* ); \\
+             if ( $?DK_UEQRU ) source $DK_ROOT/$_dk_shell/.uu; \\
+             set _dk_s = ( use alias \!* ); \\
+             source $DK_ROOT/$_dk_shell/.uu'
+alias unuse 'set _dk_s = ( unuse unalias \!* ); \\
+             source $DK_ROOT/$_dk_shell/.uu'
+alias reuse 'unuse \!*; \\
+             set _dk_s = ( use alias \!* ); \\
+             source $DK_ROOT/$_dk_shell/.uu'
+# Aliases for use within package files:
+alias dk_alter 'set _dk_aa = ( \!* ) && source $DK_ROOT/$_dk_shell/.dk_alter'
+alias dk_setenv 'set _dk_sa = ( \!* ) && source $DK_ROOT/$_dk_shell/.dk_setenv'
+alias dk_setdef 'set _dk_sa = ( \!* ) && source $DK_ROOT/$_dk_shell/.dk_setdef'
+alias dk_op 'eval $_dk_op \!*'
+alias dk_where '$DK_ROOT/etc/where'
+alias dk_test `dk_where test`
+alias dk_tr `dk_where tr`
+alias dk_alias '$_dk_ali'
+alias dk_source 'source'
+alias dk_rep '$DK_ROOT/etc/rep'
+alias dk_cev 'echo $?\!*'
+# Aliases for the *power* power user:
+alias alter 'set _dk_aa = ( \!* ) && source $DK_ROOT/$_dk_shell/.alter'
+alias unalter 'set _dk_aa = ( \!* ) && source $DK_ROOT/$_dk_shell/.unalter'
+alias car 'set _dk_aa = ( 0 \!* ) && source $DK_ROOT/$_dk_shell/.dk_carcdr'
+alias cdr 'set _dk_aa = ( 1 \!* ) && source $DK_ROOT/$_dk_shell/.dk_carcdr'

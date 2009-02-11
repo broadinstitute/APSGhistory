@@ -1,0 +1,4 @@
+#!/bin/sh
+# Diff the current environment against the initial one, and clean up.
+../envdiff
+/bin/rm -f /tmp/env_*

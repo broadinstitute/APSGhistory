@@ -1,0 +1,6 @@
+#c versioned-bio-tools
+#d Add arachne v1.14 to path
+
+dk_alter PATH /wga/scr1/ArachneReleases/ReleaseArachne-1-14/bin_x86_64_suse
+dk_setenv SOLEXA_PIPELINE_DIR /slxa/pipelineOutput/farm
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/boost-1.37.0/lib:/util/gcc-4.3.0/lib64:/util/gcc-4.3.0/lib

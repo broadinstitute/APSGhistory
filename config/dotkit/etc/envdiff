@@ -1,0 +1,160 @@
+#!/bin/sh
+
+# Look up an absolute pathname for $1.
+whereis()
+{
+  for d in /bin /usr/bin /usr/local/bin /sbin /usr/sbin
+  do test -x $d/$1 && { echo $d/$1; return 0; }
+  done
+  return 1
+}
+
+# Take out the text of functions from the environment.  A problem with bash.
+del_fn() { $SED -e '/[a-zA-Z_][a-zA-Z_[0-9]*=()/,/^}/d'; }
+
+# Make a special case for _dk_inuse, and "_", and "A__z".
+filter() { $SED -e '/_dk_inuse=/s/ /:/g' -e '/^_=/d' -e '/^A__z=/d' | $SORT; }
+
+compare()
+{
+  $AWK '
+  # A simple in place insertion sort.
+  function isort(A,n,  i,j,t){
+    for(i=2; i<=n; i++)
+      for(j=i; j>1 && A[j-1] > A[j]; j--){
+        t = A[j-1]; A[j-1] = A[j]; A[j] = t;
+      }
+  }
+  # Prepare (sorted) output index array, in "b".
+  function indexa(A, b,  i,j) {
+    j = 1
+    for(i in A) b[j++] = i
+    isort(b,j-1)
+  }
+  # Format one (name,value) pair.
+  function fo1(na, va) { return sprintf("%12s=%s", na, va); }
+
+  # Process and print one altered wordlist variable.
+  function prcs(na, t1, t2,  i, j, k, old, new, nadd, nrm, added, removed) {
+    nadd = nrm = 0
+    i = split(t1, old, ":")
+    j = split(t2, new, ":")
+    while(i>0 && j>0){
+      if( old[i] != new[j] ){
+        k = i-1
+        while( k>0 && old[k] != new[j] ) --k
+        if(k == 0){
+          added[++nadd] = fo1(j, new[j])
+          --j
+        } else {
+          while(i > k){
+            removed[++nrm] = fo1(i, old[i])
+            --i
+          }
+        }
+      } else { --i; --j; }
+    }
+    while(i>0) { removed[++nrm] = fo1(i, old[i]); --i; }
+    while(j>0) { added[++nadd] = fo1(j, new[j]); --j; }
+    if( nrm > 0){
+      print "  Removed from:", na
+      for(i=nrm;i>=1;i--) print removed[i]
+    }
+    if( nadd > 0){
+      print "  Added to:", na
+      for(i=nadd;i>=1;i--) print added[i]
+    }
+  }
+
+  ######################################################
+  BEGIN {
+    linesout = 0
+    na1 = na2 = ncs = nc = 0
+    while(getline < ARGV[1] > 0){ # Read file1 into a1 (name, value).
+      i = index($0,"=")
+      na = substr($0,1,i-1)
+      va = substr($0,i+1)
+      a1[na] = va
+      ++na1
+    }
+    while(getline < ARGV[2] > 0){ # Read file2, compare with a1[na].
+      i = index($0,"=")
+      na = substr($0,1,i-1)
+      va = substr($0,i+1)
+      if(na in a1){ # Name is in both files.
+        if(a1[na] != va) { # Value differs between the files.
+          if((index(a1[na], ":") > 0) || (index(va, ":") > 0)) {
+          # A colon-separated wordlist value.
+            cs1[na] = a1[na]
+            cs2[na] = va
+            ++ncs
+          }else{ # A plain (scalar) value.
+            c1[na] = a1[na]
+            c2[na] = va
+            ++nc
+          }
+        }
+        delete a1[na]
+        --na1
+      }else{ # Name is in file2, but not file1.
+        a2[na] = va
+        ++na2
+      }
+    }
+    # Variables that were removed are now all that remains in a1.
+    # Variables added are in a2.
+    # Variables whose value changed are in c1,c2 (old, new, resp.)
+    # Similarly, cs1, cs2 for colon-separated wordlists.
+    if(na1 > 0) {
+      ++linesout
+      print "Removed:"
+      indexa(a1,b)
+      for(i=1;i<=na1;i++) print fo1(b[i], a1[b[i]])
+    }
+    if(na2 > 0) {
+      ++linesout
+      print "Added:"
+      indexa(a2,b)
+      for(i=1;i<=na2;i++) print fo1(b[i], a2[b[i]])
+    }
+    if(nc > 0) {
+      ++linesout
+      print "Changed:"
+      indexa(c1,b)
+      for(i=1;i<=nc;i++) {
+        print fo1(b[i], c2[b[i]])
+        print fo1("(old value)", c1[b[i]])
+      }
+    }
+    if(ncs > 0) {
+      ++linesout
+      print "Wordlist variables altered:"
+      indexa(cs1,b)
+      for(i=1;i<=ncs;i++) prcs(b[i], cs1[b[i]], cs2[b[i]])
+    }
+    # Kludge to get the right newline behavior with envdiff.dk:
+    if((ARGV[3] == "-x") && (linesout > 0)) printf("\015")
+
+  }' $*
+}
+
+#######################################################
+user=${USER:-$LOGNAME}
+temp1=/tmp/env_${user}1
+temp2=/tmp/env_${user}2
+
+AWK=`whereis gawk`
+test -x "$AWK" || AWK=`whereis nawk`
+test -x "$AWK" || AWK=`whereis awk`
+MV=`whereis mv`
+ENV=`whereis env`
+SED=`whereis sed`
+SORT=`whereis sort`
+expr "$SHELL" : "/.*/bash" > /dev/null &&
+  envcom="eval $ENV | del_fn" ||
+  envcom="$ENV"
+
+test -r $temp1 || { $envcom | filter > $temp1; exit 0; }
+test -r $temp2 || { $envcom | filter > $temp2; }
+compare $temp1 $temp2 $*
+$MV $temp2 $temp1

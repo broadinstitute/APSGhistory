@@ -1,0 +1,21 @@
+#!/bin/sh
+# Display equivalent files in a list, provided on stdin.  Typically:
+#   find . -name "*.dk" -o -name ".*.dk" | equiv
+
+while read fi
+do
+  su=`sum -r $fi | cut -d' ' -f1`
+  echo "$su $fi"
+done | awk '{
+  if( ar[$1] != "" ) ar[$1] = ar[$1] " " $2
+  else ar[$1] = $2
+}
+END {
+  for(s in ar) {
+    n = split(ar[s],a," ")
+    if(n > 1){
+      printf("Equivalent files:\n")
+      for(i=1; i<=n; i++) printf("  %s\n", a[i])
+    }
+  }
+}'

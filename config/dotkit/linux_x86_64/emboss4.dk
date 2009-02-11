@@ -1,0 +1,4 @@
+#c versioned-bio-tools
+#d Add emboss v4 to path
+
+dk_alter PATH /broad/tools/apps/EMBOSS-4.0_x86-64/bin

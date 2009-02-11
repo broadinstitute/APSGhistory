@@ -1,0 +1,6 @@
+#c devel-tools
+#d Add Subversion 1.5 revision control software to path
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/subversion-1.5/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/subversion-1.5/lib
+dk_alter LD_LIBRARY_PATH /broad/tools/lib

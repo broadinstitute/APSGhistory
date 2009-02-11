@@ -1,0 +1,7 @@
+#c languages
+#d java Sun JDK 1.6.0 patch 11.
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/jdk_1.6.0_11/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/jdk_1.6.0_11/man
+
+

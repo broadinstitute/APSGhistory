@@ -1,0 +1,6 @@
+#c devel-tools
+#d groovy v 1.5.0 
+
+dk_alter PATH /broad/tools/src/groovy/groovy-1.5.0/bin
+dk_setdef JAVA_HOME /usr/java/java1.5
+dk_alter GROOVY_HOME /broad/tools/src/groovy/groovy-1.5.0

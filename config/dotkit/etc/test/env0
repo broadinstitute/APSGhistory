@@ -1,0 +1,4 @@
+#!/bin/sh
+# Create an initial recording of the environment
+/bin/rm -f /tmp/env_*
+../envdiff

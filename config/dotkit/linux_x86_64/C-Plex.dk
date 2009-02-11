@@ -1,0 +1,6 @@
+#c bio-tools
+#d C-Plex 1.1.1 
+
+dk_alter PATH /broad/tools/apps/cplex/cplex111/bin/x86-64_sles9.0_3.3
+dk_alter LD_LIBRARY_PATH /broad/tools/apps/cplex/cplex111/bin/x86-64_sles9.0_3.3
+dk_setenv ILOG_LICENSE_FILE /broad/tools/apps/cplex/ilm/access.ilm

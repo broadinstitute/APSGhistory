@@ -1,0 +1,4 @@
+#c devel-tools
+#d use default git
+
+dk_op -q .git-1.6.0.5

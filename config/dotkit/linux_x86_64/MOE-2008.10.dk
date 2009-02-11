@@ -1,0 +1,5 @@
+#c versioned-bio-tools
+#d use  Molecular Operating Environment version 2008.10
+
+dk_alter PATH /broad/tools/apps/MOE/MOE-2008.10/bin
+dk_setenv MOE /broad/tools/apps/MOE/MOE-2008.10

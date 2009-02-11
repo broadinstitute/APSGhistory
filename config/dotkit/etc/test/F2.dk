@@ -1,0 +1,15 @@
+#c test
+#d F2: Mutually exclusive packages, variants on a theme.
+
+echo ""
+echo "Starting F2"
+
+unuse `dk_rep 'F?'`
+
+dk_setenv f1 F2
+dk_alter f2 F3
+dk_alter f2 F4
+dk_alter f2 $f1
+echo ""
+echo "Leaving F2: f1=$f1 (F2 is correct)"
+echo "Leaving F2: f2=$f2 (F2:F4:F3 is correct, or nil if unuse)"
