@@ -1,8 +1,9 @@
 #c groups
-#d current gcc and build tools relevant to building things with gcc
+#d Current GCC and build tools
 
-dk_op -q pkg-config-0.23
-dk_op -q db-4.7.25 
+# Latest binutils
 dk_op -q binutils-2.19
-dk_op -q gcc-4.3.3
+
+# Latest GCC
+dk_op -q GCC-4.3
 
