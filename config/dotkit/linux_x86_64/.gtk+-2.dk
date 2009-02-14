@@ -1,0 +1,19 @@
+#c libraries
+#d GTK+ is a highly usable, feature rich toolkit for creating 
+#d graphical user interfaces which boasts cross platform 
+#d compatibility and an easy to use API.
+#d http://www.gtk.org/
+
+# GTK+ depends on a lot of libraries, these shoudl all be hidden.
+dk_op -q .atk-1.24.0
+dk_op -q .cairo-1.8.6
+dk_op -q .fontconfig-2.6.0
+dk_op -q .freetype-2.3.8
+dk_op -q .gettext-0.17
+dk_op -q .glib-2.18.4
+dk_op -q .jasper-1.900.1
+dk_op -q .libpng-1.2.34
+dk_op -q .pango-1.20.5
+dk_op -q .pixman-0.14.0
+dk_op -q .gtk+-2.14.7
+

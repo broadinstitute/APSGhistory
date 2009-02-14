@@ -1,0 +1,7 @@
+#c languages
+#d wxPython is a blending of the wxWidgets C++ class library 
+#d with the Python programming language. 
+#d http://wxpython.org/
+
+dk_op -q .wxPython-2.8.9.1
+dk_op -q .gtk+-2

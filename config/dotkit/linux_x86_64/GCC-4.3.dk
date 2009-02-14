@@ -4,3 +4,6 @@
 #d Latest release in 2.6 series.
 
 dk_op -q gcc-4.3.3
+dk_op -q .binutils-2.1
+dk_op -q .gettext-0.17
+dk_op -q .pkg-config-0.23 
