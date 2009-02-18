@@ -1,0 +1,18 @@
+#c versioned-languages
+#d Add gcc v4.3.3 to path and LD_LIBRARY_PATH
+
+
+# Clear out exisitng gcc varsions.
+unuse -q `dk_rep '*gcc-*'`
+
+# Build tools for gcc.
+dk_op -q .binutils-2.19
+dk_op -q .gettext-0.17
+dk_op -q .pkg-config-0.23
+
+# Set up gcc
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/gcc_4.3.3/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gcc_4.3.3/lib64:/broad/tools/Linux/x86_64/pkgs/gcc_4.3.3/lib
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/gcc_4.3.3/man
+
+

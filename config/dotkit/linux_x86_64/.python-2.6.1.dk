@@ -4,9 +4,15 @@
 # Clear out any python versions lingering around
 unuse -q `dk_rep 'python*'`
 
-# scipy needs this
-dk_op -q linear-algebra-0.1
-dk_op -q GCC-4.3
+# Packages python needs
+dk_op -q .linear-algebra-0.1
+dk_op -q .gtk+-2.14.7
+dk_op -q .wxPython-2.8.9.1
+dk_op -q .pygobject-2.16.0
+dk_op -q .pycairo-1.8.2
+dk_op -q .pygtk-2.12.1
+dk_op -q .matplotlib-0.98.5.2
+dk_op -q .gcc-4.3.3
 
 # Python locations.
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/python_2.6.1/bin
@@ -14,5 +20,5 @@ dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/python_2.6.1/lib
 
 # Architecture dependent packages are here
 # This allows per-cpu vendor specific packages.
-dk_alter PYTHONPATH /broad/tools/Linux/x86_64/pkgs/python-site/python-2.6.1-${ARCH_TYPE}/lib/python2.6/site-packages/
+dk_alter PYTHONPATH /broad/tools/Linux/x86_64/pkgs/python-site/python-2.6.1-${ARCH_TYPE}/lib/python2.6/site-packages
 
