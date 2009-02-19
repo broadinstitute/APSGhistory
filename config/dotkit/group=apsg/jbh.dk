@@ -1,4 +1,5 @@
-#c tesitng
+#c misc
 #d My test group dotkit.
 
+echo "This package came from APSG group dotkits."
 
