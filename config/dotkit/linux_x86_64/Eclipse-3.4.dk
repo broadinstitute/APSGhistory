@@ -1,0 +1,7 @@
+#c applications
+#d Eclipse IDE
+
+unuse -q `dk_rep "Eclipse*"`
+
+# Get latest 3.4 eclipse
+dk_op -q .eclipse-3.4.1

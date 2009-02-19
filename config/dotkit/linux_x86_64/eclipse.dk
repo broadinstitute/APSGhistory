@@ -1,4 +1,8 @@
 #c applications
 #d Eclipse IDE
 
-dk_op -q .eclipse-3.4.1
+echo -e "\nThis package is deprecated. Please use 'Eclipse-N.M'"
+echo "where N.M is the version you need. Currently this is"
+echo "Eclipse-3.4"
+
+# dk_op -q .eclipse-3.4.1

@@ -2,8 +2,8 @@
 #d Eclipse Classis SDK
 #d DEPRECATED. 'use eclipse' instead of calling this package directly.
 
-echo -e "\nThis package is deprecated. Please 'use eclipse' instead"
-echo "to get the latest APSG supported version of Eclipse."
+echo -e "\nThis package is deprecated. Please 'use Eclipse-3.4' instead"
+echo "to get the latest APSG supported version of Eclipse 3.4."
 
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/eclipse_3.4.1
 
