@@ -1,0 +1,7 @@
+#c IT/Systems
+#d Collection of default environment setting for basic user setup
+
+dk_op .broad
+dk_op .aliases
+dk_op .path
+

@@ -1,0 +1,5 @@
+#c groups
+#d APSG Specific Dotkits
+
+dk_alter DK_NODE $DK_ROOT/group=apsg
+
