@@ -1,7 +1,8 @@
 #c IT/Systems
 #d Collection of default environment setting for basic user setup
 
+# Things which make permanenet changes come first.
+dk_op .path
+dk_op .prompt
 dk_op .broad
 dk_op .aliases
-dk_op .path
-
