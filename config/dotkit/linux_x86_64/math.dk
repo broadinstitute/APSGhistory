@@ -2,6 +2,10 @@
 #d This was a collection point for math related libraries.
 #d Please use linear-algebra dotkit instead.
 
-use linear-algebra-0.1
-
+echo "The math dotkit is deprecated. Any dotkit which"
+echo "requires teh linear-algebra package should call it"
+echo "directly using the correct version. If you need"
+echo "the linear-algrebra libraries for local software"
+echo "please 'use linear-algebra' to get the latest "
+echo "APSG supported versions."
 

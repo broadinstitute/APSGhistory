@@ -1,0 +1,8 @@
+#c languages
+#d Practical Extraction and Reporting Language
+#d http://www.perl.org/
+#d Latest APSG supported release in 5.8 series.
+unuse -q `dk_rep 'Perl-*'`
+
+dk_op -q .perl-5.8.9
+
