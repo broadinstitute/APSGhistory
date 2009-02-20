@@ -3,8 +3,8 @@
 
 # Dependencies
 dk_op -q .gcc-4.3.3
-dk_op -q python-2.6.1
-dk_op -q perl-5.8.9
+dk_op -q .python-2.6.1
+dk_op -q .perl-5.8.9
 dk_op -q gnuplot
 dk_op -q ImageMagick-6.4.7-5
 dk_op -q fftw3-3.1.3-single
