@@ -1,0 +1,11 @@
+#c languages
+#d Perl is a stable, cross platform programming language.
+#d http://www.perl.org/
+#d Latest release in 5.8 series.
+
+# Unload any loaded Perl super packages.
+unuse -q `dk_rep 'Perl-*'`
+
+# Get latest perl 5.8
+dk_op -q .perl-5.8.9
+

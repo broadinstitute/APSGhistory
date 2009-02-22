@@ -1,0 +1,6 @@
+#c versioned-languages
+#d Add R v2.5.1 to path and /broad/tools R_LIBS
+
+dk_alter PATH /broad/tools/apps/R-2.5.1/bin
+dk_alter R_LIBS /broad/tools/Linux/x86_64/pkgs/R/2.5.1
+dk_alter LD_LIBRARY_PATH /util/lib/mysql

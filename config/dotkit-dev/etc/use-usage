@@ -1,0 +1,427 @@
+#!/bin/sh
+# Usage message for use.
+# Assumes DK_SUBNODE, _dk_inuse, DK_ROOT, DK_NODE are sensible.
+# $1 == 1 if we should list available dotkits by name then exit.
+# $2 == 1 if the -v flag was given, 0 otherwise.
+# $3 == 1 if the -a flag was given, 0 otherwise.
+# $4 == 1 if the -l flag was given, 0 otherwise.
+# $5 == 1 if the -q flag was given, 0 otherwise.
+# (Although the meaning of "-a" is "append" in other contexts, here
+# we overload it to mean "show hidden dotkits", like "ls -a".)
+
+# Hand over the job to a user-defined script if desired:
+test -x "$DK_USEUSAGE" && test "$0" != "$DK_USEUSAGE" && exec $DK_USEUSAGE "$@"
+
+PATH=/usr/bin:/bin:/usr/sbin:/sbin
+export PATH
+
+test -x /usr/bin/nawk && AWK=nawk || AWK=awk
+
+# Process arguments
+availflag=$1 # Show names of available packages
+if [ "$availflag" != "1" ]; then
+  vflag=$2 # Verbose flag
+  aflag=$3 # Show hidden dotkits?
+  lflag=$4 # List flag:  list package name/description or help information
+  qflag=$5 # Quiet flag: no output if set
+  shift 5  # dotkit list is now in $*
+fi
+
+# Prints list of valid {node}x{subnode} directories
+#    Node = {~/.kits  $DK_NODE  $DK_ROOT}
+# Subnode = {$DK_SUBNODE}
+f_dirs()
+{
+  sep="${1:-/}"
+  _dk_sn="`echo $DK_SUBNODE | tr : ' '`"
+  _dk_n="`echo $HOME/.kits $DK_NODE $DK_ROOT | tr : ' '`"
+  for i in $_dk_n
+  do
+    for d in $_dk_sn
+    do test -d "$i/$d" && echo "$i$sep$d"
+    done
+  done
+}
+
+# Prints fullpaths to all *.dk files found in any
+# directories listed by f_dirs(), includes hidden
+# dotkits whose name starts with a '.' if aflag is set
+f_pkgs()
+{
+  for i in `f_dirs`
+  do
+    foo=`echo $i/*.dk`
+    test $i/"*.dk" != "$foo" && echo $i/*.dk
+    if test "$aflag" = 1; then # Also show hidden dotkits.
+      foo=`echo $i/.*.dk`
+      test $i/".*.dk" != "$foo" && echo $i/.*.dk
+    fi
+  done
+}
+
+# For each readable file in $*, translates the .dk file into "@@" list format,
+# i.e., cat[/sub]*@@name[@@desc]*
+#   $* - list of absolute filenames for .dk files
+f_read_pkg()
+{
+  # build list of readable files
+  readlist=""
+  for f
+  do
+    if [ -f "$f" -a -r "$f" ]; then
+      readlist="$readlist $f"
+    fi
+  done
+
+  # if there is nothing to read, bail out
+  if [ "$readlist" = "" ]; then echo "" ; return 1 ; fi
+
+  $AWK '
+  BEGIN {
+    npkgs=0;
+    oldcats[0] = "Miscellaneous packages"
+    oldcats[1] = "Vendor-supplied software"
+    oldcats[2] = "3rd party (commercial, open source) software"
+    oldcats[3] = "Project-specific kits"
+    oldcats[4] = "Locally developed apps"
+    oldcats[5] = "Personal dotkits"
+    oldcats[9] = "Sub-site access packages"
+  }
+
+  {
+    if (FILENAME != lastFILENAME) {
+      lastFILENAME = FILENAME;
+      pk = FILENAME;
+      sub(/.*\//, "", pk); sub(/\.dk$/, "", pk);
+      npkgs++;
+    }
+
+    if( match($0, /^[ 	]*#c[ 	][ 	]*/) ){
+      pkgs[npkgs] = sprintf("%s@@%s%s", substr($0,RLENGTH+1), pk, pkgs[npkgs]);
+    } else if ( match($0, /^[   ]*#d[ 	][   ]*/) ){
+      pkgs[npkgs] = sprintf("%s@@%s", pkgs[npkgs], substr($0, RLENGTH+1));
+    } else if( match($0,/^#[0-9a-zA-Z\/]*:/) ){
+      catname = substr($0,2,RLENGTH-2);
+      if( match($0,/^#[0-9]:/) ) catname = oldcats[catname];
+      catname = sprintf("%s@@%s", catname, pk);
+      match($0,/^#[0-9a-zA-Z\/]*:[ 	]*/);
+      desc = substr($0,RLENGTH+1);
+      pkgs[npkgs] = sprintf("%s@@%s", catname, desc);
+    }
+  }
+
+  END {
+    for (n=1; n<=npkgs; n++)
+      printf("%s\n", pkgs[n]);
+  }
+  ' $readlist
+}
+
+# lists all visible and readable packages by name,
+# in alphabetical order separated by a space
+f_pkg_listavail()
+{
+  pkgs=`f_pkgs`
+  pkgs="$pkgs $DK_ROOT/..dk"
+                                                                                                                       
+  f_read_pkg $pkgs | $AWK '
+  {
+    split($0,a,"@@");
+    pk = a[2];
+    pkseen=0;
+    for (n in seen) if (seen[n] == pk) pkseen=1;
+    if (! pkseen) {
+      seen[++npkgs] = pk;
+      pkgs[npkgs] = $0;
+    }
+  }
+                                                                                                                       
+  function isort(A,n,  i,j,t){
+    for(i=2; i<=n; i++)
+      for(j=i; j>1 && A[j-1] > A[j]; j--){
+        t = A[j-1]; A[j-1] = A[j]; A[j] = t;
+      }
+  }
+                                                                                                                       
+  END {
+    isort(pkgs,npkgs);
+    avail="";
+    for(i=1; i<=npkgs; i++) {
+      num = split(pkgs[i],a,"@@");
+      pkgname = a[2];
+      avail = sprintf("%s\n%s", avail, pkgname);
+    }
+    printf("%s\n", avail);
+  }'
+}
+
+# Prints categories, package names, and short descriptions
+f_pkg_summary5()
+{
+  pkgs=`f_pkgs`
+  pkgs="$pkgs $DK_ROOT/..dk"
+
+  f_read_pkg $pkgs | $AWK '
+  {
+    split($0,a,"@@");
+    pk = a[2];
+    pkseen=0;
+    for (n in seen) if (seen[n] == pk) pkseen=1;
+    if (! pkseen) {
+      seen[++npkgs] = pk;
+      pkgs[npkgs] = $0;
+    }
+  }
+
+  function isort(A,n,  i,j,t){
+    for(i=2; i<=n; i++)
+      for(j=i; j>1 && A[j-1] > A[j]; j--){
+        t = A[j-1]; A[j-1] = A[j]; A[j] = t;
+      }
+  }
+  
+  END {
+    isort(pkgs,npkgs);
+    lastcat=""
+    print ""
+    for(i=1; i<=npkgs; i++) {
+      num = split(pkgs[i],a,"@@");
+      catname = a[1];
+      pkgname = a[2];
+      desc = a[3];
+      found=1;
+      if (filter != "") {
+        found=0;
+	filter_low = tolower(filter);
+	item_low = tolower(pkgs[i]);
+	found = (item_low ~ filter_low);
+      }
+      if (found) {
+        if (catname != lastcat) {
+          printf("%s ----------\n", catname);
+          lastcat = catname;
+        }
+        printf("  %12s - %s\n", pkgname, desc);
+        for(j=4;j<=num;j++) {
+          printf("                 %s\n", a[j]);
+        }
+      }
+    }
+    print "";
+  }' filter=$1
+}
+
+# Prints Node/Subnode directories and any packages they include
+f_pkg_summary2()
+{
+  for i in `f_dirs '->'`
+  do
+    d=`echo $i | sed 's:->:/:'`
+    echo "## Node->Subnode: $i"
+    (cd $d && ls -C *.dk .*.dk 2>/dev/null)
+    echo ""
+  done | expand | sed 's/\.dk//g'
+}
+
+# Print message, typically yes/no question, and stop for response.
+# Default answer is $2 (typically 'y' or 'n').
+f_confirm()
+{
+  test -t 1 || return 0 # If stdout is not a tty, return quietly.
+  echo "$1" | tr -d '\012' # (Portable echo -n)
+  read answer
+  test -z "$answer" && answer=$2
+  case "$answer" in
+    [yY]*) return 0;;
+        *) return 1;;
+  esac
+}
+
+f_usage()
+{
+cat << EOF
+
+Usage:
+    use [-alqv] [pkg ...]
+  unuse [-alqv] [pkg ...]
+
+Common Usage:
+  Load a package:           use <pkg>
+  Unload a package:         unuse <pkg>
+  List loaded packages:     use
+  List available packages:  use -l
+  Read package help info:   use -l <pkg>
+EOF
+}
+
+f_maintainer()
+{
+  if test -f $DK_ROOT/etc/DK_MAINTAINER; then
+  cat << EOF
+=========================  QUESTIONS?  ===========================
+Problems or questions?  Please contact the Dotkit site maintainer:
+`cat $DK_ROOT/etc/DK_MAINTAINER`
+EOF
+  fi
+}
+
+f_news()
+{
+  if test -f $DK_ROOT/etc/dk-news; then
+  cat << EOF
+=========================  DOTKIT NEWS  =====================================
+`cat $DK_ROOT/etc/dk-news`
+EOF
+  fi
+}
+
+# First argument is the value of the "-a" flag, 0 or 1.  Then follows
+# a list of package names.
+f_inuse()
+{
+  cat << EOF
+
+Packages in use:
+EOF
+  $AWK 'BEGIN {
+    blanks = "                                                             "
+    for(i=1;i<ARGC-1;i++){
+      s = ARGV[i+1]
+      nm = substr(s,1,length(s)-2)
+      indent = substr(s,length(s),1)
+      if( nm !~ /^\../ || ARGV[1] == 1 )
+        printf("  %s%s\n", substr(blanks, 1, 2*indent), nm)
+    }
+    printf("\n");
+  }' $aflag $*
+}
+
+# Returns full path to first .dk found for a package name
+# in a given directory list, returns NULL string otherwise
+#   $1 - Package name (without .dk extension)
+#   $2 - Directory list to search through
+# E.g., 
+#   node_subnode_list=`f_dirs`
+#   pathtofoo=`f_findpkg foo "$node_subnode_list"`
+f_findpkg()
+{
+  for i in $2
+  do
+    filename=${i}/${1}.dk
+    if [ -f "$filename" ]; then
+      echo "$filename"
+      return
+    fi
+  done 
+  echo ""
+}
+
+
+#################################################
+# Bail immediately if quiet mode is set (-q and no -v), no output whatsoever
+if [ "$qflag" = 1 -a "$vflag" != 1 ]; then exit 0; fi
+
+
+#################################################
+# If availflag is set, list all available (readable) dotkits by name and exit
+if [ "$availflag" = 1 ]; then
+  f_pkg_listavail
+  exit 0
+fi
+
+
+#################################################
+# List verbose mode (-l & -v)
+if [ "$lflag" = 1 -a "$vflag" = 1 ]; then
+  # if the user listed one or more dotkits, cat each one to the screen
+  # otherwise, show the usage, categories, short descriptions, and node/subnode paths for all dotkits
+  if [ -n "$*" ]; then
+    dirlist=`f_dirs`
+    for p in $*
+    do
+      echo ""
+      # get absolute path/filename to first dotkit with name $p
+      file=`f_findpkg $p "$dirlist"`
+      # if the .dk file exists and is readable, then "cat" it to the screen
+      # otherwise, notify the user that this dotkit can not be found (or read)
+      if [ -f "$file" -a -r "$file" ]; then
+        echo "***** $p :: $file *****"
+        cat $file
+      else
+        echo "***** $p :: (not found) *****"
+      fi
+    done 
+    echo ""
+    exit 0
+  fi
+
+  f_usage
+  f_maintainer
+  f_news
+  f_inuse ${_dk_inuse:-NONE.0}
+  f_pkg_summary5 # Construct package summary in the background.
+  f_pkg_summary2 # Construct detailed package summary in the background.
+  exit 0
+fi # end verbose list mode
+
+
+#################################################
+# List mode (-l)
+if test "$lflag" = 1; then
+  # if the user listed one or more dotkits, look up its help info
+  # otherwise, show the categories and short descriptions for all dotkits
+  if [ -n "$*" ]; then
+    dirlist=`f_dirs`
+    for p in $*
+    do
+      echo ""
+      # get absolute path/filename to first dotkit with name $p
+      file=`f_findpkg $p "$dirlist"`
+      # if the .dk file exists and is readable, then read and process it
+      # otherwise, notify the user that this dotkit can not be found (or read)
+      if [ -f "$file" -a -r "$file" ]; then
+        echo "***** $p *****"
+        #echo "File:  $file"
+        # print Category and Description information
+        f_read_pkg $file | $AWK '{
+          n = split($0, a, "@@");
+          # printf("Name:  %s\n", a[2]);
+          # printf("Catg:  %s\n", a[1]);
+          # if (n >= 3)
+          #   printf("Desc:  %s\n", a[3]);
+          # for(i=4;i<=n;i++)
+          #   printf("       %s\n", a[i]);
+          for(i=3;i<=n;i++)
+            printf("  %s\n", a[i]);
+        }'
+        # print any help lines in file
+        $AWK ' /^#h / {
+          match($0, /[ 	]*#h /);
+          # ++n; 
+          # if (n == 1)
+          #   printf("Help:  %s\n", substr($0,RLENGTH+1));
+          # else
+          #   printf("       %s\n", substr($0,RLENGTH+1));
+          printf("  %s\n", substr($0,RLENGTH+1));
+        }' $file
+      else
+        echo "${p}: (not found)"
+	echo "Closest matches:"
+        f_pkg_summary5 $p
+      fi
+    done 
+    echo ""
+    exit 0
+  fi
+
+  f_pkg_summary5
+  exit 0
+fi # end list mode
+
+
+##############
+# Usual output (no args or options)
+f_usage
+f_maintainer
+f_news
+f_inuse ${_dk_inuse:-NONE.0}

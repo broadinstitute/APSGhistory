@@ -1,0 +1,7 @@
+#c libraries
+#d OpenMPI version 1.2.7, Built with gcc 4.2.1
+
+dk_alter PATH /broad/tools/apps/openmpi/openmpi-1.2.7-gcc-4.2.1-i386/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/apps/openmpi/openmpi-1.2.7-gcc-4.2.1-i386/lib
+dk_alter MANPATH /broad/tools/apps/openmpi/openmpi-1.2.7-gcc-4.2.1-i386/share/man
+

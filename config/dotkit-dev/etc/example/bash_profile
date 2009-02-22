@@ -1,0 +1,20 @@
+# A basic .bash_profile for use with Dotkit for bash.  See also .bashrc.
+
+# Optional: Before you initialize Dotkit, set DK_NODE to reference any
+# project or group specific dotkits that you want to catalog.
+#export DK_NODE=/my/special/dotkits
+
+# Look for Dotkit first in $DK_ROOT, then $HOME, then LLNL default.
+if [[ -d "$DK_ROOT" ]]; then
+  eval `$DK_ROOT/init -b`
+elif [[ -d "$HOME/dotkit" ]]; then
+  eval `$HOME/dotkit/init -b`
+elif [[ -d "/usr/gapps/dotkit" ]]; then
+  eval `/usr/gapps/dotkit/init -b`
+fi
+
+# Basic environment:
+use -q Sys Dev Prefs
+
+# Bash login shells won't read .bashrc on their own.
+. $HOME/.bashrc

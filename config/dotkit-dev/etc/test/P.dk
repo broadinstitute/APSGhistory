@@ -1,0 +1,7 @@
+#c test
+#d test exit status
+
+echo ""
+echo "P begins"
+dk_test "$rec3" = "0" || setenv _dk_err "P FAILURE"
+echo "P ends"

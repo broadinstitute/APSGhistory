@@ -1,0 +1,5 @@
+#c IT/Systems
+#d Set basic system path
+
+dk_setenv PATH /usr/bin:/bin:/usr/local/bin
+

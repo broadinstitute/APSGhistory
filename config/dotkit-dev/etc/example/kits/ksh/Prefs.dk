@@ -1,0 +1,10 @@
+#c personal
+#d Personal preferences example (ksh)
+
+dk_op -q Super
+
+# Stuff that ksh cares about:
+dk_setenv CDPATH .:..:$HOME
+dk_setenv HISTSIZE 1000
+dk_test -n "$FPATH" && dk_setenv FPATH $FPATH:$HOME/autoload ||
+                       dk_setenv FPATH $HOME/autoload

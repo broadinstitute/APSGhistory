@@ -1,0 +1,4 @@
+#c bio-tools
+#d PAUP v4b10  
+
+dk_alter PATH /broad/tools/Linux/x86_64/bin

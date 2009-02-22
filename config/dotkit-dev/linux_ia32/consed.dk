@@ -1,0 +1,5 @@
+#c bio-tools
+#d consed v15.0, phredphrap, crossmatch and utility scripts 
+
+dk_alter PATH /broad/tools/Linux/i686/genome/bin
+dk_setenv CONSED_HOME /broad/tools/Linux/i686/genome

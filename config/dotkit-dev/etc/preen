@@ -1,0 +1,56 @@
+#!/bin/sh
+# Set permissions under dotkit according to a plan:  Stuff is generally
+# world-readable and group-writable to a group that defaults to "dotkit".
+# Run this from $DK_ROOT, as "etc/preen".
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+export PATH
+
+# Designated group to use.  Allow over-ride with environment variable.
+des_grp=${DES_GRP:-dotkit}
+user=${LOGNAME:-$USER}
+
+test -n "$user" || { echo "LOGNAME and USER are unset!"; exit 0; }
+groups | grep $des_grp > /dev/null ||
+  { echo "You are not a member of group $des_grp"; exit 0; }
+
+# Print (potentially) long lines.  First line/arg is left-justified.
+# Subsequent lines are indented 2 spaces.
+prll()
+{
+  echo $1
+  shift
+  echo $* | fold -s -w72 |
+  while read line
+  do echo "  $line"
+  done
+}
+
+# DIRECTORIES
+# Set group to DES_GRP, and turn on group write/setgid bits.
+find . -type d -user $user -exec chgrp $des_grp {} \;
+find . -type d -user $user -exec chmod ug+rwx,g+s,o+rx {} \;
+[ -d repository ] && chmod o-rwx repository
+
+# Allow, but warn about, directories that are not readable/searchable by world.
+not_world_rx=`find . -type d ! -perm -05`
+test -n "$not_world_rx" &&
+  { prll "Directories NOT world-readable/searchable:" $not_world_rx; }
+
+# Allow, but warn about, world-writable directories.
+world_w=`find . -type d -perm -02`
+test -n "$world_w" &&
+  { prll "World-writable directories:" $world_w; }
+
+# FILES
+# Set group to DES_GRP, turn on group write.
+find . -type f -user $user -exec chgrp $des_grp {} \;
+find . -type f -user $user -exec chmod ug+rwX,o+rX {} \;
+
+not_world_r=`find . -type f ! -perm -04`
+test -n "$not_world_r" &&
+  { prll "Files NOT world-readable:" $not_world_r; }
+
+world_w=`find . -type f -perm -02`
+test -n "$world_w" &&
+  { prll "World-writable files:" $world_w; }

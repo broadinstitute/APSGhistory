@@ -1,0 +1,50 @@
+#!/bin/sh
+# Usage:
+#   SYS_TYPE=`/path/to/systype`          in sh, ksh, zsh, bash
+#   setenv SYS_TYPE `/path/to/systype`   in csh, tcsh
+
+PATH=/bin:/usr/bin:/usr/sbin:/sbin
+export PATH
+
+if [ -r /etc/home.config ]; then
+  SYS_TYPE=`grep SYS_TYPE /etc/home.config | cut -d" " -f2`
+  echo $SYS_TYPE
+  exit
+fi
+
+um="`uname -m | tr '[A-Z]' '[a-z]'`"
+ur="`uname -r | tr '[A-Z]' '[a-z]'`"
+us="`uname -s | tr '[A-Z]' '[a-z]'`"
+SYS_TYPE=unknown
+guess=
+
+case "$us$um" in
+  osf*)
+    case "$ur" in
+      v4.*) SYS_TYPE="tru64_4";;
+      v5.*) SYS_TYPE="tru64_5";;
+      *) guess="tru64_5"
+    esac;;
+  sunos*) 
+    case "$ur" in
+      5.10) SYS_TYPE="solaris_10_i86pc";;
+    esac;;
+  linux*)
+    case "$um" in
+      i[36]86) ar=ia32;;
+      ia64) ar=ia64;;
+      *) ar=x86_64;;
+    esac
+    SYS_TYPE="linux_$ar"
+    ;;
+  *) echo "SYS_TYPE: system type unknown: $us $um $ur" >&2 ;;
+esac
+
+if test -n "$guess"; then
+  echo "SYS_TYPE: system release unknown, guessing $guess" >&2
+  SYS_TYPE=$guess
+fi
+echo $SYS_TYPE
+test "$SYS_TYPE" != "unknown"
+exit
+

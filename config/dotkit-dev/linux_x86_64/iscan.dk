@@ -1,0 +1,5 @@
+#c bio-tools
+#d IScan-1.0.0
+
+dk_alter PATH /util/bin:/broad/tools/Linux/x86_64/bin
+dk_alter PERL5LIB /broad/tools/Linux/x86_64/lib/perl5:/broad/tools/Linux/x86_64/lib/perl5/site_perl

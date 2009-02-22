@@ -1,0 +1,11 @@
+#c versioned-languages
+#d Add python v2.4.2 to path and /broad/tools PYTHONPATH
+
+# Clear out any python versions lingering around
+unuse -q `dk_rep 'python*'`
+
+dk_alter PATH /util/bin
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/wx/2.8/bin
+dk_alter PYTHONPATH /broad/tools/Linux/x86_64/lib/python2.4/site-packages
+dk_alter LD_LIBRARY_PATH /util/lib64:/util/lib
+dk_alter LD_LIBRARY_PATH  /broad/tools/Linux/x86_64/pkgs/wx/2.8/lib

@@ -1,0 +1,15 @@
+#!/bin/csh -f
+# where:  If executable is found, print full path and exit status 0.
+# Otherwise, be silent and exit status 1.  Also, this one probably works
+# even if PATH is empty.
+
+set stat = 1
+if ( ! $?path ) set path = ()
+foreach d ( $path /bin /usr/bin /sbin /usr/sbin /usr/ucb /usr/bsd /usr/local/bin )
+  if ( -x "$d/$1" && -f "$d/$1" ) then
+    echo "$d/$1"
+    set stat = 0
+    break
+  endif
+end
+exit $stat

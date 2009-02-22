@@ -1,0 +1,9 @@
+#c test
+#d test
+
+dk_setdef foo BAR
+
+# Force prepend components to X.
+dk_test "$_dk_pream" = "Appending" && setenv _dk_pream Prepending
+dk_alter X a
+dk_alter X b

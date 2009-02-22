@@ -1,0 +1,4 @@
+#c versioned-bio-tools
+#d Add emboss v5 to path
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/EMBOSS-5.0_x86-64_png/bin

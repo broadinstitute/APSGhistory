@@ -1,0 +1,4 @@
+#c bio-tools
+#d polyscan v3.0  
+
+dk_alter PATH /broad/tools/Linux/x86_64/bin

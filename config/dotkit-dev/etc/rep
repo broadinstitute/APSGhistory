@@ -1,0 +1,26 @@
+#!/bin/csh -f
+# Implement the dk_rep command.  Each argument is matched against each
+# element of _dk_inuse.  Each element that matches is printed.
+
+setenv PATH /bin:/usr/bin:/sbin:/usr/sbin
+
+@ count = 0
+while ( $#argv )
+  if ( $?_dk_inuse ) then
+    foreach k ( $_dk_inuse )
+      if ( $k:r =~ $argv[1] ) then
+        echo -n "$k:r "
+        @ count++
+      endif
+    end
+  endif
+  shift
+end
+if ( $count ) then # At least one match.
+  echo ""
+  set stat = 0
+else # Nothing matched.
+  echo "__NIL__ "
+  set stat = 1
+endif
+exit $stat

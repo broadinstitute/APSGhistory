@@ -1,0 +1,17 @@
+# UNUSE
+if ( ! $?_dk_ ) goto _dk_unuseend
+# Update package list
+if ($?_dk_inuse) then
+  set _dk_ninu = ()
+  set _dk_match = $_dk_
+  foreach _dk_comp ( $_dk_inuse )
+    if ($_dk_comp:r != $_dk_match) then
+      set _dk_ninu = ( $_dk_ninu $_dk_comp )
+    else
+      set _dk_match = "JunkjunkJunkjunk" # Delete just 1st match.
+    endif
+  end
+  setenv _dk_inuse "$_dk_ninu"
+  unset _dk_ninu _dk_comp _dk_match
+endif
+_dk_unuseend:

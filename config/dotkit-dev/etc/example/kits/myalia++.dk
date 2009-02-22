@@ -1,0 +1,19 @@
+#c personal
+#d Personal alia example. (shell-independent)
+
+# Settings, generally idempotent:
+mesg n
+umask 022
+
+# Alia
+dk_alias m `dk_where zmore` || dk_alias m $PAGER
+dk_alias cls clear
+dk_alias vi $EDITOR
+dk_where mailx >/dev/null && dk_alias mail mailx
+dk_alias encrypt 'ccencrypt'
+dk_alias decrypt 'ccdecrypt'
+dk_alias vcg 'xvcg -geometry 600x800 -'
+dk_alias startbash "env -i SHELL=$_dk_bash HOME=$HOME TERM=$TERM $_dk_bash"
+dk_alias startcsh "env -i SHELL=/bin/csh HOME=$HOME TERM=$TERM /bin/csh"
+dk_alias startksh "env -i SHELL=/bin/ksh PATH=/bin:/usr/bin HOME=$HOME TERM=$TERM $HOME/$SYS_TYPE/bin/-ksh"
+dk_alias starttcsh "env -i SHELL=$_dk_tcsh HOME=$HOME TERM=$TERM $_dk_tcsh"

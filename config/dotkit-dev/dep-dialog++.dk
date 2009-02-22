@@ -1,0 +1,1 @@
+dialog --msgbox 'This package is deprecated. Please use newpackage instead.' 8 48

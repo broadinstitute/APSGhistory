@@ -1,0 +1,6 @@
+# A basic .bash_rc for use with Dotkit for bash.
+# File is sourced by login and read by interactive subshells.
+use -q alia1++ myalia++
+
+# Set won't work from inside a function, so set options outside Dotkit:
+set -o ignoreeof -o nolog -o vi

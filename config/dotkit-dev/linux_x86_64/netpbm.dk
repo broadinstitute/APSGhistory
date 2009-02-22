@@ -1,0 +1,4 @@
+#c graphics
+#d Netpbm graphics conversion tools (default: 10.33)
+
+dk_op -q netpbm-10.33

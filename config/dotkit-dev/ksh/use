@@ -1,0 +1,219 @@
+# Copyright (c) 2004, The Regents of the University of California.
+# See the file named "Copyright" for the full text of the copyright notice.
+
+function setenv { set +u; export $1="$2"; }
+function unsetenv { set +u; unset $1; }
+function dk_alias { set +u; eval $($DK_ROOT/etc/alias $_dk_op "$@"); }
+function dk_where { set +u; $DK_ROOT/etc/where $1; }
+function dk_test { set +u; test "$@"; }
+function dk_source { set +u; . "$@"; }
+function dk_rep { set +u; $DK_ROOT/etc/rep "$@"; }
+function dk_cev { echo 1; }
+
+function _dk_ccu { print "Usage: $1 WORDLIST_VALUE [ NTH ] [ SEPARATOR ]"; }
+function _dk_carcdr
+{
+  typeset _dk_ex="$2"; typeset -i _dk_n="${4:-$1}"
+  typeset IFS="${5:-${DK_IFS:-:}}"
+  set -- $3; (( _dk_n > $# )) && _dk_n=$#; shift $_dk_n
+  eval echo \"$_dk_ex\"
+}
+function cdr { set +u; test $# = 0 && _dk_ccu $0 || _dk_carcdr 1 '$*' "$@"; }
+function car { set +u; test $# = 0 && _dk_ccu $0 || _dk_carcdr 0 '$1' "$@"; }
+
+# Split $2 using $1 as a separator:
+function _dk_spliton  { typeset IFS="$1"; shift; echo $*;  }
+
+# $1=':' or ' ', $2='.' or '..[0-9]', $3=VARNAME, $4=NEW_COMPONENT
+function _dk_use
+{
+  eval typeset _dk_u=\"\${$3\:-}\" _dk_pp= _dk_ap=
+  [[ -z "$_dk_u" ]] && { export $3="${4:-}"; return 0; } # (was already empty.)
+  [[ $_dk_u = ${_dk_u#$2$1} ]] || _dk_pp=${_dk_u%${_dk_u#$2$1}}
+  [[ $_dk_u = ${_dk_u%$1$2} ]] || _dk_ap=${_dk_u#${_dk_u%$1$2}}
+  [[ "$_dk_pream" = "Appending" ]] &&
+    _dk_u="${_dk_u%$_dk_ap}$1$4$_dk_ap" || _dk_u="$_dk_pp$4$1${_dk_u#$_dk_pp}"
+  export $3="$_dk_u"
+}
+
+# (Same arguments as _dk_use.)
+function _dk_unuse
+{
+  typeset IFS="$1" _dk_up="${2#.}" _dk_va=$3 _dk_nc="$4" _dk_j _dk_np=
+  eval typeset _dk_v=\"\${$3\:-}\"
+  [[ -n "$_dk_v" ]] || return 0 # (nothing to do.)
+  set -- $_dk_v
+  for _dk_j; do
+    [[ ${_dk_j%$_dk_up} = ${_dk_nc%$_dk_up} ]] &&
+      _dk_nc=JunkjunkJunkjunk || _dk_np="$_dk_np$IFS$_dk_j"
+  done
+  export $_dk_va="${_dk_np#$IFS}"
+}
+
+function dk_alter
+{ set +u; [[ -z "$_dk_err" ]] && _dk_$_dk_op "${3:-${DK_IFS:-:}}" . "$@" || return 0; }
+
+function dk_setenv
+{
+  set +u
+  [[ -z "$_dk_err" ]] || return 0
+  if [[ $_dk_op = "use" ]]; then
+    eval [[ -z \${$1\:-} ]] || eval export _dk_sev_$1="\$$1"
+  else # unuse
+    eval typeset _dk_sv="\${_dk_sev_$1:-}"
+     [[ -n $_dk_sv ]] \
+     && export _dk_us="export $1=\"$_dk_sv\";unset _dk_sev_$1;$_dk_us" \
+     || export _dk_us="unset $1; $_dk_us"
+  fi
+  export $1="$2"
+  [[ -n "$2" ]]
+}
+function dk_setdef
+{
+  set +u
+  eval typeset _dk_sd=\${$1\:-}
+  [[ -n $_dk_sd && $_dk_sd != $2 ]] || dk_setenv "$@"
+}
+
+function _dk_uset
+{
+  unset _dk_self _dk_opt_a _dk_us _dk_op _dk_err _dk_opt_q _dk_opt_v _dk_opt_l
+  unset _dk_recovering _dk_hide _dk_dirs _dk_pream _dk_ok
+}
+
+function _dk_uu # common code for both use and unuse
+{
+  if (( $2 > 9 ));then
+    echo ""; echo "Recursion limit exceeded!"
+    _dk_recovering=1
+    _dk_err="(Error)"
+    return 0
+  fi
+  [[ -z ${_dk_err:=} ]] || return 0
+
+  typeset _dk_fn=_dk_$1 _dk_ms=$4
+  typeset -i _dk_e1=$3 _dk_e2 _dk_stat=0 _dk_flg
+  typeset _dk_s1=${_dk_opt_a:=} _dk_s2="${_dk_us:=}" _dk_s3=${_dk_op:=}
+  typeset _dk_s4=${_dk_rl:=} _dk_s5=${_dk_opt_q:=} _dk_s6=${_dk_opt_v:=}
+  typeset _dk_s7=${_dk_self:=} _dk_s8=${_dk_hide:=} _dk_s9=${_dk_pream:=}
+  typeset _dk_p _dk_i _dk_d _dk_s _dk_c _dk_vtq _dk_tq _dk_tp
+  _dk_us= _dk_op=$1 _dk_rl=${2:-0} _dk_recovering=0
+
+  shift 4; [[ $# > 0 && -z $1 ]] && shift
+  OPTIND=1
+  while getopts aqvl _dk_c; do eval _dk_opt_$_dk_c=1; done
+  shift $(( OPTIND - 1 ))
+  _dk_opt_a=${_dk_opt_a:-0}
+  _dk_opt_q=${_dk_opt_q:-${use_bequiet:-0}}
+  _dk_opt_v=${_dk_opt_v:-0}
+  _dk_opt_l=${_dk_opt_l:-0}
+  _dk_hide=${_dk_hide:-0}
+  _dk_vtq=$(( _dk_opt_v | (_dk_isatty & ~_dk_opt_q & ~ ${dk_taciturn:-0}) ))
+  ((_dk_isatty & ~_dk_opt_q)) && _dk_tq=${dk_smask:-4094} || _dk_tq=0
+
+  if [[ $# = 0 || $_dk_opt_l = 1 ]]; then
+    _dk_rl=-1  # do this early in case use-usage is so slow user kills it
+    if [[ $_dk_op = "use" && ($_dk_opt_v = 1 || $_dk_opt_q != 1) ]]; then
+      $DK_ROOT/etc/use-usage 0 $_dk_opt_v $_dk_opt_a $_dk_opt_l $_dk_opt_q $*
+    fi
+    _dk_uset
+    return 0
+  fi
+  if [[ $_dk_rl = 0 ]]; then
+    _dk_dirs=
+    for _dk_d in $HOME/.kits $(_dk_spliton ":" $DK_NODE) $DK_ROOT; do
+      [[ -d $_dk_d ]] || continue
+      for _dk_s in $(_dk_spliton ":" $DK_SUBNODE); do
+        [[ -d $_dk_d/$_dk_s ]] || continue
+        _dk_dirs="$_dk_dirs $_dk_d/$_dk_s"
+      done
+    done
+  fi
+  if [[ $_dk_op = "unuse" ]]; then
+    export _dk_pream="Dropping"
+  elif [[ $_dk_opt_a = 1 || $_dk_s9 = "Appending" ]]; then
+    export _dk_pream="Appending"
+  else
+    export _dk_pream="Prepending"
+  fi
+  # Main loop
+  if [[ $# > 0 ]]; then
+    ((_dk_vtq)) && _dk_print -n "${_dk_pream}:"
+    for _dk_p; do
+      [[ $_dk_p = "Super" ]] && _dk_p=${_dk_self##*/}
+      ((_dk_vtq)) && _dk_print -n " $_dk_p"
+      _dk_e2=1 _dk_err= _dk_stat=0 _dk_flg=0 _dk_ok=
+      for _dk_i in ${_dk_inuse:-}; do
+        [[ $_dk_p = "${_dk_i%.[0-9]}" ]] && { _dk_e2=0; break; }
+      done
+      if ((_dk_e1^_dk_e2)); then
+        [[ $_dk_e2 = 0 ]] && $_dk_fn ' ' ..[0-9] _dk_inuse $_dk_p.$_dk_rl
+      elif [[ $_dk_e2 = 1 || $_dk_p != *++ ]]; then
+         [[ $_dk_e2 = 0 ]] && _dk_stat=1 || _dk_stat=$(( 1<<(2+_dk_rl) ))
+         ((${dk_taciturn:-0})) && _dk_tp="${_dk_p}: " || _dk_tp=
+         ((_dk_vtq | (_dk_tq & _dk_stat))) && _dk_print -n " ($_dk_tp$_dk_ms)"
+         continue
+      fi
+      for _dk_d in $_dk_dirs; do
+        if [[ $_dk_p = ${_dk_self##*/} ]]; then
+          if [[ $_dk_d = ${_dk_self%/*} ]]; then
+            _dk_flg=1
+            continue
+          elif [[ $_dk_flg = 0 ]]; then
+            continue
+          fi
+        fi
+        if [[ -f $_dk_d/$_dk_p.dk ]]; then
+          _dk_self=$_dk_d/$_dk_p
+          ((_dk_opt_v)) && _dk_print -n " (Found: $_dk_self.dk)"
+          . $_dk_self.dk
+          [[ -n "$_dk_us" ]] && eval $_dk_us
+          [[ -z $_dk_err ]] || _dk_stat=2
+          ((_dk_vtq | (_dk_tq & _dk_stat))) &&
+            _dk_print -n "${_dk_err:-${_dk_ok:- (ok)}}"
+          if [[ -z $_dk_err &&
+                $_dk_e1 = 0 &&
+                $_dk_e2 = 1 &&
+                $_dk_recovering = 0 &&
+                $_dk_hide = 0 ]]
+          then
+            $_dk_fn ' ' ..[0-9] _dk_inuse $_dk_p.$_dk_rl
+          fi
+          _dk_err=
+          continue 2
+        fi
+      done
+      _dk_stat=$(( 1<<(2+_dk_rl) ))
+      ((${dk_taciturn:-0})) && _dk_tp="${_dk_p}: " || _dk_tp=
+      ((_dk_vtq | (_dk_tq & _dk_stat))) && _dk_print -n " (${_dk_tp}not found)"
+    done
+    ((_dk_vtq | (_dk_tq & _dk_stat))) && _dk_print ""
+  fi
+  _dk_opt_a=$_dk_s1 _dk_us="$_dk_s2" _dk_op=$_dk_s3 _dk_rl=$_dk_s4
+  _dk_opt_q=$_dk_s5 _dk_opt_v=$_dk_s6 _dk_self=$_dk_s7 _dk_hide=$_dk_s8
+  export _dk_pream=$_dk_s9
+  (( _dk_rl >= 0 )) || _dk_uset
+  return $_dk_stat
+}
+
+function _dk_alu { print "Usage: $1 $2 VARIABLE COMPONENT [ SEPARATOR ]"; }
+function _dk_aua
+{
+  _dk_pream=$2 _dk_op=$3
+  test $# = 4 && { _dk_alu $1 "$4"; return; } || shift 4
+  [[ $1 = "-a" && $_dk_op = "use" ]] && { shift; export _dk_pream=Appending; }
+  dk_alter "$@"
+  unset _dk_pream
+}
+function alter   { set +u; _dk_aua alter Prepending   use "[ -a ]" "$@"; }
+function unalter { set +u; _dk_aua unalter Dropping unuse       "" "$@"; }
+function unuse { set +u; _dk_uu unuse $((_dk_rl+1)) 1 "not found" "$@"; }
+function use
+{
+  set +u
+  [[ -n ${DK_UEQRU:-} ]] && unuse -q "$@"
+  _dk_uu use $((_dk_rl+1)) 0 "already loaded" "$@"
+}
+function reuse
+{ set +u; unuse "$@"; _dk_uu use $((_dk_rl+1)) 0 "already loaded" "$@"; }
+function dk_op { set +u; ${_dk_op:-use} "$@"; }

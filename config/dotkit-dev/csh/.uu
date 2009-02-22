@@ -1,0 +1,257 @@
+# Copyright (c) 2004, The Regents of the University of California.
+# See the file named "Copyright" for the full text of the copyright notice.
+
+# Common code for 'use' and 'unuse'.
+set _dk_op = $_dk_s[1]
+set _dk_ali = $_dk_s[2]
+shift _dk_s
+shift _dk_s
+
+if ( $_dk_rl > 8 ) then
+  echo; echo "Recursion limit exceeded!"
+  set _dk_recovering = 1
+  goto _dk_uuend
+endif
+set _dk_recovering = 0
+if ($?_dk_err) goto _dk_uuend
+
+set _dk_save_pream = ""
+# If the recursion level is >= 0, this invocation of "use" or "unuse"
+# must have come from within a dotkit.  The variables saved here belong
+# to the previous recursion level.
+if ( $_dk_rl >= 0 ) then
+  eval set _dk_save_opt_a$_dk_rl = "$_dk_opt_a"
+  eval set _dk_save_pream$_dk_rl = "$_dk_pream"
+  set _dk_save_pream = $_dk_pream
+  eval set _dk_save_opt_q$_dk_rl = "$_dk_opt_q"
+  eval set _dk_save_opt_v$_dk_rl = "$_dk_opt_v"
+  eval set _dk_save_vtq$_dk_rl = "$_dk_vtq"
+  eval set _dk_save_self$_dk_rl = "$_dk_self"
+  eval setenv _dk_save_hide$_dk_rl "$_dk_hide"
+  eval set _dk_save_inlist$_dk_rl = "$_dk_inlist"
+  eval set _dk_save_$_dk_rl = "$_dk_"
+  if ($?_dk_us) then
+    eval set _dk_save_us$_dk_rl = \"$_dk_us\"
+  endif
+endif
+
+@ _dk_rl++
+
+if ( $_dk_rl == 0 ) then
+  set _dk_dirs = ""
+  set _dk_dirs1 = ($DK_ROOT)
+  if ($?DK_NODE) then
+    set _dk_dirs1 = (`echo $DK_NODE | dk_tr : ' '` $DK_ROOT)
+  endif
+  if ( -d $HOME/.kits ) set _dk_dirs1 = ($HOME/.kits $_dk_dirs1)
+  set _dk_dirs2 = (`echo $DK_SUBNODE | dk_tr : ' '`)
+  foreach _dk_dir ($_dk_dirs1)
+    if ( ! -d $_dk_dir ) continue
+    foreach _dk_ext ($_dk_dirs2)
+      if ( ! -d $_dk_dir/$_dk_ext ) continue
+      set _dk_dirs = ( $_dk_dirs $_dk_dir/$_dk_ext )
+    end
+  end
+  if ( ! $?_dk_inuse) setenv _dk_inuse ""
+endif
+
+setenv _dk_hide 0
+
+# Command line argument handling:
+if ($?_dk_s) then
+  while ($#_dk_s > 0)
+    if ( "$_dk_s[1]" !~ -* ) break
+    if ( "$_dk_s[1]" =~ -*q* ) set _dk_opt_q = 1
+    if ( "$_dk_s[1]" =~ -*a* ) set _dk_opt_a = 1
+    if ( "$_dk_s[1]" =~ -*v* ) set _dk_opt_v = 1
+    if ( "$_dk_s[1]" =~ -*l* ) set _dk_opt_l = 1
+    shift _dk_s
+  end
+endif
+if ($?use_bequiet) set _dk_opt_q = 1 # Backward compatibility fix.
+
+set _dk_tq = 0
+set _dk_smsk = 4094
+set _dk_tactrn = 0
+if ( ! $?_dk_opt_a ) set _dk_opt_a = 0
+if ( ! $?_dk_opt_q ) set _dk_opt_q = 0
+if ( ! $?_dk_opt_v ) set _dk_opt_v = 0
+if ( ! $?_dk_opt_l ) set _dk_opt_l = 0
+if ( $?dk_smask ) then
+  set _dk_smsk = $dk_smask
+endif
+if ( $?dk_taciturn ) then
+  set _dk_tactrn = $dk_taciturn
+endif
+@ _dk_vtq = ( $_dk_opt_v | ( $_dk_isatty & ~ $_dk_opt_q & ~ $_dk_tactrn ) )
+if ( $_dk_isatty & ~ $_dk_opt_q ) set _dk_tq = $_dk_smsk
+if ( "$_dk_op" == "unuse" ) then
+  setenv _dk_pream "Dropping"
+else if ( $_dk_opt_a == 1 || $_dk_save_pream == "Appending" ) then
+  setenv _dk_pream "Appending"
+else
+  setenv _dk_pream "Prepending"
+endif
+if ( ! $?_dk_self) set _dk_self = ""
+
+# _Dk_op was set in the "use" or "unuse" aliases.  It needs to be saved
+# before any packages are sourced, to account for possible future recursion.
+eval set _dk_save_op$_dk_rl = "$_dk_op"
+
+if ($?_dk_s) then
+  if ($#_dk_s > 0 && ! $_dk_opt_l) then
+    if ( $_dk_vtq ) echo -n "${_dk_pream}:"
+    # Main loop on packages:
+    # Copy the package list into a list per recursion level:
+    eval set _dk_s$_dk_rl = \( $_dk_s \)
+    eval foreach _dk_ \( \$_dk_s$_dk_rl \)
+      if ($_dk_ == "Super") set _dk_ = $_dk_self:t
+      if ( $_dk_vtq ) echo -n " ${_dk_}"
+
+      set _dk_stat = 0
+      set _dk_flg = 0
+      # Look at list of packages in use, short-circuit if possible:
+      set _dk_inlist = 0
+      @ _dk_opuse = ( $_dk_op == "use" )
+      foreach _dk_p ( $_dk_inuse )
+        if ($_dk_p:r == $_dk_) then
+          set _dk_inlist = 1
+          break
+        endif
+      end
+      if($_dk_opuse ^ $_dk_inlist) then
+        # Remove from package list now, to prevent loops later.
+        if ($_dk_inlist) source $DK_ROOT/$shell:t/.unuse
+      else if( ! $_dk_inlist || $_dk_ !~ *++ ) then
+        set _dk_tp = ""
+        if ($_dk_tactrn) set _dk_tp = "${_dk_}: "
+        if ($_dk_op == "unuse") then
+          @ _dk_stat = (1 << (2 + $_dk_rl) )
+          if ($_dk_vtq | ($_dk_tq & $_dk_stat) ) echo -n " (${_dk_tp}not found)"
+        else
+          set _dk_stat = 1
+          if ($_dk_vtq | ($_dk_tq & $_dk_stat) ) echo -n " (${_dk_tp}already loaded)"
+        endif
+        goto _dk_nextpkg
+      endif
+
+      # Find the package file for this package:
+      unset _dk_fnd
+      foreach _dk_dir ($_dk_dirs)
+
+        # Handle Super reference:
+        if ($_dk_ == $_dk_self:t) then
+          if ($_dk_dir == $_dk_self:h) then
+            set _dk_flg = 1
+            continue
+          else if ($_dk_flg == 0 ) then
+            continue
+          endif
+        endif
+
+        if (-f $_dk_dir/$_dk_.dk) then
+          set _dk_fnd = 1
+          set _dk_self = $_dk_dir/$_dk_
+          set _dk_us = ""
+          # Read the package file:
+          if ($_dk_opt_v) echo -n " (Found: ${_dk_self}.dk)"
+          source ${_dk_self}.dk
+          set _dk_stat = 0
+
+          if ($_dk_recovering) goto _dk_uuend
+          # Unset any variables on dk_setenv saved list:
+          eval "$_dk_us"
+
+          if ($?_dk_err) then
+            set _dk_stat = 2
+            if ($_dk_vtq | ($_dk_tq & $_dk_stat)) echo -n "${_dk_err}"
+            unsetenv _dk_err
+            goto _dk_nextpkg
+          else if( $_dk_op == "use"  && $_dk_inlist == 0 && $_dk_hide == 0) then
+            # Update _dk_inuse list:
+            source $DK_ROOT/$shell:t/.use
+          endif
+
+          if ($_dk_vtq | ($_dk_tq & $_dk_stat)) then
+            if ($?_dk_ok) then
+              echo -n "$_dk_ok"
+              unsetenv _dk_ok
+            else
+              echo -n " (ok)"
+            endif
+          endif
+          goto _dk_nextpkg
+        endif
+
+      end
+      if ( ! $?_dk_fnd ) then
+        @ _dk_stat = (1 << (2 + $_dk_rl) )
+        set _dk_tp = ""
+        if ($_dk_tactrn) set _dk_tp = "${_dk_}: "
+        if ($_dk_vtq | ($_dk_tq & $_dk_stat) ) echo -n " (${_dk_tp}not found)"
+      endif
+  _dk_nextpkg:
+    end # for loop on packages
+    if ($_dk_vtq | ($_dk_tq & $_dk_stat) ) echo ""
+  else if ($_dk_op == "use" && ("$_dk_opt_v" == "1" || "$_dk_opt_q" != "1")) then
+    set _dk_rl = -1 # do this early in case use-usage is so slow user kills it
+    $DK_ROOT/etc/use-usage 0 $_dk_opt_v $_dk_opt_a $_dk_opt_l $_dk_opt_q $_dk_s
+    set _dk_stat = 0
+    set _dk_rl = 0
+  endif
+endif
+
+_dk_uuend:
+
+eval unset _dk_save_op$_dk_rl
+eval unset _dk_s$_dk_rl
+
+@ _dk_rl--
+
+if ($_dk_rl >= 0) then
+  # Restore prior level:
+  eval set _dk_op = '$'_dk_save_op$_dk_rl
+  #eval unset _dk_save_op$_dk_rl
+
+  eval set _dk_opt_a = '$'_dk_save_opt_a$_dk_rl
+  eval unset _dk_save_opt_a$_dk_rl
+
+  eval setenv _dk_pream '$'_dk_save_pream$_dk_rl
+  eval unset _dk_save_pream$_dk_rl
+
+  eval set _dk_opt_q = '$'_dk_save_opt_q$_dk_rl
+  eval unset _dk_save_opt_q$_dk_rl
+
+  eval set _dk_opt_v = '$'_dk_save_opt_v$_dk_rl
+  eval unset _dk_save_opt_v$_dk_rl
+
+  eval set _dk_vtq = '$'_dk_save_vtq$_dk_rl
+  eval unset _dk_save_vtq$_dk_rl
+
+  eval set _dk_self = '$'_dk_save_self$_dk_rl
+  eval unset _dk_save_self$_dk_rl
+
+  eval setenv _dk_hide '$'_dk_save_hide$_dk_rl
+  eval unsetenv _dk_save_hide$_dk_rl
+
+  eval set _dk_inlist = '$'_dk_save_inlist$_dk_rl
+  eval unset _dk_save_inlist$_dk_rl
+
+  eval set _dk_ = '$'_dk_save_$_dk_rl
+  eval unset _dk_save_$_dk_rl
+
+  eval set _dk_uss = '$?'_dk_save_us$_dk_rl
+  if ($_dk_uss) then
+    eval set _dk_us = \"'$'_dk_save_us$_dk_rl\"
+    eval unset _dk_save_us$_dk_rl
+  endif
+  unset _dk_uss
+else
+  unset _dk_op _dk_opt_a _dk_us _dk_opuse _dk_inlist _dk_ali _dk_dirs1
+  unset _dk_ _dk_dir _dk_dirs _dk_ext _dk_self _dk_recovering _dk_dirs2
+  unset _dk_p _dk_s _dk_opt_q _dk_opt_v _dk_opt_l _dk_match _dk_fnd _dk_flg
+  unset _dk_save_pream _dk_vtq _dk_tp _dk_smsk _dk_tq _dk_tactrn
+  unsetenv _dk_hide _dk_pream
+endif
+if ( ! $?_dk_stat ) set _dk_stat = 0
+set status = $_dk_stat

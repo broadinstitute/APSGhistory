@@ -1,0 +1,5 @@
+#c versioned-bio-tools
+#d lagan toolkit: http://lagan.stanford.edu/lagan_web/index.shtml
+
+dk_alter PATH /broad/tools/apps/lagan/lagan-2.0
+dk_setenv LAGAN_DIR /broad/tools/apps/lagan/lagan-2.0 

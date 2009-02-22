@@ -1,0 +1,7 @@
+#c development-tools
+#d Ecliplse Classis SDK
+
+unuse -q `dk_rep '*eclipse-*'`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/eclipse_3.4.1
+

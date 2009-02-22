@@ -1,0 +1,4 @@
+#c versioned-bio-tools
+#d Add NCBI blast v2.2.16 to path
+
+dk_alter PATH /broad/tools/apps/NCBI_blast/blast-2.2.16_i686/bin

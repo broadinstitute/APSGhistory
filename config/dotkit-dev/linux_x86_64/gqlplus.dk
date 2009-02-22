@@ -1,0 +1,4 @@
+#c devel-tools
+#d gqlplus v1.12  
+
+dk_alter PATH /broad/tools/Linux/x86_64/bin

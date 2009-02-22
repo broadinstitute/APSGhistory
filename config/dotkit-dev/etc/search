@@ -1,0 +1,35 @@
+#!/bin/sh
+# search:  Implement a grep through the available dotkits.  Can't pass
+# arguments, so we have to ask.
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+export PATH
+
+f_dirs()
+{
+  sep=${1:-/}
+  _dk_sn="`echo $DK_SUBNODE | tr : ' '`"
+  _dk_n="`echo $HOME/.kits $DK_NODE $DK_ROOT | tr : ' '`"
+  for i in $_dk_n
+  do
+    for d in $_dk_sn
+    do test -d "$i/$d" && echo "$i$sep$d"
+    done
+  done
+}
+
+f_pkgs()
+{
+  for i in `f_dirs`
+  do
+    foo=`echo $i/*.dk`
+    test $i"/*.dk" = "$foo" && continue
+    echo $i/*.dk
+  done
+}
+
+################################################
+echo
+echo "Pattern to search? -> " | tr -d '\012'
+read pattern
+grep $pattern `f_pkgs`
