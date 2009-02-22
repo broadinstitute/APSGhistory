@@ -13,7 +13,13 @@ whereis()
 del_fn() { $SED -e '/[a-zA-Z_][a-zA-Z_[0-9]*=()/,/^}/d'; }
 
 # Make a special case for _dk_inuse, and "_", and "A__z".
-filter() { $SED -e '/_dk_inuse=/s/ /:/g' -e '/^_=/d' -e '/^A__z=/d' | $SORT; }
+filter() {
+  if [ "$1" = "-test" ]; then
+    $SED -e '/_dk_inuse=/s/ /:/g' -e '/^_=/d' -e '/^A__z=/d' | $SORT
+  else
+    $SED -e '/^_dk_inuse=/d' -e '/^_=/d' -e '/^A__z=/d' | $SORT
+  fi
+}
 
 compare()
 {
@@ -135,14 +141,10 @@ compare()
     # Kludge to get the right newline behavior with envdiff.dk:
     if((ARGV[3] == "-x") && (linesout > 0)) printf("\015")
 
-  }' $*
+  }' "$@"
 }
 
 #######################################################
-user=${USER:-$LOGNAME}
-temp1=/tmp/env_${user}1
-temp2=/tmp/env_${user}2
-
 AWK=`whereis gawk`
 test -x "$AWK" || AWK=`whereis nawk`
 test -x "$AWK" || AWK=`whereis awk`
@@ -150,11 +152,19 @@ MV=`whereis mv`
 ENV=`whereis env`
 SED=`whereis sed`
 SORT=`whereis sort`
+TTY=`whereis tty`
+
+user=${USER:-$LOGNAME}
+_tty=`$TTY | $SED 's:.*/::'`
+temp1=/tmp/env_${user}_${_tty}.1
+temp2=/tmp/env_${user}_${_tty}.2
+umask 0077 # Readable/writeable only by this user.
+
 expr "$SHELL" : "/.*/bash" > /dev/null &&
   envcom="eval $ENV | del_fn" ||
   envcom="$ENV"
 
-test -r $temp1 || { $envcom | filter > $temp1; exit 0; }
-test -r $temp2 || { $envcom | filter > $temp2; }
-compare $temp1 $temp2 $*
+test -r $temp1 || { $envcom | filter "$@" > $temp1; exit 0; }
+test -r $temp2 || { $envcom | filter "$@" > $temp2; }
+compare $temp1 $temp2 "$@"
 $MV $temp2 $temp1

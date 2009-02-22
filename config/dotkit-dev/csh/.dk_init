@@ -2,7 +2,6 @@
 @ _dk_rl = -1
 setenv _dk_shell $shell:t
 if ( ! $?SYS_TYPE ) setenv SYS_TYPE `$DK_ROOT/etc/systype`
-if ( ! $?ARCH_TYPE ) setenv ARCH_TYPE `$DK_ROOT/etc/archtype`
 set _dk_cat = "/usr/bin/cat"
 if ( -x /bin/cat ) set _dk_cat = "/bin/cat"
 if ( -f "$DK_ROOT/etc/DK_NODE" ) then
@@ -27,14 +26,14 @@ $_dk_tty -s
 if ( $status == 0 ) set _dk_isatty=1
 unset _dk_tty
 # Primary aliases to select or deselect packages:
-alias use   'set _dk_s = ( unuse unalias -q \!* ); \\
+alias use   'set _dk_s = ( unuse -q \!* ); \\
              if ( $?DK_UEQRU ) source $DK_ROOT/$_dk_shell/.uu; \\
-             set _dk_s = ( use alias \!* ); \\
+             set _dk_s = ( use \!* ); \\
              source $DK_ROOT/$_dk_shell/.uu'
-alias unuse 'set _dk_s = ( unuse unalias \!* ); \\
+alias unuse 'set _dk_s = ( unuse \!* ); \\
              source $DK_ROOT/$_dk_shell/.uu'
 alias reuse 'unuse \!*; \\
-             set _dk_s = ( use alias \!* ); \\
+             set _dk_s = ( use \!* ); \\
              source $DK_ROOT/$_dk_shell/.uu'
 # Aliases for use within package files:
 alias dk_alter 'set _dk_aa = ( \!* ) && source $DK_ROOT/$_dk_shell/.dk_alter'
@@ -44,7 +43,8 @@ alias dk_op 'eval $_dk_op \!*'
 alias dk_where '$DK_ROOT/etc/where'
 alias dk_test `dk_where test`
 alias dk_tr `dk_where tr`
-alias dk_alias '$_dk_ali'
+alias dk_sed `dk_where sed`
+alias dk_alias  "set _dk_an = \!:1 && alias _dk_av \!:2* && source $DK_ROOT/$_dk_shell/.dk_alias"
 alias dk_source 'source'
 alias dk_rep '$DK_ROOT/etc/rep'
 alias dk_cev 'echo $?\!*'

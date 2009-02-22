@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "USE 1"
-.TH USE 1 "2006-06-08" "Dotkit 1.0" "AX Local Docs"
+.TH USE 1 "2008-04-16" "Dotkit 1.0" "AX Local Docs"
 .SH "NAME"
 use/unuse \- Load, unload, or display dotkits, also known as \fIpackages\fR.
 .SH "SYNOPSIS"
@@ -385,6 +385,9 @@ and arrange for that package to over-ride a \*(L"generic\*(R" version
 whenever someone is running on the given architecture,
 or with the given shell.
 Most packages are independent of shell and \s-1SYS_TYPE\s0.
+.PP
+It is also possible to load a package by giving an absolute
+path to the dotkit (but leave off the trailing \fI.dk\fR.)
 For more on the package search process,
 see the \fIdotkit\fR\|(7) man page.
 .Sh "Dot floats"
@@ -439,10 +442,11 @@ but occasionally subtle, art of writing package files.
 .SH "BUGS"
 .IX Header "BUGS"
 Unuse removes the \fIfirst\fR instance of a given component from
-\&\s-1PATH\s0, \s-1MANPATH\s0, etc.
-(There could be more than one if your \s-1PATH\s0 was not empty
+\&\s-1PATH\s0, \s-1MANPATH\s0, etc.,
+or the \fIlast\fR instance if the \fB\-a\fR flag is given.
+(There could be more than one instance if your \s-1PATH\s0 was not empty
 when Dotkit was initialized,
-or if two packages happened to include the same component.)
+or if two or more packages happened to include the same component.)
 This is usually correct,
 but can be wrong in a few cases.
 .PP
@@ -459,7 +463,7 @@ Adam Moody, also of \s-1LLNL\s0,
 has made additional major contributions.
 .SH "COPYRIGHT"
 .IX Header "COPYRIGHT"
-Copyright (c) 2004, The Regents of the University of California.
+Copyright (c) 2007, Lawrence Livermore National Security, \s-1LLC\s0.
 See the file named \*(L"Copyright\*(R" for the full text of the copyright notice.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"

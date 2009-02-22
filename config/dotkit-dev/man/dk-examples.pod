@@ -266,6 +266,8 @@ is like this:
 
   unuse -q `dk_rep 'gcc-*'`
 
+(Note that the I<dk_rep> expression is surrounded by back quotes,
+while the pattern is surrounded by forward quotes.)
 The I<dk_rep> command is reminiscent of Perl's I<grep> command,
 operating on Dotkit's built-in list of packages in
 current use.  In this case, it finds any package already loaded
@@ -625,7 +627,7 @@ has made additional major contributions.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Regents of the University of California.
+Copyright (c) 2007, Lawrence Livermore National Security, LLC.
 See the file named "Copyright" for the full text of the copyright notice.
 
 =head1 SEE ALSO

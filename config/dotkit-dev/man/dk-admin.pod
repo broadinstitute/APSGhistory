@@ -332,7 +332,7 @@ has made additional major contributions.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Regents of the University of California.
+Copyright (c) 2007, Lawrence Livermore National Security, LLC.
 See the file named "Copyright" for the full text of the copyright notice.
 
 =head1 SEE ALSO

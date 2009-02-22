@@ -2,15 +2,42 @@
 # See the file named "Copyright" for the full text of the copyright notice.
 
 function setenv { set +u; export $1="$2"; }
-function unsetenv { set +u; unset $1; }
-function dk_alias { set +u; eval $($DK_ROOT/etc/alias $_dk_op "$@"); }
+function unsetenv { set +u; unset "$@"; }
 function dk_where { set +u; $DK_ROOT/etc/where $1; }
 function dk_test { set +u; test "$@"; }
 function dk_source { set +u; . "$@"; }
 function dk_rep { set +u; $DK_ROOT/etc/rep "$@"; }
 function dk_cev { echo 1; }
 
-function _dk_ccu { print "Usage: $1 WORDLIST_VALUE [ NTH ] [ SEPARATOR ]"; }
+function dk_alias {
+  set +u
+  [[ -z "$_dk_err" ]] || return 0
+  typeset _dk_mm= _dk_ov _dk_an="$1"; shift
+  [[ $_dk_an = [-+]* ]] && _dk_mm="--"
+  [[ "$@" = *!* ]] && return 0 # Ignore alias if arguments are present.
+  typeset _dk_sed=/bin/sed
+  [[ -x $_dk_sed ]] || _dk_sed=/usr/bin/sed
+  if [[ $_dk_op = use ]]; then
+    if alias $_dk_mm $_dk_an >/dev/null 2>&1; then # Save old alias value.
+      _dk_ov=$(alias $_dk_mm $_dk_an)
+      eval alias _dk_sal_$_dk_an="${_dk_ov#*=}"
+    fi
+    # Remove backslashes at end of line, if present.
+    [[ "$@" = *[\\]'
+'* ]] && alias $_dk_mm $_dk_an="$(echo "$*" | $_dk_sed 's/ *\\*$//')" ||
+         alias $_dk_mm $_dk_an="$*"
+  else # unuse
+    if alias _dk_sal_$_dk_an >/dev/null 2>&1; then # Restore old value.
+      _dk_ov=$(alias _dk_sal_$_dk_an)
+      eval alias $_dk_mm $_dk_an="${_dk_ov#*=}"
+      unalias _dk_sal_$_dk_an
+    else
+      unalias $_dk_mm $_dk_an
+    fi
+  fi
+}
+
+function _dk_ccu { _dk_print "Usage: $1 WORDLIST_VALUE [ NTH ] [ SEPARATOR ]"; }
 function _dk_carcdr
 {
   typeset _dk_ex="$2"; typeset -i _dk_n="${4:-$1}"
@@ -31,23 +58,60 @@ function _dk_use
   [[ -z "$_dk_u" ]] && { export $3="${4:-}"; return 0; } # (was already empty.)
   [[ $_dk_u = ${_dk_u#$2$1} ]] || _dk_pp=${_dk_u%${_dk_u#$2$1}}
   [[ $_dk_u = ${_dk_u%$1$2} ]] || _dk_ap=${_dk_u#${_dk_u%$1$2}}
-  [[ "$_dk_pream" = "Appending" ]] &&
+  [[ "$_dk_opt_a" = 1 ]] &&
     _dk_u="${_dk_u%$_dk_ap}$1$4$_dk_ap" || _dk_u="$_dk_pp$4$1${_dk_u#$_dk_pp}"
   export $3="$_dk_u"
 }
 
-# (Same arguments as _dk_use.)
+# $1=':' or ' ', $2='.' or '..[0-9]', $3=VARNAME, $4=NEW_COMPONENT
 function _dk_unuse
 {
-  typeset IFS="$1" _dk_up="${2#.}" _dk_va=$3 _dk_nc="$4" _dk_j _dk_np=
+  typeset IFS="$1" _dk_up="${2#.}" _dk_va=$3 _dk_i _dk_s _dk_p
+  typeset _dk_ns= _dk_na= _dk_4="$4"
+  typeset -i _dk_st=0 _dk_k=0 _dk_j=0
   eval typeset _dk_v=\"\${$3\:-}\"
-  [[ -n "$_dk_v" ]] || return 0 # (nothing to do.)
-  set -- $_dk_v
-  for _dk_j; do
-    [[ ${_dk_j%$_dk_up} = ${_dk_nc%$_dk_up} ]] &&
-      _dk_nc=JunkjunkJunkjunk || _dk_np="$_dk_np$IFS$_dk_j"
+  [[ -n "$_dk_v" ]] || return 0 # (can't remove anything from nothing.)
+  # (Some versions of bash and ksh have a bug in "set", according to me.)
+  typeset -i _dk_badset=$(set -- X$IFS; (($# == 1)) && echo 1 || echo 0)
+  if (( _dk_badset == 1 )); then
+    [[ "${_dk_v%$IFS}" != "${_dk_v}" ]] && _dk_v="$_dk_v$IFS"
+    [[ "${_dk_4%$IFS}" != "${_dk_4}" ]] && _dk_4="$_dk_4$IFS"
+    _dk_4="${_dk_4:-$IFS}"
+  fi
+  [[ $_dk_shell = ksh ]] && set -A _dk_s -- $_dk_v || eval _dk_s='($_dk_v)'
+  [[ $_dk_shell = ksh ]] && set -A _dk_p -- ${_dk_4:-''} || eval _dk_p='($_dk_4)'
+  if [[ "$_dk_opt_a" = 1 ]]; then # Reverse string and pattern.
+    set -- "${_dk_s[@]}"
+    while (($#)); do _dk_s[$#-1]="$1"; shift; done
+    set -- "${_dk_p[@]}"
+    while (($#)); do _dk_p[$#-1]="$1"; shift; done
+  fi
+  for _dk_i in "${_dk_s[@]}"; do # For each component in the old string.
+    _dk_na[_dk_k]="$_dk_i"
+    ((_dk_k += 1))
+    if (( _dk_st < ${#_dk_p[*]} )); then # Check for one match.
+      if [[ ${_dk_i%$_dk_up} = ${_dk_p[_dk_st]%$_dk_up} ]]; then # one match.
+        (( _dk_st += 1 ))
+        (( _dk_st == ${#_dk_p[*]} )) && ((_dk_k -= _dk_st)) # full match
+      fi
+    fi
   done
-  export $_dk_va="${_dk_np#$IFS}"
+  if ((_dk_k > 0)); then # At least one element is in the new string.
+    _dk_ns="${_dk_na[_dk_j]}"
+    ((_dk_j += 1))
+    if [[ "$_dk_opt_a" = 1 ]]; then # Un-reverse the string (unalter -a).
+      while ((_dk_j < _dk_k)); do
+        _dk_ns="${_dk_na[_dk_j]}$IFS$_dk_ns"
+        ((_dk_j += 1))
+      done
+    else # normal order (no -a option).
+      while ((_dk_j < _dk_k)); do
+        _dk_ns="$_dk_ns$IFS${_dk_na[_dk_j]}"
+        ((_dk_j += 1))
+      done
+    fi
+  fi
+  export $_dk_va="$_dk_ns"
 }
 
 function dk_alter
@@ -78,7 +142,7 @@ function dk_setdef
 function _dk_uset
 {
   unset _dk_self _dk_opt_a _dk_us _dk_op _dk_err _dk_opt_q _dk_opt_v _dk_opt_l
-  unset _dk_recovering _dk_hide _dk_dirs _dk_pream _dk_ok
+  unset _dk_recovering _dk_hide _dk_dirs _dk_pream _dk_ok _dk_nl _dk_sp
 }
 
 function _dk_uu # common code for both use and unuse
@@ -103,6 +167,7 @@ function _dk_uu # common code for both use and unuse
   OPTIND=1
   while getopts aqvl _dk_c; do eval _dk_opt_$_dk_c=1; done
   shift $(( OPTIND - 1 ))
+  OPTIND=1
   _dk_opt_a=${_dk_opt_a:-0}
   _dk_opt_q=${_dk_opt_q:-${use_bequiet:-0}}
   _dk_opt_v=${_dk_opt_v:-0}
@@ -119,8 +184,9 @@ function _dk_uu # common code for both use and unuse
     _dk_uset
     return 0
   fi
+  _dk_sp="${_dk_sp:-}  "
   if [[ $_dk_rl = 0 ]]; then
-    _dk_dirs=
+    _dk_dirs= _dk_sp=
     for _dk_d in $HOME/.kits $(_dk_spliton ":" $DK_NODE) $DK_ROOT; do
       [[ -d $_dk_d ]] || continue
       for _dk_s in $(_dk_spliton ":" $DK_SUBNODE); do
@@ -138,7 +204,9 @@ function _dk_uu # common code for both use and unuse
   fi
   # Main loop
   if [[ $# > 0 ]]; then
-    ((_dk_vtq)) && _dk_print -n "${_dk_pream}:"
+    _dk_nl=${_dk_nl:-}
+    ((_dk_vtq)) && _dk_print -n "${_dk_nl:-}${_dk_sp:-}${_dk_pream}:"
+    _dk_nl="\n"
     for _dk_p; do
       [[ $_dk_p = "Super" ]] && _dk_p=${_dk_self##*/}
       ((_dk_vtq)) && _dk_print -n " $_dk_p"
@@ -152,11 +220,13 @@ function _dk_uu # common code for both use and unuse
          [[ $_dk_e2 = 0 ]] && _dk_stat=1 || _dk_stat=$(( 1<<(2+_dk_rl) ))
          ((${dk_taciturn:-0})) && _dk_tp="${_dk_p}: " || _dk_tp=
          ((_dk_vtq | (_dk_tq & _dk_stat))) && _dk_print -n " ($_dk_tp$_dk_ms)"
+         _dk_nl="\n"
          continue
       fi
+      [[ $_dk_p = /* && $_dk_dirs != /\ * ]] && _dk_dirs="/ $_dk_dirs"
       for _dk_d in $_dk_dirs; do
         if [[ $_dk_p = ${_dk_self##*/} ]]; then
-          if [[ $_dk_d = ${_dk_self%/*} ]]; then
+          if [[ "$_dk_d" = ${_dk_self%/*} ]]; then
             _dk_flg=1
             continue
           elif [[ $_dk_flg = 0 ]]; then
@@ -167,6 +237,7 @@ function _dk_uu # common code for both use and unuse
           _dk_self=$_dk_d/$_dk_p
           ((_dk_opt_v)) && _dk_print -n " (Found: $_dk_self.dk)"
           . $_dk_self.dk
+          [[ -x $DK_ROOT/etc/log ]] && $DK_ROOT/etc/log $_dk_self $_dk_op
           [[ -n "$_dk_us" ]] && eval $_dk_us
           [[ -z $_dk_err ]] || _dk_stat=2
           ((_dk_vtq | (_dk_tq & _dk_stat))) &&
@@ -179,7 +250,7 @@ function _dk_uu # common code for both use and unuse
           then
             $_dk_fn ' ' ..[0-9] _dk_inuse $_dk_p.$_dk_rl
           fi
-          _dk_err=
+          _dk_err= _dk_nl="\n"
           continue 2
         fi
       done
@@ -187,26 +258,28 @@ function _dk_uu # common code for both use and unuse
       ((${dk_taciturn:-0})) && _dk_tp="${_dk_p}: " || _dk_tp=
       ((_dk_vtq | (_dk_tq & _dk_stat))) && _dk_print -n " (${_dk_tp}not found)"
     done
-    ((_dk_vtq | (_dk_tq & _dk_stat))) && _dk_print ""
+    (((_dk_vtq|(_dk_tq&_dk_stat))&(_dk_rl<=0))) && { _dk_print ""; _dk_nl= ; }
   fi
   _dk_opt_a=$_dk_s1 _dk_us="$_dk_s2" _dk_op=$_dk_s3 _dk_rl=$_dk_s4
   _dk_opt_q=$_dk_s5 _dk_opt_v=$_dk_s6 _dk_self=$_dk_s7 _dk_hide=$_dk_s8
   export _dk_pream=$_dk_s9
+  _dk_sp="${_dk_sp#  }"
   (( _dk_rl >= 0 )) || _dk_uset
   return $_dk_stat
 }
 
-function _dk_alu { print "Usage: $1 $2 VARIABLE COMPONENT [ SEPARATOR ]"; }
+function _dk_alu { _dk_print "Usage: $1 $2 VARIABLE COMPONENT [ SEPARATOR ]"; }
 function _dk_aua
 {
-  _dk_pream=$2 _dk_op=$3
+  _dk_opt_a=$2 _dk_op=$3
   test $# = 4 && { _dk_alu $1 "$4"; return; } || shift 4
-  [[ $1 = "-a" && $_dk_op = "use" ]] && { shift; export _dk_pream=Appending; }
+  [[ $1 = "-a" ]] && { shift; export _dk_opt_a=1; }
   dk_alter "$@"
-  unset _dk_pream
+  [[ -z $_dk_err ]] || _dk_print "$_dk_err"
+  unset _dk_opt_a _dk_err _dk_op
 }
-function alter   { set +u; _dk_aua alter Prepending   use "[ -a ]" "$@"; }
-function unalter { set +u; _dk_aua unalter Dropping unuse       "" "$@"; }
+function alter   { set +u; _dk_aua alter 0     use "[ -a ]" "$@"; }
+function unalter { set +u; _dk_aua unalter 0 unuse "[ -a ]" "$@"; }
 function unuse { set +u; _dk_uu unuse $((_dk_rl+1)) 1 "not found" "$@"; }
 function use
 {

@@ -129,22 +129,22 @@
 .\" ========================================================================
 .\"
 .IX Title "DK-COMMANDS 1"
-.TH DK-COMMANDS 1 "2005-11-28" "Dotkit 1.0" "AX Local Docs"
+.TH DK-COMMANDS 1 "2008-04-16" "Dotkit 1.0" "AX Local Docs"
 .SH "NAME"
 The reference document for all Dotkit commands, functions and special variables.
 .SH "SYNOPSIS"
 .IX Header "SYNOPSIS"
 .Sh "Dotkit commands for interactive or shell script use"
 .IX Subsection "Dotkit commands for interactive or shell script use"
-use [ \fB\-alqv\fR ] [ \fIpkg\fR ... ]
+use   [ \fB\-alqv\fR ] [ \fIpkg\fR ... ]
 .PP
 unuse [ \fB\-alqv\fR ] [ \fIpkg\fR ... ]
 .PP
 reuse [ \fB\-alqv\fR ] [ \fIpkg\fR ... ]
 .PP
-alter [ \fB\-a\fR ] \fI\s-1VARIABLE\s0\fR \fI\s-1COMPONENT\s0\fR [ \fI\s-1SEPARATOR\s0\fR ]
+alter   [ \fB\-a\fR ] \fI\s-1VARIABLE\s0\fR \fI\s-1COMPONENT\s0\fR [ \fI\s-1SEPARATOR\s0\fR ]
 .PP
-unalter \fI\s-1VARIABLE\s0\fR \fI\s-1COMPONENT\s0\fR [ \fI\s-1SEPARATOR\s0\fR ]
+unalter [ \fB\-a\fR ] \fI\s-1VARIABLE\s0\fR \fI\s-1COMPONENT\s0\fR [ \fI\s-1SEPARATOR\s0\fR ]
 .PP
 car \fI\s-1WORDLIST_VALUE\s0\fR [ \fI\s-1NTH\s0\fR ] [ \fI\s-1SEPARATOR\s0\fR ]
 .PP
@@ -179,7 +179,7 @@ setenv _dk_ok "\fI\s-1CUSTOM\s0 \s-1REPLY\s0\fR"
 .PP
 setenv _dk_hide 0|1
 .PP
-setenv _dk_pream "\fI\s-1PREFIX\s0\fR"
+setenv _dk_opt_a 0|1
 .SH "DESCRIPTION"
 .IX Header "DESCRIPTION"
 This is the reference document for Dotkit commands,
@@ -283,13 +283,13 @@ This command is shorthand for the pair of operations:
 .Sp
 It has the effect of re-reading \fIpkg\fR and moving it to the front of the list
 of packages in use.
-.IP "alter \fI\s-1VARIABLE\s0\fR \fI\s-1COMPONENT\s0\fR [ \fI\s-1SEPARATOR\s0\fR ]" 6
-.IX Item "alter VARIABLE COMPONENT [ SEPARATOR ]"
+.IP "alter   [ \fB\-a\fR ] \fI\s-1VARIABLE\s0\fR \fI\s-1COMPONENT\s0\fR [ \fI\s-1SEPARATOR\s0\fR ]" 6
+.IX Item "alter   [ -a ] VARIABLE COMPONENT [ SEPARATOR ]"
 .PD 0
-.IP "unalter \fI\s-1VARIABLE\s0\fR \fI\s-1COMPONENT\s0\fR [ \fI\s-1SEPARATOR\s0\fR ]" 6
-.IX Item "unalter VARIABLE COMPONENT [ SEPARATOR ]"
+.IP "unalter [ \fB\-a\fR ] \fI\s-1VARIABLE\s0\fR \fI\s-1COMPONENT\s0\fR [ \fI\s-1SEPARATOR\s0\fR ]" 6
+.IX Item "unalter [ -a ] VARIABLE COMPONENT [ SEPARATOR ]"
 .PD
-Add (alter) or remove (unalter) one component
+Add (alter) or remove (unalter) components
 to or from the named \fI\s-1VARIABLE\s0\fR,
 a list of zero or more components delimited by \fI\s-1SEPARATOR\s0\fR,
 which defaults to the value of \fI\s-1DK_IFS\s0\fR,
@@ -302,7 +302,7 @@ as it utilizes its calling context (use or unuse) to add or remove the
 .Sp
 \&\fIAlter\fR prepends \fI\s-1COMPONENT\s0\fR to \fI\s-1VARIABLE\s0\fR,
 unless the \fB\-a\fR (append) option is given.
-\&\fIUnalter\fR removes the \fI\s-1COMPONENT\s0\fR, whatever its location.
+\&\fIUnalter\fR removes the first or last (\fB\-a\fR) instance of \fI\s-1COMPONENT\s0\fR.
 .IP "car \fI\s-1WORDLIST_VALUE\s0\fR [ \fI\s-1NTH\s0\fR ] [ \fI\s-1SEPARATOR\s0\fR ]" 6
 .IX Item "car WORDLIST_VALUE [ NTH ] [ SEPARATOR ]"
 .PD 0
@@ -342,7 +342,7 @@ personal script will yield incorrect results.)
 \&\fIDk_alter\fR adds to, in the case of \fIuse\fR, or deletes from,
 in the case of \fIunuse\fR,
 the given component for the given \fI\s-1VARIABLE\s0\fR.
-\&\fI\s-1VARIABLE\s0\fR is a list of zero or more
+The value of \fI\s-1VARIABLE\s0\fR is a list of zero or more
 components, separated by \fI\s-1SEPARATOR\s0\fR,
 such as the \fI\s-1PATH\s0\fR environment variable.
 The default \fI\s-1SEPARATOR\s0\fR is the value of \fI\s-1DK_IFS\s0\fR,
@@ -355,6 +355,16 @@ For any given \fI\s-1VARIABLE\s0\fR, \fI\s-1SEPARATOR\s0\fR is a constant value.
 The [t]csh implementation of \fIdk_alter\fR may temporarily modify
 the contents of \fI\s-1VARIABLE\s0\fR,
 converting \s-1SPACE\s0 characters to `^B' (Control\-B).
+.Sp
+It is possible to supply multiple components to this command.
+E.g., the following syntax works with the commonly expected meaning:
+.Sp
+.Vb 1
+\&  dk_alter PATH /bin:/usr/bin
+.Ve
+.Sp
+Multiple components are added or removed as a group, in the order
+that they appear in the command line.
 .IP "dk_setenv \fI\s-1VARIABLE\s0\fR [ \fI\s-1VALUE\s0\fR ]" 6
 .IX Item "dk_setenv VARIABLE [ VALUE ]"
 In the case of \fIuse\fR,
@@ -412,20 +422,45 @@ set it to the the given default \fI\s-1VALUE\s0\fR,
 (or if the variable's previous value was identically \fI\s-1VALUE\s0\fR.)
 .IP "dk_alias \fI\s-1ALIAS_NAME\s0\fR \fI'\s-1ALIAS_DEFINITION\s0'\fR" 6
 .IX Item "dk_alias ALIAS_NAME 'ALIAS_DEFINITION'"
-Create (or remove, in the case of \fIunuse\fR),
+Create (or restore/remove, in the case of \fIunuse\fR),
 the alias \fI\s-1ALIAS_NAME\s0\fR with the given definition.
 The syntax of \fIdk_alias\fR is essentially identical to that of the
-csh or tcsh \fIalias\fR command,
-except that alias arguments are not allowed.
-(To be precise, arguments *can* be given,
-but such syntax cannot, at present,
-be part of a shell-independent dotkit.)
+csh or tcsh \fIalias\fR command.
+Alias definitions that include arguments
+(words of the form \fI\e!:1\fR, etc.) are allowed,
+and will be processed correctly by \fIcsh\fR or \fItcsh\fR,
+but are quietly ignored by \fIbash\fR or \fIksh\fR.
 .Sp
-Dotkits containing the \fIdk_alias\fR command normally should
-be marked as \fIidempotent\fR by appending '++' to the
+If \fI\s-1ALIAS_NAME\s0\fR has a pre-existing value,
+it is saved during a \fIuse\fR operation in a new alias
+named \fI_dk_sal_ALIAS_NAME\fR.
+A subsequent \fIunuse\fR operation will restore the original alias value.
+.Sp
+Dotkits containing the \fIdk_alias\fR command typically
+are marked as \fIidempotent\fR by appending '++' to the
 dotkit name (e.g., \fIfoo++.dk\fR.)
 This allows Dotkit to read the package more than once,
 a requirement if subshells are to receive proper alias definitions.
+.Sp
+Multi-line alias definitions are allowed.
+Proper quoting of multi-line definitions can occasionally be tricky
+with older versions of \fIcsh\fR.
+The simplest syntax is of the form:
+.Sp
+.Vb 3
+\&  dk_alias foofer 'test "$foo" = "XX" && \e\e
+\&                   echo "foo is XX" || \e\e
+\&                   echo "foo is not XX"'
+.Ve
+.Sp
+However, old versions of csh may require that each line be
+separately quoted, with a single backslash, as follows.
+.Sp
+.Vb 3
+\&  dk_alias foofer 'test "$foo" = "XX" &&' \e
+\&                  'echo "foo is XX" ||' \e
+\&                  'echo "foo is not XX"'
+.Ve
 .IP "dk_cev \fI\s-1VARIABLE\s0\fR" 6
 .IX Item "dk_cev VARIABLE"
 Print the value 1 if you can safely evaluate \fI\s-1VARIABLE\s0\fR,
@@ -519,7 +554,7 @@ located at \f(CW$DK_ROOT\fR/etc/where.
 \&  setenv _dk_err "<error message>"
 \&  setenv _dk_ok "<custom reply>"
 \&  setenv _dk_hide 0|1
-\&  setenv _dk_pream "PREFIX"
+\&  setenv _dk_opt_a 0|1
 .Ve
 .Sp
 The \fI_dk_err\fR variable is used to indicate that something
@@ -552,16 +587,18 @@ Obviously, such a package needs to be written with re-use in mind,
 since hiding it also prevents Dotkit from ignoring it in
 any future \*(L"use\*(R" request.
 .Sp
-The \fI_dk_pream\fR variable allows a package author to over-rule
+The \fI_dk_opt_a\fR variable allows a package author to over-rule
 the \fB\-a\fR flag if necessary, or conversely, to force an append operation
 even if the user does not provide \fB\-a\fR.
 Typical use is as follows:
 .Sp
-.Vb 4
+.Vb 6
 \&  # Force prepend "bar" to "foo".
-\&  dk_test "$_dk_pream" = "Appending" && \e
-\&    setenv _dk_pream "Prepending"
+\&  setenv _dk_opt_a 0
 \&  dk_alter foo bar
+\&  # Force append "/usr/bin" to PATH.
+\&  setenv _dk_opt_a 1
+\&  dk_alter PATH /usr/bin
 .Ve
 .Sp
 Note the leading underscore in the names of these variables,
@@ -647,19 +684,19 @@ A \fIreuse\fR dotkit is available to conveniently set or unset this
 variable.
 .SH "BUGS"
 .IX Header "BUGS"
-It would be nice if the \fIdk_alias\fR command would save and
-restore alias definitions,
-like \fIdk_setenv\fR does for environment variables.
 It would be nice if \fIdk_alias\fR accepted arguments for all shells,
 and wrote an appropriate shell function in the case of bash or ksh.
+Some versions of ksh from \s-1AT&T\s0 may not properly
+save and restore aliases whose name
+begins with a literal '+' or '\-' character.
 .PP
 Handling of null (empty) components in \fIdk_alter\fR, \fIalter\fR, \fIunalter\fR
 is inconsistent and sometimes incorrect.
-Adding a null component to an empty wordlist produces a double null;
-removing one null component then removes them both.
-Once added, a null component is difficult to remove for the [t]csh version.
+Adding a null component to an empty wordlist produces an empty result.
+Attempting to add more than one null component to a wordlist
+may produce incorrect results.
 Null components in a context where the \s-1SEPARATOR\s0 character is whitespace
-will often produce incorrect results.
+may produce incorrect results.
 .SH "AUTHOR"
 .IX Header "AUTHOR"
 The original author of Dotkit is
@@ -668,7 +705,7 @@ Adam Moody, also of \s-1LLNL\s0,
 has made additional major contributions.
 .SH "COPYRIGHT"
 .IX Header "COPYRIGHT"
-Copyright (c) 2004, The Regents of the University of California.
+Copyright (c) 2007, Lawrence Livermore National Security, \s-1LLC\s0.
 See the file named \*(L"Copyright\*(R" for the full text of the copyright notice.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"

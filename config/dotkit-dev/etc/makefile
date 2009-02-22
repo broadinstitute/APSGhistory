@@ -1,6 +1,8 @@
 # Makefile to help maintain dotkit
 # We assume your present working directory is $DK_ROOT/etc.
 
+.PHONY: help
+
 DKU = $${USER:-$${LOGNAME}}
 
 help:
@@ -13,8 +15,11 @@ help:
 links:
 	@ rm -f ../bash/unuse && ln -s ../ksh/use ../bash/unuse
 	@ rm -f ../bash/use && ln -s ../ksh/use ../bash
+	@ rm -f ../bash/prompt0.dk && ln -s ../ksh/prompt0.dk ../bash
 	@ rm -f ../bash/prompt1.dk && ln -s ../ksh/prompt1.dk ../bash
 	@ rm -f ../bash/prompt2.dk && ln -s ../ksh/prompt2.dk ../bash 
+	@ rm -f ../bash/prompt3.dk && ln -s ../ksh/prompt3.dk ../bash 
+	@ rm -f ../bash/prompt4.dk && ln -s ../ksh/prompt4.dk ../bash 
 	@ rm -f ../bash/envdiff.dk && ln -s ../ksh/envdiff.dk ../bash 
 	@ rm -f ../bash/macos_10 && ln -s ../ksh/macos_10 ../bash 
 	@ rm -f ../bash/.dk_init && ln -s ../ksh/.dk_init ../bash 

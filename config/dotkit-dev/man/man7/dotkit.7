@@ -129,7 +129,7 @@
 .\" ========================================================================
 .\"
 .IX Title "DOTKIT 1"
-.TH DOTKIT 1 "2005-11-28" "Dotkit 1.0" "AX Local Docs"
+.TH DOTKIT 1 "2008-04-16" "Dotkit 1.0" "AX Local Docs"
 .SH "NAME"
 Dotkit \- A set of interchangeable parts for managing the Unix shell
 environment.
@@ -260,7 +260,9 @@ Given a request such as \*(L"use foo\*(R",
 Dotkit searches a list of directories for a file named \*(L"foo.dk\*(R",
 taking the first such file found if there are multiple instances.
 (The search algorithm is slightly modified for the special
-case of \*(L"use Super\*(R".)
+case of \*(L"use Super\*(R".
+It is also possible to load a dotkit by giving the absolute
+pathname to the file, leaving off the final \fI.dk\fR suffix.)
 .PP
 The list can be depicted as a two-level tree structure,
 where each node in the upper level tree is itself the root of
@@ -514,8 +516,21 @@ program used by the \*(L"envdiff\*(R" dotkit,
 a makefile for various maintenance operations,
 the \*(L"systype\*(R" script used to compute values of \f(CW$SYS_TYPE\fR,
 a \fItest/\fR subdirectory with several Dotkit regression tests,
-and the \*(L"where\*(R", \*(L"alias\*(R", and \*(L"rep\*(R" scripts referenced by the \fIdk_where\fR,
-\&\fIdk_alias\fR, and \fIdk_rep\fR commands.
+and the \*(L"where\*(R",  and \*(L"rep\*(R" scripts referenced by the \fIdk_where\fR,
+and \fIdk_rep\fR commands.
+.Sh "Logging"
+.IX Subsection "Logging"
+Find one other script at \fI$DK_ROOT/etc/\fR named \*(L"log.example\*(R".  If
+an executable file is located at \fI$DK_ROOT/etc/log\fR, Dotkit
+will call that script immediately after successfully finding
+and reading each dotkit.
+The Dotkit administrator is expected to provide the
+logging program if this functionality is desired,
+and to ensure that their implementation provides
+sensible behavior for their particular Dotkit installation.
+.PP
+Usage logging can provide useful statistics about which dotkits
+are being referenced across a given site.
 .SH "ENVIRONMENT"
 .IX Header "ENVIRONMENT"
 (Dotkit environment variables are documented in \fIdk\-commands\fR\|(5).)
@@ -527,7 +542,7 @@ Adam Moody, also of \s-1LLNL\s0,
 has made additional major contributions.
 .SH "COPYRIGHT"
 .IX Header "COPYRIGHT"
-Copyright (c) 2004, The Regents of the University of California.
+Copyright (c) 2007, Lawrence Livermore National Security, \s-1LLC\s0.
 See the file named \*(L"Copyright\*(R" for the full text of the copyright notice.
 .SH "SEE ALSO"
 .IX Header "SEE ALSO"
