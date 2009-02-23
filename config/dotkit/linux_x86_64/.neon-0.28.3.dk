@@ -1,0 +1,15 @@
+#c libraries
+#d neon 0.28.3
+#d neon is an HTTP and WebDAV client library, with a C interface
+
+unuse -q `dk_rep "\.neon-[0-9].*"`
+
+# Set up environment for using library
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/neon_0.28.3/lib
+
+# Set up build env.
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/neon_0.28.3/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/neon_0.28.3/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/neon_0.28.3/include
+
+
