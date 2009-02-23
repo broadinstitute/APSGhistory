@@ -1,0 +1,14 @@
+#c libraries
+#d berkely DB libraries and tools
+
+unuse -q `dk_rep "\.db-[0-9]"`
+
+# Set up env
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/db_gcc_4.3.2_4.7.25/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/db_gcc_4.3.2_4.7.25/lib
+
+# Set up build env.
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/db_gcc_4.3.2_4.7.25/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/db_gcc_4.3.2_4.7.25/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/db_gcc_4.3.2_4.7.25/include
+

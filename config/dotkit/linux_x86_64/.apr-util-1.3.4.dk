@@ -1,0 +1,21 @@
+#c libraries
+#d apr-util-1.3.4 Apache Portable Runtime Utilities
+
+# Remove other apr-util packages
+unuse -q `dk_rep "\.apr-util-[0-9]*"`
+
+# Dependencies
+dk_op -q .db-4.7.25
+dk_op -q .apr-1.3.3
+
+
+# Set up environment for using library
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/apr-util_1.3.4/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/apr-util_1.3.4/lib
+
+# Set up build env.
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/apr-util_1.3.4/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/apr-util_1.3.4/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/apr-util_1.3.4/include
+
+
