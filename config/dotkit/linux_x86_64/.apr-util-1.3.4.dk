@@ -2,7 +2,7 @@
 #d apr-util-1.3.4 Apache Portable Runtime Utilities
 
 # Remove other apr-util packages
-unuse -q `dk_rep "\.apr-util-[0-9]*"`
+unuse -q `dk_rep "\.apr-util-[0-9].*"`
 
 # Dependencies
 dk_op -q .db-4.7.25
