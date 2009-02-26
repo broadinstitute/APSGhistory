@@ -18,6 +18,6 @@
     <property name="hibernate.connection.username">sa</property>
     <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
     <property name="hibernate.setup">true</property>
-    <property name="license">AAABCA0ODAoPeNptkFtLw0AQhd/3Vyz4vCGbipjAQptNwEgu1lZE8WWTjLrQbMJeov33Nm2KIn2cM +ec+Zirolf4XihMA0yvoyCM/BDzzRYHvh+iBEyj5WBlrxjX/Vf7FuF0FDsnJgk1k+SJxsoRmNUOE NdwXCXCApsqiE8JXSDeK3vwlaIDJtp6WetetF4nrQetm3ty2YAysN0PcPTxqijSR56t8nM8LYTcX cj/Ip0oDjZlQQnVQPo9SL3/gxMQGqBKfwglzSkST104U8ZK6yygDegRdJaweFG+kHi9XpGb/PaVP Pt38Yxauq4GXb0/GdCGEYpm9kMoz5LzdPn2g9PNpzDw/0U/EBiB7DAsAhRY5DkwZpjiD+p08kRf3 dI+yG6aMwIUbhlJs1XETCoPYrGs5ooor++jdH4=X02dh</property>
+    <property name="license">AAABBw0ODAoPeNptkFtrg0AQhd/3Vyz0ecXrQwWhidqyoDE0phDoy7pOm4W4yl5s8++riaGl5HHOn HPmYx7qo8XP0GDPx14YR34cuTjd1dh33UeUgeZKDEb0MklV/9W+xzgf2cmyWUJ8lhzGjRghMcoCS hVcVhkzkMwVxPWJF6C0l2bybVgHCWubp0b1rHU6YRxo7dJTCA5SQ30e4OJLq7LMX1O6Km7xvGTid Cf/i3SlmGzSgGSSQ/49CHX+gxMQL0KV+mRS6GtkPXdhKrURxhpAO1AjKJolaxoeSLCtDiSk7gvxV tHbgrqxXQOq+thrUDohHlrYp1BBs9t0//bWKn5kGv6/6AftooG3MCwCFDgEX1H1a/rPUMPoXbwhL MbFvVhcAhQ0nWRq1HAXYc5ibZoYvNZ6eHSSHw==X02dh</property>
   </properties>
 </application-configuration>
