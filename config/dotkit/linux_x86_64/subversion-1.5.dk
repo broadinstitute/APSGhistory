@@ -1,6 +1,10 @@
 #c devel-tools
 #d Add Subversion 1.5 revision control software to path
 
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/subversion-1.5/bin
-dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/subversion-1.5/lib
-dk_alter LD_LIBRARY_PATH /broad/tools/lib
+echo -e "\n\nThis version of subversion and the subversion-1.5"
+echo -e "dotkit have been deprecated. Please 'use Subversion-1.5'"
+echo -e "(note uppercase S) to get the latest supported subversion"
+echo -e "release."
+
+dk_op -q .subversion-1.5.1
+

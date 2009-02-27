@@ -1,0 +1,9 @@
+#c devel-tools
+#d groovy v 1.5.7
+
+# Clean out old groovys
+unuse -q `dk_rep "*groovy*"`
+
+# Set up groovy.
+dk_alter PATH /broad/tools/Linux/noarch/pkgs/groovy_1.5.7/bin
+dk_alter GROOVY_HOME /broad/tools/Linux/noarch/pkgs/groovy_1.5.7
