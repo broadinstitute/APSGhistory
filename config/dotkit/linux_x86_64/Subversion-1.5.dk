@@ -1,0 +1,8 @@
+#c development/tools
+#d Subversion is an open source version control system
+#d http://subversion.tigris.org
+#d Latest release in 1.5 series.
+unuse -q `dk_rep 'Subversion-*'`
+
+dk_op -q .subversion-1.5.5
+
