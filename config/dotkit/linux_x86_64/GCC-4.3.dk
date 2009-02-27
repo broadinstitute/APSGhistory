@@ -1,6 +1,6 @@
 #c languages
-#d Python is a dynamic object-oriented programming language.
-#d http://www.python.org/
-#d Latest release in 2.6 series.
+#d GCC, the GNU Compiler Collection
+#d http://gcc.gnu.org/
+#d Latest release in 4.3 series.
 
 dk_op -q .gcc-4.3.3
