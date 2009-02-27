@@ -12,6 +12,13 @@ if [ -r /etc/home.config ]; then
   exit
 fi
 
+# For now we only care about linux_x86_64
+if [ $SYS_TYPE != "linux_x86_64" ]; then
+  ARCH_TYPE=unknown
+  echo $ARCH_TYPE
+  exit
+fi
+
 VENDOR=`grep vendor /proc/cpuinfo | tail -1 | awk '{print $3}'`
 
 ARCH_TYPE=unknown
