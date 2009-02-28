@@ -1,0 +1,5 @@
+#c IT/Systems
+#d Set $HOST
+
+dk_setenv HOST `hostname -s`
+
