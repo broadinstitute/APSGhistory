@@ -1,18 +1,7 @@
 #c applications
 #d MySQL 5.1.30
 
-# Remove any currently used versions
-unuse -q `dk_rep 'mysql-*'`
+echo -e "\n\nThis dotkit have been deprecated. Please 'use MySQL-1.5'"
+echo -e "(note uppercase S) to get the latest supported MySQL tools"
 
-# Set up environment for using library
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/mysql_5.1.30/bin
-dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/mysql_5.1.30/share/man
-dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/mysql_5.1.30/lib/mysql
-
-
-# Set up build environment
-dk_alter LIBRARY_PATH=/broad/tools/Linux/x86_64/pkgs/mysql_5.1.30/lib/mysql
-dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/mysql_5.1.30/include/mysql
-dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/mysql_5.1.30/include/mysql
-
-
+dk_op -q .mysql-5.1.30

@@ -14,6 +14,8 @@ dk_op -q .pygtk-2.12.1
 dk_op -q .matplotlib-0.98.5.2
 dk_op -q .gcc-4.3.3
 dk_op -q .oracle-instaclient-11.1
+dk_op -q .tcl-tk-8.5.6
+dk_op -q .mysql-5.1.30
 
 # Python locations.
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/python_2.6.1/bin

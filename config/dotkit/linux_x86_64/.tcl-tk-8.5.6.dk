@@ -1,0 +1,21 @@
+#c versioned-languages
+#d Tcl/Tk 8.5.6 
+
+# Clear out any python versions lingering around
+unuse -q `dk_rep 'tcl-tk-*'`
+
+dk_op -q .gcc-4.3.3
+
+# Python locations.
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/tcl_8.5.6/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/tcl_8.5.6/lib
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/tcl_8.5.6/man
+
+# Set up build env.
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/tcl_8.5.6/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/tcl_8.5.6/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/tcl_8.5.6/include
+
+
+
+

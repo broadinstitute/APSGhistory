@@ -5,5 +5,5 @@ dk_alter PATH /broad/tools/Linux/x86_64/pkgs/binutils-2.19/bin
 dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/binutils-2.19/man
 dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/binutils-2.19/lib:/broad/tools/Linux/x86_64/pkgs/binutils-2.19/lib64
 
-dk_alter C_INCLUDE /broad/tools/Linux/x86_64/pkgs/binutils-2.19/include
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/binutils-2.19/include
 

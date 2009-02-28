@@ -1,0 +1,8 @@
+#c utilities
+#d Gnu m4
+
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/agg_2.5
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/agg_2.5
+
+
+

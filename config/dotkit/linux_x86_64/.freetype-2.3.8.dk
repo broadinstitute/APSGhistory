@@ -13,6 +13,7 @@ dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/freetype_2.3.8/lib
 # For gcc
 dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/freetype_2.3.8/lib
 dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/freetype_2.3.8/include
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/freetype_2.3.8/include/freetype2/freetype
 
 # Let pkg-config know where we are.
 dk_alter PKG_CONFIG_PATH /broad/tools/Linux/x86_64/pkgs/freetype_2.3.8/lib/pkgconfig

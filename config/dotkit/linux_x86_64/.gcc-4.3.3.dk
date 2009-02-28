@@ -9,6 +9,9 @@ unuse -q `dk_rep '*gcc-*'`
 dk_op -q .binutils-2.19
 dk_op -q .gettext-0.17
 dk_op -q .pkg-config-0.23
+dk_op -q .m4-1.4.12
+dk_op -q .autoconf-2.63
+dk_op -q .automake-1.10
 
 # Set up gcc
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/gcc_4.3.3/bin
