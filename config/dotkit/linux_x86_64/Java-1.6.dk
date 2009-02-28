@@ -3,4 +3,4 @@
 #d http://java.com/
 #d Latest release of 1.6.
 
-dk_op -q .java-sun-jdk-1.6.0-11
+dk_op -q .java-sun-jdk-1.6.0-12
