@@ -1,0 +1,7 @@
+#c applications/queue
+#d LSF 7.0
+
+# Source teh version of the LSF init for our shell.
+dk_test $_dk_shell = csh -o $_dk_shell = tcsh && \
+    dk_source /broad/lsf/conf/cshrc.lsf || \
+    dk_source /broad/lsf/conf/profile.lsf
