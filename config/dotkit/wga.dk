@@ -1,0 +1,6 @@
+#c groups
+#d WGA group specific dotkits.
+
+
+dk_alter DK_NODE $DK_ROOT/group=wga
+

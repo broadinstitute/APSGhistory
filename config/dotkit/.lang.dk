@@ -1,0 +1,4 @@
+#c system
+#d set LANG
+
+dk_setenv LANG C

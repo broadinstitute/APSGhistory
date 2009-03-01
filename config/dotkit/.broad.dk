@@ -1,5 +1,6 @@
 #c system
 #d Set Broad related items
 
-ORGANIZATION="Broad Institute of MIT and Harvard"
-DOMAINNAME="broad.mit.edu"
+dk_setenv ORGANIZATION "Broad Institute of MIT and Harvard"
+dk_setenv DOMAINNAME "broad.mit.edu"
+dk_setenv LANG C
