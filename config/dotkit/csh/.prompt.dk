@@ -1,0 +1,23 @@
+#c IT/Systems
+#d Set prompt in csh.
+
+# We need to make sure $HOST is set.
+dk_op -q .hostname
+
+# Alias for setting the xterm title.
+dk_alias set_title 'echo -n "]0;${user}@${HOST}: $cwd"' 
+
+dk_alias cd 'cd \!*;set_title'
+dk_alias pushd 'pushd \!*; set_title'
+dk_alias popd 'popd \!*; set_title'
+
+# Set the prompt
+# dk_setenv doesn't seem to work for this.
+set prompt = "${user}@%m:%~ > "
+
+# Force an xterm title set to get things started.
+set_title
+
+
+
+

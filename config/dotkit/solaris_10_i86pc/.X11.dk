@@ -1,0 +1,5 @@
+#c IT/Systems
+#d Set X11 Path and variables.
+
+dk_alter PATH /usr/X/bin
+
