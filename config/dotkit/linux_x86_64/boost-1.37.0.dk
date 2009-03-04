@@ -3,3 +3,7 @@
 
 dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/boost-1.37.0/lib
 
+# For gcc
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/boost-1.37.0/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/boost-1.37.0/include
+
