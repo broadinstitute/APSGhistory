@@ -1,0 +1,19 @@
+#c IT/Systems
+#d display a deprecation warning
+
+PKG=`basename $_dk_s7`
+
+echo -e "\n\nWARNING:
+
+The $PKG dotkit is deprecated. 
+This can happen for two reasons:
+  1) The package is old and is being 
+     removed.
+  2) Dotkit for package does not conform to
+     dotkit naming standards and is being 
+     replaced or renamed.
+Please see http://webserver/dotkit-howto for
+tips on finding the package you need and other
+information on using dotkit in the Broad 
+computing environment."
+

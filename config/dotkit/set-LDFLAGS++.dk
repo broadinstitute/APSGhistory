@@ -1,0 +1,7 @@
+#c IT/Systems
+#d Set the LDFLAGS Variable with -L arguments for everything
+# in LIBRARY_PATH for building things that don't honor LIBRARY_PATH
+# but do check for LDFLAGS. This package can be used multiple times
+# and will reset LDFLAGS each time it is ran.
+
+dk_setenv LDFLAGS "-L`echo $LIBRARY_PATH | sed -e 's/:/ -L/g'`"
