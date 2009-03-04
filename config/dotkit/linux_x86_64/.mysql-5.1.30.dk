@@ -11,7 +11,7 @@ dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/mysql_5.1.30/lib/mysql
 
 
 # Set up build environment
-dk_alter LIBRARY_PATH=/broad/tools/Linux/x86_64/pkgs/mysql_5.1.30/lib/mysql
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/mysql_5.1.30/lib/mysql
 dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/mysql_5.1.30/include/mysql
 dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/mysql_5.1.30/include/mysql
 
