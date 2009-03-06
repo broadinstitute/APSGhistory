@@ -6,6 +6,6 @@ dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/boost_1.37.0_rt145860/li
 
 # Building
 dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/boost_1.37.0_rt145860/lib
-dk_alter CPATH /broad/tools/Linux/x86_64/pkgs/boost_1.37.0_rt145860/include/boost-1_37/boost
+dk_alter CPATH /broad/tools/Linux/x86_64/pkgs/boost_1.37.0_rt145860/include/boost-1_37
 
 
