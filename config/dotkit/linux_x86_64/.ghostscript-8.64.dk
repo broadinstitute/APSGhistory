@@ -1,0 +1,18 @@
+#c applications
+#d GhostScript 8.64
+
+# Clear out any python versions lingering around
+unuse -q `dk_rep '.ghostscript-*'`
+
+# Packages python needs
+dk_op -q .gcc-libs-4.3.3
+dk_op -q .cairo-1.8.6
+dk_op -q .fontconfig-2.6.0
+dk_op -q .pixman-0.14.0
+dk_op -q .freetype-2.3.8
+dk_op -q .zlib-1.2.3
+
+# Environment setup
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/ghostscript_8.64/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/ghostscript_8.64/share/man
+

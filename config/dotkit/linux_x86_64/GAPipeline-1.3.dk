@@ -1,0 +1,7 @@
+#c languages
+#d GAPipline
+
+unuse -q `dk_rep 'GAPipeline-*'`
+
+dk_op -q .gapipeline-1.3.4
+
