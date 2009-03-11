@@ -1,9 +1,9 @@
 #c applications/queue
-#d Load Sharing Facility version 7.0
+#d Load Sharing Facility
 
+# Only one LSF to bind them.
+unuse -q `dk_rep "LSF-*"`
+
+# Grab the latest.
 dk_op -q .lsf-7.0
-
-dk_alias ish 'bsub -Is -q interactive bash'
-dk_alias isub 'bsub -Is -q interactive '
-
 

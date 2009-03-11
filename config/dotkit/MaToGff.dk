@@ -1,0 +1,12 @@
+#c applications
+#d MaToGff
+#d MaToGff converts a FASTA file, maFile, of unmated 
+#d reads to a SOLiD GFF v0.2 file
+
+# One MaToGff at a time, please.
+unuse -q `dk_rep 'MaToGff*'`
+
+# grab latest hidden matogff package.
+dk_op -q .matogff-0.2.06
+
+

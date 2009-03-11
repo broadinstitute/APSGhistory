@@ -1,6 +1,12 @@
 #c applications/queue
 #d LSF 7.0
 
+# LSF Specific aliases.
+
+dk_alias ish 'bsub -Is -q interactive bash'
+dk_alias isub 'bsub -Is -q interactive '
+
+
 # Source teh version of the LSF init for our shell.
 dk_test $_dk_shell = csh -o $_dk_shell = tcsh && \
     dk_source /broad/lsf/conf/cshrc.lsf || \
