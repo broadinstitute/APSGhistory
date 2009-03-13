@@ -1,0 +1,10 @@
+#c applications
+#d Primer3 is a widely used program for designing PCR 
+#d primers (PCR = "Polymerase Chain Reaction"). PCR is 
+#d an essential and ubiquitous tool in genetics and 
+#d molecular biology. Primer3 can also design hybridization 
+#d probes and sequencing primers.
+
+unuse -q `dk_rep "*primer3*"`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/primer3_1.1.4
