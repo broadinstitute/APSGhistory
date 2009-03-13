@@ -1,5 +1,4 @@
 #!/bin/bash -l
 use perl
-TEXT="test"
-export TEXT
+export TEXT="test2"
 perl example.pl
