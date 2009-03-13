@@ -1,5 +1,5 @@
 #!/bin/bash -l
 use perl
-TEXT="Hello world"
+TEXT="test"
 export TEXT
 perl example.pl
