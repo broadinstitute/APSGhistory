@@ -1,0 +1,9 @@
+#c applications/biotools
+#d SOAPaligner/soap2 is a program for faster and efficient 
+#d alignemt for short oligonucleotide onto reference sequences. 
+#d SOAPaligner/soap2 is compatible with numerous applications, 
+#d including single-read or pair-end resequencing. 
+
+unuse -q `dk_rep "SOAP*"`
+
+dk_op -q .soap-2.1.0
