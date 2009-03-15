@@ -1,0 +1,40 @@
+#c IT/Systems
+#d Collection of default environment settings for basic user 
+#d setup. This is meant to *REPLACE* current startup scripts.
+#d Do not use unless you know what you are doing!
+
+# Things which make permanenet changes come first.
+# Set up a basic PATH
+dk_op -q .path
+
+# Set the prompt
+dk_op -q .prompt
+
+# Set LANG
+dk_op -q .lang
+
+# Set HOST
+dk_op -q .hostname
+
+# Set up broad variables.
+dk_op -q .broad
+
+# Set up common aliases
+dk_op -q .aliases++
+
+# Set up local scripts ad tools
+dk_op -q .local
+
+# Add X11 to path, this should check for the existance of X11
+# as well as use the correct path for each distro/OS
+dk_op -q .X11
+
+# Source the lsf setup file.
+# LSF related aliases go in this dotkit.
+dk_op -q .lsf-7.0
+
+# Default Applications
+dk_op -q .pdsh-2.17
+dk_op -q .subversion-1.5.5
+
+

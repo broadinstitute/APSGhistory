@@ -1,0 +1,25 @@
+Here are some example dotfiles that show one way to integrate Dotkit
+into your environment.  This is not necessary for using Dotkit, but it
+shortens your dotfiles and makes it easier to share personal kits with
+other people.
+
+There is an example setup for use with each of bash, csh, ksh, and tcsh.
+It should yield an environment that is very similar for any of those
+shells.  Suggestions on how to improve the examples are always welcome.
+
+A list of files and directories here:
+
+bash_profile: Copy this to $HOME/.bash_profile, if you wish to
+  run bash.
+
+bashrc: Copy to $HOME/.bashrc, for bash users.
+
+cshrc: Copy to $HOME/.cshrc, for csh and tcsh users.  This one file
+  is designed to take the place of .cshrc and .login for most people.
+
+kits/: Copy the whole directory to $HOME/.kits.  It provides
+  some personalizable dotkits to set preferences and aliases.  It works
+  with any of the four shells.
+
+profile.ksh: Copy to $HOME/.profile, for ksh users.  This one file
+  is designed to serve as both .profile and $ENV for most people.

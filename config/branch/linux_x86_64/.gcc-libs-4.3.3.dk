@@ -1,0 +1,13 @@
+#c versioned-languages
+#d Add gcc directories 4.3.3 LD_LIBRARY_PATH
+
+
+# Clear out exisitng gcc varsions.
+unuse -q `dk_rep '*gcc-libs-*'`
+
+
+# Set up gcc
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gcc_4.3.3/lib
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gcc_4.3.3/lib64
+
+

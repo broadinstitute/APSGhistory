@@ -1,0 +1,11 @@
+#c libraries
+#d libaio-0.3.99
+
+# Set up environment for using library
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/libaio_0.3.99/lib
+
+# Set up build env.
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/libaio_0.3.99/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/libaio_0.3.99/include
+
+

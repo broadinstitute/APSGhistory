@@ -1,0 +1,13 @@
+#c languages
+#d Tcl (Tool Command Language) is a very powerful but easy 
+#d to learn dynamic programming language, suitable for a 
+#d very wide range of uses, including web and desktop 
+#d applications, networking, administration, testing 
+#d and many more. 
+#d http://www.tcl.tk/
+#d Latest release in 8.5 series.
+
+unuse -q `dk_rep 'Tcl-Tk-*'`
+
+dk_op -q .tcl-tk-8.5.6
+

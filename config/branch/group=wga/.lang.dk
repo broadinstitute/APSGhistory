@@ -1,0 +1,5 @@
+#c wga/system
+#d Set LANG for wga group
+
+dk_setenv LANG en_US.iso88591
+

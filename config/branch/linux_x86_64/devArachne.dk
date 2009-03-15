@@ -1,0 +1,7 @@
+#c versioned-bio-tools
+#d Add latest assembly analysis build of Arachne to path
+
+dk_alter PATH /seq/arachne/Arachne_x86_64/bin
+dk_setenv SOLEXA_PIPELINE_DIR /slxa/pipelineOutput/farm
+dk_alter LD_LIBRARY_PATH .:/seq/arachne/Arachne_x86_64/:/util/gcc-4.3.0/lib64:/util/gcc-4.3.0/lib/:/util/gcc-4.3.0/lib/gcc/x86_64-unknown-linux-gnu/4.3.0:/util/lib64:/util/lib/lib:$LD_LIBRARY_PATH
+

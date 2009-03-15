@@ -1,0 +1,6 @@
+#c versioned-bio-tools
+#d Add hmmer suite v2.3.2 to path 
+# hmmalign  hmmcalibrate  hmmemit   hmmindex  hmmsearch
+# hmmbuild  hmmconvert    hmmfetch  hmmpfam
+
+dk_alter PATH /broad/tools/apps/hmmer/hmmer-2.3.2/bin

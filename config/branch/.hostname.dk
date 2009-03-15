@@ -1,0 +1,8 @@
+#c IT/Systems
+#d Set $HOST
+
+# Set the hostname to the short version.
+# linux coudl use hostname -s, but -s means "set" on solaris.
+# This should be os agnostic between the two OSes
+dk_setenv HOST `hostname | cut -f1 -d'.'`
+

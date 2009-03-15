@@ -1,0 +1,4 @@
+#c bio-tools
+#d signalp v3.0
+
+dk_alter PATH /broad/tools/apps/signalp-3.0

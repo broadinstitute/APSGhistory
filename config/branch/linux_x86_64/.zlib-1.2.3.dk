@@ -1,0 +1,16 @@
+#c libraries
+#d zlib 1.2.3
+#d A Massively Spiffy Yet Delicately Unobtrusive Compression Library
+
+unuse -q `dk_rep "\.zlib-[0-9]*"`
+
+# Set up environment for using library
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/zlib_1.2.3/lib
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/zlib_1.2.3/share/man
+
+# Set up build env.
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/zlib_1.2.3/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/zlib_1.2.3/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/zlib_1.2.3/include
+
+

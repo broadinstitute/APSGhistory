@@ -1,0 +1,8 @@
+#c applications
+#d MySQL 5.1.30
+
+# Remove any currently used versions
+unuse -q `dk_rep 'MySQL-*'`
+
+dk_op -q .mysql-5.1.30
+

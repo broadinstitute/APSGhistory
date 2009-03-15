@@ -1,0 +1,14 @@
+# DK_SETDEF
+if ($?_dk_err) goto _dk_setdefend
+if ($#_dk_sa == 1) set _dk_sa = ( $_dk_sa "" )
+eval set _dk_already = '$?'$_dk_sa[1]
+if ( ! $_dk_already) then
+  source $DK_ROOT/$_dk_shell/.dk_setenv
+else # does already have a value.
+  eval set _dk_value = \"'$'$_dk_sa[1]\"
+  if ( "$_dk_value" == "" || "$_dk_value" == "$_dk_sa[2]" ) then
+    source $DK_ROOT/$_dk_shell/.dk_setenv
+  endif
+endif
+unset _dk_already _dk_value _dk_sa
+_dk_setdefend:

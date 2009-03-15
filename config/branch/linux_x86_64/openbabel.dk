@@ -1,0 +1,6 @@
+#c bio-tools
+#d openbabel v2.1.1 
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/openbabel/bin
+dk_alter PYTHONPATH /broad/tools/Linux/x86_64/pkgs/openbabel/lib/python2.4/site-packages
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/openbabel/lib

@@ -1,0 +1,5 @@
+#0: test
+
+dk_op -q Super
+
+echo "Q: DK_ROOT/SYS_TYPE"

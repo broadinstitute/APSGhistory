@@ -1,0 +1,115 @@
+# DK_ALTER
+
+if($?_dk_err) goto _dk_alterend
+if ($?DK_IFS) then
+  set _dk_ifs="$DK_IFS"
+else
+  set _dk_ifs=':'
+endif
+if ( $#_dk_aa == 2 ) then
+  set _dk_aa = ( $_dk_aa[1] "$_dk_aa[2]" "$_dk_ifs" )
+else if ( $#_dk_aa != 3 ) then
+  goto _dk_alterend
+endif
+
+if ( "$_dk_op" == "use" ) then
+
+  if ( ! $?_dk_pream ) setenv _dk_pream "Prepending"
+  eval set _dk_ss = '$?'$_dk_aa[1]
+  if ($_dk_ss) then
+    eval set _dk_v1s = \"'$'$_dk_aa[1]\"
+    if ( "$_dk_v1s" != "" ) then
+      if ("$_dk_aa[3]" != ' ') then
+        set _dk_v1s = `echo "$_dk_v1s" | dk_tr ' ' ''`
+        set _dk_tmp = `echo "$_dk_aa[2]" | dk_tr ' ' ''`
+        set _dk_aa = ( $_dk_aa[1] "$_dk_tmp" "$_dk_aa[3]" )
+      endif
+      set _dk_v1x = ( `echo "$_dk_v1s" | dk_tr "$_dk_aa[3]" ' '` )
+      if($#_dk_v1x == 0) set _dk_v1x = "$_dk_aa[3]"
+      if ( "$_dk_pream" == "Prepending") then
+        if( "$_dk_v1x[1]" == '.') then
+          if ($#_dk_v1x > 1) then
+            set _dk_v1x = ( . "$_dk_aa[2]" $_dk_v1x[2-] )
+          else # Exactly one element in variable, namely '.'
+            set _dk_v1x = ( . "$_dk_aa[2]" )
+          endif
+        else
+          set _dk_v1x = ( "$_dk_aa[2]" $_dk_v1x )
+        endif
+      else # Appending
+        if( "$_dk_v1x[$#_dk_v1x]" == '.') then
+          if ($#_dk_v1x > 1) then
+            @ _dk_n = $#_dk_v1x - 1
+            set _dk_v1x = ( $_dk_v1x[1-$_dk_n] "$_dk_aa[2]" . )
+          else # Exactly one element in variable, namely '.'
+            set _dk_v1x = ( "$_dk_aa[2]" . )
+          endif
+        else
+          set _dk_v1x = ( $_dk_v1x "$_dk_aa[2]" )
+        endif
+      endif
+      if ("$_dk_aa[3]" != ' ') then
+        setenv $_dk_aa[1] "`echo '$_dk_v1x' | dk_tr ' ' '$_dk_aa[3] '`"
+      else
+        setenv $_dk_aa[1] "$_dk_v1x"
+      endif
+    else # $#_dk_v1x == 0 (Empty variable.)
+      setenv $_dk_aa[1] "$_dk_aa[2]"
+    endif
+  else # (Unset variable.)
+    setenv $_dk_aa[1] "$_dk_aa[2]"
+  endif
+else # unuse
+# To help keep the variables straight, the code below is commented
+# with a specific example.  The various pieces are shown in
+# the variables below.  Suppose the initial value of MANPATH is
+# /opt/man:/foo/bar:/usr/man:/local/man, and the action statement was
+# "dk_alter MANPATH /foo/bar".  The code below is going to tear out
+# /foo/bar from MANPATH.  In referring to the variables, the leading
+# _dk_ is dropped by convention.
+
+  eval set _dk_ss = '$?'$_dk_aa[1] # Set ss to 0 or 1.
+  if ($_dk_ss) then # MANPATH is already set.
+    eval set _dk_v1s = \"'$'$_dk_aa[1]\"
+    if ("$_dk_aa[3]" != ' ') then
+      set _dk_v1s = `echo "$_dk_v1s" | dk_tr ' ' ''`
+      set _dk_tmp = `echo "$_dk_aa[2]" | dk_tr ' ' ''`
+      set _dk_aa = ( $_dk_aa[1] "$_dk_tmp" "$_dk_aa[3]" )
+    endif
+    # set v1s to "/opt/man:/foo/bar:/usr/man:/local/man"
+    set _dk_x = (`echo "$_dk_v1s" | dk_tr "$_dk_aa[3]" ' '`)
+    if($#_dk_x == 0) set _dk_x = ""
+    # set x to ( /opt/man /foo/bar /usr/man /local/man )
+    if ($#_dk_x > 1) then # MANPATH has more than 1 component.
+      if ( "$_dk_x[1]" == "$_dk_aa[2]") then
+        set _dk_nx = $_dk_x[2]
+        shift _dk_x
+      else
+        set _dk_nx = $_dk_x[1]
+      endif
+      shift _dk_x
+      foreach _dk_comp ($_dk_x)
+        if ( "$_dk_comp" == "$_dk_aa[2]" ) then
+          set _dk_aa[2] = JunkjunkJunkjunk # Only delete the 1st match.
+        else
+          set _dk_nx = ( "$_dk_nx" "$_dk_comp" )
+        endif
+      end
+      unset _dk_comp
+      if ("$_dk_aa[3]" != ' ') then
+        setenv $_dk_aa[1] "`echo '$_dk_nx' | dk_tr ' ' '$_dk_aa[3] '`"
+      else
+        setenv $_dk_aa[1] "$_dk_nx"
+      endif
+      # setenv MANPATH /opt/man:/usr/man:/local/man
+    else if ($#_dk_x == 1) then # MANPATH has exactly 1 component now.
+      if ( "$_dk_x[1]" == "$_dk_aa[2]") then # if it matches, remove it.
+        setenv $_dk_aa[1] ""
+      endif
+    endif
+  endif
+  unset _dk_ss _dk_v1s _dk_nx _dk_x
+endif
+unset _dk_comp _dk_aa _dk_ss _dk_v1s _dk_v1x _dk_n _dk_tmp _dk_ifs
+
+_dk_alterend:

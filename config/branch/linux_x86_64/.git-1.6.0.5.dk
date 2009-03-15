@@ -1,0 +1,3 @@
+#c versioned devel-tools
+
+dk_alter PATH /broad/tools/apps/git/git-1.6.0.5/bin

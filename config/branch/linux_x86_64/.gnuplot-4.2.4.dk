@@ -1,0 +1,15 @@
+#c applications
+#d gnuplot v4.2.4 
+
+unuse -q `dk_rep ".gnuplot=*"`
+
+# Dependencies
+dk_op -q .python-2.6.1
+dk_op -q .gcc-lib-4.3.3
+
+# Environment
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/gnuplot_4.2.4/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/gnuplot_4.2.4/share/man
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gnuplot_4.2.4/lib
+
+

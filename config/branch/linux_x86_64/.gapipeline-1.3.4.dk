@@ -1,0 +1,18 @@
+#c applications
+#d GAPipeline 1.3.2
+
+# Dependencies
+dk_op -q .gcc-4.3.3-libs
+dk_op -q .python-2.6.1
+dk_op -q .perl-5.8.9
+dk_op -q .gnuplot-4.2.4
+dk_op -q .imagemagick-6.4.9-10
+dk_op -q .fftw3-3.1.3-single
+dk_op -q .ghostscript-8.64
+
+# Environement for running GAPipeline.
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/GAPipeline_1.3.4/bin
+dk_alter PERL5LIB /broad/tools/Linux/x86_64/pkgs/GAPipeline_1.3.4/lib/perl
+dk_alter PYTHONPATH /broad/tools/Linux/x86_64/pkgs/GAPipeline_1.3.4/lib/python
+
+

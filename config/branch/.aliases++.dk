@@ -1,0 +1,6 @@
+#c IT/Systems
+#d Common aliases for users.
+
+dk_alias finger 'finger -M'
+dk_alias quota 'quota -sQ'
+

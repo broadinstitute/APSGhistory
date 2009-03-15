@@ -1,0 +1,6 @@
+#c bio-tools
+#d Schrodinger chemistry tools
+
+dk_alter PATH /broad/tools/apps/schrodinger
+dk_alter SCHRODINGER /broad/tools/apps/schrodinger
+dk_alter LM_LICENSE_FILE /broad/tools/apps/schrodinger/schrodinger.license

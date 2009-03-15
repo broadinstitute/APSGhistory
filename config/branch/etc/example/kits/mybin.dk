@@ -1,0 +1,5 @@
+#c personal
+#d My binaries for the given SYS_TYPE
+
+dk_alter PATH $HOME/$SYS_TYPE/bin
+dk_alter MANPATH $HOME/$SYS_TYPE/man

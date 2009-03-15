@@ -1,0 +1,327 @@
+=head1 NAME
+
+use/unuse - Load, unload, or display dotkits, also known as I<packages>.
+
+=head1 SYNOPSIS
+
+use [ B<-alqv> ] [ I<pkg> ... ]
+
+unuse [ B<-alqv> ] [ I<pkg> ... ]
+
+reuse [ B<-alqv> ] [ I<pkg> ... ]
+
+=head1 OPTIONS
+
+=over 6
+
+=item B<-a>
+
+Append components from the given package(s) to the end of the
+environment variables they affect.
+This generally makes the added component(s) the I<last> item searched
+instead of the I<first>,
+as is the behavior of the default I<Prepend> action.
+This option has no effect with the I<unuse> command.
+
+Note: Don't use this option unless you know what you're doing.
+The default prepend action is
+better at avoiding possible conflicts with any pre-existing dotkits
+or PATH components, etc.
+The only common package that should arguably be appended is
+the '.' (dot) package,
+which adds '.' to your PATH.
+
+=item B<-l>
+
+The B<-l> "long listing" option
+turns off the interpretation (sourcing) of any I<pkg> arguments that follow.
+With no other arguments,
+this option produces a summary of available dotkits.
+If a I<pkg> argument follows,
+the descriptive text and any help text for that I<pkg> is
+printed to the screen.
+If no package whose name exactly macthes I<pkg> is found,
+a summary of available packages whose name, category, or short description
+includes I<pkg> in a case-insensitive pattern-match search is printed to the screen.
+The B<-l> option can be combined with B<-v> to produce more verbose output.
+With no arguments, B<-lv> prints a usage message,
+a list of packages currently in use,
+a summary of available packages,
+and a list of all nodes in the Dotkit search path.
+With a I<pkg> argument, B<-lv> prints the entire contents of the I<pkg>.
+The B<-l> option is quietly ignored by I<unuse>.
+
+=item B<-q>
+
+Make I<use>, I<unuse>, or I<reuse> quiet in operation.
+You generally want this option for commands inside startup dotfiles.
+
+=item B<-v>
+
+Be verbose about the location of
+package files found in satisfying your request.
+With B<-l>, show the full contents of any I<pkg> arguments,
+or give a more verbose listing, if no arguments were given.
+
+=back
+
+If no package arguments are given,
+a usage message is displayed,
+followed by a list of the available packages.
+It is sometimes handy to save the output of this
+usage message in a file.
+Since the I<use> command is an alias for csh and tcsh,
+it may require some extra syntax to redirect its output:
+
+  (use -lv) > mycopy.out
+
+=head1 DESCRIPTION
+
+I<Use> and I<unuse> help
+you control and understand your Unix environment.
+They simplify dotfile setup and maintenance,
+and are also available for interactive use,
+allowing you to easily modify your environment as you go.
+Together, the use/unuse pair provides a do/undo facility
+that is convenient, informative, and quick.
+
+Suppose your site has an application named "viztools",
+made up of one or more executable programs, documentation, etc.
+In order to add the needed components to your PATH,
+MANPATH, or other environment variables
+necessary for your use of those programs,
+you say
+
+  use viztools.
+
+Assuming all is well, you'll get a message
+
+  Prepending: viztools (ok),
+
+which means that the package file was found, and your PATH,
+MANPATH, or other environment variables needed to access it were
+adjusted correctly.
+(If you give the B<-a> option, the message will instead say "Appending",
+and any new components will be added at the end of the respective
+variable, instead of the beginning.)
+
+If you type "use viztools" again, it will say
+
+  Prepending: viztools (already loaded),
+
+meaning that the package has already been read once.
+If you typed "use vzitools" (mis-spelled),
+the response would read
+
+  Prepending: vzitools (not found),
+
+to let you know that the requested package had a problem of some sort.
+
+Later on, when you are done, you say
+
+  unuse viztools
+
+and all the relevant adjustments will be made to your environment
+to remove the package, with the message
+
+  Dropping: viztools (ok).
+
+You can use or unuse more than one package at a time.
+Typing "use" or "unuse" without arguments causes a help message
+to be printed.
+You can get a list of all the packages available for
+a given platform by typing "use -l" with no arguments,
+and you can learn more about the I<viztools> package by
+typing "use -l viztools".
+
+If you know you always want I<viztools> to be loaded,
+you can add the line "use -q viztools"
+(the B<-q> option makes the command quiet)
+into one of your dotfiles,
+and get it automatically included whenever you start a session.
+
+=head2 Dotfile setup
+
+The setup required to make the
+I<use> command available is simple.
+Add the following line to your .profile or .cshrc file,
+or execute it directly in a current shell window,
+if you don't want to modify your startup file:
+
+  eval `/<path_to>/dotkit/init`
+
+(The I</path_to> portion varies among sites.  At LLNL, it is
+generally "/usr/gapps".)
+The script usually guesses your shell type correctly.
+If you get complaints about "command not found", or
+"unbound variable", or "parameter not set",
+you may need to tell it explicitly
+what kind of shell you are using:
+
+  eval `/<path_to>/dotkit/init -b` # bash or ksh
+  eval `/<path_to>/dotkit/init -c` # csh or tcsh
+
+I<Init> adds aliases or shell functions for "use", "unuse",
+and related commands,
+and sets the two environment variables SYS_TYPE and DK_ROOT
+if they are not set already.
+The exact commands to initialize Dotkit at your site may
+be slightly different.
+
+In addition to evaluating the output of I<dotkit/init>,
+you may want to go ahead and read a few packages
+in your dotfiles.
+Lines such as follows can be added to your .profile, .login
+or .cshrc files, after the ``eval ...'' line:
+
+  use -q bin usr sbin x11
+  use -qa .        # Puts '.' last on your path.
+
+The four packages loaded in the first line arrange to put /bin,
+/usr/bin, /sbin, and (usually) /usr/bin/X11 on the PATH,
+and set up MANPATH accordingly.
+The action of the x11 package will vary - on Linux systems,
+it adds /usr/X11R6/{bin,man} to the PATH and MANPATH, respectively.
+The last package loaded, a literal '.' (dot), appends '.' to your PATH.
+
+It does no harm to ask for a package that isn't present on all platforms.
+Let "use" sort out which packages are actually available on your
+current system.
+You'll get it on those platforms where it is installed,
+and the request is quietly skipped otherwise.
+
+It is redundant (but does no harm) to put code like
+
+  if($SYS_TYPE == "solaris_8_s64") then
+    use -q SUNWspro # load sun compilers
+  endif
+
+in your dotfiles.
+This is just the kind of check that "use" is designed to do for you.
+
+You can start using Dotkit interactively without making any changes to
+your dotfiles other than the "eval" line above.
+It won't change your environment except when you "use"
+or "unuse" packages. 
+Alternatively,
+you can start from a mostly empty environment,
+and use Dotkit commands to build the one you like.
+
+=head2 Searching for packages
+
+To look at a list of all the available packages for your current SYS_TYPE,
+type "use -l" with no arguments,
+This gives you a categorized listing of packages,
+with a short description of what each one does.
+
+The I<search> package allows you to type in a word or pattern,
+much like grep(1),
+then looks through all the available dotkits for lines that
+match that word or pattern.
+To use it, simply type "use search".
+It prompts for the pattern,
+and prints the results to your screen.
+
+To see the entire contents of a given package,
+type "use -lv I<pkg>".
+
+To find packages,
+I<use> and I<unuse> look in $HOME/.kits/,
+if that directory exists, then each component of DK_NODE,
+if it exists,
+and finally in DK_ROOT,
+for files named I<*.dk>.
+To be precise, they look first in three subdirectories of each of
+those directories, in the following order:
+I<*sh>/$SYS_TYPE, $SYS_TYPE, I<*sh>,
+where I<*sh> stands for whichever of I<bash>, I<csh>,
+I<ksh>, or I<tcsh> is your login shell,
+and $SYS_TYPE is the name of the current system type.
+In this way, you (or the Dotkit maintainer)
+can specialize a package to a given architecture
+or shell if needed,
+and arrange for that package to over-ride a "generic" version
+whenever someone is running on the given architecture,
+or with the given shell.
+Most packages are independent of shell and SYS_TYPE.
+For more on the package search process,
+see the dotkit(7) man page.
+
+=head2 Dot floats
+
+The dot (.) character has a special meaning when discussing
+Unix directories,
+signifying your current working directory.
+Many users add ``dot'', called '.' hereafter,
+to their PATH environment variable
+so as to be able to easily execute programs located in
+the current directory,
+wherever that might be.
+Although there are some security considerations,
+this convenience is important.
+Dotkit supports the use of '.' with a special package by that name:
+
+  use .         # Puts '.' at the beginning of your PATH.
+  use -a .      # Puts '.' at the end of your PATH.
+
+Moreover, once '.' is in your PATH,
+(or any other colon-separated environment variable,)
+Dotkit arranges for it to "float" up or down
+as future changes are made,
+so as to always remain at the beginning or end.
+
+=head2 Writing your own package files
+
+As a simple example,
+suppose you keep some personal programs at $HOME/bin,
+with their associated man pages under $HOME/man.
+You can add a personal package to Dotkit by creating
+the new file $HOME/.kits/mybin.dk, containing
+the following five lines:
+
+  #c personal
+  #d My very own programs
+
+  dk_alter PATH $HOME/bin
+  dk_alter MANPATH $HOME/man
+
+Most package files are no more complicated than that.
+To learn more about writing package files,
+and the overall organization of Dotkit,
+see the man pages for dk-examples(5), dk-commands(5) and dotkit(7).
+They give extensive instruction on the usually simple,
+but occasionally subtle, art of writing package files.
+
+=head1 BUGS
+
+Unuse removes the I<first> instance of a given component from
+PATH, MANPATH, etc.
+(There could be more than one if your PATH was not empty
+when Dotkit was initialized,
+or if two packages happened to include the same component.)
+This is usually correct,
+but can be wrong in a few cases.
+
+I<Use> and I<unuse> are aliases in csh and tcsh;
+you can't re-direct their output to a file.
+(However, you can pipe their output to another command,
+so "use|cat>file" will usually get the job done.
+Failing that, try a subshell: "(use -lv)>file".)
+
+=head1 AUTHOR
+
+The original author of Dotkit is
+Lee Busby, Lawrence Livermore National Laboratory.
+Adam Moody, also of LLNL,
+has made additional major contributions.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2004, The Regents of the University of California.
+See the file named "Copyright" for the full text of the copyright notice.
+
+=head1 SEE ALSO
+
+L<dk-commands>(5), L<dk-examples>(5), L<dotkit>(7), L<use>(1), L<dk-admin>(8).
+
+=cut

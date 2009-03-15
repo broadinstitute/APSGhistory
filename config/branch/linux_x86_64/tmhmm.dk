@@ -1,0 +1,4 @@
+#c bio-tools
+#d TMHMM v2.0c 
+
+dk_alter PATH /broad/tools/apps/TMHMM2.0c/bin

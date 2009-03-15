@@ -1,0 +1,4 @@
+#c bio-tools
+#d use rocs chemical similarity software v2.3.1
+
+dk_op -q .rocs-2.3.1

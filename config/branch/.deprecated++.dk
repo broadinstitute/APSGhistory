@@ -1,0 +1,25 @@
+#c IT/Systems
+#d display a deprecation warning
+
+PKG=`basename $_dk_s7`
+
+echo -e "\n\nWARNING:
+
+The $PKG dotkit is deprecated. 
+This can happen for two reasons:
+  1) The package is old and is being 
+     removed.
+  2) Dotkit for package does not conform to
+     dotkit naming standards and is being 
+     replaced or renamed.
+
+ 'use -l' will produce a list of all major 
+packages that are available.
+
+ 'use -al' will list all packages, libraries
+and any dotkits that are available.
+
+If the application or version you need 
+is not listed you can request it at
+   help@broad.mit.edu
+

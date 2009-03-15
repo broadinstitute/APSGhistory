@@ -1,0 +1,4 @@
+#c versioned-bio-tools
+#d eagleview: http://www.joybz.com/research/eagleview/
+
+dk_alter PATH /broad/tools/apps/eagleview/EagleView-2.2_Linux32/bin

@@ -1,0 +1,5 @@
+#c versioned-bio-tools
+#d Add fred v2.2.3 to path
+
+dk_alter PATH /broad/tools/apps/fred/fred-2.2.3/openeye/arch/suse-9.1-x86_64/bin
+dk_setdef OE_LICENSE /broad/tools/apps/rocs/license/ralph_oe_license.txt

@@ -1,0 +1,6 @@
+#c versioned-graphics
+#d Netpbm graphics conversion tools v10.33
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/netpbm/10.33/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/netpbm/10.33/man
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/netpbm/10.33/lib

@@ -1,0 +1,5 @@
+#c bio-tools
+#d Add star*P parallel compute engine for MATLAB and python
+
+dk_op -q matlab76
+dk_alter PATH /broad/tools/apps/starp-client/2.6.2/bin

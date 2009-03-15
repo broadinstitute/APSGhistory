@@ -1,0 +1,6 @@
+#c versioned-languages
+#d Add R v2.7.2 to path and /broad/tools R_LIBS 
+
+dk_alter PATH /broad/tools/apps/R-2.7.2/bin:/broad/tools/Linux/x86_64/pkgs/curl/curl-7.19.0/bin
+dk_alter R_LIBS /broad/tools/Linux/x86_64/pkgs/R/2.7.2
+dk_alter LD_LIBRARY_PATH /util/lib/mysql:/broad/tools/apps/R-2.7.2/lib64/R/lib:/broad/tools/Linux/x87_64/pkgs/cairo/lib:/broad/tools/Linux/x86_64/pkgs/pixman/lib:/broad/tools/Linux/x86_64/pkgs/curl/curl-7.19.0/lib:/util/lib

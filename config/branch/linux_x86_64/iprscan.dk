@@ -1,0 +1,7 @@
+#c bio-tools
+#d iprscan v4.3.1; InterPro database v16.0
+
+dk_op -q .perl5
+dk_alter PATH /broad/tools/iprscan/bin
+dk_alter PATH /broad/tools/apps/signalp-3.0
+dk_alter PATH /broad/tools/apps/TMHMM2.0c/bin

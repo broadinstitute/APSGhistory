@@ -1,0 +1,14 @@
+#c versioned-languages
+#d Perl 5.8.9
+
+# Only one active perl dotikit allowed.
+unuse -q `dk_rep '*perl-*'`
+
+# For XML::SAX::Expat
+dk_op -q .expat-2.0.1
+
+# Perl 
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/perl_gcc-4.3.2_5.8.9/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/perl_gcc-4.3.2_5.8.9/lib
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/perl_gcc-4.3.2_5.8.9/man
+

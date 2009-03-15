@@ -1,0 +1,4 @@
+#c bio-tools
+#d Affymetrix Power Tools (version 1.10.0 is default)
+
+dk_op -q apt-1.10.0

@@ -1,0 +1,5 @@
+#c versioned-bio-tools
+#d SOLiD Alignment Browser v1.0.0
+
+dk_alter PATH /usr/java/jdk1.6.0/bin
+dk_alter PATH /prodinfo/prod3pty/solid/browser

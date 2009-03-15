@@ -1,0 +1,9 @@
+#c devel-tools
+#d groovy v 1.6.0
+
+# Clean out old groovys
+unuse -q `dk_rep "*groovy*"`
+
+# Set up groovy.
+dk_alter PATH /broad/tools/NoArch/pkgs/groovy_1.6.0/bin
+dk_alter GROOVY_HOME /broad/tools/NoArch/pkgs/groovy_1.6.0

@@ -1,0 +1,13 @@
+#!/bin/sh
+# alias:  Interpret dk_alias for bash and ksh.  Incoming syntax is supposed
+# to be the same as csh alia.  First argument is the operation ("use" or
+# "unuse"), second is the alias name, and the remaining arguments are
+# the alias definition.  It might be interesting to parse "\!:1" style
+# arguments here, and write an appropriate alias/function pair to carry
+# out the desired operation.
+
+# Output of this program just gets eval'ed by the shell.
+
+op=$1 name=$2
+shift 2
+test "$op" = "use" && echo "alias $name='$@ '" || echo "unalias $name"

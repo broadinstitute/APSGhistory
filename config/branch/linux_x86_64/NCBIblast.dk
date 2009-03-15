@@ -1,0 +1,6 @@
+#c bio-tools
+#d NCBI blast tools v2.2.16 (default)
+# bl2seq    blastclust  copymat   formatdb     impala   megablast  seedtop
+# blastall  blastpgp    fastacmd  formatrpsdb  makemat  rpsblast
+
+dk_op -q NCBIblast-2.2.16

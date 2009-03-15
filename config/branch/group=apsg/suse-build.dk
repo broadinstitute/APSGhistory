@@ -1,0 +1,10 @@
+#c APSG
+#d APSG Build environment.
+
+
+
+dk_op -q .gcc-4.3.3
+dk_op -q .python-2.6.1
+dk_op -q .perl-5.8.9
+
+

@@ -1,0 +1,34 @@
+#c libraries
+#d GTK+ is a highly usable, feature rich toolkit for creating 
+#d graphical user interfaces which boasts cross platform 
+#d compatibility and an easy to use API.
+#d http://www.gtk.org/
+
+# Clear out any versions lingering around
+unuse -q `dk_rep '*gtk+-*'`
+
+# Add dependencies
+dk_op -q .atk-1.24.0
+dk_op -q .cairo-1.8.6
+dk_op -q .fontconfig-2.6.0
+dk_op -q .freetype-2.3.8
+dk_op -q .gettext-0.17
+dk_op -q .glib-2.18.4
+dk_op -q .jasper-1.900.1
+dk_op -q .libpng-1.2.34
+dk_op -q .pango-1.20.5
+dk_op -q .pixman-0.14.0
+
+# ENVIRONMENT Variables
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/gtk+_2.14.7/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/gtk+_2.14.7/share/man
+
+# For dynamic linking at runtime
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gtk+_2.14.7/lib
+
+# For gcc
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gtk+_2.14.7/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/gtk+_2.14.7/include
+
+# Let pkg-config know where we are.
+dk_alter PKG_CONFIG_PATH /broad/tools/Linux/x86_64/pkgs/gtk+_2.14.7/lib/pkgconfig

@@ -1,0 +1,31 @@
+digraph G {
+#size = "7.5,10.0";
+#ratio = fill;
+center = true;
+orientation = portrait;
+rankdir = TB;
+#ranksep=0.25;
+samplepoints = 32;
+#node [fontname=Helvetica, fontsize=6, height=0.2, width=0.4,
+#  style=filled, color=white, shape=ellipse];
+#edge [arrowsize=0.4];
+
+v [ shape=diamond, label="-v?" ];
+q [ shape=diamond, label = "-q?" ];
+isatty [ shape=diamond, label="isatty?" ];
+taciturn [ shape=diamond, label="taciturn?" ];
+err [ shape=diamond, label = "hard\nerror?" ];
+dprint [ shape=box,label = "don't print" ];
+print [ shape=box,label = "print" ];
+
+v -> print [ label="Y"];
+v -> q [label="N"];
+q -> dprint [label="Y"];
+q -> isatty [label="N"];
+isatty -> dprint [label="N"];
+isatty -> taciturn [label="Y"];
+taciturn -> print [label="N"];
+taciturn -> err [label="Y"];
+err -> print[label="Y"];
+err -> dprint[label="N"];
+}

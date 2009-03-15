@@ -1,0 +1,53 @@
+head	1.1;
+access;
+symbols;
+locks
+	busby:1.1; strict;
+comment	@# @;
+
+
+1.1
+date	2005.07.13.20.57.25;	author busby;	state Exp;
+branches;
+next	;
+
+
+desc
+@Flags controlling the printing process in Dotkit.
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@digraph G {
+size = "7.5,10.0";
+#ratio = fill;
+center = true;
+orientation = portrait;
+rankdir = LR;
+#ranksep=0.25;
+samplepoints = 32;
+#node [fontname=Helvetica, fontsize=6, height=0.2, width=0.4,
+#  style=filled, color=white, shape=ellipse];
+#edge [arrowsize=0.4];
+
+v [ shape=diamond, label="-v?" ];
+isatty [ shape=diamond, label="isatty?" ];
+dprint [ shape=box,label = "don't print" ];
+print [ shape=box,label = "print" ];
+q [ shape=diamond, label = "-q?" ];
+masked [ shape=diamond, label = "masked?" ];
+
+v -> print [ label="Y=1"];
+v -> isatty [label="N=0"];
+isatty -> dprint[label="N=0"];
+isatty -> q[label="Y=1"];
+q -> masked[label="Y=1"];
+q -> print[label="N=0"];
+masked -> print[label="Y=1"];
+masked -> dprint[label="N=0"];
+}
+@

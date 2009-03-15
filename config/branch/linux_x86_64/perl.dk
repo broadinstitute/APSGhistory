@@ -1,0 +1,4 @@
+#c languages
+#d use perl v5; set /broad/tools PERL5LIB
+
+dk_op -q .perl5

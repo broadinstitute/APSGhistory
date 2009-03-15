@@ -1,0 +1,5 @@
+=head1 NAME
+
+(Check for the makefile, to verify that pod2man exists.)
+
+=cut

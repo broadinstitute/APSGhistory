@@ -1,0 +1,8 @@
+#c versioned-bio-tools
+#d Staden v1.7.1b
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/staden-linux-x86_64-1-7-1b/linux-x86_64-bin
+dk_setenv STADENROOT /broad/tools/Linux/x86_64/pkgs/staden-linux-x86_64-1-7-1b
+source $STADENROOT/staden.profile
+dk_setenv TCL_LIBRARY $STADLIB/tcl
+dk_setenv TK_LIBRARY $STADLIB/tk

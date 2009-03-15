@@ -1,0 +1,5 @@
+#c IT/Systems
+#d Local user/system scripts and files
+
+dk_alter PATH /broad/tools/NoArch/pkgs/local
+

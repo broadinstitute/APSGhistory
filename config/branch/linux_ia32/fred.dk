@@ -1,0 +1,4 @@
+#c bio-tools
+#d use fred docking search for ligand binding version 2.2.3
+
+dk_op -q .fred-2.2.3

@@ -1,0 +1,4 @@
+#c languages
+#d use R v2.4 (default); set /broad/tools R_LIBS 
+
+dk_op -q R-2.4

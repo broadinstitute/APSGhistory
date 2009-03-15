@@ -1,0 +1,4 @@
+#c test
+#d Test proper variable preservation during recursion
+
+echo "M1: pream=$_dk_pream, a=$_dk_opt_a, q=$_dk_opt_q, v=$_dk_opt_v"

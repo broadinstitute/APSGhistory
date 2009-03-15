@@ -1,0 +1,32 @@
+# DK_SETENV
+if ($?_dk_err) goto _dk_setenvend
+set _dk_noerr
+if ($#_dk_sa == 1) then
+  set _dk_sa = ( $_dk_sa "" )
+  unset _dk_noerr
+endif
+if ( $_dk_op == "use" ) then
+  eval set _dk_already = '$?'$_dk_sa[1]
+  if ($_dk_already) then
+    eval set _dk_value = \"'$'$_dk_sa[1]\"
+    if ("$_dk_value" != "") eval setenv _dk_sev_$_dk_sa[1] \'$_dk_value\'
+  endif
+else # unuse
+  eval set _dk_already = '$?'_dk_sev_$_dk_sa[1]
+  if ($_dk_already) then
+    eval set _dk_value = \"'$'_dk_sev_$_dk_sa[1]\"
+    set _dk_value = `echo \'$_dk_value\'`
+    set _dk_us = "unsetenv _dk_sev_$_dk_sa[1]; $_dk_us"
+    set _dk_us = "setenv $_dk_sa[1] $_dk_value; $_dk_us"
+  else
+    set _dk_us = "unsetenv $_dk_sa[1]; $_dk_us"
+  endif
+endif
+eval setenv $_dk_sa[1] \'$_dk_sa[2]\'
+unset _dk_sa _dk_already _dk_value
+if ($?_dk_noerr) then
+  unset _dk_noerr
+else
+  set status = 1
+endif
+_dk_setenvend:

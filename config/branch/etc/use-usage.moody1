@@ -1,0 +1,305 @@
+#!/bin/sh
+# Usage message for use.
+# Assumes DK_SUBNODE, _dk_inuse, DK_ROOT, DK_NODE are sensible.
+# $1 == 1 if the -v flag was given, 0 otherwise.
+# $2 == 1 if the -a flag was given, 0 otherwise.
+# (Although the meaning of "-a" is "append" in other contexts, here
+# we overload it to mean "show hidden dotkits", like "ls -a".)
+
+# Hand over the job to a user-defined script if desired:
+test -x "$DK_USEUSAGE" && test "$0" != "$DK_USEUSAGE" && exec $DK_USEUSAGE "$@"
+
+PATH=/usr/bin:/bin:/usr/sbin:/sbin
+export PATH
+
+test -x /usr/bin/nawk && AWK=nawk || AWK=awk
+tempfile=/tmp/use.$$
+tempfile2=/tmp/use2.$$
+trap 'rm -f $tempfile $tempfile2' 0 1 2
+
+vflag=$1 # Verbose output?
+aflag=$2 # Show hidden dotkits?
+
+f_dirs()
+{
+  sep="${1:-/}"
+  _dk_sn="`echo $DK_SUBNODE | tr : ' '`"
+  _dk_n="`echo $HOME/.kits $DK_NODE $DK_ROOT | tr : ' '`"
+  for i in $_dk_n
+  do
+    for d in $_dk_sn
+    do test -d "$i/$d" && echo "$i$sep$d"
+    done
+  done
+}
+
+f_pkgs()
+{
+  for i in `f_dirs`
+  do
+    foo=`echo $i/*.dk`
+    test $i/"*.dk" != "$foo" && echo $i/*.dk
+    if test "$aflag" = 1; then # Also show hidden dotkits.
+      foo=`echo $i/.*.dk`
+      test $i/".*.dk" != "$foo" && echo $i/.*.dk
+    fi
+  done
+}
+
+f_pkg_summary()
+{
+  $AWK '{
+    if( match($0, /^[ 	]*#[ 	]*/) ){
+      $0 = substr($0, RLENGTH+1);
+      if(FNR == 1){
+        indocblock = 1
+        pk = FILENAME
+        sub(/.*\//, "", pk); sub(/\.dk$/, "", pk)
+        ncat = 0
+        if( match($0,/^[0-9]:[ 	]*/) == 1){
+          ncat = substr($0,1,1);
+          $0 = substr($0,RLENGTH+1);
+        }
+        if( already_seen(pk, ncat)){
+          close(FILENAME);
+        }else{
+          init(pk, ncat);
+        }
+      } else if ( indocblock ) {
+        addto(pk, ncat);
+      }
+    } else { indocblock = 0 }
+  }
+  
+  function already_seen(pk, n){
+    if      (n == 0){ return(pk in misc); }
+    else if (n == 1){ return(pk in syst); }
+    else if (n == 2){ return(pk in tpso); }
+    else if (n == 3){ return(pk in proj); }
+    else if (n == 4){ return(pk in loca); }
+    else if (n == 5){ return(pk in pers); }
+    else if (n == 9){ return(pk in subs); }
+  }
+
+  function init(pk, n){
+    if      (n == 0){ ++nmisc; misc[pk] = $0; }
+    else if (n == 1){ ++nsyst; syst[pk] = $0; }
+    else if (n == 2){ ++ntpso; tpso[pk] = $0; }
+    else if (n == 3){ ++nproj; proj[pk] = $0; }
+    else if (n == 4){ ++nloca; loca[pk] = $0; }
+    else if (n == 5){ ++npers; pers[pk] = $0; }
+    else if (n == 9){ ++nsubs; subs[pk] = $0; }
+  }
+  
+  function addto(pk, n){
+    if      (n == 0){ misc[pk] = misc[pk] "#" $0; }
+    else if (n == 1){ syst[pk] = syst[pk] "#" $0; }
+    else if (n == 2){ tpso[pk] = tpso[pk] "#" $0; }
+    else if (n == 3){ proj[pk] = proj[pk] "#" $0; }
+    else if (n == 4){ loca[pk] = loca[pk] "#" $0; }
+    else if (n == 5){ pers[pk] = pers[pk] "#" $0; }
+    else if (n == 9){ subs[pk] = subs[pk] "#" $0; }
+  }
+  
+  function prcat(catname, arr,    n, A, i, p, j, m, a){
+    for (p in arr) A[++n] = p;
+    isort(A,n);
+    printf("%s::\n", catname);
+    for(i=1; i<=n; i++) {
+      p = A[i];
+      printf("%12s ", p);
+      m = split(arr[p], a, "#");
+      printf("%s\n", a[1]);
+      for(j=2;j<=m;j++){ printf("              %s\n", a[j]); }
+    }
+    print "";
+  }
+
+  function isort(A,n,  i,j,t){
+    for(i=2; i<=n; i++)
+      for(j=i; j>1 && A[j-1] > A[j]; j--){
+        t = A[j-1]; A[j-1] = A[j]; A[j] = t;
+      }
+  }
+  
+  END {
+    if(npers) { prcat("Personal dotkits", pers); }
+    if(nproj) { prcat("Project-specific kits", proj); }
+    if(nloca) { prcat("Locally developed apps", loca); }
+    if(ntpso) { prcat("3rd party (commercial, open source) software", tpso); }
+    if(nsyst) { prcat("Vendor-supplied software", syst); }
+    if(nmisc) { prcat("Miscellaneous packages", misc); }
+    if(nsubs) { prcat("Sub-site access packages", subs); }
+  }' `f_pkgs` $DK_ROOT/..dk > $tempfile &
+}
+
+f_pkg_summary2()
+{
+  for i in `f_dirs '->'`
+  do
+    d=`echo $i | sed 's:->:/:'`
+    echo "## Node->Subnode: $i"
+    (cd $d && ls -C *.dk .*.dk 2>/dev/null)
+    echo ""
+  done | expand | sed 's/\.dk//g' > $tempfile2 &
+}
+
+f_pkg_summary4()
+{
+  $AWK '
+  BEGIN {
+    oldcats[0] = "Miscellaneous packages"
+    oldcats[1] = "Vendor-supplied software"
+    oldcats[2] = "3rd party (commercial, open source) software"
+    oldcats[3] = "Project-specific kits"
+    oldcats[4] = "Locally developed apps"
+    oldcats[5] = "Personal dotkits"
+    oldcats[9] = "Sub-site access packages"
+  }
+
+  {
+    if (ARGIND > lastARGIND) {
+      lastARGIND = ARGIND;
+      pk = FILENAME;
+      sub(/.*\//, "", pk); sub(/\.dk$/, "", pk);
+      if (pk in seen) { close(FILENAME); }
+      else { seen[++npkgs] = pk; }
+    }
+
+    if( match($0, /^[ 	]*#c[ 	][ 	]*/) ){
+      pkgs[npkgs] = sprintf("%s##%s%s", substr($0,RLENGTH+1), pk, pkgs[npkgs]);
+    } else if ( match($0, /^[   ]*#d[ 	][   ]*/) ){
+      pkgs[npkgs] = sprintf("%s##%s", pkgs[npkgs], substr($0, RLENGTH+1));
+    } else if( match($0,/^#[0-9a-zA-Z\/]*:/) ){
+      catname = substr($0,2,RLENGTH-2);
+      if( match($0,/^#[0-9]:/) ) catname = oldcats[catname];
+      catname = sprintf("%s##%s", catname, pk);
+      match($0,/^#[0-9a-zA-Z\/]*:[ 	]*/);
+      desc = substr($0,RLENGTH+1);
+      pkgs[npkgs] = sprintf("%s##%s", catname, desc);
+    }
+  }
+  
+  function isort(A,n,  i,j,t){
+    for(i=2; i<=n; i++)
+      for(j=i; j>1 && A[j-1] > A[j]; j--){
+        t = A[j-1]; A[j-1] = A[j]; A[j] = t;
+      }
+  }
+  
+  END {
+    isort(pkgs,npkgs);
+    lastcat=""
+    for(i=1; i<=npkgs; i++) {
+      num = split(pkgs[i],a,"##");
+      catname = a[1];
+      pkgname = a[2];
+      desc = a[3];
+      if (catname != lastcat) {
+        printf("%s ----------\n", catname);
+        lastcat = catname;
+      }
+      printf("  %12s - %s\n", pkgname, desc);
+      for(j=4;j<=num;j++) {
+        printf("                  %s\n", a[j]);
+      }
+    }
+    print "";
+  }' `f_pkgs` $DK_ROOT/..dk > $tempfile &
+}
+
+# Print message, typically yes/no question, and stop for response.
+# Default answer is $2 (typically 'y' or 'n').
+f_confirm()
+{
+  test -t 1 || return 0 # If stdout is not a tty, return quietly.
+  echo "$1" | tr -d '\012' # (Portable echo -n)
+  read answer
+  test -z "$answer" && answer=$2
+  case "$answer" in
+    [yY]*) return 0;;
+        *) return 1;;
+  esac
+}
+
+#################################################
+# Verbose output:
+if test "$vflag" = 1; then
+  ( echo "       *** Contents of all dotkits for this platform: ***"
+  for i in `f_pkgs`; do
+    echo \
+"============================================================================="
+    echo "KIT: $i"
+    cat $i
+    echo
+  done ) 2>/dev/null
+  exit 0
+fi
+
+f_maintainer()
+{
+  if test -f $DK_ROOT/etc/DK_MAINTAINER; then
+  cat << EOF
+=========================  QUESTIONS?  ===========================
+Problems or questions?  Please contact the Dotkit site maintainer:
+`cat $DK_ROOT/etc/DK_MAINTAINER`
+EOF
+  fi
+}
+
+f_news()
+{
+  if test -f $DK_ROOT/etc/dk-news; then
+  cat << EOF
+=========================  DOTKIT NEWS  =====================================
+`cat $DK_ROOT/etc/dk-news`
+EOF
+  fi
+}
+
+# First argument is the value of the "-a" flag, 0 or 1.  Then follows
+# a list of package names.
+f_inuse()
+{
+  cat << EOF
+===============
+Packages in use
+---------------
+EOF
+  $AWK 'BEGIN {
+    blanks = "                                                             "
+    for(i=1;i<ARGC-1;i++){
+      s = ARGV[i+1]
+      nm = substr(s,1,length(s)-2)
+      indent = substr(s,length(s),1)
+      if( nm !~ /^\../ || ARGV[1] == 1 )
+        printf("%s%s\n", substr(blanks, 1, 2*indent), nm)
+    }
+  }' $aflag $*
+}
+
+##############
+# Usual output
+cat << EOF
+Usage:
+    use [-aqv] [pkg ...]
+  unuse [-aqv] [pkg ...]
+===========================
+For complete documentation:
+  man use
+For details about a particular dotkit, type "use view".
+EOF
+f_maintainer
+f_news
+f_inuse ${_dk_inuse:-NONE.0}
+f_pkg_summary4 # Construct package summary in the background.
+f_confirm "View available packages for this platform? y[n] " "n" || exit 0
+
+wait $!
+test -t 1 && COMM=${PAGER:-more} || COMM=cat
+f_pkg_summary2 # Construct detailed package summary in the background.
+$COMM $tempfile
+
+f_confirm "Show details of your Dotkit search path? y[n] " "n" || exit 0
+wait $!
+$COMM $tempfile2

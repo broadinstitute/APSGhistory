@@ -1,0 +1,11 @@
+#c applications
+#d Primer3 is a widely used program for designing PCR 
+#d primers (PCR = "Polymerase Chain Reaction"). PCR is 
+#d an essential and ubiquitous tool in genetics and 
+#d molecular biology. Primer3 can also design hybridization 
+#d probes and sequencing primers.
+
+unuse -q `dk_rep "Primer3*"`
+
+dk_op -q .primer3-2.0.0-alpha
+

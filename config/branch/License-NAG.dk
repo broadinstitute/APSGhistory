@@ -1,0 +1,5 @@
+#c licenses
+#d NAG license file
+
+dk_alter LM_LICENSE_FILE /usr/lib/nag/license.dat
+

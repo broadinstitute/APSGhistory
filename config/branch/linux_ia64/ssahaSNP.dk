@@ -1,0 +1,4 @@
+#c bio-tools
+#d ssahaSNP toolset  
+
+dk_alter PATH /broad/tools/src/ssahaSNP/SSAHA_ia64

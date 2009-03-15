@@ -1,0 +1,10 @@
+#c arachne-1.15
+#d Setup for executing arachne v1.15 binaries
+
+# Dependencies
+dk_op -q .boost-1.38.0
+dk_op -q .gcc-4.3.3
+
+# Environment
+dk_alter PATH /wga/scr1/ArachneReleases/ReleaseArachne-1-15/bin
+dk_setenv SOLEXA_PIPELINE_DIR /slxa/pipelineOutput/farm

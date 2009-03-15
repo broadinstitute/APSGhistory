@@ -1,0 +1,4 @@
+#!/bin/ksh
+
+#dot -Tps $1 > ${1%.dot}.ps
+~/$SYS_TYPE/gv185/bin/dot -Tps $1 > ${1%.dot}.ps

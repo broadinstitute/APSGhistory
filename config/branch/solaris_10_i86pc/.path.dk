@@ -1,0 +1,19 @@
+#c IT/Systems
+#d Set basic system path on Solaris
+
+# Basic PATH
+dk_setenv PATH /usr/bin:/bin
+
+# Taken from https://www.broad.mit.edu/twiki/bin/view/Systems/SolarisPathHowTo
+dk_alter PATH /usr/xpg4/bin
+dk_alter PATH /usr/sfw/bin
+dk_alter PATH /opt/csw/bin
+dk_alter PATH /usr/local/bin
+
+
+# Based on https://www.broad.mit.edu/twiki/bin/view/Systems/SolarisPathHowTo
+dk_alter LD_LIBRARY_PATH  /usr/local/lib:/usr/csw/lib:/usr/sfw/lib:/usr/xpg4/lib
+dk_alter LIBRARY_PATH  /usr/local/lib:/usr/csw/lib:/usr/sfw/lib:/usr/xpg4/lib
+dk_alter C_INCLUDE_PATH /usr/local/include:/usr/csw/include:/usr/sfw/include:/usr/xpg4/include
+
+

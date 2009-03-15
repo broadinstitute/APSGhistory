@@ -1,0 +1,13 @@
+#c libraries
+#d Expat 2.0.1
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/expat_2.0.1/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/expat_2.0.1/man
+
+# For dynamic linking at runtime
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/expat_2.0.1/lib
+
+# For gcc
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/expat_2.0.1/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/expat_2.0.1/include
+

@@ -1,0 +1,17 @@
+#c test
+#d A: Basic operation of dk_setenv and dk_alter.
+
+dk_setenv foo1 bar1
+dk_setenv foo2 bar2
+
+dk_alter Foo1 Bar1
+dk_alter Foo1 Bar2
+dk_alter Foo1 $foo1
+dk_alter Foo1 $foo2
+echo "Leaving A, foo1=$foo1 (bar1 is correct)"
+echo "Leaving A, foo2=$foo2 (bar2 is correct)"
+echo "Leaving A, Foo1=$Foo1"
+echo "(bar2:bar1:Bar2:Bar1 is correct, or nil if unuse, or reversed if -a)"
+echo "A: _dk_rl=$_dk_rl"
+echo "A: _dk_self=$_dk_self"
+echo "A: _dk_inuse=$_dk_inuse"
