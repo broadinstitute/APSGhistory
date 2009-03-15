@@ -1,5 +1,0 @@
-#c bio-tools
-#d Mauve v2.1.1  
-
-dk_alter PATH /broad/tools/apps/mauve_2.1.1
-dk_alter PATH /broad/tools/apps/mauve_2.1.1/linux-i386

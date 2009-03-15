@@ -1,4 +1,0 @@
-#c languages
-#d use version 7.5 of the MATLAB language
-
-dk_alter PATH /broad/tools/apps/matlab75/bin

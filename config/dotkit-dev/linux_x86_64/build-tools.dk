@@ -1,9 +1,0 @@
-#c groups
-#d Current GCC and build tools
-
-# Latest binutils
-dk_op -q binutils-2.19
-
-# Latest GCC
-dk_op -q GCC-4.3
-

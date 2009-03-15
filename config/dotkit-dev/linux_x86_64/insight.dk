@@ -1,4 +1,0 @@
-#c devel-tools
-#d insight v6.6  
-
-dk_alter PATH /broad/tools/Linux/x86_64/insight/bin

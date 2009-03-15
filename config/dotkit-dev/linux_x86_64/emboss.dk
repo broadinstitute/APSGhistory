@@ -1,4 +1,0 @@
-#c bio-tools
-#d emboss suite v5.0 (default)
-
-dk_op -q emboss5 

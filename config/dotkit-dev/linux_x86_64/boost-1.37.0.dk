@@ -1,5 +1,0 @@
-#c libraries
-#d BOOST http://www.boost.org/
-
-dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/boost-1.37.0/lib
-

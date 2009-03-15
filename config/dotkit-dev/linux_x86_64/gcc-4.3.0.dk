@@ -1,5 +1,0 @@
-#c versioned-languages
-#d Add gcc v4.3.0 to path and LD_LIBRARY_PATH
-
-dk_alter PATH /util/gcc-4.3.0/bin
-dk_alter LD_LIBRARY_PATH /util/gcc-4.3.0/lib64:/util/gcc-4.3.0/lib

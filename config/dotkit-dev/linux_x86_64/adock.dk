@@ -1,4 +1,0 @@
-#c bio-tools
-#d use autodock version 3.0 small molecule docking software
-
-dk_op -q .adock-3.0

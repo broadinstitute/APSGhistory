@@ -1,5 +1,0 @@
-#c versioned-bio-tools
-#d Add fred v2.2.3 to path
-
-dk_alter PATH /broad/tools/apps/adock-3.0/x86_64/bin
-dk_alter LD_LIBRARY_PATH /broad/tools/apps/intel/x86_64/cc/10.0.023/lib

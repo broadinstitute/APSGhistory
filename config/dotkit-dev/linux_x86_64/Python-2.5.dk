@@ -1,6 +1,0 @@
-#c languages
-#d Python is a dynamic object-oriented programming language.
-#d http://www.python.org/
-#d Latest release in 2.5 series.
-
-dk_op -q python-2.5.3

@@ -1,5 +1,0 @@
-#c versioned-bio-tools
-#d Add rocs v2.3.1 to path
-
-dk_alter PATH /broad/tools/apps/eon/eon-2.0.1/openeye/arch/suse-9.1-i586/bin
-dk_setdef OE_LICENSE /broad/tools/apps/rocs/license/ralph_oe_license.txt

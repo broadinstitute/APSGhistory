@@ -1,5 +1,0 @@
-#c versioned-bio-tools
-#d Add Affymetrix Power Tools version 1.10.0 to the PATH
-
-dk_alter PATH /broad/tools/apps/affymetrix/apt-1.10.0-20080710-amd64-pc-linux/bin
-

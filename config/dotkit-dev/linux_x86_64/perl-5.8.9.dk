@@ -1,8 +1,0 @@
-#c versioned-languages
-#d Perl 5.8.9
-
-echo "The perl-5.8.9 dotkit is deprecated. Please 'use Perl-5.8'"
-echo "to always get the latest APSG supported Perl 5.8.x release."
-
-dk_op -q .perl-5.8.9
-

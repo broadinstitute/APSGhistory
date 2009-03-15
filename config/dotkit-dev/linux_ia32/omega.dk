@@ -1,4 +1,0 @@
-#c bio-tools
-#d use omega conformer generation software version 2.2.1
-
-dk_op -q .omega-2.2.1

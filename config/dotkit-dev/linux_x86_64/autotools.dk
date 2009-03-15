@@ -1,7 +1,0 @@
-#c versioned-languages
-#d Add autoconf, automake, libtool, and m4 to PATH
-
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/m4_1.4.12/bin
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/autoconf_2.63/bin
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/automake_1.9.6/bin
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/libtool_2.2.6/bin

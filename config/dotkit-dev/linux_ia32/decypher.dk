@@ -1,4 +1,0 @@
-#c bio-tools
-#d DeCypher command-line tools for Linux
-
-dk_alter PATH /broad/tools/apps/decypher/bin

@@ -1,7 +1,0 @@
-#c languages
-#d use python v2.4.2 (default); set /broad/tools PYTHONPATH
-
-# Clear out any python versions lingering around
-unuse -q `dk_rep 'python*'`
-
-dk_op -q python-2.4.2

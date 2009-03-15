@@ -1,5 +1,0 @@
-#c versioned-bio-tools
-#d prepend path to bioPerl v1.5.2 to default /broad/tools PERL5LIB
-
-dk_alter PATH /util/bin
-dk_alter PERL5LIB /broad/tools/Linux/x86_64/lib/perl5/site_perl/bioPerl-1.5.2:/broad/tools/Linux/x86_64/lib/perl5:/broad/tools/Linux/x86_64/lib/perl5/site_perl

@@ -1,4 +1,0 @@
-#c languages
-#d use python v2.4.2 (default); set /broad/tools PYTHONPATH
-
-dk_op -q java-sun-jdk-1.6.0-11.dk

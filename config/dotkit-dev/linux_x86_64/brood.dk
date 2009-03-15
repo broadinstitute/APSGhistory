@@ -1,4 +1,0 @@
-#c bio-tools
-#d use brood bioisostere analysis software version 1.1.1
-
-dk_op -q .brood-1.1.1

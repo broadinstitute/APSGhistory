@@ -1,7 +1,0 @@
-#c versioned-bio-tools
-#d set up environment for 454 xlr processing
-
-dk_alter PATH /data/matlab/work/Bin
-dk_alter LD_LIBRARY_PATH /data/matlab/7p2/mcr/v72/runtime/glnx86:/data/matlab/7p2/mcr/v72/sys/os/glnx86:/data/matlab/7p2/mcr/v72/sys/java/jre/glnx86/jre1.5.0/lib/i386/native_threads:/data/matlab/7p2/mcr/v72/sys/java/jre/glnx86/jre1.5.0/lib/i386/server:/data/matlab/7p2/mcr/v72/sys/java/jre/glnx86/jre1.5.0/lib/i386
-dk_setenv XAPPLRESDIR /data/matlab/7p2/mcr/v72/X11/app-defaults
-dk_setenv JAVAHOME /usr/java/java1.5

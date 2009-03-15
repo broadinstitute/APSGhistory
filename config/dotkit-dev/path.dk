@@ -1,3 +1,0 @@
-setenv PATH /usr/bin:/bin:/usr/X11R6/bin:/usr/bin/X11
-setenv LD_LIBRARY_PATH 
-

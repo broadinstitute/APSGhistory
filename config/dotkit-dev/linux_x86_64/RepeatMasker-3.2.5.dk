@@ -1,4 +1,0 @@
-#c versioned-bio-tools
-#d RepeatMasker v3.2.5 and RepBase RELEASE 20080611 
-
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/repeatmasker3.2.5

@@ -1,7 +1,0 @@
-#c system
-#d Common aliases
-
-dk_alias finger "finger -M"
-dk_alias quota "quota -sQ"
-
-

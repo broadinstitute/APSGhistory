@@ -1,5 +1,0 @@
-#c versioned-languages
-#d Add gcc v4.3.0 to path and LD_LIBRARY_PATH
-
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/gcc_4.3.2/bin
-dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gcc_4.3.2/lib64:/broad/tools/Linux/x86_64/pkgs/gcc_4.3.2/lib

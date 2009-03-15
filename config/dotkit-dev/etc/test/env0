@@ -1,5 +1,0 @@
-#!/bin/sh
-# Create an initial recording of the environment
-user=${USER:-$LOGNAME}
-/bin/rm -f /tmp/env_${user}_*
-../envdiff -test

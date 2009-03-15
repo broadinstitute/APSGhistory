@@ -1,8 +1,0 @@
-#c versioned-languages
-#d Python 3.0
-
-# Clear out any python versions lingering around
-unuse -q `dk_rep 'python*'`
-
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/python_3.0/bin
-dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/python_3.0/lib

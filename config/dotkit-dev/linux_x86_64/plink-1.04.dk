@@ -1,4 +1,0 @@
-#c versioned-bio-tools
-#d Add plink version 1.04 to path
-
-dk_alter PATH /broad/tools/apps/plink/1.04/plink-1.04-x86_64

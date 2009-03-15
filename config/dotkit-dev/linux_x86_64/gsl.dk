@@ -1,6 +1,0 @@
-#c libraries
-#d Gnu Scientific Library
-#d The GNU Scientific Library (GSL) is a numerical library for C and C++ programmers.
-#d http://www.gnu.org/software/gsl/
-
-dk_op -q .gsl-1.12.dk

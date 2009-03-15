@@ -1,4 +1,0 @@
-#c shell/dotkit
-#d The Dotkit package - for man page access.  (Try "man dotkit".)
-
-dk_alter MANPATH $DK_ROOT/man

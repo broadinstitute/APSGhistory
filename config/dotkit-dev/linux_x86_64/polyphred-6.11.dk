@@ -1,4 +1,0 @@
-#c versioned-bio-tools
-#d polyphred v6.11 to path
-
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/polyphred/6.11

@@ -1,5 +1,0 @@
-#c applications
-#d MPIBlast: Latest version of mpiblast
-
-dk_op -q mpiblast-1.5.0
-

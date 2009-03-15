@@ -1,4 +1,0 @@
-#c bio-tools
-#d gnuplot v4.2.2  
-
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/gnuplot/bin

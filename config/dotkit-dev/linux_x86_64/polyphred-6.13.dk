@@ -1,4 +1,0 @@
-#c versioned-bio-tools
-#d polyphred v6.13a1 debug version to path
-
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/polyphred/6.13/bin

@@ -1,5 +1,0 @@
-#c versioned-bio-tools
-#d Add arachne v1.3 to path
-
-dk_alter PATH /wga/scr8/jmaguire/releases/ReleaseArachne-1-3/bin_ia64_suse
-dk_setenv SOLEXA_PIPELINE_DIR /seq/solexaproc/pipelineOutput

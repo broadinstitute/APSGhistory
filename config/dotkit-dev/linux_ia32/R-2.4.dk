@@ -1,5 +1,0 @@
-#c versioned-languages
-#d Add R v2.4 to path and /broad/tools R_LIBS
-
-dk_alter PATH /util/R-2.4.0/bin
-dk_alter R_LIBS /broad/tools/Linux/i686/pkgs/R/2.4.0

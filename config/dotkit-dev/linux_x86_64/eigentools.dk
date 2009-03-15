@@ -1,5 +1,0 @@
-#c bio-tools
-#d EIGENTOOLS-2.0 (pca, pcatoy, eigenstrat, convertf, smartpca, eigenstratQTL, twstats)
-
-dk_alter PATH /broad/tools/apps/eigentools-2.0
-dk_alter LD_LIBRARY_PATH /broad/tools/lib64

@@ -1,4 +1,0 @@
-#c bio-tools
-#d polyphred suite v6.02 (default)
-
-dk_op -q polyphred-6.02
