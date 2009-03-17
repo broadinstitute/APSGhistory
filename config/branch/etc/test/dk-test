@@ -16,15 +16,27 @@ whereis()
 # Strip trailing newline from echo.
 echon() { echo "$@" | tr -d '\012'; }
 
+# For a new test, or when the reference file changes due to an expected
+# change in a test, the procedure is to remove all ref/ files for the
+# given test.  Then run do-test, which will create 4 new reference files,
+# one for each shell.  If they are all supposed to be the same, remove
+# all except the ref/*.ksh version.  Otherwise, leave the ref/*.<shell>
+# file as required for proper testing.
 # $1=testname, $2=shell
 compare()
 {
-  if test -f ref/$1.ksh; then
+  # First look for a reference created by the same shell.
+  if test -f ref/$1.$2; then
+    diff ref/$1.$2 new/$1.$2 > dif/$1.$2 && echon "ok ($2) " ||
+      { echo "$2: Differences noted:  See dif/$1.$2.)"; return 1; }
+  # Then look for the ksh reference file.
+  elif test -f ref/$1.ksh; then
     diff ref/$1.ksh new/$1.$2 > dif/$1.$2 && echon "ok ($2) " ||
       { echo "$2: Differences noted:  See dif/$1.$2.)"; return 1; }
+  # If neither is found, create a reference file for this shell.
   else
-    echo "(Created reference output for $1)"
-    mv new/$1.ksh ref/$1.ksh
+    echo "(Created ($2) reference output for $1)"
+    mv new/$1.$2 ref/$1.$2
   fi
 }
 
@@ -40,13 +52,15 @@ test2()
   echo "###"
 }
 
-# $1=testname
+# $1=testname, $2=basetestname, $3+ =shell(s)
 test1()
 {
-  test2 . ksh -c $1 > new/$2.ksh
-  test2 . bash -c $1 > new/$2.bash
-  test2 source csh -fc $1 > new/$2.csh
-  test2 source tcsh -fc $1 > new/$2.tcsh
+  testname=$1 base=$2; shift 2
+  for i
+  do
+    [ $i = csh -o $i = tcsh ] && { f=fc; so=source; } || { f=c; so=. ; }
+    test2 $so $i -$f $testname > new/$base.$i
+  done
 }
 
 
@@ -54,12 +68,13 @@ test1()
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin
 export PATH
 
+shells=${TESTSHELL:-"csh tcsh bash ksh"}
 tests=${1:-*.t}
 for t in $tests; do
   n=`basename $t .t`
-  test1 $t $n
+  test1 $t $n $shells
   echon "$n: "
-  for s in ksh bash csh tcsh
+  for s in $shells
   do
     compare $n $s
   done

@@ -1,0 +1,8 @@
+#c shell
+#d Put '.' in your PATH, first by default, or last with use -a.
+
+#h This package is specially handled, so that the '.' always floats
+#h at the beginning or the end of your PATH, even as other packages
+#h are loaded or unloaded.
+
+dk_alter PATH .

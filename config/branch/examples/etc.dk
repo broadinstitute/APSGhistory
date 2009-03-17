@@ -1,0 +1,5 @@
+#c shell
+#d Add /etc to PATH, and /usr/etc, if it exists.
+
+dk_alter PATH /etc
+dk_test -d /usr/etc && dk_alter PATH /usr/etc

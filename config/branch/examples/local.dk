@@ -1,0 +1,5 @@
+#c shell
+#d Add /usr/local/{bin,man} to PATH, MANPATH
+
+dk_alter PATH /usr/local/bin
+dk_alter MANPATH /usr/local/man

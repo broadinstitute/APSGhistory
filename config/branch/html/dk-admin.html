@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NAME</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#installing_dotkit_at_a_new_site">Installing Dotkit at a new site</a></li>
+		<li><a href="#supporting_the_dotkit_user">Supporting the Dotkit user</a></li>
+		<li><a href="#adding,_changing,_or_removing_a_dotkit">Adding, changing, or removing a dotkit</a></li>
+		<li><a href="#updating_the_man_or_html_pages">Updating the man or html pages</a></li>
+		<li><a href="#running_the_test_suite">Running the test suite</a></li>
+		<li><a href="#adding_an_motd_(message_of_the_day)">Adding an MOTD (message of the day)</a></li>
+		<li><a href="#preening_the_permission_bits">Preening the permission bits</a></li>
+		<li><a href="#making_a_tar_ball">Making a tar ball</a></li>
+	</ul>
+
+	<li><a href="#environment">ENVIRONMENT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Basic task descriptions for the Dotkit administrator.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This man page gives instructions to the administrator,
+covering several common situations.</p>
+<p>
+</p>
+<h2><a name="installing_dotkit_at_a_new_site">Installing Dotkit at a new site</a></h2>
+<p>Here are a couple of basic pre-install questions to answer:</p>
+<p>(1) Who will administer Dotkit for your site?
+If there is more than one person,
+it makes sense to set up a Unix group for Dotkit maintainers.</p>
+<p>(2) Will any or all of them have root privileges?
+This is not a requirement for Dotkit.
+If you do use root, then group ownership of your Dotkit distribution
+is less of an issue.
+If you don't, it becomes more important.
+(See <em>Preening the permission bits</em> below.</p>
+<ol>
+<li><strong><a name="item_unpack_the_distribution_tar_file%2e">Unpack the distribution tar file.</a></strong><br />
+</li>
+One approach is to choose a location for dotkit that is visible to all users,
+typically an NFS file system mounted on every machine at your site.
+Putting all your eggs in one basket requires a reliable basket.
+<p>Another approach is to put a copy of Dotkit on each host,
+at, say, <em>/usr/dotkit</em> or <em>/etc/dotkit</em>.
+Then change one master copy, and utilize a synchronizing tool
+to push or pull changes to each host.
+This requires more work, but may provide better service in
+a large network.</p>
+<p>For the sake of example, let's put Dotkit at <em>/foo</em>:</p>
+<pre>
+  % gunzip -c dotkit.tgz | (cd /foo; tar xf -)</pre>
+<p></p>
+<li><strong><a name="item_set_the_value_of_dk_root_in_your_current_shell_pro">Set the value of DK_ROOT in your current shell process.</a></strong><br />
+</li>
+<pre>
+  % setenv DK_ROOT /foo/dotkit # csh or tcsh
+  % export DK_ROOT=/foo/dotkit # bash or ksh</pre>
+<li><strong><a name="item_make_necessary_soft_links%2e">Make necessary soft links.</a></strong><br />
+</li>
+<pre>
+  % cd /foo/dotkit/etc
+  % make links</pre>
+<li><strong><a name="item_format_the_man_pages_and_html_documents%2e">Format the man pages and html documents.</a></strong><br />
+</li>
+<pre>
+  % cd /foo/dotkit/man
+  % make</pre>
+<li><strong><a name="item_run_the_test_suite%2e">Run the test suite.</a></strong><br />
+</li>
+<pre>
+  % cd /foo/dotkit/etc/test
+  % make
+  mutex1: ok (ksh) ok (bash) ok (csh) ok (tcsh) 
+  recursive1: ok (ksh) ok (bash) ok (csh) ok (tcsh) 
+   [ etc. ]</pre>
+<p>All the tests should complete without error for each shell
+you support.</p>
+<li><strong><a name="item_write_dotkits_to_define_your_site%2e">Write dotkits to define your site.</a></strong><br />
+</li>
+If your site is named <em>foo</em>,
+the convention for its Dotkit node name is <em>site=foo</em>.
+It is also conventional to locate the <em>site=foo</em>
+directory under <em>$DK_ROOT</em>,
+but that is not a requirement.
+<p></p>
+<li><strong><a name="item_add_a_maintainer_file%2e">Add a maintainer file.</a></strong><br />
+</li>
+Create a one line file, $DK_ROOT/etc/DK_MAINTAINER, with
+your name and email address.
+This is read and output by the <em>use-usage</em> script,
+also in the <em>etc</em> subdirectory.
+<p></p>
+<li><strong><a name="item_add_a_site_node_definition_file%2e">Add a site node definition file.</a></strong><br />
+</li>
+Create a one line file, $DK_ROOT/etc/DK_NODE.
+It contains one or more colon separated pathnames
+to your site specific Dotkit nodes.
+<p></p>
+<li><strong><a name="item_verify_that_etc%2fsystype_produces_correct_results">Verify that <em>etc/systype</em> produces correct results.</a></strong><br />
+</li>
+Each platform architecture at your site is expected to
+have an associated <em>SYS_TYPE</em>.
+The value of that environment variable is used by Dotkit
+to find kits that are specific to the given platform.
+<p>If $SYS_TYPE is pre-defined before initializing Dotkit,
+that value is accepted.
+Otherwise, <em>$DK_ROOT/init</em> calls the script 
+<em>$DK_ROOT/etc/systype</em>,
+which attempts to compute an appropriate value for <em>SYS_TYPE</em>.</p>
+<p>If you have another system in place to define <em>SYS_TYPE</em>,
+such as setting it in <em>/etc/profile</em>,
+this step may not be necessary.
+Dotkit will still work even if <em>SYS_TYPE</em> is unknown,
+but it obviously will not find any <em>SYS_TYPE</em>-specific kits.</p>
+<p></p></ol>
+<p>
+</p>
+<h2><a name="supporting_the_dotkit_user">Supporting the Dotkit user</a></h2>
+<p>A variety of problems may be presented,
+some more common than others
+Here is a list of things to check,
+that will likely make the solution clear for the common issues.</p>
+<ol>
+<li><strong><a name="item_check_the_variables_related_to_dotkit%3a">Check the variables related to Dotkit:</a></strong><br />
+</li>
+Generate a list of Dotkit-related
+environment and shell variables as follows:
+<pre>
+  (env;set) | grep -i dk | sort -u</pre>
+<p>Five variables are essential:</p>
+<ul>
+<li><strong><a name="item_dk_root%3a_the_location_where_dotkit_is_installed%">DK_ROOT: The location where Dotkit is installed.</a></strong><br />
+</li>
+<li><strong><a name="item_dk_node%3a_zero_or_more_additional_nodes_to_search">DK_NODE: Zero or more additional nodes to search.</a></strong><br />
+</li>
+<li><strong><a name="item_dk_subnode%3a_the_sub%2ddirectories_within_a_node%">DK_SUBNODE: The sub-directories within a node.</a></strong><br />
+</li>
+<li><strong><a name="item__dk_rl%3a_the_current_recursion_level%2e">_dk_rl: The current recursion level.</a></strong><br />
+</li>
+The last variable (_dk_rl) should always have a value of -1
+when your shell is at the prompt.
+If it does not,
+the most common cause is a keyboard
+interrupt (Control-C) while the shell
+is in the process of reading a dotkit.
+Typing ``use'' with no arguments should restore the correct value.
+<p></p>
+<li><strong><a name="item__dk_inuse%3a_list_of_packages_currently_in_use%2e">_dk_inuse: List of packages currently in use.</a></strong><br />
+</li>
+This is a whitespace-separated list of the packages that
+have been used.
+The trailing digit on each name is the recursion level
+at which the package was encountered.
+<p></p></ul>
+<p>Some additional Dotkit-related variables may also appear.
+<em>_dk_sev_FOO</em> is the saved value of an environment
+variable named <em>FOO</em>,
+which was reset by some package as it loaded.
+The saved value will be restored to <em>FOO</em>
+(and <em>_dk_sev_FOO</em> will disappear)
+when the package is unused.</p>
+<li><strong><a name="item_verify_they_are_finding_the_expected_dotkit%2e">Verify they are finding the expected dotkit.</a></strong><br />
+</li>
+Run <em>reuse -v foo</em>, where <em>foo</em> is the name of any dotkit
+that seems to be mis-behaving.
+This will show you exactly which file is ultimately being source'ed.
+<p>Shell startup can get very complicated.
+It is not unusual to load a particular dotkit,
+and then have some other (non-Dotkit) command buried in an
+obscure startup file change the PATH variable in
+an unexpected way.</p>
+<p>The user complains that kit <em>foo</em> is ``already loaded'',
+but the component it was supposed to add to PATH isn't there.
+Trying to ``use foo'' won't fix the trouble.
+However, ``reuse foo'' is often a good strategy in this situation,
+because it generally will make things work while you try to
+figure out what really went wrong.
+There is a special dotkit <em>reuse</em> that sets environment variable
+<em>DK_UEQRU</em> to 1.
+When this is so,
+the <em>use</em> command always behaves as if <em>reuse</em> had been typed.
+Some sites like to do this as a matter of policy.</p>
+<p></p>
+<li><strong><a name="item_verify_that_%24dk_root%2finit_is_doing_the_right_t">Verify that $DK_ROOT/init is doing the right thing.</a></strong><br />
+</li>
+Normally, you <em>eval</em> the output of this script:
+<pre>
+  eval `/usr/gapps/dotkit/init`</pre>
+<p>For debugging purposes, you can run it directly,
+(take off the <em>eval</em> and the surrounding backquotes,)
+and check that it is printing the correct set of commands
+for your shell.</p>
+<p>The init script emits a pair of shell-independent commands that
+set the value of $DK_ROOT, if it wasn't set already,
+then pass further processing on to a shell-specific script that
+does the rest of the setup.</p>
+<p>If your shell seems to be getting confused, (``export: command not
+found'', or ``setenv: command not found'', or ``unbound variable'', or
+``parameter not set'') it is possible to force
+the init script to emit commands for a particular kind of shell.
+Use the ``-b'' option to force Bourne-shell (bash or ksh) style initialization.
+Use the ``-c'' option to force C-shell (csh or tcsh) style initialization.</p>
+<p></p>
+<li><strong><a name="item_look_at_the_output_from_use%2dusage%2e">Look at the output from <em>use-usage</em>.</a></strong><br />
+</li>
+The script <em>$DK_ROOT/etc/use-usage</em> is run whenever you
+type ``use'' with no arguments.
+You can also run it directly.
+Verify that the list of packages on the first screen
+matches <em>_dk_inuse</em>,
+and that the Dotkit search path
+matches the values in <em>DK_ROOT</em>, <em>DK_NODE</em>, and <em>DK_SUBNODE</em>.
+Its arguments are documented at the beginning of the script.
+<p></p></ol>
+<p>
+</p>
+<h2><a name="adding,_changing,_or_removing_a_dotkit">Adding, changing, or removing a dotkit</a></h2>
+<p>Decide where the new dotkit belongs.
+If it is a personal preference,
+it belongs in <em>$HOME/.kits</em>.
+Otherwise, it may be part of
+a group project, site-specific, or universal.</p>
+<p>Group projects that want to define dotkits for their use
+typically need to add a group node to DK_NODE before
+initializing Dotkit:</p>
+<pre>
+  setenv DK_NODE /usr/local/share/&lt;project&gt;/kits
+  eval `/foo/dotkit/init`</pre>
+<p>Site-specific kits are added under the <em>site=XYZ</em> directory,
+while universal kits are under $DK_ROOT itself.</p>
+<p>See the <a href="/busby/dotkit/html/./dk-examples.html">the dk-examples manpage</a>(5) man page for a listing of Dotkit categories
+and many example dotkits.
+After your change is complete,
+be sure to commit it to your source code management system,
+and preen permission bits:</p>
+<pre>
+  % cd $DK_ROOT
+  % ./etc/preen</pre>
+<p>
+</p>
+<h2><a name="updating_the_man_or_html_pages">Updating the man or html pages</a></h2>
+<p>Source text for the man and html pages is located at <em>$DK_ROOT/man</em>.
+The format is known as POD (Plain Old Documentation),
+developed and distributed as part of the Perl language.
+See the <em>perlpod</em>, <em>pod2man</em>, and <em>pod2html</em> man pages
+for details on how to write and process POD files.</p>
+<p>Briefly, modify the appropriate <em>*.pod</em> file in <em>$DK_ROOT/man</em>,
+then run <em>make</em>.
+If there are no errors,
+this should reconstitute the formatted man and html pages.
+You need to be on a platform where the full Perl distribution
+is installed in order to run <em>pod2man</em>, etc.</p>
+<p>
+</p>
+<h2><a name="running_the_test_suite">Running the test suite</a></h2>
+<p>Change directory to $DK_ROOT/etc/test,
+and run <em>make</em>.
+This should run a series of <em>mutex</em>,
+<em>recursive</em>, and <em>simple</em> regression tests for
+each supported shell.
+You hope to see <em>ok</em> for every test and every shell.
+If you do, it means that every file under the <em>dif</em>
+sub-directory will be zero length.</p>
+<p>If there is a problem,
+you can inspect the corresponding <em>dif</em> file to begin
+analyzing what went wrong.</p>
+<p>
+</p>
+<h2><a name="adding_an_motd_(message_of_the_day)">Adding an MOTD (message of the day)</a></h2>
+<p>Create a file named <em>dk-news</em>,
+located at <em>$DK_ROOT/etc</em>,
+with the literal text of your message.
+Every user who subsequently runs <em>use</em> without arguments
+will see your text on the first splash page of output.</p>
+<p>
+</p>
+<h2><a name="preening_the_permission_bits">Preening the permission bits</a></h2>
+<p>If a group of people administer Dotkit for a site,
+it is best to create a Unix group,
+say <em>dotkit</em>, with those users in it.
+There is a script at <em>$DK_ROOT/etc/preen</em>,
+which will attempt to make all the files under $DK_ROOT
+have the correct group ownership and permission bits.
+(Permissions are generally set to allow group write on
+files and directories,
+and world read/access/execute as appropriate.)
+If the Dotkit administrative group does not use <em>root</em>,
+then each dotkit administrator needs to run <em>preen</em>
+whenever they change files,
+to set the permissions on files that they own.</p>
+<p>
+</p>
+<h2><a name="making_a_tar_ball">Making a tar ball</a></h2>
+<p>Change directory to <em>$DK_ROOT/etc</em>,
+and run <em>make export</em>.
+Anyone can do this,
+as it does not change anything under $DK_ROOT.
+(It does elide CVS subdirectories from the output tar file.)</p>
+<p>The smallest tar file is made using
+<em>make clean export</em> (note whitespace),
+which throws away all temporary files, soft links,
+and the formatted man pages.</p>
+<p>A third option is <em>make cleanexport</em>,
+which re-creates the formatted man pages before tarring up the result.</p>
+<p>
+</p>
+<hr />
+<h1><a name="environment">ENVIRONMENT</a></h1>
+<p>(Dotkit environment variables are documented in <a href="/busby/dotkit/html/./dk-commands.html">the dk-commands manpage</a>(5).)</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>The original author of Dotkit is
+Lee Busby, Lawrence Livermore National Laboratory.
+Adam Moody, also of LLNL,
+has made additional major contributions.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2007, Lawrence Livermore National Security, LLC.
+See the file named ``Copyright'' for the full text of the copyright notice.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/busby/dotkit/html/./dk-commands.html">the dk-commands manpage</a>(5), <a href="/busby/dotkit/html/./dk-examples.html">the dk-examples manpage</a>(5), <a href="/busby/dotkit/html/./dotkit.html">the dotkit manpage</a>(7), <a href="/busby/dotkit/html/./use.html">the use manpage</a>(1), <a href="/busby/dotkit/html/./dk-admin.html">the dk-admin manpage</a>(8).</p>
+
+</body>
+
+</html>

@@ -1,0 +1,17 @@
+#c shell
+#d Prompt with your working directory and command number.
+
+if ( $_dk_op == "use" ) then
+  unuse -q `dk_rep 'prompt*' 'envdiff'`
+  if ( $?prompt ) then
+    set oldprompt = "$prompt"
+  endif
+  set prompt = "${cwd}:\!% "
+  alias cd 'chdir \!* && set prompt = "${cwd}:\\!% "'
+else # unuse
+  if ( $?oldprompt ) then
+    set prompt = "$oldprompt"
+    unset oldprompt
+  endif
+  unalias cd
+endif

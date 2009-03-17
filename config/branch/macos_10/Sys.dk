@@ -1,0 +1,4 @@
+#c shell
+#d Macintosh OS-X system packages
+
+dk_op -q Super local swbin swsbin x11

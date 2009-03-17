@@ -1,0 +1,13 @@
+2,13d1
+< Prepending: Q
+< Q: DK_ROOT/.
+< Q: DK_ROOT/SYS_TYPE
+< Q: site=*
+< Q: site=*/SYS_TYPE
+<  (ok)
+< Dropping: Q
+< Q: DK_ROOT/.
+< Q: DK_ROOT/SYS_TYPE
+< Q: site=*
+< Q: site=*/SYS_TYPE
+<  (ok)

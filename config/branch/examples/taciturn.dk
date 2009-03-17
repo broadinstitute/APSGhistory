@@ -1,0 +1,6 @@
+#c shell/dotkit
+#d Make 'use' quiet except for 'not found' errors.
+
+unuse -q bequiet
+
+dk_setenv dk_taciturn 1

@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>use/unuse - Load, unload, or display dotkits, also known as I&lt;packages&gt;.</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#dotfile_setup">Dotfile setup</a></li>
+		<li><a href="#searching_for_packages">Searching for packages</a></li>
+		<li><a href="#dot_floats">Dot floats</a></li>
+		<li><a href="#writing_your_own_package_files">Writing your own package files</a></li>
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>use/unuse - Load, unload, or display dotkits, also known as <em>packages</em>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>use [ <strong>-alqv</strong> ] [ <em>pkg</em> ... ]</p>
+<p>unuse [ <strong>-alqv</strong> ] [ <em>pkg</em> ... ]</p>
+<p>reuse [ <strong>-alqv</strong> ] [ <em>pkg</em> ... ]</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<dl>
+<dt><strong><a name="item_%2da"><strong>-a</strong></a></strong><br />
+</dt>
+<dd>
+Append components from the given <code>package(s)</code> to the end of the
+environment variables they affect.
+This generally makes the added <code>component(s)</code> the <em>last</em> item searched
+instead of the <em>first</em>,
+as is the behavior of the default <em>Prepend</em> action.
+This option has no effect with the <em>unuse</em> command.
+</dd>
+<dd>
+<p>Note: Don't use this option unless you know what you're doing.
+The default prepend action is
+better at avoiding possible conflicts with any pre-existing dotkits
+or PATH components, etc.
+The only common package that should arguably be appended is
+the '.' (dot) package,
+which adds '.' to your PATH.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_%2dl"><strong>-l</strong></a></strong><br />
+</dt>
+<dd>
+The <strong>-l</strong> ``long listing'' option
+turns off the interpretation (sourcing) of any <em>pkg</em> arguments that follow.
+With no other arguments,
+this option produces a summary of available dotkits.
+If a <em>pkg</em> argument follows,
+the descriptive text and any help text for that <em>pkg</em> is
+printed to the screen.
+If no package whose name exactly macthes <em>pkg</em> is found,
+a summary of available packages whose name, category, or short description
+includes <em>pkg</em> in a case-insensitive pattern-match search is printed to the screen.
+The <strong>-l</strong> option can be combined with <strong>-v</strong> to produce more verbose output.
+With no arguments, <strong>-lv</strong> prints a usage message,
+a list of packages currently in use,
+a summary of available packages,
+and a list of all nodes in the Dotkit search path.
+With a <em>pkg</em> argument, <strong>-lv</strong> prints the entire contents of the <em>pkg</em>.
+The <strong>-l</strong> option is quietly ignored by <em>unuse</em>.
+</dd>
+<p></p>
+<dt><strong><a name="item_%2dq"><strong>-q</strong></a></strong><br />
+</dt>
+<dd>
+Make <em>use</em>, <em>unuse</em>, or <em>reuse</em> quiet in operation.
+You generally want this option for commands inside startup dotfiles.
+</dd>
+<p></p>
+<dt><strong><a name="item_%2dv"><strong>-v</strong></a></strong><br />
+</dt>
+<dd>
+Be verbose about the location of
+package files found in satisfying your request.
+With <strong>-l</strong>, show the full contents of any <em>pkg</em> arguments,
+or give a more verbose listing, if no arguments were given.
+</dd>
+<p></p></dl>
+<p>If no package arguments are given,
+a usage message is displayed,
+followed by a list of the available packages.
+It is sometimes handy to save the output of this
+usage message in a file.
+Since the <em>use</em> command is an alias for csh and tcsh,
+it may require some extra syntax to redirect its output:</p>
+<pre>
+  (use -lv) &gt; mycopy.out</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><em>Use</em> and <em>unuse</em> help
+you control and understand your Unix environment.
+They simplify dotfile setup and maintenance,
+and are also available for interactive use,
+allowing you to easily modify your environment as you go.
+Together, the use/unuse pair provides a do/undo facility
+that is convenient, informative, and quick.</p>
+<p>Suppose your site has an application named ``viztools'',
+made up of one or more executable programs, documentation, etc.
+In order to add the needed components to your PATH,
+MANPATH, or other environment variables
+necessary for your use of those programs,
+you say</p>
+<pre>
+  use viztools.</pre>
+<p>Assuming all is well, you'll get a message</p>
+<pre>
+  Prepending: viztools (ok),</pre>
+<p>which means that the package file was found, and your PATH,
+MANPATH, or other environment variables needed to access it were
+adjusted correctly.
+(If you give the <strong>-a</strong> option, the message will instead say ``Appending'',
+and any new components will be added at the end of the respective
+variable, instead of the beginning.)</p>
+<p>If you type ``use viztools'' again, it will say</p>
+<pre>
+  Prepending: viztools (already loaded),</pre>
+<p>meaning that the package has already been read once.
+If you typed ``use vzitools'' (mis-spelled),
+the response would read</p>
+<pre>
+  Prepending: vzitools (not found),</pre>
+<p>to let you know that the requested package had a problem of some sort.</p>
+<p>Later on, when you are done, you say</p>
+<pre>
+  unuse viztools</pre>
+<p>and all the relevant adjustments will be made to your environment
+to remove the package, with the message</p>
+<pre>
+  Dropping: viztools (ok).</pre>
+<p>You can use or unuse more than one package at a time.
+Typing ``use'' or ``unuse'' without arguments causes a help message
+to be printed.
+You can get a list of all the packages available for
+a given platform by typing ``use -l'' with no arguments,
+and you can learn more about the <em>viztools</em> package by
+typing ``use -l viztools''.</p>
+<p>If you know you always want <em>viztools</em> to be loaded,
+you can add the line ``use -q viztools''
+(the <strong>-q</strong> option makes the command quiet)
+into one of your dotfiles,
+and get it automatically included whenever you start a session.</p>
+<p>
+</p>
+<h2><a name="dotfile_setup">Dotfile setup</a></h2>
+<p>The setup required to make the
+<em>use</em> command available is simple.
+Add the following line to your .profile or .cshrc file,
+or execute it directly in a current shell window,
+if you don't want to modify your startup file:</p>
+<pre>
+  eval `/&lt;path_to&gt;/dotkit/init`</pre>
+<p>(The <em>/path_to</em> portion varies among sites.  At LLNL, it is
+generally ``/usr/gapps''.)
+The script usually guesses your shell type correctly.
+If you get complaints about ``command not found'', or
+``unbound variable'', or ``parameter not set'',
+you may need to tell it explicitly
+what kind of shell you are using:</p>
+<pre>
+  eval `/&lt;path_to&gt;/dotkit/init -b` # bash or ksh
+  eval `/&lt;path_to&gt;/dotkit/init -c` # csh or tcsh</pre>
+<p><em>Init</em> adds aliases or shell functions for ``use'', ``unuse'',
+and related commands,
+and sets the two environment variables SYS_TYPE and DK_ROOT
+if they are not set already.
+The exact commands to initialize Dotkit at your site may
+be slightly different.</p>
+<p>In addition to evaluating the output of <em>dotkit/init</em>,
+you may want to go ahead and read a few packages
+in your dotfiles.
+Lines such as follows can be added to your .profile, .login
+or .cshrc files, after the ``eval ...'' line:</p>
+<pre>
+  use -q bin usr sbin x11
+  use -qa .        # Puts '.' last on your path.</pre>
+<p>The four packages loaded in the first line arrange to put /bin,
+/usr/bin, /sbin, and (usually) /usr/bin/X11 on the PATH,
+and set up MANPATH accordingly.
+The action of the x11 package will vary - on Linux systems,
+it adds /usr/X11R6/{bin,man} to the PATH and MANPATH, respectively.
+The last package loaded, a literal '.' (dot), appends '.' to your PATH.</p>
+<p>It does no harm to ask for a package that isn't present on all platforms.
+Let ``use'' sort out which packages are actually available on your
+current system.
+You'll get it on those platforms where it is installed,
+and the request is quietly skipped otherwise.</p>
+<p>It is redundant (but does no harm) to put code like</p>
+<pre>
+  if($SYS_TYPE == &quot;solaris_8_s64&quot;) then
+    use -q SUNWspro # load sun compilers
+  endif</pre>
+<p>in your dotfiles.
+This is just the kind of check that ``use'' is designed to do for you.</p>
+<p>You can start using Dotkit interactively without making any changes to
+your dotfiles other than the ``eval'' line above.
+It won't change your environment except when you ``use''
+or ``unuse'' packages. 
+Alternatively,
+you can start from a mostly empty environment,
+and use Dotkit commands to build the one you like.</p>
+<p>
+</p>
+<h2><a name="searching_for_packages">Searching for packages</a></h2>
+<p>To look at a list of all the available packages for your current SYS_TYPE,
+type ``use -l'' with no arguments,
+This gives you a categorized listing of packages,
+with a short description of what each one does.</p>
+<p>The <em>search</em> package allows you to type in a word or pattern,
+much like grep(1),
+then looks through all the available dotkits for lines that
+match that word or pattern.
+To use it, simply type ``use search''.
+It prompts for the pattern,
+and prints the results to your screen.</p>
+<p>To see the entire contents of a given package,
+type ``use -lv <em>pkg</em>''.</p>
+<p>To find packages,
+<em>use</em> and <em>unuse</em> look in $HOME/.kits/,
+if that directory exists, then each component of DK_NODE,
+if it exists,
+and finally in DK_ROOT,
+for files named <em>*.dk</em>.
+To be precise, they look first in three subdirectories of each of
+those directories, in the following order:
+<em>*sh</em>/$SYS_TYPE, $SYS_TYPE, <em>*sh</em>,
+where <em>*sh</em> stands for whichever of <em>bash</em>, <em>csh</em>,
+<em>ksh</em>, or <em>tcsh</em> is your login shell,
+and $SYS_TYPE is the name of the current system type.
+In this way, you (or the Dotkit maintainer)
+can specialize a package to a given architecture
+or shell if needed,
+and arrange for that package to over-ride a ``generic'' version
+whenever someone is running on the given architecture,
+or with the given shell.
+Most packages are independent of shell and SYS_TYPE.</p>
+<p>It is also possible to load a package by giving an absolute
+path to the dotkit (but leave off the trailing <em>.dk</em>.)
+For more on the package search process,
+see the <code>dotkit(7)</code> man page.</p>
+<p>
+</p>
+<h2><a name="dot_floats">Dot floats</a></h2>
+<p>The dot (.) character has a special meaning when discussing
+Unix directories,
+signifying your current working directory.
+Many users add ``dot'', called '.' hereafter,
+to their PATH environment variable
+so as to be able to easily execute programs located in
+the current directory,
+wherever that might be.
+Although there are some security considerations,
+this convenience is important.
+Dotkit supports the use of '.' with a special package by that name:</p>
+<pre>
+  use .         # Puts '.' at the beginning of your PATH.
+  use -a .      # Puts '.' at the end of your PATH.</pre>
+<p>Moreover, once '.' is in your PATH,
+(or any other colon-separated environment variable,)
+Dotkit arranges for it to ``float'' up or down
+as future changes are made,
+so as to always remain at the beginning or end.</p>
+<p>
+</p>
+<h2><a name="writing_your_own_package_files">Writing your own package files</a></h2>
+<p>As a simple example,
+suppose you keep some personal programs at $HOME/bin,
+with their associated man pages under $HOME/man.
+You can add a personal package to Dotkit by creating
+the new file $HOME/.kits/mybin.dk, containing
+the following five lines:</p>
+<pre>
+  #c personal
+  #d My very own programs</pre>
+<pre>
+  dk_alter PATH $HOME/bin
+  dk_alter MANPATH $HOME/man</pre>
+<p>Most package files are no more complicated than that.
+To learn more about writing package files,
+and the overall organization of Dotkit,
+see the man pages for dk-examples(5), dk-commands(5) and dotkit(7).
+They give extensive instruction on the usually simple,
+but occasionally subtle, art of writing package files.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>Unuse removes the <em>first</em> instance of a given component from
+PATH, MANPATH, etc.,
+or the <em>last</em> instance if the <strong>-a</strong> flag is given.
+(There could be more than one instance if your PATH was not empty
+when Dotkit was initialized,
+or if two or more packages happened to include the same component.)
+This is usually correct,
+but can be wrong in a few cases.</p>
+<p><em>Use</em> and <em>unuse</em> are aliases in csh and tcsh;
+you can't re-direct their output to a file.
+(However, you can pipe their output to another command,
+so ``use|cat&gt;file'' will usually get the job done.
+Failing that, try a subshell: ``(use -lv)&gt;file''.)</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>The original author of Dotkit is
+Lee Busby, Lawrence Livermore National Laboratory.
+Adam Moody, also of LLNL,
+has made additional major contributions.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2007, Lawrence Livermore National Security, LLC.
+See the file named ``Copyright'' for the full text of the copyright notice.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/busby/dotkit/html/./dk-commands.html">the dk-commands manpage</a>(5), <a href="/busby/dotkit/html/./dk-examples.html">the dk-examples manpage</a>(5), <a href="/busby/dotkit/html/./dotkit.html">the dotkit manpage</a>(7), <a href="/busby/dotkit/html/./use.html">the use manpage</a>(1), <a href="/busby/dotkit/html/./dk-admin.html">the dk-admin manpage</a>(8).</p>
+
+</body>
+
+</html>

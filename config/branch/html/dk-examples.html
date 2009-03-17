@@ -1,0 +1,589 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>example - Examples and rationale for writing your own dotkits.</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#how_to_write_a_dotkit">How to write a dotkit</a></li>
+		<li><a href="#fancier,_but_still_simple,_dotkits">Fancier, but still simple, dotkits</a></li>
+		<li><a href="#reusable_or_idempotent_dotkits">Reusable or idempotent dotkits</a></li>
+		<li><a href="#recursive_or_nested_dotkits">Recursive or nested dotkits</a></li>
+		<li><a href="#mutually_exclusive_(mutex)_dotkits">Mutually exclusive (mutex) dotkits</a></li>
+		<li><a href="#super_dotkits">Super dotkits</a></li>
+		<li><a href="#subsite_access_dotkits">Sub-site access dotkits</a></li>
+		<li><a href="#sys_typespecific_dotkits">SYS_TYPE-specific dotkits</a></li>
+		<li><a href="#shellspecific_dotkits">Shell-specific dotkits</a></li>
+		<li><a href="#how_to_hide_a_dotkit">How to hide a dotkit</a></li>
+		<li><a href="#dotfile_setup">Dotfile setup</a></li>
+	</ul>
+
+	<li><a href="#environment">ENVIRONMENT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Dotkit by example - Examples and rationale for writing your own dotkits.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This man page provides examples of some dotkits,
+and discusses the rationale for their construction and
+placement in the system.
+See <code>use(1)</code> for a general introduction to using Dotkit.
+See dk-commands(5) for reference documentation on all
+the Dotkit commands, functions and variables.
+See <code>dotkit(7)</code> for discussion of the motivation behind Dotkit,
+its overall organization and structure,
+and strategies for fitting it to a given situation.</p>
+<p>
+</p>
+<h2><a name="how_to_write_a_dotkit">How to write a dotkit</a></h2>
+<p>A dotkit is a file named <em>something</em>.dk,
+containing instructions to modify your environment so as to
+match the requirements of a given software system.</p>
+<p>Most dotkits are very simple.
+The first line of the file categorizes the kit into one of several kinds.
+This is followed by a one-line textual description of the kit's purpose,
+possibly followed with some additional help.
+After that, you modify environment variables as needed
+to do the job.  Here is $DK_ROOT/bin.dk (a four-line file):</p>
+<pre>
+  #c shell
+  #d Add /bin to PATH</pre>
+<pre>
+  dk_alter PATH /bin</pre>
+<p>The ``#c'' at the beginning of the first line tells Dotkit that this
+package is part of the ``shell'' category.
+(Most of the dotkits that ship with the system are in this category.)
+The line ``Add /bin to PATH'', beginning with ``#d'',
+is descriptive text.
+Descriptive text lines (there can be more than one) should generally be kept
+to 65 characters or less
+for neat display by <em>use-usage</em>.</p>
+<p>The <em>dk_alter</em> line accomplishes two things:
+If you are using the kit, it adds ``/bin'' to your PATH,
+while if you are unusing the kit, it deletes ``/bin'' from
+your PATH.
+The end user controls whether ``/bin'' goes at the beginning or
+end of their PATH,
+with the <strong>-a</strong> option for <em>use</em>.</p>
+<p>The category/sub-category and descriptive text at the beginning of
+each dotkit file allows
+you to publish the existence and purpose of your package to all
+the users of Dotkit.
+They are collated together by the <em>use-usage</em> program
+when you run ``use -l'' to
+display all the available dotkits in a nicely formatted list.
+Otherwise, they don't affect the operation of Dotkit in any way.
+(<em>Use-usage</em> is the program that runs when you type ``use'' with no arguments,
+or ``use -l''.)</p>
+<p>Besides <em>dk_alter</em>,
+the other command used most frequently inside a dotkit
+is <em>dk_setenv</em>.
+It is common for applications to look for auxiliary
+environment variables specific to them.
+Here is the ``less.dk'' dotkit:</p>
+<pre>
+  #c shell
+  #d Set up PAGER as &quot;less&quot; if available, or fall back to &quot;more&quot;</pre>
+<pre>
+  dk_setenv PAGER `dk_where less` || \
+    dk_setenv PAGER `dk_where more`
+  dk_setenv LESS -isceM
+  dk_setenv MANPAGER $PAGER
+  dk_setenv MORE -c</pre>
+<p>This package does several things.
+The first <em>dk_setenv</em> line uses <em>dk_where</em> to look
+for the pathname of the ``less'' pager.
+If that cannot be found,
+we settle for setting PAGER to the pathname of ``more'',
+which is presumed to be available everywhere.</p>
+<p>The last 3 lines set options for both less and more,
+and make sure that the ``man'' utility uses the same PAGER
+as everything else.</p>
+<p>
+</p>
+<h2><a name="fancier,_but_still_simple,_dotkits">Fancier, but still simple, dotkits</a></h2>
+<p>Quoting of variables inside a dotkit is not usually required,
+unless the value of the variable contains white space.
+Simple applications of <em>eval</em> (hopefully) behave as you would expect:</p>
+<pre>
+  dk_setenv A AAA
+  dk_setenv A2 &quot;X Y Z&quot;
+  dk_setenv C B
+  eval dk_setenv $C $A</pre>
+<p>In addition to <em>A</em>, <em>A2</em>, and <em>C</em>,
+the last <em>dk_setenv</em> will
+create an environment variable <em>B</em> with value <em>AAA</em>.</p>
+<p>As you have already seen,
+conditional code can be put into dotkits using the standard
+``And/Or'' command list syntax common to all Unix shells:</p>
+<pre>
+  grep foobar /etc/passwd &gt;/dev/null &amp;&amp; \
+    dk_setenv X A || \
+    dk_setenv X B</pre>
+<p>will set the environment variable <em>X</em> to 'A' if the name 'foobar'
+appears in /etc/passwd, or to 'B' otherwise.</p>
+<p><em>Dk_source</em> allows you to read the contents of another file
+from within a dotkit.
+This is sometimes useful,
+especially to utilize pre-existing or external code
+that sets up the environment for some application.</p>
+<p>Unless you know <em>a priori</em> that the dk_source'd file is written
+in shell-independent fashion,
+you might need to test the current shell
+in order to choose the appropriate file to source:</p>
+<pre>
+  dk_test $_dk_shell = csh -o $_dk_shell = tcsh &amp;&amp; \
+    dk_source foo.csh || \
+    dk_source foo.sh</pre>
+<p><em>_Dk_shell</em> is an internal variable available inside
+any dotkit, containing the (base) name of your shell.</p>
+<p>
+</p>
+<h2><a name="reusable_or_idempotent_dotkits">Reusable or idempotent dotkits</a></h2>
+<p>Any dotkit can be reused, if you just <em>unuse</em> it first.
+There is even a <em>reuse</em> command to do that.
+Normally, however, Dotkit will decline to read the text of a
+package file more than once,
+telling you that the dotkit was ``already loaded''.
+An <em>idempotent</em> dotkit allows you to break that rule,
+by giving the kit a base name that ends with the 2 characters '++'.
+(The file name extension is still <em>.dk</em>.)
+In this case, Dotkit
+will re-read the file even if it has previously been seen.
+This is usually of interest only in the case where a
+dotkit contains <em>dk_alias</em> definitions.</p>
+<p>Shell aliases are not inherited by subshells,
+and are treated differently from environment variables
+at login time,
+or when a subshell is started.
+You therefore probably want to place your <em>dk_alias</em> definitions
+in a <em>reusable</em> dotkit.</p>
+<p>Alternatively, you can set up Dotkit so that it always re-reads
+every package, even if the package has previously been loaded.
+Set the environment variable <em>DK_UEQRU</em> to 1 (there is
+a special ``reuse'' package available that does this for you).
+Then every ``use'' behaves as if you had typed ``reuse''.
+Although it slows things down a little,
+this can be good if Dotkit is not the only process that
+might be making changes to your environment.</p>
+<p>
+</p>
+<h2><a name="recursive_or_nested_dotkits">Recursive or nested dotkits</a></h2>
+<p>Dotkits can include other dotkits,
+up to 9 levels deep.
+This allows you to compose and name a set of modifications
+to the environment by combining the effects of one or
+more other dotkits.</p>
+<p>Suppose you want to write a recursive dotkit that includes
+several others.
+You might start off by creating the file ``Fancy.dk'', with
+contents as follows:</p>
+<pre>
+  #c personal
+  #d My fancy package, includes bin, etc, local, sbin packages</pre>
+<pre>
+  use -q bin etc local sbin</pre>
+<p>This is almost correct.
+When you type ``use Fancy'',
+the effect is to load it (which otherwise does nothing),
+then the four other named packages.
+The only problem comes when you want to ``unuse Fancy''.
+It would be nice if that line beginning ``use -q ...''
+would somehow magically turn into ``unuse -q ...''
+This is what <em>dk_op</em> does.
+Write the line instead as</p>
+<pre>
+  dk_op -q bin etc local sbin</pre>
+<p>and it means ``use'' or ``unuse'' (quietly) those four packages,
+depending on whether you are using or unusing the ``Fancy'' package.</p>
+<p>As a general rule,
+a dotkit can't include itself (but see <em>Super</em> below.)
+It can, however, <em>unuse</em> itself,
+as the following section makes clear.</p>
+<p>
+</p>
+<h2><a name="mutually_exclusive_(mutex)_dotkits">Mutually exclusive (mutex) dotkits</a></h2>
+<p>Recursion offers a nice solution to another common problem
+in managing your environment.
+Many commands, libraries,
+or code systems are installed in multiple versions.
+Suppose you have three versions of gcc installed, version 1.1, 1.2,
+and 1.3,
+with 3 dotkits named gcc-1.1, gcc-1.2, gcc-1.3, respectively.
+In order to set your environment for using 1.1,
+you would type ``use gcc-1.1'',
+and so forth.
+Here is what the package file for gcc-1.1
+might look like:</p>
+<pre>
+  #c compilers/gnu
+  #d GCC version 1.1</pre>
+<pre>
+  unuse -q gcc-1.1 gcc-1.2 gcc-1.3</pre>
+<pre>
+  dk_setenv COMPILER gcc_1_1
+  dk_alter PATH /usr/local/gcc-1.1/bin</pre>
+<p>The initial <em>unuse</em> command clears all variants of this package (if any)
+from your
+environment before the dk_setenv and dk_alter commands add back the
+changes for this specific package.
+Note that the <em>unuse</em> mentions ``gcc-1.1'',
+which is the name of this particular package itself.
+Dotkit notices,
+and ignores,
+a trivial self-reference in this (unuse) case.
+This allows you to put an identical ``unuse'' line in all
+variants of a package.
+See <em>Super dotkits</em> below for more about self-reference in
+the <em>use</em> case.</p>
+<p>The pattern ``unuse -q &lt;all variants&gt;'' is so common that Dotkit
+includes special support for it with the <em>dk_rep</em> command.
+Although the example as given above works fine,
+it requires old packages to change every time a new variant
+is added.  It would be nicer to be able to refer to all the
+variants of a given mutex family by using a pattern for their names.
+Thus, a better way to write the ``unuse'' line for the given example
+is like this:</p>
+<pre>
+  unuse -q `dk_rep 'gcc-*'`</pre>
+<p>(Note that the <em>dk_rep</em> expression is surrounded by back quotes,
+while the pattern is surrounded by forward quotes.)
+The <em>dk_rep</em> command is reminiscent of Perl's <em>grep</em> command,
+operating on Dotkit's built-in list of packages in
+current use.  In this case, it finds any package already loaded
+whose name matches ``gcc-*''.</p>
+<p>
+</p>
+<h2><a name="super_dotkits">Super dotkits</a></h2>
+<p>One more variation on recursion is the so-called ``Super'' package.
+(It may be useful to now read the
+section <em>How Dotkit finds package files</em>,
+in the <code>dotkit(1)</code> man page.)
+Briefly, kits are arranged in a hierarchy from the most general
+or universally applicable (those under $DK_ROOT itself),
+to the most specific
+(your personal dotkits, under $HOME/.kits/),
+with site-wide or project dotkits intermediate between
+those extremes.</p>
+<p>You can write universal, site, SYS_TYPE, shell-specific, or personal
+versions of any given package by choosing its location in the
+hierarchy.
+You override the more general version of a dotkit by creating
+a new package with the same name,
+and placing it in a more specific location.
+Moreover, you can choose whether to override the general version entirely,
+or you can ``inherit'' the general <code>version(s)</code> by the
+artifice of the ``Super'' package.</p>
+<p>Refer back to the ``less.dk'' example shown earlier.
+Suppose you like everything about that package,
+but would prefer to change the MORE option from <strong>-c</strong>
+to <strong>-p</strong>.
+Create a personal dotkit named ``less.dk'',
+(the same name as the universal kit),
+located at $HOME/.kits (your personal node in the Dotkit search path.)
+Your version first loads the universal package,
+then makes the adjustment you desire:</p>
+<pre>
+  #c personal
+  #d My personal less/more options</pre>
+<pre>
+  dk_op -q Super
+  dk_setenv MORE -p</pre>
+<p><em>Super</em> is a self-reference,
+interpreted by Dotkit to mean the ``next package up'' by the same name
+in the hierarchy.
+It allows you to construct a dotkit by
+selecting general capabilities,
+then making more and more specific additions or changes.</p>
+<p>Use of <em>Super</em> can be chained, if there are more than 2 versions
+of a given package in the Dotkit search tree.
+Each use of <em>Super</em> finds the next upward instance of the current dotkit.</p>
+<p>Self-reference in any other context will generally cause a ``Recursion
+limit exceeded!'' error.
+This usually happens when two (different) packages reference each other.</p>
+<p>
+</p>
+<h2><a name="subsite_access_dotkits">Sub-site access dotkits</a></h2>
+<p>A large network may serve several audiences,
+not all of whom want to see the entire array of dotkits
+that are otherwise available at the site.</p>
+<p>For example,
+your site may have 12 varieties of MPI libraries,
+with 12 different dotkits to select from.
+The only users who probably want to see those 12 dotkits
+are developers who compile parallel MPI programs.</p>
+<p>The sub-site dotkit for this example might be a file named <em>mpi.dk</em>,
+located in the site node, with contents such as</p>
+<pre>
+  #c sub-site
+  #d Add MPI library selections to your catalog.</pre>
+<pre>
+  dk_alter DK_NODE /foo/bar/subsite=mpi</pre>
+<p>Every user will see the <em>mpi</em> dotkit in their catalog,
+while those who <em>use mpi</em> will thenceforth have all the
+mpi-related dotkits added to their catalog listing.</p>
+<p>This mechanism allows the user to control the size and contents
+of their dotkit catalog.
+It also allows delegation of responsibility for maintaining
+dotkits to a group of people,
+each assigned to one sub-site.</p>
+<p>
+</p>
+<h2><a name="sys_typespecific_dotkits">SYS_TYPE-specific dotkits</a></h2>
+<p>Sometimes, programs are available on just one kind of machine on your network,
+or their location varies depending on the host type.
+Dotkit provides for this common situation,
+in the form of a $SYS_TYPE sub-directory of each node in the
+Dotkit search path.
+The package files themselves look exactly the same as described above,
+but their location in the search path makes them visible
+only on the set of hosts where that is useful.</p>
+<p>For example, there is a universal <em>x11</em> dotkit with contents:</p>
+<pre>
+  #c shell
+  #d generic X11 commands (/usr/bin/X11)</pre>
+<pre>
+  dk_alter PATH /usr/bin/X11</pre>
+<p>On our networks, the machines that run Redhat Linux have a SYS_TYPE
+value of <em>redhat_9_ia32</em>.
+There is also an <em>x11</em> dotkit for them,
+located at <em>$DK_ROOT/redhat_9_ia32</em>:</p>
+<pre>
+  #c shell
+  #d Add /usr/X11R6/{bin,man} to PATH, MANPATH</pre>
+<pre>
+  dk_alter PATH /usr/X11R6/bin
+  dk_alter MANPATH  /usr/X11R6/man</pre>
+<p>Whenever you log into a Linux host and ``use x11'',
+Dotkit finds the second, SYS_TYPE-specific version.
+Otherwise, it finds the generic kit.</p>
+<p>SYS_TYPE works well for many cases where you need to make
+host type distinctions.
+Sometimes it is too fine-grained.
+For example, the SYS_TYPE value for the same Linux machines
+used to be <em>redhat_7_ia32</em>,
+before our last operating system upgrade.
+If two SYS_TYPE values really do share essentially all the
+same dotkits,
+it is sufficient to make the new SYS_TYPE value a symbolic
+link to the old value.
+Otherwise, it may take a new SYS_TYPE directory,
+and some duplication or linking of individual dotkits between
+the new and old.</p>
+<p>Another situation might occur where only one host of a given
+SYS_TYPE has a particular package.
+(This is frequently due to licensing restrictions.)
+In that case, you may choose to write a SYS_TYPE-specific
+package something like this:</p>
+<pre>
+  #c special
+  #d The hotstuff application</pre>
+<pre>
+  dk_test `hostname` = &quot;frodo&quot; || \
+    setenv _dk_err &quot;Sorry, only frodo can run hotstuff&quot;</pre>
+<pre>
+  dk_setenv HOTSTUFF /opt/hotstuff
+  dk_alter PATH $HOTSTUFF/bin</pre>
+<p>Then, if an attempt to ``use hotstuff'' on any machine other than
+frodo occurs, a polite message is printed declining the request.</p>
+<p>
+</p>
+<h2><a name="shellspecific_dotkits">Shell-specific dotkits</a></h2>
+<p>If the commands and techniques above are inadequate to carry
+out a needed computation inside a package file,
+you have the option of writing to the ``bare metal'' of any given shell.
+Such a package is normally located in a <em>*sh</em> sub-directory of
+one of the nodes on the Dotkit search path (see <code>dotkit(7)</code> for a full
+discussion of the search process.)
+And if you desire to make the functionality available to users
+of other shell types,
+you will need to write shell-specific versions of the package
+for those shells, too.</p>
+<p>The first line of a shell-specific package is a
+comment structured as shown previously.
+After that, you can write pure
+<em>bash</em>, <em>csh</em>, <em>ksh</em>, or <em>tcsh</em>
+code as necessary to get the job done.
+Any of the commands documented in dk-commands(5) can be used if you wish.</p>
+<p>A common approach in a shell-specific package is to 
+write it in two sections, one for ``use'' and another for ``unuse''.
+The <em>_dk_op</em> variable (note the leading underscore)
+is available for this purpose.
+A short but complete shell-specific package (for tcsh) is as follows:</p>
+<pre>
+  #c shell/dotkit
+  #d Set/unset the rmstar variable</pre>
+<pre>
+  if( $_dk_op == &quot;use&quot; ) then
+    set rmstar
+  else # unuse
+    unset rmstar
+  endif</pre>
+<p><em>Rmstar</em> is a shell variable known only in <em>tcsh</em>,
+that, if set, prompts the user before executing an ``rm&nbsp;*'' command.
+Since it's only available to users of that shell,
+the code to set or unset it should be in a shell-specific
+package.</p>
+<p>
+</p>
+<h2><a name="how_to_hide_a_dotkit">How to hide a dotkit</a></h2>
+<p>Not every dotkit necessarily has to be catalogued.
+Some may do work on behalf of other kits.
+Some may be for testing.
+Whatever.
+If the name of a dotkit begins with ``.'',
+it won't show up in the output from <em>use-usage</em>
+unless the <strong>-a</strong> option is also given.
+However, the kit will still be found and loaded if
+you ``use'' it by its proper name.</p>
+<p>If the first line of the kit is not a shell comment
+(beginning with '#'),
+the kit won't show up in <em>use-usage</em> either,
+regardless of its name or the options given.
+Like the first case, it will still be found and loaded
+if named explicitly.</p>
+<p>If the internals of the kit include the line</p>
+<pre>
+  setenv _dk_hide 1,</pre>
+<p>the kit will show up normally in <em>use-usage</em>,
+and will be found and loaded if named explicitly,
+but will not then be listed in the set of kits currently in use.
+This allows you to subsequently read the kit again
+without unusing it first.</p>
+<p>
+</p>
+<h2><a name="dotfile_setup">Dotfile setup</a></h2>
+<p>If you have read this far, perhaps you are considering whether
+Dotkit would be useful to incorporate into your own shell
+startup files.
+It was after all designed to help make those files shorter,
+easier to read, and more independent of system considerations.</p>
+<p>There is a small but complete working set of example shell startup files
+located at <em>$DK_ROOT/etc/example/</em>,
+along with a personal <em>$HOME/.kits/</em> directory
+for any of the four shells currently covered by Dotkit.
+Let's look at the ``cshrc'' startup file to consider a few of your options:</p>
+<pre>
+  # A basic .cshrc for use with Dotkit for csh and tcsh.
+  
+  #setenv DK_NODE /my/special/dotkits # optional project or group dotkits
+  # Look for Dotkit first in $DK_ROOT, then $HOME, then LLNL default.
+  if ( $?DK_ROOT ) then
+    eval `$DK_ROOT/init -c`
+  else if ( -d &quot;$HOME/dotkit&quot; ) then
+    eval `$HOME/dotkit/init -c`
+  else if ( -d &quot;/usr/gapps/dotkit&quot; ) then
+    eval `/usr/gapps/dotkit/init -c`
+  endif
+  
+  # This conditional needs to execute once only.
+  if ( ! $?SETUP_ONCE ) then
+    setenv SETUP_ONCE 1
+    use -q Sys Dev Prefs
+  endif
+  
+  # Remainder is read by every shell instance.
+  use -q alia1++ myalia++</pre>
+<p>As you probably know already, a <em>csh</em> process reads one or more files
+when it starts: <em>/etc/cshrc</em>, <em>$HOME/.cshrc</em>, and if it is a ``login''
+shell, <em>$HOME/.login</em>.
+There is a lot of variation in the exact name of the first file listed.
+Tcsh supplies many other alternative files,
+and can be compiled with further variant options.
+I won't consider those here.</p>
+<p>Csh was designed so that login shells would read both of <em>$HOME/.cshrc</em>
+and <em>$HOME/.login</em>, in that order,
+while all other shell instances would read only <em>$HOME/.cshrc</em>.
+In particular,
+remote shells started by <em>rsh</em> or <em>ssh</em> typically are not login shells,
+nor are those shell instances started by an X window display manager.
+Many users have therefore found <em>$HOME/.login</em> to be of minimal value.
+The example above assumes that there is no <em>$HOME/.login</em>
+file at all.  It does all the work traditionally done by the pair,
+with a conditional check to prevent most redundant setup.
+With that in mind, look at the first of the three sections in the file.</p>
+<p>The <em>setenv DK_NODE</em> line is optional, if you should need to
+reference dotkits in locations other than <em>$DK_ROOT</em> or
+site-specific locations set up by the Dotkit maintainer.
+If you do set it, do so before the <em>eval</em> line,
+because the <em>init</em> script may append site-specific components
+to DK_NODE.</p>
+<p>The seven line if/else test to locate a copy of Dotkit shows one approach
+that can be used to initialize the system.
+It can be reduced to a single <em>eval</em> if you really only
+need to reference one copy of Dotkit.</p>
+<p>Section two is the <em>if</em> test on SETUP_ONCE.
+This piece of code could reasonably be moved to $HOME/.login,
+if you prefer that arrangement,
+because it sets up environment variables that normally will
+be inherited automatically by any subsequent subshells.
+You could also choose to replace the ``use&nbsp;-q&nbsp;...'' statement
+with a simpler (faster) group of statements that set up
+a more minimal initial environment.</p>
+<p>Dotkit enables a new way to view your environment.
+Previously, most of us have built startup dotfiles that throw in
+all possible contingencies,
+because it is painful to change the environment later.
+With Dotkit,
+you can start from a minimal environment,
+and add to or change it later on.</p>
+<p>Section three is the ``Remainder''.
+It defines aliases,
+and so needs to be read by most shells.
+You might surround this line with an <em>if($?prompt)</em> test
+to keep non-interactive shells from looking for alia.
+Or you might choose to just set up your own alia definitions
+directly in this file,
+if your desires are simple.
+If you do choose to <em>use</em>,
+note that the dotkits need to be idempotent,
+or the request to re-read them will be ignored.</p>
+<p>
+</p>
+<hr />
+<h1><a name="environment">ENVIRONMENT</a></h1>
+<p>(See dk-commands(5) for the Dotkit environment variables.)</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>The original author of Dotkit is
+Lee Busby, Lawrence Livermore National Laboratory.
+Adam Moody, also of LLNL,
+has made additional major contributions.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2007, Lawrence Livermore National Security, LLC.
+See the file named ``Copyright'' for the full text of the copyright notice.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/busby/dotkit/html/./dk-commands.html">the dk-commands manpage</a>(5), <a href="/busby/dotkit/html/./dk-examples.html">the dk-examples manpage</a>(5), <a href="/busby/dotkit/html/./dotkit.html">the dotkit manpage</a>(7), <a href="/busby/dotkit/html/./use.html">the use manpage</a>(1), <a href="/busby/dotkit/html/./dk-admin.html">the dk-admin manpage</a>(8).</p>
+
+</body>
+
+</html>

@@ -3,8 +3,6 @@
 
 # Common code for 'use' and 'unuse'.
 set _dk_op = $_dk_s[1]
-set _dk_ali = $_dk_s[2]
-shift _dk_s
 shift _dk_s
 
 if ( $_dk_rl > 8 ) then
@@ -13,14 +11,19 @@ if ( $_dk_rl > 8 ) then
   goto _dk_uuend
 endif
 set _dk_recovering = 0
-if ($?_dk_err) goto _dk_uuend
+if ($?_dk_err) then
+  set _dk_stat = 2
+  if ($_dk_vtq | ($_dk_tq & $_dk_stat)) echo -n "${_dk_err}"
+  unsetenv _dk_err
+  unset _dk_stat
+endif
 
 set _dk_save_pream = ""
 # If the recursion level is >= 0, this invocation of "use" or "unuse"
 # must have come from within a dotkit.  The variables saved here belong
 # to the previous recursion level.
 if ( $_dk_rl >= 0 ) then
-  eval set _dk_save_opt_a$_dk_rl = "$_dk_opt_a"
+  eval setenv _dk_save_opt_a$_dk_rl "$_dk_opt_a"
   eval set _dk_save_pream$_dk_rl = "$_dk_pream"
   set _dk_save_pream = $_dk_pream
   eval set _dk_save_opt_q$_dk_rl = "$_dk_opt_q"
@@ -38,6 +41,7 @@ endif
 @ _dk_rl++
 
 if ( $_dk_rl == 0 ) then
+  set _dk_bl = ('  ' '    ' '      ' '        ' '          ' '            ' '              ' '                ' '                  ')
   set _dk_dirs = ""
   set _dk_dirs1 = ($DK_ROOT)
   if ($?DK_NODE) then
@@ -62,7 +66,7 @@ if ($?_dk_s) then
   while ($#_dk_s > 0)
     if ( "$_dk_s[1]" !~ -* ) break
     if ( "$_dk_s[1]" =~ -*q* ) set _dk_opt_q = 1
-    if ( "$_dk_s[1]" =~ -*a* ) set _dk_opt_a = 1
+    if ( "$_dk_s[1]" =~ -*a* ) setenv _dk_opt_a 1
     if ( "$_dk_s[1]" =~ -*v* ) set _dk_opt_v = 1
     if ( "$_dk_s[1]" =~ -*l* ) set _dk_opt_l = 1
     shift _dk_s
@@ -73,7 +77,7 @@ if ($?use_bequiet) set _dk_opt_q = 1 # Backward compatibility fix.
 set _dk_tq = 0
 set _dk_smsk = 4094
 set _dk_tactrn = 0
-if ( ! $?_dk_opt_a ) set _dk_opt_a = 0
+if ( ! $?_dk_opt_a ) setenv _dk_opt_a 0
 if ( ! $?_dk_opt_q ) set _dk_opt_q = 0
 if ( ! $?_dk_opt_v ) set _dk_opt_v = 0
 if ( ! $?_dk_opt_l ) set _dk_opt_l = 0
@@ -93,6 +97,8 @@ else
   setenv _dk_pream "Prepending"
 endif
 if ( ! $?_dk_self) set _dk_self = ""
+if ( ! $?_dk_sp) set _dk_sp = ""
+if ( $_dk_rl > 0 ) set _dk_sp = "$_dk_bl[$_dk_rl]"
 
 # _Dk_op was set in the "use" or "unuse" aliases.  It needs to be saved
 # before any packages are sourced, to account for possible future recursion.
@@ -100,12 +106,20 @@ eval set _dk_save_op$_dk_rl = "$_dk_op"
 
 if ($?_dk_s) then
   if ($#_dk_s > 0 && ! $_dk_opt_l) then
-    if ( $_dk_vtq ) echo -n "${_dk_pream}:"
+    if (! $?_dk_nl) set _dk_nl = 0
+    if ( $_dk_vtq ) then
+      if ( $_dk_nl == 1 ) then
+        echo ""
+        echo -n "$_dk_sp"
+      endif
+      echo -n "${_dk_pream}:"
+    endif
+    set _dk_nl = 1
     # Main loop on packages:
     # Copy the package list into a list per recursion level:
     eval set _dk_s$_dk_rl = \( $_dk_s \)
     eval foreach _dk_ \( \$_dk_s$_dk_rl \)
-      if ($_dk_ == "Super") set _dk_ = $_dk_self:t
+      if ("$_dk_" == "Super") set _dk_ = $_dk_self:t
       if ( $_dk_vtq ) echo -n " ${_dk_}"
 
       set _dk_stat = 0
@@ -132,16 +146,18 @@ if ($?_dk_s) then
           set _dk_stat = 1
           if ($_dk_vtq | ($_dk_tq & $_dk_stat) ) echo -n " (${_dk_tp}already loaded)"
         endif
+        set _dk_nl = 1
         goto _dk_nextpkg
       endif
 
       # Find the package file for this package:
       unset _dk_fnd
+      if ($_dk_ =~ /* && $_dk_dirs[1] != "/") set _dk_dirs = ( / $_dk_dirs )
       foreach _dk_dir ($_dk_dirs)
 
         # Handle Super reference:
-        if ($_dk_ == $_dk_self:t) then
-          if ($_dk_dir == $_dk_self:h) then
+        if ("$_dk_" == $_dk_self:t) then
+          if ("$_dk_dir" == $_dk_self:h) then
             set _dk_flg = 1
             continue
           else if ($_dk_flg == 0 ) then
@@ -157,8 +173,12 @@ if ($?_dk_s) then
           if ($_dk_opt_v) echo -n " (Found: ${_dk_self}.dk)"
           source ${_dk_self}.dk
           set _dk_stat = 0
-
+          if (! $?_dk_recovering) then
+            @ _dk_rl = 0
+            goto _dk_uuend
+          endif
           if ($_dk_recovering) goto _dk_uuend
+          if ( -x $DK_ROOT/etc/log ) $DK_ROOT/etc/log $_dk_self $_dk_op
           # Unset any variables on dk_setenv saved list:
           eval "$_dk_us"
 
@@ -166,6 +186,7 @@ if ($?_dk_s) then
             set _dk_stat = 2
             if ($_dk_vtq | ($_dk_tq & $_dk_stat)) echo -n "${_dk_err}"
             unsetenv _dk_err
+            set _dk_nl = 1
             goto _dk_nextpkg
           else if( $_dk_op == "use"  && $_dk_inlist == 0 && $_dk_hide == 0) then
             # Update _dk_inuse list:
@@ -180,6 +201,7 @@ if ($?_dk_s) then
               echo -n " (ok)"
             endif
           endif
+          set _dk_nl = 1
           goto _dk_nextpkg
         endif
 
@@ -192,12 +214,15 @@ if ($?_dk_s) then
       endif
   _dk_nextpkg:
     end # for loop on packages
-    if ($_dk_vtq | ($_dk_tq & $_dk_stat) ) echo ""
+    if ( ($_dk_vtq | ($_dk_tq & $_dk_stat)) & ($_dk_rl <= 0) ) then
+      echo ""
+      set _dk_nl = 0
+    endif
   else if ($_dk_op == "use" && ("$_dk_opt_v" == "1" || "$_dk_opt_q" != "1")) then
-    set _dk_rl = -1 # do this early in case use-usage is so slow user kills it
+    @ _dk_rl = -1 # do this early in case use-usage is so slow user kills it
     $DK_ROOT/etc/use-usage 0 $_dk_opt_v $_dk_opt_a $_dk_opt_l $_dk_opt_q $_dk_s
     set _dk_stat = 0
-    set _dk_rl = 0
+    @ _dk_rl = 0
   endif
 endif
 
@@ -206,15 +231,15 @@ _dk_uuend:
 eval unset _dk_save_op$_dk_rl
 eval unset _dk_s$_dk_rl
 
-@ _dk_rl--
+if ($_dk_rl >= 0) @ _dk_rl--
 
 if ($_dk_rl >= 0) then
   # Restore prior level:
   eval set _dk_op = '$'_dk_save_op$_dk_rl
   #eval unset _dk_save_op$_dk_rl
 
-  eval set _dk_opt_a = '$'_dk_save_opt_a$_dk_rl
-  eval unset _dk_save_opt_a$_dk_rl
+  eval setenv _dk_opt_a '$'_dk_save_opt_a$_dk_rl
+  eval unsetenv _dk_save_opt_a$_dk_rl
 
   eval setenv _dk_pream '$'_dk_save_pream$_dk_rl
   eval unset _dk_save_pream$_dk_rl
@@ -247,11 +272,12 @@ if ($_dk_rl >= 0) then
   endif
   unset _dk_uss
 else
-  unset _dk_op _dk_opt_a _dk_us _dk_opuse _dk_inlist _dk_ali _dk_dirs1
+  unset _dk_op _dk_us _dk_opuse _dk_inlist _dk_dirs1
   unset _dk_ _dk_dir _dk_dirs _dk_ext _dk_self _dk_recovering _dk_dirs2
   unset _dk_p _dk_s _dk_opt_q _dk_opt_v _dk_opt_l _dk_match _dk_fnd _dk_flg
   unset _dk_save_pream _dk_vtq _dk_tp _dk_smsk _dk_tq _dk_tactrn
-  unsetenv _dk_hide _dk_pream
+  unset _dk_bl _dk_sp _dk_nl
+  unsetenv _dk_hide _dk_pream _dk_err _dk_opt_a
 endif
 if ( ! $?_dk_stat ) set _dk_stat = 0
 set status = $_dk_stat

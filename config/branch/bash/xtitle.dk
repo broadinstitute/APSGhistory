@@ -1,0 +1,22 @@
+#c shell
+#d A functional title bar for your xterms
+
+if [[ $- = *i* ]]; then # interactive shell
+  if [[ $_dk_op = "use" && $TERM = xterm* ]]; then
+    do_title=yes
+    if [[ "$XBOOT" = "encrypted" ]]; then
+      if [[ -z $XBOOT2 ]]; then
+        setenv XBOOT2 child
+        do_title=no
+      fi
+    fi
+    if [[ $do_title = "yes" ]]; then
+      _dk_Host=${_dk_Host:-$(hostname)}
+      PROMPT_COMMAND='echo -ne "\033]0;${USER}@${_dk_Host%%.*}: ${PWD}\007"'
+    fi
+    unset do_title
+  else # unuse this package.
+    unset _dk_Host PROMPT_COMMAND
+    echo -ne "\033]0;xterm\007" # reset default title.
+  fi
+fi

@@ -1,0 +1,20 @@
+#c shell/dotkit
+#d Run envdiff before each prompt - useful for learning "use".
+
+# The precmd alias will only work on tcsh.
+if ($_dk_shell == "tcsh") then
+  set _tty = `tty | sed 's:.*/::'`
+  foreach __i (1 2)
+    if( -f /tmp/env_${USER}_${_tty}.$__i) then
+      /bin/rm -f /tmp/env_${USER}_${_tty}.$__i
+    endif
+  end
+  unset _tty __i
+  if ( $_dk_op == "use" ) then
+    alias precmd '$DK_ROOT/etc/envdiff'
+  else # unuse
+    unalias precmd
+  endif
+else
+  setenv _dk_err " (envdiff requires tcsh, not csh, sorry)"
+endif

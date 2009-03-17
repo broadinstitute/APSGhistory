@@ -1,0 +1,18 @@
+#c shell/dotkit
+#d Run envdiff before each prompt - useful for learning "use".
+
+#h Although this works fine for KSH93, PDKSH, and bash, it doesn't work
+#h on older ksh versions.  Sadly, that includes the ksh that ships with
+#h current Solaris, AIX, TRU64, probably HP-UX and IRIX.  They are still
+#h shipping KSH88, which is now 16 years old.  Sometimes you don't get what
+#h you pay for.
+
+_tty=`tty | sed 's:.*/::'`
+/bin/rm -f /tmp/env_${USER:-$LOGNAME}_${_tty}.[12]
+unset _tty
+
+if [[ $_dk_op = "use" ]]; then
+  PS1='$($DK_ROOT/etc/envdiff -x)'"$PS1"
+else # unuse
+  PS1="${PS1#*\)}"
+fi

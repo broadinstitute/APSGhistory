@@ -1,0 +1,134 @@
+Copyright (c) 2004, The Regents of the University of California.
+Produced at the Lawrence Livermore National Laboratory
+Written by Lee Busby <busby1@llnl.gov>.
+UCRL-CODE-155929.
+All rights reserved.
+See the file named "Copyright" for the full text of the copyright notice.
+
+                          The README file for Dotkit.
+
+*******************
+* GETTING STARTED *
+*******************
+
+To try out Dotkit:
+
+  eval `/<directory/where/this/README/is>/init`
+
+For example, if at your site, the main Dotkit directory is located at
+/usr/local/dotkit, you should type (note the back quotes):
+
+  eval `/usr/local/dotkit/init`
+
+(If you are using bash or ksh, and if your shell complains about
+"parameter not set" or "unbound variable", type "set +u" before the eval
+command.)  Now type "use" without any arguments.  You should get a usage
+message that will tell you the syntax and some other basic information,
+then give a listing of all the currently available packages.  After you
+have played with it for awhile, if you like it, add the "eval" line near
+the beginning of your .cshrc or .profile file.  Specific instructions
+for starting Dotkit may vary slightly for your particular site.
+
+**************
+* WHAT IT IS *
+**************
+
+Dotkit is a set of shell scripts, small "package" files (dotkits), and
+an organizing plan to help you set up, modify, maintain, and understand
+your working environment.  It provides a uniform interface for setting
+your PATH, MANPATH, and other environment variables during login, as
+well as interactively.
+
+Suppose your site has a package named "viztools".  In order to add all
+the appropriate values to your PATH, etc. and get access to the files,
+you say
+
+  use viztools.
+
+Later on, when you are done, you say
+
+  unuse viztools
+
+to remove the package from your environment.  If you know you always want
+"viztools" to be available, you can put the command into one of your
+dotfiles, and get it automatically loaded whenever you start a session.
+
+Dotkit works with bash, csh, ksh, or tcsh, among common user shells.
+(Others might be added.)  It has capabilities that let you (or the site
+maintainer) specialize the available set of packages according to the
+platform or SYS_TYPE you are on.  You can write your own package files
+if you like.  Most of them are around 5 lines long, and are simple to
+read, understand, and create.
+
+****************
+* INSTALLATION *
+****************
+
+Dotkit is distributed in a single small tar file.  Choose a location to
+serve as DK_ROOT, and unpack the file at that spot.  DK_ROOT should be
+visible from any host on the network where you want to use the system.
+For an individual user, putting Dotkit in your HOME directory is a
+good choice.
+
+Suppose your name is Jane Foobar, with HOME directory at /usr/home/foobar,
+and the Dotkit tar file is named "dotkit.tgz".  Unpack the tar file there,
+and start up Dotkit like this:
+
+  gunzip -c dotkit.tgz | tar xf -
+  eval `$HOME/dotkit/init`
+
+That's it!  You can now type the "use" command with no arguments, and
+read its output for more instruction.  Also try
+
+  use dotkit
+  man dotkit    # Other man pages are also available.
+  use -l        # "Long listing" of available dotkits.
+
+If you observe problems getting started, try running the "make links"
+command in the dotkit/etc subdirectory.  There are a few important
+symbolic links that are usually correct as shipped, but that sometimes
+get lost.  If man pages have not yet been created, "cd man; make" will
+generate them, assuming perlpod is available on your system.
+
+Optional:
+
+Having unpacked the tar file, "cd dotkit", and edit or add several files:
+
+  init: You can hardwire the value for DK_ROOT to correspond with
+    its actual location at your site, if it differs from the default.
+
+  etc/use-usage: Add a file to dotkit/etc named DK_MAINTAINER with the
+    name of the person(s) who will care for your site.  An optional file
+    named "dk-news" in dotkit/etc is for ongoing, site-wide news about
+    updates and changes to your Dotkit system.
+
+  Add a site-specific subdirectory to your installation:  Read the
+    man page for dotkit(7) to learn more about this.  When you are ready,
+    add a file named "DK_NODE" to the dotkit/etc subdirectory for your
+    installation.
+
+Testing:
+
+  Move to dotkit/etc/test, and type "make":
+    This runs a set of regression tests, to verify operation at
+    your site.  Each test should end with "ok" for every shell.
+
+Examples:
+  
+  In etc/example, there are example files that can be used as .cshrc,
+    .profile, and so on.  (These are not necessary for using Dotkit,
+    but you might find them interesting.)
+
+**********************************
+* MAKING YOUR OWN COPY OF DOTKIT *
+**********************************
+
+If you are reading this file in an already-set up copy of Dotkit, you can
+make yourself a tar archive for use elsewhere by doing the following:
+
+  cd $DK_ROOT/etc; make export
+
+This should create a gzip'ed tar file at /tmp, named according to your
+USER name on this system.  (For me, the file is named "dk-busby.tgz".)
+You can then take this file elsewhere and install it according to the
+instructions above.

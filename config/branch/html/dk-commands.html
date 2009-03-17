@@ -1,0 +1,727 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>NAME</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<ul>
+
+		<li><a href="#dotkit_commands_for_interactive_or_shell_script_use">Dotkit commands for interactive or shell script use</a></li>
+		<li><a href="#basic_functions_for_use_in_dotkits_only">Basic functions for use in dotkits only</a></li>
+		<li><a href="#advanced_functions_for_use_in_dotkits_only">Advanced functions for use in dotkits only</a></li>
+		<li><a href="#special_variables_for_use_in_dotkits">Special variables for use in dotkits</a></li>
+	</ul>
+
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#environment">ENVIRONMENT</a></li>
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>The reference document for all Dotkit commands, functions and special variables.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<p>
+</p>
+<h2><a name="dotkit_commands_for_interactive_or_shell_script_use">Dotkit commands for interactive or shell script use</a></h2>
+<p>use   [ <strong>-alqv</strong> ] [ <em>pkg</em> ... ]</p>
+<p>unuse [ <strong>-alqv</strong> ] [ <em>pkg</em> ... ]</p>
+<p>reuse [ <strong>-alqv</strong> ] [ <em>pkg</em> ... ]</p>
+<p>alter   [ <strong>-a</strong> ] <em>VARIABLE</em> <em>COMPONENT</em> [ <em>SEPARATOR</em> ]</p>
+<p>unalter [ <strong>-a</strong> ] <em>VARIABLE</em> <em>COMPONENT</em> [ <em>SEPARATOR</em> ]</p>
+<p>car <em>WORDLIST_VALUE</em> [ <em>NTH</em> ] [ <em>SEPARATOR</em> ]</p>
+<p>cdr <em>WORDLIST_VALUE</em> [ <em>NTH</em> ] [ <em>SEPARATOR</em> ]</p>
+<p>
+</p>
+<h2><a name="basic_functions_for_use_in_dotkits_only">Basic functions for use in dotkits only</a></h2>
+<p>dk_alter <em>VARIABLE</em> <em>COMPONENT</em> [ <em>SEPARATOR</em> ]</p>
+<p>dk_setenv <em>VARIABLE</em> [ <em>VALUE</em> ]</p>
+<p>dk_setdef <em>VARIABLE</em> [ <em>VALUE</em> ]</p>
+<p>
+</p>
+<h2><a name="advanced_functions_for_use_in_dotkits_only">Advanced functions for use in dotkits only</a></h2>
+<p>dk_alias <em>ALIAS_NAME</em> <em>'ALIAS_DEFINITION'</em></p>
+<p>dk_cev <em>VARIABLE</em></p>
+<p>dk_op [ <strong>-alqv</strong> ] <em>pkg</em> [ ... ]</p>
+<p>dk_rep '<em>PATTERN</em>' [ '<em>PATTERN</em>' ... ]</p>
+<p>dk_source <em>FILE</em></p>
+<p>dk_test <em>EXPRESSION</em></p>
+<p>dk_where <em>PROGRAM_NAME</em></p>
+<p>
+</p>
+<h2><a name="special_variables_for_use_in_dotkits">Special variables for use in dotkits</a></h2>
+<p>setenv _dk_err ``<em>ERROR MESSAGE</em>''</p>
+<p>setenv _dk_ok ``<em>CUSTOM REPLY</em>''</p>
+<p>setenv _dk_hide 0|1</p>
+<p>setenv _dk_opt_a 0|1</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This is the reference document for Dotkit commands,
+functions, and special variables.
+It covers arguments, options, return values, and other usage
+details, with brief examples where appropriate.</p>
+<p>An introduction to the <em>use</em> and <em>unuse</em> commands is available
+in the <code>use(1)</code> man page.
+The overall structure and organization of Dotkit is
+covered in the <code>dotkit(1)</code> man page.
+Examples of how to write a dotkit,
+and how to use the various functions together are provided in the
+dk-examples(1) man page.</p>
+<dl>
+<dt><strong><a name="item_use_%5b_%2dalqv_%5d_%5b_pkg_%2e%2e%2e_%5d">use [ <strong>-alqv</strong> ] [ <em>pkg</em> ... ]</a></strong><br />
+</dt>
+<dt><strong><a name="item_unuse_%5b_%2dalqv_%5d_%5b_pkg_%2e%2e%2e_%5d">unuse [ <strong>-alqv</strong> ] [ <em>pkg</em> ... ]</a></strong><br />
+</dt>
+<dd>
+Read the dotkits named as arguments,
+and interpret their contents in the current shell process.
+If no arguments are given,
+run the program $DK_ROOT/etc/use-usage,
+which normally provides a view of the current state of your
+environment,
+and a list of available packages.
+</dd>
+<dd>
+<p>The <strong>-a</strong> ``append'' option causes any components added to environment
+variables by <em>pkg</em> to be appended instead of prepended.
+If <strong>-a</strong> is given with no package arguments,
+it causes <em>use-usage</em> to list all packages,
+including any whose name begins with ``.'' (dot).</p>
+</dd>
+<dd>
+<p>The <strong>-l</strong> ``long listing'' option
+turns off the interpretation (sourcing) of any <em>pkg</em> arguments that follow.
+With no other arguments,
+this option produces a summary of available dotkits.
+If a <em>pkg</em> argument follows,
+the descriptive text and any help text for that <em>pkg</em> is
+printed to the screen.
+The <strong>-l</strong> option can be combined with <strong>-v</strong> to produce more verbose output.
+With no arguments, <strong>-lv</strong> prints a usage message,
+a list of packages currently in use,
+a summary of available packages,
+and a list of all nodes in the Dotkit search path.
+With a <em>pkg</em> argument, <strong>-lv</strong> prints the entire contents of the <em>pkg</em>.
+The <strong>-l</strong> option is quietly ignored by <em>unuse</em>.</p>
+</dd>
+<dd>
+<p>The <strong>-q</strong> ``quiet'' option causes <em>use</em> or <em>unuse</em> to be
+entirely quiet in operation.
+It is commonly used inside dotfiles,
+or inside nested (recursive) dotkits.
+A special dotkit, <em>bequiet</em>, is available to make the <strong>-q</strong> option
+persistent.</p>
+</dd>
+<dd>
+<p>Output behavior similar to <strong>-q</strong>,
+but allowing notice of particular errors,
+can be achieved by setting the <em>dk_taciturn</em> environment variable
+to a non-zero value.
+A special <em>taciturn</em> dotkit is available to make this mode persistent.
+Precise control over the warnings printed in
+taciturn mode is achieved by setting the <em>dk_smask</em>
+environment variable,
+which has a default value of 4094.
+<em>Dk_smask</em> is a bitmask applied to the return status
+of <em>use</em> or <em>unuse</em>, detailed below.
+Each bit set in <em>dk_smask</em> allows a warning for that
+particular error status, if in taciturn mode.</p>
+</dd>
+<dd>
+<p>The <strong>-v</strong> ``verbose'' option causes <em>use</em> or <em>unuse</em> to print the full
+pathname of each <em>pkg</em> argument as it is found and sourced.
+This option over-rides <strong>-q</strong> and taciturn mode.
+Note that Dotkit also checks whether stdin appears to be a tty.
+If not, output messages are turned off for any option except <strong>-v</strong>.</p>
+</dd>
+<dd>
+<p><em>Unuse</em> normally reverses the action of <em>use</em>.
+It finds and reads the <em>pkg</em> argument files,
+but causes their actions to be undone relative to <em>use</em>.</p>
+</dd>
+<dd>
+<p>Return status:
+0 if a dotkit is found and read without
+apparent error.
+1 means the dotkit was found,
+but ignored (previously read),
+and 2 means that <em>_dk_err</em> was set during package execution,
+indicating a package error.
+4 indicates a dotkit was not found at the initial (zeroth) recursion level.
+8 indicates a dotkit was not found at the second recursion level,
+and so on, up to recursion level nine.
+If more than one argument is given,
+<em>use</em> and <em>unuse</em> return the status of their last operation.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_reuse_%5b_%2dalqv_%5d_%5b_pkg_%2e%2e%2e_%5d">reuse [ <strong>-alqv</strong> ] [ <em>pkg</em> ... ]</a></strong><br />
+</dt>
+<dd>
+This command is shorthand for the pair of operations:
+</dd>
+<dd>
+<pre>
+  unuse pkg
+  use pkg</pre>
+</dd>
+<dd>
+<p>It has the effect of re-reading <em>pkg</em> and moving it to the front of the list
+of packages in use.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_alter_%5b_%2da_%5d_variable_component_%5b_separato">alter   [ <strong>-a</strong> ] <em>VARIABLE</em> <em>COMPONENT</em> [ <em>SEPARATOR</em> ]</a></strong><br />
+</dt>
+<dt><strong><a name="item_unalter_%5b_%2da_%5d_variable_component_%5b_separa">unalter [ <strong>-a</strong> ] <em>VARIABLE</em> <em>COMPONENT</em> [ <em>SEPARATOR</em> ]</a></strong><br />
+</dt>
+<dd>
+Add (alter) or remove (unalter) components
+to or from the named <em>VARIABLE</em>,
+a list of zero or more components delimited by <em>SEPARATOR</em>,
+which defaults to the value of <em>DK_IFS</em>,
+or colon if that is not set.
+These commands provide interactive or shell script access to the
+machinery of the <em>dk_alter</em> function.
+Inside a dotkit, you should generally choose <em>dk_alter</em> instead,
+as it utilizes its calling context (use or unuse) to add or remove the
+<em>COMPONENT</em>, respectively.
+</dd>
+<dd>
+<p><em>Alter</em> prepends <em>COMPONENT</em> to <em>VARIABLE</em>,
+unless the <strong>-a</strong> (append) option is given.
+<em>Unalter</em> removes the first or last (<strong>-a</strong>) instance of <em>COMPONENT</em>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_car_wordlist_value_%5b_nth_%5d_%5b_separator_%5d">car <em>WORDLIST_VALUE</em> [ <em>NTH</em> ] [ <em>SEPARATOR</em> ]</a></strong><br />
+</dt>
+<dt><strong><a name="item_cdr_wordlist_value_%5b_nth_%5d_%5b_separator_%5d">cdr <em>WORDLIST_VALUE</em> [ <em>NTH</em> ] [ <em>SEPARATOR</em> ]</a></strong><br />
+</dt>
+<dd>
+<em>WORDLIST_VALUE</em> is a list of components separated by
+<em>SEPARATOR</em>, which defaults to the value of <em>DK_IFS</em>,
+or colon if that is not set.
+(The value of $PATH is one example.)
+<em>Car</em> returns (echoes) the <em>NTH</em> component of the list,
+where <em>NTH</em> defaults to 0, the index of the first component.
+<em>Cdr</em> echoes all components remaining after the <em>NTH</em>,
+with <em>NTH</em> defaulting to 1 in this case.  Some examples:
+</dd>
+<dd>
+<pre>
+  car a:b:c 0 :         # =&gt; a, equivalent to ``car a:b:c''
+  car a:b:c 1 :         # =&gt; b
+  car a:b:c 3 :         # =&gt; (nil), the empty list</pre>
+</dd>
+<dd>
+<pre>
+  cdr a:b:c 0 :         # =&gt; a:b:c, the entire list
+  cdr a:b:c 1 :         # =&gt; b:c, equivalent to ``cdr a:b:c''
+  cdr a:b:c 3 :         # =&gt; (nil), the empty list</pre>
+</dd>
+<dd>
+<p>If <em>WORDLIST_VALUE</em> contains whitespace,
+it should generally be surrounded by quotes.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_alter_variable_component_%5b_separator_%5d">dk_alter <em>VARIABLE</em> <em>COMPONENT</em> [ <em>SEPARATOR</em> ]</a></strong><br />
+</dt>
+<dd>
+(The remaining functions and variables should be accessed only
+from within a dotkit or package context.
+Calling them directly from the command line or from within a
+personal script will yield incorrect results.)
+</dd>
+<dd>
+<p><em>Dk_alter</em> adds to, in the case of <em>use</em>, or deletes from,
+in the case of <em>unuse</em>,
+the given component for the given <em>VARIABLE</em>.
+The value of <em>VARIABLE</em> is a list of zero or more
+components, separated by <em>SEPARATOR</em>,
+such as the <em>PATH</em> environment variable.
+The default <em>SEPARATOR</em> is the value of <em>DK_IFS</em>,
+or colon (:) if that is not set.
+In particular, <em>SEPARATOR</em> can be a single SPACE or TAB character,
+generally given inside single quotes.
+If a (properly quoted) <em>COMPONENT</em> itself contains SPACE characters,
+the <em>SEPARATOR</em> cannot also be SPACE.
+For any given <em>VARIABLE</em>, <em>SEPARATOR</em> is a constant value.
+The [t]csh implementation of <em>dk_alter</em> may temporarily modify
+the contents of <em>VARIABLE</em>,
+converting SPACE characters to `^B' (Control-B).</p>
+</dd>
+<dd>
+<p>It is possible to supply multiple components to this command.
+E.g., the following syntax works with the commonly expected meaning:</p>
+</dd>
+<dd>
+<pre>
+  dk_alter PATH /bin:/usr/bin</pre>
+</dd>
+<dd>
+<p>Multiple components are added or removed as a group, in the order
+that they appear in the command line.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_setenv_variable_%5b_value_%5d">dk_setenv <em>VARIABLE</em> [ <em>VALUE</em> ]</a></strong><br />
+</dt>
+<dd>
+In the case of <em>use</em>,
+set <em>VARIABLE</em> to <em>VALUE</em>.
+In the case of <em>unuse</em>,
+unset the given environment variable.
+</dd>
+<dd>
+<p>To be more precise,
+in the case of <em>use</em>,
+<em>dk_setenv</em> checks the variable about to be set,
+and if it already has a non-null value,
+saves the old value before setting the new.
+In the case of <em>unuse</em>,
+<em>dk_setenv</em> re-installs the value for the duration of the package read,
+but places a deferred restore or unsetenv command onto a list to
+be executed when the package read is complete.</p>
+</dd>
+<dd>
+<p>Thus, subsequent <em>dk_alter</em> or <em>dk_setenv</em> commands
+in the same dotkit
+that use the variable in question will operate as expected.
+Moreover, if variables in your environment are reset by a given package,
+they will normally be restored to their original value
+when the package is <em>unused</em>.</p>
+</dd>
+<dd>
+<p>Otherwise, <em>dk_alter</em> and <em>dk_setenv</em> take immediate effect,
+so the following sequence in a package file has the
+manifest outcome:</p>
+</dd>
+<dd>
+<pre>
+  dk_setenv ABC_HOME /usr/abc
+  dk_alter PATH $ABC_HOME/bin
+  dk_alter MANPATH $ABC_HOME/man</pre>
+</dd>
+<dd>
+<p>E.g., if ABC_HOME has a pre-existing value,
+it is first saved by <em>dk_setenv</em>,
+then ABC_HOME is set to the value <em>/usr/abc</em>.
+A new component is added to PATH with value <em>/usr/abc/bin</em>,
+and a new component to MANPATH with value <em>/usr/abc/man</em>.
+Unusing the package will remove those components from PATH and
+MANPATH, and will restore ABC_HOME to the value (if any) it had before
+the package was <em>used</em> in the first place.</p>
+</dd>
+<dd>
+<p>Return status: 1 if the second argument is null, otherwise 0.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_setdef_variable_%5b_value_%5d">dk_setdef <em>VARIABLE</em> [ <em>VALUE</em> ]</a></strong><br />
+</dt>
+<dd>
+This is a variant of <em>dk_setenv</em> that sets <em>VARIABLE</em> to
+<em>VALUE</em> only if <em>VARIABLE</em> is currently unset or has the
+NULL (empty string) value.
+It is otherwise the same as <em>dk_setenv</em>.
+</dd>
+<dd>
+<p>For the <em>unuse</em> operation,
+<em>dk_setdef</em> unsets <em>VARIABLE</em> only if the prior <em>use</em>
+set it to the the given default <em>VALUE</em>, 
+(or if the variable's previous value was identically <em>VALUE</em>.)</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_alias_alias_name_%27alias_definition%27">dk_alias <em>ALIAS_NAME</em> <em>'ALIAS_DEFINITION'</em></a></strong><br />
+</dt>
+<dd>
+Create (or restore/remove, in the case of <em>unuse</em>),
+the alias <em>ALIAS_NAME</em> with the given definition.
+The syntax of <em>dk_alias</em> is essentially identical to that of the
+csh or tcsh <em>alias</em> command.
+Alias definitions that include arguments
+(words of the form <em>\!:1</em>, etc.) are allowed,
+and will be processed correctly by <em>csh</em> or <em>tcsh</em>,
+but are quietly ignored by <em>bash</em> or <em>ksh</em>.
+</dd>
+<dd>
+<p>If <em>ALIAS_NAME</em> has a pre-existing value,
+it is saved during a <em>use</em> operation in a new alias
+named <em>_dk_sal_ALIAS_NAME</em>.
+A subsequent <em>unuse</em> operation will restore the original alias value.</p>
+</dd>
+<dd>
+<p>Dotkits containing the <em>dk_alias</em> command typically
+are marked as <em>idempotent</em> by appending '++' to the
+dotkit name (e.g., <em>foo++.dk</em>.)
+This allows Dotkit to read the package more than once,
+a requirement if subshells are to receive proper alias definitions.</p>
+</dd>
+<dd>
+<p>Multi-line alias definitions are allowed.
+Proper quoting of multi-line definitions can occasionally be tricky
+with older versions of <em>csh</em>.
+The simplest syntax is of the form:</p>
+</dd>
+<dd>
+<pre>
+  dk_alias foofer 'test &quot;$foo&quot; = &quot;XX&quot; &amp;&amp; \\
+                   echo &quot;foo is XX&quot; || \\
+                   echo &quot;foo is not XX&quot;'</pre>
+</dd>
+<dd>
+<p>However, old versions of csh may require that each line be
+separately quoted, with a single backslash, as follows.</p>
+</dd>
+<dd>
+<pre>
+  dk_alias foofer 'test &quot;$foo&quot; = &quot;XX&quot; &amp;&amp;' \
+                  'echo &quot;foo is XX&quot; ||' \
+                  'echo &quot;foo is not XX&quot;'</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_cev_variable">dk_cev <em>VARIABLE</em></a></strong><br />
+</dt>
+<dd>
+Print the value 1 if you can safely evaluate <em>VARIABLE</em>,
+or 0 otherwise.
+</dd>
+<dd>
+<p>Typical usage:</p>
+</dd>
+<dd>
+<pre>
+  dk_test `dk_cev FOO` -eq 1 &amp;&amp; dk_setenv BAR $FOO</pre>
+</dd>
+<dd>
+<p>This provides shell-independent code equivalent to the csh test:</p>
+</dd>
+<dd>
+<pre>
+  if ($?FOO) then
+    dk_setenv BAR $FOO
+  endif</pre>
+</dd>
+<dd>
+<p><em>Dk_cev</em> always prints 1 for bash or ksh,
+as those shells traditionally do not distinguish
+between unset variables and variables that are set,
+but whose value is the empty string.</p>
+</dd>
+<dd>
+<p>Return status for this function is always 0.
+The relevant value is the one that it *prints*.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_op_%5b_%2dalqv_%5d_pkg_%5b_%2e%2e%2e_%5d">dk_op [ <strong>-alqv</strong> ] <em>pkg</em> [ ... ]</a></strong><br />
+</dt>
+<dd>
+<em>Use</em> or <em>unuse</em> the <em>pkg</em>, depending on the context in which
+<em>dk_op</em> occurs.
+This command is used inside recursive or nested dotkits,
+to read and source sub-packages.
+If the parent dotkit was <em>used</em>,
+then <em>dk_op</em> also means <em>use</em>.
+If the parent dotkit was <em>unused</em>,
+then <em>dk_op</em> unuses its argument list.
+Options, usage, and return values are otherwise
+identical to <em>use</em> and <em>unuse</em>.
+However, the <strong>-l</strong> option should never be used with this command.
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_rep_%27pattern%27_%5b_%27pattern%27_%2e%2e%2e_%">dk_rep '<em>PATTERN</em>' [ '<em>PATTERN</em>' ... ]</a></strong><br />
+</dt>
+<dd>
+Print the names, if any, of dotkits presently in use whose
+name matches <em>PATTERN</em>,
+in the sense of shell pattern matching.
+If no names match, the token ``__NIL__'' is printed.
+One or more patterns can be given,
+and can include the usual shell meta-characters.
+Single quotes around the pattern are generally required.
+The <em>dk_rep</em> function is commonly used in the case
+of <em>mutex</em> (mutually exclusive) dotkits.
+</dd>
+<dd>
+<p>Return status: 0 if at least one dotkit currently in use matches the
+given pattern(s), otherwise 1.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_source_file">dk_source <em>FILE</em></a></strong><br />
+</dt>
+<dd>
+This command is equivalent to ``source'' for csh or tcsh,
+or ``.'' for bash and ksh,
+with the same return values as those commands.
+It allows you to read the contents of another file in your
+current shell, from within a package file.
+This is occasionally useful.
+If <em>FILE</em> is itself a dotkit, use <em>dk_op</em> instead.
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_test_expression">dk_test <em>EXPRESSION</em></a></strong><br />
+</dt>
+<dd>
+Apply the standard Unix <code>test(1)</code> command to <em>EXPRESSION</em>.
+<em>Dk_test</em> takes the same expressions as that program,
+with the same return values,
+and can be used to construct simple if-else tests
+in your dotkits, in shell-independent fashion:
+</dd>
+<dd>
+<pre>
+  dk_test -d /usr/local/gribble &amp;&amp; dk_setenv GRIBBLE YES</pre>
+</dd>
+<dd>
+<p>sets GRIBBLE to YES if /usr/local/gribble is a directory.
+See the <code>test(1)</code> man page for more information on that command.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_where_program_name">dk_where <em>PROGRAM_NAME</em></a></strong><br />
+</dt>
+<dd>
+Print the full path of <em>PROGRAM_NAME</em> if found,
+returning status 0,
+or be silent, with return status 1.
+<em>Dk_where</em> searches first in the current <em>PATH</em>,
+then searches the in order
+/bin, /usr/bin, /sbin, /usr/sbin, /usr/ucb, /usr/bsd, /usr/local/bin
+for <em>PROGRAM_NAME</em>.
+<em>Dk_where</em> is implemented as an external script,
+located at $DK_ROOT/etc/where.
+</dd>
+<p></p>
+<dt><strong><a name="item_special_variables">Special variables</a></strong><br />
+</dt>
+<dd>
+<pre>
+  setenv _dk_err &quot;&lt;error message&gt;&quot;
+  setenv _dk_ok &quot;&lt;custom reply&gt;&quot;
+  setenv _dk_hide 0|1
+  setenv _dk_opt_a 0|1</pre>
+</dd>
+<dd>
+<p>The <em>_dk_err</em> variable is used to indicate that something
+went wrong while reading a package file.
+Set it to a string value,
+which will be printed in place of the usual ``(ok)'' when Dotkit
+returns after reading the package file.
+After <em>_dk_err</em> is set in a package file,
+subsequent <em>dk_alter</em>, <em>dk_setenv</em>, <em>use</em>, <em>unuse</em>,
+or <em>dk_op</em> commands inside 
+that file are ignored,
+and the package name is not added to the list of current
+packages in use.</p>
+</dd>
+<dd>
+<p>The <em>_dk_ok</em> variable allows a package author to customize the
+reply message from Dotkit after attempting to read a package.
+By default, if the package is found and read successfully,
+the reply is `` (ok)''.
+If <em>_dk_ok</em> is set, its value is substituted for the default text.
+Setting <em>_dk_ok</em> does not affect return status.
+If <em>_dk_err</em> is also set, its value will dominate <em>_dk_ok</em>.</p>
+</dd>
+<dd>
+<p><em>_Dk_hide</em> is a boolean variable whose value is normally 0 (FALSE).
+Set it to 1 (TRUE) if you wish to hide (not include)
+the current package in the list of packages in use.
+This is occasionally useful in a ``worker'' package
+that is called from various places,
+but which should not show up itself as in use.
+Obviously, such a package needs to be written with re-use in mind,
+since hiding it also prevents Dotkit from ignoring it in
+any future ``use'' request.</p>
+</dd>
+<dd>
+<p>The <em>_dk_opt_a</em> variable allows a package author to over-rule
+the <strong>-a</strong> flag if necessary, or conversely, to force an append operation
+even if the user does not provide <strong>-a</strong>.
+Typical use is as follows:</p>
+</dd>
+<dd>
+<pre>
+  # Force prepend &quot;bar&quot; to &quot;foo&quot;.
+  setenv _dk_opt_a 0
+  dk_alter foo bar
+  # Force append &quot;/usr/bin&quot; to PATH.
+  setenv _dk_opt_a 1
+  dk_alter PATH /usr/bin</pre>
+</dd>
+<dd>
+<p>Note the leading underscore in the names of these variables,
+and note that their value is properly set using <em>setenv</em>,
+not <em>dk_setenv</em>.
+They are reset automatically by Dotkit before
+the next operation.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="environment">ENVIRONMENT</a></h1>
+<dl>
+<dt><strong><a name="item_dk_root">DK_ROOT</a></strong><br />
+</dt>
+<dd>
+Path to the root of a Dotkit installation.
+The code implementing Dotkit is stored in the various <em>*sh</em>
+subdirectories of $DK_ROOT, and at $DK_ROOT/etc.
+DK_ROOT is also the root node on the tree of directories
+searched for package files.
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_node">DK_NODE</a></strong><br />
+</dt>
+<dd>
+Optional colon-separated list of directories added to
+the path searched by Dotkit.
+This is often used to add site-specific dotkits to an installation.
+</dd>
+<p></p>
+<dt><strong><a name="item_sys_type">SYS_TYPE</a></strong><br />
+</dt>
+<dd>
+A string identifying the current architecture.
+SYS_TYPE may be pre-set for you by the network administrators.
+If not,
+a script is provided at $DK_ROOT/etc/systype to compute some
+common values of SYS_TYPE.
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_useusage">DK_USEUSAGE</a></strong><br />
+</dt>
+<dd>
+Optional pathname to a replacement for the $DK_ROOT/etc/use-usage program.
+</dd>
+<p></p>
+<dt><strong><a name="item__dk_shell">_dk_shell</a></strong><br />
+</dt>
+<dd>
+The base name of your shell interpreter program:
+<em>bash</em>, <em>csh</em>, <em>ksh</em>, or <em>tcsh</em>.
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_subnode">DK_SUBNODE</a></strong><br />
+</dt>
+<dd>
+A colon-separated list of directories searched for package
+files within each node of the package file tree.
+The default value for DK_SUBNODE has four components:
+</dd>
+<dd>
+<pre>
+  $_dk_shell/$SYS_TYPE:$_dk_shell:$SYS_TYPE:.</pre>
+</dd>
+<dd>
+<p>It can be useful to change or add to this list in certain special
+circumstances.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item__dk_inuse">_dk_inuse</a></strong><br />
+</dt>
+<dd>
+A space-separated list of package names currently in use.
+A trailing digit identifies the recursion level at which the
+package was loaded,
+with 0 being the top (command line) level,
+and 9 the deepest (maximum) level.
+</dd>
+<p></p>
+<dt><strong><a name="item__dk_rl">_dk_rl</a></strong><br />
+</dt>
+<dd>
+The ``recursion level'' for Dotkit:
+An integer variable with legal values in the range -1, 0, 1, ..., 9.
+When not actually processing a ``use'' or ``unuse'' command,
+the correct value for _dk_rl is -1.
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_export_bash_fns">DK_EXPORT_BASH_FNS</a></strong><br />
+</dt>
+<dd>
+Dotkit is implemented primarily using shell functions for bash and ksh.
+By default, those functions are not exported to the environment for
+bash users.  Bash users can choose to export the Dotkit shell functions
+by defining this environment variable to 'YES' (or any other non-null
+string) before executing the ``eval `.../dotkit/init`'' initialization
+command.
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_ifs">DK_IFS</a></strong><br />
+</dt>
+<dd>
+Defines the character used to separate components
+of wordlist variables.
+If unset, the default is ':' (colon).
+</dd>
+<p></p>
+<dt><strong><a name="item_dk_ueqru">DK_UEQRU</a></strong><br />
+</dt>
+<dd>
+If this variable is set to a non-null value,
+the ``use'' command behaves as a ``reuse''.
+That is, any package arguments are first (quietly) unused,
+then re-read.
+This can occasionally be helpful if processes other than Dotkit
+are changing the environment.
+A <em>reuse</em> dotkit is available to conveniently set or unset this
+variable.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>It would be nice if <em>dk_alias</em> accepted arguments for all shells,
+and wrote an appropriate shell function in the case of bash or ksh.
+Some versions of ksh from AT&amp;T may not properly
+save and restore aliases whose name
+begins with a literal '+' or '-' character.</p>
+<p>Handling of null (empty) components in <em>dk_alter</em>, <em>alter</em>, <em>unalter</em>
+is inconsistent and sometimes incorrect.
+Adding a null component to an empty wordlist produces an empty result.
+Attempting to add more than one null component to a wordlist
+may produce incorrect results.
+Null components in a context where the SEPARATOR character is whitespace
+may produce incorrect results.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>The original author of Dotkit is
+Lee Busby, Lawrence Livermore National Laboratory.
+Adam Moody, also of LLNL,
+has made additional major contributions.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2007, Lawrence Livermore National Security, LLC.
+See the file named ``Copyright'' for the full text of the copyright notice.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/busby/dotkit/html/./dk-commands.html">the dk-commands manpage</a>(5), <a href="/busby/dotkit/html/./dk-examples.html">the dk-examples manpage</a>(5), <a href="/busby/dotkit/html/./dotkit.html">the dotkit manpage</a>(7), <a href="/busby/dotkit/html/./use.html">the use manpage</a>(1), <a href="/busby/dotkit/html/./dk-admin.html">the dk-admin manpage</a>(8).</p>
+
+</body>
+
+</html>

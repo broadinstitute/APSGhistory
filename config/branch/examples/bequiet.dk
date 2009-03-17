@@ -1,0 +1,6 @@
+#c shell/dotkit
+#d Make 'use', 'unuse' completely quiet in operation.
+
+unuse -q taciturn
+
+dk_setenv use_bequiet 1

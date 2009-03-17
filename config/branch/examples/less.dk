@@ -1,0 +1,7 @@
+#c shell
+#d Set up PAGER as "less" if available, or fall back to "more"
+
+dk_setenv PAGER `dk_where less` || dk_setenv PAGER `dk_where more`
+dk_setenv LESS -isceM
+dk_setenv MANPAGER $PAGER
+dk_setenv MORE -c

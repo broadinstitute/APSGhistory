@@ -1,0 +1,4 @@
+#c shell/dotkit
+#d Make "use" equivalent to "reuse".
+
+dk_setenv DK_UEQRU 1

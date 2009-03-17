@@ -1,0 +1,6 @@
+#c shell
+#d Add /usr/sbin to PATH, if it exists
+
+dk_test -d /usr/sbin && \
+  dk_alter PATH /usr/sbin || \
+  setenv _dk_err " (/usr/sbin not a directory)"

@@ -1,0 +1,484 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Dotkit - A set of interchangeable parts for managing the Unix shell
+environment.</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#some_background_on_the_problem">Some background on the problem</a></li>
+		<li><a href="#how_dotkit_works">How Dotkit works</a></li>
+		<li><a href="#how_dotkit_finds_package_files">How Dotkit finds package files</a></li>
+		<li><a href="#the_scope_of_a_dotkit">The scope of a dotkit</a></li>
+		<li><a href="#more_about_site_nodes">More about site nodes</a></li>
+		<li><a href="#customizing_the_search_within_nodes">Customizing the search within nodes</a></li>
+		<li><a href="#small_dotkit_installations">Small Dotkit installations</a></li>
+		<li><a href="#useusage,_and_other_miscellany">Use-usage, and other miscellany</a></li>
+		<li><a href="#logging">Logging</a></li>
+	</ul>
+
+	<li><a href="#environment">ENVIRONMENT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Dotkit - A set of interchangeable parts for managing the Unix shell
+environment.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This man page describes the overall organization of the Dotkit system.
+Some other man pages are available for information
+about specific parts of Dotkit:
+See <a href="/busby/dotkit/html/./use.html">the use manpage</a>(1) for basic instruction about Dotkit for the user.
+See <a href="/busby/dotkit/html/./dk-commands.html">the dk-commands manpage</a>(5) for a reference of each command, function,
+or variable in the system.
+See <a href="/busby/dotkit/html/./dk-examples.html">the dk-examples manpage</a>(5) for worked-out examples of dotkits and related files,
+and the rationale for their construction and location.
+See the README file located in $DK_ROOT for a brief introduction,
+initial installation, and ``getting started'' instructions.
+For additional information about maintaining Dotkit,
+see <a href="/busby/dotkit/html/./dk-admin.html">the dk-admin manpage</a>(8).</p>
+<p>
+</p>
+<h2><a name="some_background_on_the_problem">Some background on the problem</a></h2>
+<p>If you read many existing shell startup files,
+you will observe that much of the conditional code --
+``if/else'' or ``case'' and ``switch'' statements --
+uses the machine architecture or operating system type as its selector.
+A small section from a (much longer) .cshrc file at our site reads:</p>
+<pre>
+  if ($HostType == &quot;Solaris&quot;) then
+    set path = ( $path /usr/local/cvs/bin )
+    set path = ( $path ~/bin/solaris )
+  else if ($HostType == &quot;Linux&quot;) then
+    setenv PGI /usr/local/pgi
+    set path = ( $path /usr/local/intel/compiler60/ia32/bin )
+  else
+    ...
+  endif</pre>
+<p>The process that set the value of $HostType above is not shown,
+but it is quite useful to settle on a convention for
+this process.
+As a general statement,
+the more widely the convention is understood and utilized,
+the more useful it becomes.
+Dotkit assumes such a convention, and uses an environment variable named
+SYS_TYPE to express the value of the current system type.</p>
+<p>Continuing the example from above,
+a step in the direction of Dotkit is to divide your shell
+startup file into several files,
+one master, plus an additional file for each SYS_TYPE.
+Then the conditional code in the master file can
+be reduced to one check:</p>
+<pre>
+  if ( -e $HOME/.cshrc.$SYS_TYPE ) then
+    source $HOME/.cshrc.$SYS_TYPE
+  endif</pre>
+<p>Each of the approaches to writing dotfiles shown above is workable.
+(After all, we've been doing it this way for decades ....)
+Some of the problems we have encountered might include:</p>
+<dl>
+<dt></dt>
+<dd>
+<em>If/else</em> and <em>case</em> statements tend to get longer as time goes by.
+They rarely get shorter,
+even though some parts are no longer relevant.
+</dd>
+<p></p>
+<dt></dt>
+<dd>
+The dotfiles require maintenance by (or on behalf of) each
+user whenever a new SYS_TYPE appears, or other things change network-wide;
+</dd>
+<p></p>
+<dt></dt>
+<dd>
+In part because they are complicated,
+dotfiles proliferate by sharing among users.
+However, sharing code between users usually requires each recipient
+to start a text editor and carry out a merge.
+The historical variations between your and my dotfiles
+may be trivial or they may not.
+Even if they are trivial,
+the code has to be read and understood (or not) over and over.
+</dd>
+<p></p>
+<dt></dt>
+<dd>
+Sharing code across shell types (csh to bash, say) requires translation;
+</dd>
+<p></p>
+<dt></dt>
+<dd>
+It is vexing to move a carefully tuned set of startup
+files to a new environment.
+<em>If/else</em> constructions are brittle with respect to changes.
+For example, in the case above, for HostType ``Linux'',
+it doesn't matter that 
+PGI was set prior to adding the intel compiler to <em>path</em>.
+However, that ordering is imposed by the code,
+whether the code author intended it to matter or not.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="how_dotkit_works">How Dotkit works</a></h2>
+<p>As mentioned already, one of the assumptions Dotkit starts with
+is the notion of a received SYS_TYPE to guide basic decisions
+about the environment.
+The value of SYS_TYPE (``Solaris'' or ``Linux'' in the above example)
+might be set outside Dotkit as part of the standard login procedure,
+or it can be set by Dotkit itself,
+using a short script (provided) that applies some simple heuristic logic
+to the output of uname(1).
+Determining an appropriate value for SYS_TYPE on a given machine,
+or deciding when two machines differ enough to merit different
+values of SYS_TYPE can itself be a knotty problem,
+but we'll assume that has been done in the further discussion.</p>
+<p>Dotkit breaks out the shell code needed to set up a given
+code system or other facility into a short package file or <em>dotkit</em>.
+It is similar to the <em>Modules</em> system (see references) in
+this respect.</p>
+<p>One difference from <em>Modules</em> is that Dotkit
+integrates site location, shell, and SYS_TYPE information
+into the data structure of dotkits.
+It then uses polymorphism or,
+more simply, name overloading,
+to select a particular piece of code (dotkit)
+that satisfies the site, shell, USER,
+and SYS_TYPE requirements for that request.
+The data structure (and the problem space, not incidentally)
+is arranged such that the majority of package files
+have only one instance.
+E.g., if a given package does the same thing across multiple
+shells and SYS_TYPE's,
+only one -- shell and systype-independent --
+instance of the dotkit file needs to be written.</p>
+<p>
+</p>
+<h2><a name="how_dotkit_finds_package_files">How Dotkit finds package files</a></h2>
+<p>Given a request such as ``use foo'',
+Dotkit searches a list of directories for a file named ``foo.dk'',
+taking the first such file found if there are multiple instances.
+(The search algorithm is slightly modified for the special
+case of ``use Super''.
+It is also possible to load a dotkit by giving the absolute
+pathname to the file, leaving off the final <em>.dk</em> suffix.)</p>
+<p>The list can be depicted as a two-level tree structure,
+where each node in the upper level tree is itself the root of
+a smaller tree of subnodes.  Every subtree has the same
+structure as all others.</p>
+<p>The first node searched in the upper tree is <em>$HOME/.kits</em>,
+if it exists.
+The last node searched is $DK_ROOT, which is guaranteed to exist.
+In between, the entries in $DK_NODE, if they exist,
+(two are shown in the diagram below) are the intermediate nodes:</p>
+<pre>
+                           $DK_ROOT
+                            /      \
+                           /        \
+                    $HOME/.kits  $DK_NODE[2]
+                                    /
+                                   /
+                              $DK_NODE[1]</pre>
+<pre>
+                Tree of Nodes Searched by Dotkit</pre>
+<p>As previously stated, each node in the tree above
+is the root of a subtree, laid out as shown below:</p>
+<pre>
+                            (.)
+                            / \
+                           /   \
+                        *sh   $SYS_TYPE
+                          \
+                           \
+                          $SYS_TYPE</pre>
+<pre>
+                 Directory layout of One Node</pre>
+<p>That is, the node directory itself, signified by (.), has
+sub-directories corresponding to each of the supported shell
+types - bash, csh, ksh, and tcsh -
+and it has sub-directories corresponding to each possible SYS_TYPE
+in the network at hand.
+Each <em>*sh</em> sub-directory may itself have SYS_TYPE sub-directories.
+Empty nodes and sub-directories do not need to be created or searched.</p>
+<p>Dotkit traverses the logical tree under $DK_ROOT left to right,
+in post-order:
+Visit the children, then visit the node itself.
+This means that the <em>$HOME/.kits</em> node is visited first,
+and will always win the race to find
+a given package file.
+The post-order traverse continues in the subnodes,
+so that within <em>$HOME/.kits</em>, the <em>*sh/$SYS_TYPE</em> directory
+is visited first,
+and <em>$HOME/.kits/.</em> (the node directory itself) is visited last.</p>
+<p>Three characteristics of the Dotkit search process might
+be highlighted here:</p>
+<dl>
+<dt></dt>
+<dd>
+It dynamically adapts to the USER, shell, system type,
+and site.
+</dd>
+<p></p>
+<dt></dt>
+<dd>
+As discussed further below,
+it defines an ordering that can be utilized to inherit general
+characteristics into more-specific dotkits.
+</dd>
+<p></p>
+<dt></dt>
+<dd>
+The tree is under user control,
+and can be dynamically modified to suit project purposes.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<h2><a name="the_scope_of_a_dotkit">The scope of a dotkit</a></h2>
+<p>In practice, the <em>*sh</em> sub-directories are usually empty,
+except in $DK_ROOT itself.
+(Dotkit is implemented as a set of shell scripts,
+so what better place to store each shell's code 
+than <em>$DK_ROOT/*sh</em>?)</p>
+<p>In a logical sense, the dotkits stored in the $DK_ROOT
+node describe software systems that are universal,
+available everywhere,
+independent of site or user or system type.
+For example, the package ``bin.dk'' is stored at $DK_ROOT/.
+It simply adds /bin to PATH.
+This action is useful on any Unix or Unix-like system.</p>
+<p>The <em>$DK_ROOT/$SYS_TYPE</em> directory stores dotkits that should
+apply to every system of type $SYS_TYPE,
+wherever they are.
+For example, the dotkit <em>$DK_ROOT/redhat_9_ia32/x11.dk</em>
+adds /usr/X11R6/bin to PATH, and /usr/X11R6/man to MANPATH
+on every system running Redhat Linux, version 9.
+There is also a <em>$DK_ROOT/x11.dk</em> file,
+which adds /usr/bin/X11 to PATH.
+The first variant is the one found if your current $SYS_TYPE
+happens to match ``redhat_9_ia32'';
+otherwise, the second is used.</p>
+<p>The <em>$HOME/.kits/</em> node stores your personal dotkits.
+You can create your own set of new dotkits as needed,
+categorizing them according to SYS_TYPE or <em>*sh</em> if necessary,
+or you can over-ride system dotkits by reusing their file name,
+and creating your own new actions.
+No one but you has direct access to your personal dotkits.
+However, if you want to share,
+you can place your unmodified dotkit in a node that is visible
+to other Dotkit users,
+or they can copy your file, unchanged,
+to their own personal stash of kits.</p>
+<p>The nodes listed in $DK_NODE, if any,
+are usually used for site-specific or project-specific dotkits.
+(A ``site'' is typically that portion of a network
+under a single administrative domain.
+Or it may simply be the set of machines that have common NFS access
+to $DK_ROOT.)
+These <code>node(s)</code> are searched after your personal node,
+but before the universal node.</p>
+<p>
+</p>
+<h2><a name="more_about_site_nodes">More about site nodes</a></h2>
+<p>By convention, a site node is a directory whose name begins
+with the string ``site=''.
+It has the internal structure shown in the second diagram above,
+and it can be located anywhere in the file system.
+It is often convenient, but not required,
+to locate site nodes as physical subdirectories of $DK_ROOT.</p>
+<p>A site node identifies a set of dotkits that belong to
+and describe the software available at that site.
+For example, <em>site=olbullit</em> identifies dotkits for my personal machine,
+which I manage as a stand-alone host.
+On that machine, my DK_NODE setting is simple:</p>
+<pre>
+  DK_NODE=$DK_ROOT/site=olbullit</pre>
+<p>Like olbullit,
+many or most sites need have only a single entry in DK_NODE.</p>
+<p>As a more demanding example,
+in my working environment,
+I have accounts at two primary sites.
+One is a division-wide network (OAX),
+and the other is a Lab-wide network (OCF).
+They are managed separately,
+and have separate $DK_ROOT directories.
+Each has some software that is unique,
+and some that is the same as the other network.
+It has therefore been useful to divide their dotkits into
+three sets:
+One for OAX alone, one for OCF alone,
+and one for dotkits that are the same at both sites.
+Consider the proper setting for <em>DK_NODE</em> on my local OAX network:</p>
+<pre>
+  DK_NODE=$DK_ROOT/site=oax:$DK_ROOT/site=oax+ocf</pre>
+<p>In words, this says that for any site-specific dotkit,
+we look first in the OAX node.
+(We're on the OAX network, so it takes precedence.)
+If there is no match, look next in the OAX+OCF node,
+where dotkits that work for either network can be found.</p>
+<p>On the OCF network, the setting for DK_NODE becomes:</p>
+<pre>
+  DK_NODE=$DK_ROOT/site=ocf:$DK_ROOT/site=oax+ocf</pre>
+<p><em>Site=ocf</em> takes the place of <em>site=oax</em>.
+DK_NODE makes it easy to customize Dotkit to a site
+with minimal configuration effort.</p>
+<p>Adding site nodes to DK_NODE is a task usually assigned to
+the Dotkit maintainer at that site.
+In addition to site nodes,
+individual users can add entries to DK_NODE that make project-specific
+or other collections of dotkits available to the project contributors.</p>
+<p>If your network is large,
+it is also possible to divide up the contents of a site node
+into <em>subsites</em>,
+each containing a useful category of software available at
+your site,
+such as compilers,
+parallel libraries, and so on.</p>
+<p>A subsite is structured exactly like a site,
+conventionally named <em>subsite=FOO</em>.
+One dotkit in the primary site node is associated with
+each subsite,
+and modifies <em>DK_NODE</em> to add (<em>use</em>) or remove (<em>unuse</em>) the subsite.</p>
+<p>
+</p>
+<h2><a name="customizing_the_search_within_nodes">Customizing the search within nodes</a></h2>
+<p>DK_NODE gives you and your site maintainers the ability
+to define the nodes on the Dotkit search tree (the first
+diagram shown above.)
+If you or your site has special requirements,
+it is also possible to modify the tree internal to each node,
+by changing the value of the environment
+variable $DK_SUBNODE, set in <em>$DK_ROOT/$_dk_shell/.dk_init</em>.</p>
+<p>For example, if your network is organized as many small client
+workstations around a couple of large application servers,
+it might make sense to use the $HOSTNAME instead of or in
+addition to $SYS_TYPE as a selector inside each node.
+In this way, the view of available applications (dotkits) would
+vary according to whether you were logged into a client
+or an application server.</p>
+<p>
+</p>
+<h2><a name="small_dotkit_installations">Small Dotkit installations</a></h2>
+<p>The discussion above describes how to configure Dotkit for a
+large multi-network situation.
+Dotkit is also well-suited to a small network or a single machine.
+It is distributed as a single small tar file.
+Installation consists of choosing a location for DK_ROOT,
+which may well be your HOME directory,
+and unpacking the tar file at that spot.
+At this point, Dotkit is fully usable without having to compile
+any code or create any dotkits of your own.
+The universal dotkits under $DK_ROOT
+are all available with no setup.
+Further customization for yourself or your site can then be done as needed.</p>
+<p>
+</p>
+<h2><a name="useusage,_and_other_miscellany">Use-usage, and other miscellany</a></h2>
+<p>When you type ``use'' with no arguments,
+or with just the <strong>-a</strong> or <strong>-v</strong> options,
+or ``use -l'' with or without file arguments,
+Dotkit arranges to run
+a shell script named ``use-usage'', located at
+<em>$DK_ROOT/etc</em>.
+This script looks for a file named <em>$DK_ROOT/etc/DK_MAINTAINER</em>,
+whose contents is the name of the person who will maintain
+Dotkit for your site.
+Another optional file named ``dk-news'' can also be placed at <em>$DK_ROOT/etc</em>,
+to provide site-wide notice of updates, additions, or other changes
+to Dotkit at your location.</p>
+<p>If you prefer, you can write your own usage program,
+by defining <em>DK_USEUSAGE</em> to the pathname of an executable
+program or script.</p>
+<p>Also at <em>$DK_ROOT/etc/</em> find a script named ``envdiff'', a helper
+program used by the ``envdiff'' dotkit,
+a makefile for various maintenance operations,
+the ``systype'' script used to compute values of $SYS_TYPE,
+a <em>test/</em> subdirectory with several Dotkit regression tests,
+and the ``where'',  and ``rep'' scripts referenced by the <em>dk_where</em>,
+and <em>dk_rep</em> commands.</p>
+<p>
+</p>
+<h2><a name="logging">Logging</a></h2>
+<p>Find one other script at <em>$DK_ROOT/etc/</em> named ``log.example''.  If
+an executable file is located at <em>$DK_ROOT/etc/log</em>, Dotkit
+will call that script immediately after successfully finding
+and reading each dotkit.
+The Dotkit administrator is expected to provide the
+logging program if this functionality is desired,
+and to ensure that their implementation provides
+sensible behavior for their particular Dotkit installation.</p>
+<p>Usage logging can provide useful statistics about which dotkits
+are being referenced across a given site.</p>
+<p>
+</p>
+<hr />
+<h1><a name="environment">ENVIRONMENT</a></h1>
+<p>(Dotkit environment variables are documented in dk-commands(5).)</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>The original author of Dotkit is
+Lee Busby, Lawrence Livermore National Laboratory.
+Adam Moody, also of LLNL,
+has made additional major contributions.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2007, Lawrence Livermore National Security, LLC.
+See the file named ``Copyright'' for the full text of the copyright notice.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/busby/dotkit/html/./dk-commands.html">the dk-commands manpage</a>(5), <a href="/busby/dotkit/html/./dk-examples.html">the dk-examples manpage</a>(5), <a href="/busby/dotkit/html/./dotkit.html">the dotkit manpage</a>(7), <a href="/busby/dotkit/html/./use.html">the use manpage</a>(1), <a href="/busby/dotkit/html/./dk-admin.html">the dk-admin manpage</a>(8).</p>
+<p>``Modules: Providing a Flexible User Environment'',
+John L. Furlani, proceedings of Large Installation
+Systems Administration V (LISA V), USENIX Association,
+October, 1991.</p>
+<p>``user-setup: A System for Custom Configuration of User Environments ...'',
+Richard Elling and Matthew Long,
+proceedings of LISA VI, USENIX Association,
+October, 1992.</p>
+<p>The ENVV package, contributed by David F. Skoll,
+comp.sources.misc, Volume 42, Issue 70,
+May, 1994.</p>
+<p>``Soft: A Software Environment Abstraction Mechanism'',
+Remy Evard and Robert Leslie,
+proceedings of LISA VIII, USENIX Association,
+September, 1994.</p>
+<p>``Abstract Yourself With Modules'',
+J.L. Furlani, Peter W. Osel,
+proceedings of LISA X, USENIX Association,
+October, 1996.</p>
+<p>``Global Impact Analysis of Dynamic Library Dependencies'',
+Yizhan Sun, Alva L. Couch,
+proceedings of LISA XV, USENIX Association,
+December, 2001.
+(Introduced the author to <em>use</em>, <em>unuse</em> as package access commands.)</p>
+
+</body>
+
+</html>

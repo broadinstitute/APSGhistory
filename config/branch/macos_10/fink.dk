@@ -1,0 +1,4 @@
+#c vendor
+#d fink - fink installs applications in /sw/bin. Based on /sw/bin/init.sh. 
+
+dk_source $DK_ROOT/$_dk_shell/$SYS_TYPE/fink.shell

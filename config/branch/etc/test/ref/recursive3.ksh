@@ -6,11 +6,11 @@ O should be found
 Prepending: O (Found: ././O.dk)
 O begins
 use P
-Prepending: P (Found: ././P.dk)
+
+  Prepending: P (Found: ././P.dk)
 P begins
 P ends
- (ok)
-O: use P succeeded
+ (ok)O: use P succeeded
 O ends
  (ok)
  ... O found on first attempt
@@ -27,11 +27,11 @@ Unuse O
 Dropping: O (Found: ././O.dk)
 O begins
 unuse P
-Dropping: P (Found: ././P.dk)
+
+  Dropping: P (Found: ././P.dk)
 P begins
 P ends
- (ok)
-O: unuse P succeeded
+ (ok)O: unuse P succeeded
 O ends
  (ok)
  ... Yes, unuse O succeeded
@@ -44,11 +44,11 @@ O should be found and succeed, but P should fail
 Prepending: O (Found: ././O.dk)
 O begins
 use P
-Prepending: P (Found: ././P.dk)
+
+  Prepending: P (Found: ././P.dk)
 P begins
 P ends
-P FAILURE
-O: use P failed
+P FAILUREO: use P failed
 O ends
  (ok)
  ... O found on first attempt
@@ -68,8 +68,8 @@ Unuse O, should succeed, with P not found
 Dropping: O (Found: ././O.dk)
 O begins
 unuse P
-Dropping: P (not found)
-O: unuse P failed
+
+  Dropping: P (not found)O: unuse P failed
 O ends
  (ok)
  ... Yes, unuse O succeeded
@@ -80,8 +80,7 @@ Look for non-existent dotkits, with dk_smask=0.  Should be silent
 (1: Did not find aa bb)
 
 Look for non-existent dotkits, with dk_smask=4.  Should NOT be silent
- (aa: not found) (bb: not found)
-(2: Did not find aa bb)
+ (aa: not found) (bb: not found)(2: Did not find aa bb)
 
 Check masking for dk_err, first with dk_smask=0
 
@@ -105,8 +104,7 @@ use P
 
 P begins
 P ends
-P FAILURE
-O: use P failed
+P FAILUREO: use P failed
 O ends
 
 Now with dk_smask=1, check for already loaded

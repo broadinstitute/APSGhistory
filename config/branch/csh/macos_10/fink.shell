@@ -1,0 +1,58 @@
+# 
+
+if ( $?DID_FINKINIT ) then    # only source this file once
+  exit
+endif
+setenv DID_FINKINIT 1
+
+if ( $?INFOPATH ) then
+  setenv INFOPATH /sw/share/info:/sw/info:$INFOPATH
+else
+  setenv INFOPATH /sw/share/info:/sw/info:/usr/local/share/info:/usr/local/lib/info:/usr/local/info:/usr/share/info
+endif
+
+if ( $?PERL5LIB ) then
+  setenv PERL5LIB /sw/lib/perl5:$PERL5LIB
+else
+  setenv PERL5LIB /sw/lib/perl5
+endif
+
+# setting this is not neccessary and results in performance degradation
+#if ( $?DYLD_LIBRARY_PATH ) then
+#  setenv DYLD_LIBRARY_PATH /sw/lib:$DYLD_LIBRARY_PATH
+#else
+#  setenv DYLD_LIBRARY_PATH /sw/lib
+#endif
+
+# read per-package scripts from /sw/etc/profile.d
+if ( -d /sw/etc/profile.d ) then
+  set nonomatch
+  foreach i ( /sw/etc/profile.d/*.csh )
+    if ( -x $i ) then
+      source $i
+    endif
+  end
+  unset i nonomatch
+endif
+
+if ($?version) then
+  if ("$version" =~ tcsh*) then
+    complete fink 'n/fink/(install remove selfupdate update-all configure list apropos describe --help --version)/'
+  endif
+endif
+
+set PROXYHTTP=`grep ProxyHTTP /sw/etc/fink.conf | grep -v "#" | cut -d " " -f2`
+
+if ( "$PROXYHTTP" != "" ) then
+  setenv HTTP_PROXY $PROXYHTTP
+  setenv http_proxy $PROXYHTTP
+endif
+
+set PROXYFTP=`grep ProxyFTP /sw/etc/fink.conf | grep -v "#" | cut -d " " -f2`
+
+if ( "$PROXYFTP" != "" ) then
+  setenv FTP_PROXY $PROXYFTP
+  setenv ftp_proxy $PROXYFTP
+endif
+
+# eof

@@ -1,0 +1,4 @@
+#c shell
+#d Universal system kits: etc, sbin, bin, usr/bin, local
+
+dk_op -q etc sbin usbin bin ubin local

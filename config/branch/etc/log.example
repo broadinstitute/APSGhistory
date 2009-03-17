@@ -1,0 +1,54 @@
+#!/bin/sh
+# Implement a logging function for Dotkit.  If Dotkit finds an executable
+# file at $DK_ROOT/etc/log, it assumes this file is a logging program,
+# and executes it.
+# Arguments passed to this script are as follows:
+# $1: _dk_self, the full pathname to the Dotkit just read.
+# $2: _dk_op, the current Dotkit operation - use or unuse.
+
+PATH=/usr/bin:/bin
+export PATH
+
+# Define some information you want to log.
+info="$1 $2 $LOGNAME $_dk_shell"
+
+##############################################
+# Some examples of logging functions follow. #
+##############################################
+
+##############################################################################
+# A simple logging function sends some useful data directly to a logfile.
+# That logfile needs to be writable by everyone who uses it, although
+# it need not be readable by all.  Note that if the log file is on an
+# NFS-mounted filesystem, this command might hang if the NFS server is down.
+#echo `date` ':' $info >> /tmp/dotkit.log
+
+##############################################################################
+# A slightly more complex approach to logging might pick out one
+# or more users for logging, and ignore the rest.
+#case $LOGNAME in
+#  joebob)   echo `date` ':' $info >> /tmp/dotkit.log;;
+#  billyjoe) echo `date` ':' $info >> /tmp/dotkit.log;;
+#esac
+
+##############################################################################
+# If your system administration team supports it, one excellent approach
+# is to use the syslog(3) logging facility.  For more information, type
+# "man logger".
+#logger -p local7.info $info
+
+##############################################################################
+# Another approach to logging that avoids the problem of an unavailable
+# NFS server is to log into a file located on the local file system.
+# Typically this might be /tmp.  The new problem with this scheme might
+# be privacy.  And a central logging facility would need to collect log
+# files from all the local hosts.
+# 
+# The privacy issue might be handled using a "write-only" directory, with
+# a separate log file for each user.  For example, create the directory
+# "/tmp/.dklogs", with permissions 1703.  Anyone can create files in the
+# directory, but only the directory owner (an administrative account or
+# "root") can see or read them.  The logging commands look like this:
+#LOG=/tmp/.dklogs/$USER.log
+#touch $LOG && chmod 0600 $LOG
+#test -w $LOG && echo `date` ':' $info >> $LOG

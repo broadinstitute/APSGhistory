@@ -1,0 +1,5 @@
+#c shell/dotkit
+#d Search the available dotkits for a pattern
+
+$DK_ROOT/etc/search
+setenv _dk_err " (ok, search done)"

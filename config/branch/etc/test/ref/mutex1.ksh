@@ -2,8 +2,8 @@ Test: mutex1.t
 use F1
 Prepending: F1
 Starting F1
-Dropping: __NIL__ (not found)
 
+  Dropping: __NIL__ (not found)
 Leaving F1: f1=F1 (F1 is correct)
 Leaving F1: f2=F1:F3:F2 (F1:F3:F2 is correct, or nil if unuse)
  (ok)
@@ -17,14 +17,14 @@ Changed:
 Now use F2, which should unuse F1
 Prepending: F2
 Starting F2
-Dropping: F1
-Starting F1
-Dropping: __NIL__ (not found)
 
+  Dropping: F1
+Starting F1
+
+    Dropping: __NIL__ (not found)
 Leaving F1: f1=F1 (F1 is correct)
 Leaving F1: f2= (F1:F3:F2 is correct, or nil if unuse)
  (ok)
-
 Leaving F2: f1=F2 (F2 is correct)
 Leaving F2: f2=F2:F4:F3 (F2:F4:F3 is correct, or nil if unuse)
  (ok)
@@ -44,14 +44,14 @@ Wordlist variables altered:
 Now use F3, which should unuse F2
 Prepending: F3
 Starting F3
-Dropping: F2
-Starting F2
-Dropping: __NIL__ (not found)
 
+  Dropping: F2
+Starting F2
+
+    Dropping: __NIL__ (not found)
 Leaving F2: f1=F2 (F2 is correct)
 Leaving F2: f2= (F2:F4:F3 is correct, or nil if unuse)
  (ok)
-
 Leaving F3: f1=F3 (F3 is correct)
 Leaving F3: f2=F3:F6:F5 (F3:F6:F5 is correct, or nil if unuse)
  (ok)
@@ -71,8 +71,8 @@ Wordlist variables altered:
 Return to the starting state by unusing F3
 Dropping: F3
 Starting F3
-Dropping: __NIL__ (not found)
 
+  Dropping: __NIL__ (not found)
 Leaving F3: f1=F3 (F3 is correct)
 Leaving F3: f2= (F3:F6:F5 is correct, or nil if unuse)
  (ok)

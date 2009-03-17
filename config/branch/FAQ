@@ -1,0 +1,12 @@
+Initialization:
+
+  * Why does bash/ksh complain about "parameter not set", or "unbound
+    variable" when I try to run eval `.../init`?
+
+Answer: You have the "nounset" option turned on, either deliberately,
+or inadvertently.  You can turn it off by typing "set +u" before running
+the "eval" command.  Or you can give the "-b" option to init, to tell
+it you want Bourne-shell style initialization.
+
+The nounset option has its uses, but some older (buggy) versions of bash
+and ksh have a hard time with Dotkit and nounset together.

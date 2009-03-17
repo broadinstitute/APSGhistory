@@ -1,0 +1,7 @@
+#c shell
+#d Set the erase character to Delete (^?).
+
+unuse -q erase=bs erase=del
+# Check that stdout is a TTY, and that we are "using" this kit,
+# before running stty.
+dk_test -t 1 && dk_test "$_dk_op" = "use" && stty erase '^?'

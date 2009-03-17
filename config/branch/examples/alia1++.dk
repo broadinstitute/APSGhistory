@@ -1,0 +1,31 @@
+#c shell
+#d A selection of basic alia
+
+# Typical junk:
+dk_alias df 'df -k'
+dk_alias cls 'clear'
+dk_alias md 'mkdir'
+dk_alias rd 'rmdir'
+dk_alias hi 'history'
+
+# Some variations on ls:
+dk_alias ls 'ls -CF'
+dk_alias la 'ls -a'
+dk_alias lf 'ls -F'
+dk_alias lh 'ls -lt|head'
+dk_alias ll 'ls -la'
+dk_alias lt 'ls -lt'
+
+# Conveniences to change PATH, MANPATH, LD_LIBRARY_PATH:
+dk_alias pathadd 'alter PATH '
+dk_alias pathdel 'unalter PATH '
+dk_alias manadd 'alter MANPATH '
+dk_alias mandel 'unalter MANPATH '
+dk_alias libadd 'alter LD_LIBRARY_PATH '
+dk_alias libdel 'unalter LD_LIBRARY_PATH '
+
+# Show me my dotkits, pure and simple:
+dk_alias dk 'echo $_dk_inuse|tr " " "\n"|sed '"'"'s/..$//'"'"
+
+# Look for dotkits matching a pattern:
+dk_alias dkgrep 'use -l | grep '

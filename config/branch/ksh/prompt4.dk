@@ -1,0 +1,13 @@
+#c shell
+#d Prompt with "hostname(command_number) ".
+
+if [[ $_dk_op = "use" ]]; then
+  unuse -q `dk_rep 'prompt*' 'envdiff'`
+  setenv _h $(hostname)
+  dk_test -n "$PS1" && setenv oldPS1 "$PS1"
+  setenv PS1 "${_h%%.*}(\!) "
+  unsetenv _h
+else # unuse
+  dk_test -n "$oldPS1" && setenv PS1 "$oldPS1"
+  unsetenv oldPS1
+fi

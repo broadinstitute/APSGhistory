@@ -1,0 +1,5 @@
+#c shell
+#d generic X11 commands (/usr/bin/X11)
+
+dk_alter PATH /usr/bin/X11
+dk_test -d /usr/X11R6/man && dk_alter MANPATH /usr/X11R6/man

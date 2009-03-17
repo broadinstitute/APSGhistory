@@ -1,0 +1,5 @@
+#c shell
+#d OS-X: Add /sw/{bin,share/man} to PATH, MANPATH
+
+dk_alter PATH /sw/bin
+dk_alter MANPATH /sw/share/man

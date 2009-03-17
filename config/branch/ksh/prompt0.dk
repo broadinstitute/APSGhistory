@@ -1,0 +1,11 @@
+#c shell
+#d The canonical Bourne shell prompt: "$ "
+
+if [[ $_dk_op = "use" ]]; then
+  unuse -q `dk_rep 'prompt*' 'envdiff'`
+  dk_test -n "$PS1" && setenv oldPS1 "$PS1"
+  setenv PS1 '$ '
+else # unuse
+  dk_test -n "$oldPS1" && setenv PS1 "$oldPS1"
+  unsetenv oldPS1
+fi

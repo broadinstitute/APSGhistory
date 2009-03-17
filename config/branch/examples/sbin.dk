@@ -1,0 +1,7 @@
+#c shell
+#d Add /sbin to PATH, if it exists
+
+# dk_err keeps kit from being loaded, if /sbin isn't a directory.
+dk_test -d /sbin && \
+  dk_alter PATH /sbin || \
+  setenv _dk_err " (/sbin not a directory)"

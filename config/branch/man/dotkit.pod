@@ -143,7 +143,9 @@ Given a request such as "use foo",
 Dotkit searches a list of directories for a file named "foo.dk",
 taking the first such file found if there are multiple instances.
 (The search algorithm is slightly modified for the special
-case of "use Super".)
+case of "use Super".
+It is also possible to load a dotkit by giving the absolute
+pathname to the file, leaving off the final I<.dk> suffix.)
 
 The list can be depicted as a two-level tree structure,
 where each node in the upper level tree is itself the root of
@@ -398,8 +400,22 @@ program used by the "envdiff" dotkit,
 a makefile for various maintenance operations,
 the "systype" script used to compute values of $SYS_TYPE,
 a I<test/> subdirectory with several Dotkit regression tests,
-and the "where", "alias", and "rep" scripts referenced by the I<dk_where>,
-I<dk_alias>, and I<dk_rep> commands.
+and the "where",  and "rep" scripts referenced by the I<dk_where>,
+and I<dk_rep> commands.
+
+=head2 Logging
+
+Find one other script at I<$DK_ROOT/etc/> named "log.example".  If
+an executable file is located at I<$DK_ROOT/etc/log>, Dotkit
+will call that script immediately after successfully finding
+and reading each dotkit.
+The Dotkit administrator is expected to provide the
+logging program if this functionality is desired,
+and to ensure that their implementation provides
+sensible behavior for their particular Dotkit installation.
+
+Usage logging can provide useful statistics about which dotkits
+are being referenced across a given site.
 
 =head1 ENVIRONMENT
 
@@ -414,7 +430,7 @@ has made additional major contributions.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Regents of the University of California.
+Copyright (c) 2007, Lawrence Livermore National Security, LLC.
 See the file named "Copyright" for the full text of the copyright notice.
 
 =head1 SEE ALSO

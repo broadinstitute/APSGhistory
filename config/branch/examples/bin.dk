@@ -1,0 +1,4 @@
+#c shell
+#d Add /bin to PATH
+
+dk_alter PATH /bin

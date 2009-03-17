@@ -1,0 +1,121 @@
+busby Wed Apr 16 12:30:07 PDT 2008
+  Add ability to "use /some/absolute/path/to/a/dotkit".
+
+busby Mon Mar  3 15:36:40 PST 2008
+  Add example code for etc/{alter.awk, dk_alter.c}.
+
+busby Thu Jan 31 13:38:31 PST 2008
+  Change unalter to accept a "-a" option.  This causes it to remove the
+  *last* instance of a pattern in a string, instead of the first.  Change
+  extends to dk_alter, when operating in an "unuse -a ..." context.
+
+busby Thu Jan 17 18:23:46 PST 2008
+  Change dk_alter so as to accept "multiple" arguments.  This is ok now:
+  dk_alter PATH /bin:/usr/bin
+
+busby Wed Jan  2 13:07:15 PST 2008
+  Add code to save and restore alias definitions with dk_alias.
+
+busby Tue Dec 18 15:58:28 PST 2007
+  Add code to pretty-print recursive dotkits, with newlines and indentation.
+
+busby Fri Nov  2 14:01:17 PDT 2007
+  Clean up bugs in prompt* series of universal dotkits.
+  Add a pushpop dotkit for ksh, emulating csh pushd/popd commands.
+  Modify Copyright to incorporate changes due to transition from
+  University of California to LLNS, LLC.
+
+busby Wed Oct 17 16:02:35 PDT 2007
+  Add a logging function to Dotkit.  Requested by Jean Chang (MIT).
+
+moody20 Thu Jun  8 10:25:46 PDT 2006
+  Added support for pattern matching in "use -l <keyword>" syntax.
+
+moody20 Mon Nov 28 11:20:09 PST 2005
+  Rename completion package to dkcomplete.
+
+busby Mon Nov 28 10:10:11 PST 2005
+  Add A. Moody to Author section of man pages.
+
+moody20 Wed Nov  9 10:09:20 PST 2005
+  Added "Common Usage" section to use-usage output for "use" command, which
+  provides a quick reference to the most commonly used commands.
+
+moody20 Tue Oct 25 18:07:31 PDT 2005
+  Updated common .dk files with new "#c, #d, #h" syntax.
+
+moody20 Tue Oct 25 16:56:05 PDT 2005
+  Added support for -l and -lv listing features.
+  Added support for new category, description, and help .dk file sytax.
+  Provides backward compatibility (to a degree) for old sytax.
+  Added support for TAB-completion of dotkit names in use commands
+  (completion.dk for tcsh and bash).
+
+busby Thu Sep  1 11:37:02 PDT 2005
+  Remove "trap '_dk_rl=-1' INT" from ksh/.dk_init.  Some don't like it.
+
+busby Wed Aug 31 15:09:37 PDT 2005
+  Change name DK_ALWAYSUNUSE to DK_UEQRU, for Solaris csh 20 character limit.
+
+busby Mon Aug 22 11:16:16 PDT 2005
+  Work around apparent bug in bash-3.x, with bit-shift "<<".
+
+busby Tue Aug  2 09:03:13
+  Modify so that set -o nounset will work for bash/ksh.
+
+busby Wed Jul 13 16:36:11 PDT 2005
+  Add taciturn (mostly quiet) mode.
+
+busby Fri Jun 24 10:51:44 PDT 2005
+  Add support for use_bequiet, and a bequiet dotkit.  DK_ALWAYSUNUSE option.
+
+busby Mon May  2 14:58:40 PDT 2005
+  Add ability for dotkit author to force prepend or append.  "Init" now
+  adds .../dotkit/man to MANPATH by default.  Don't print most messages
+  if stdin is not a tty.
+
+busby Tue Feb  8 10:40:12 PST 2005
+  Add -b, -c options to force init into a particular shell type.
+
+busby Mon Feb  7 16:05:52 PST 2005
+  Add usage messages for alter, unalter, car, cdr.  Change "ignored"
+  to "already loaded" in Dotkit output.
+
+busby Fri Feb  4 10:17:38 PST 2005
+  Remove the altera command, and replace with alter -a.  Add a note
+  to the "use" man page recommending non-use of "-a" in most cases.
+
+busby Tue Jan 18 15:54:24 PST 2005
+  Added subsite category, simplified output from use-usage, updated docs.
+
+busby Fri Jan 14 11:55:28 PST 2005
+  Add dk-admin man page.
+
+busby Thu Jan 13 10:04:49 PST 2005
+  Add changes necessary to incorporate DK_IFS variable, defining the
+  separator character in wordlists.
+
+busby Wed Dec 22 14:10:10 PST 2004
+  Add html documentation.
+
+busby Fri Oct  8 10:06:09 PDT 2004
+  Added initial implementation of car and cdr.
+
+busby Mon Oct  4 10:23:27 PDT 2004
+  Lift _dk_print into the bash and ksh specific .dk_init, so as to remove
+  the need for a "print" function in the bash version.  Add new environment
+  variable DK_EXPORT_BASH_FNS, to export the bash Dotkit functions in the
+  environment.
+
+busby Tue Sep 14 08:33:31 PDT 2004
+  Add swbin.dk, swsbin.dk, for OS X.
+
+busby Mon Aug  9 10:38:19 PDT 2004
+  Modify f_inuse to hide dotkit names that begin with ".", except for
+  the "." dotkit itself, and unless the "-a" option was given.
+
+busby Fri Aug  6 12:17:19 PDT 2004
+  Added prompt3 dotkit.
+
+busby Fri Jul 23 10:59:12 PDT 2004
+  Add the dk_setdef command, plus test and documentation.

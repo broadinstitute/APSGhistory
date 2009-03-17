@@ -1,0 +1,60 @@
+# DK_ALIAS
+
+if($?_dk_err) goto _dk_aliasend
+alias dk_wc /usr/bin/wc
+if ( ! -x /usr/bin/wc ) alias dk_wc /bin/wc
+set _dk_wcn = ( `alias _dk_av | dk_wc` )
+if ( $_dk_wcn[1] < 1 ) then
+  setenv _dk_err " (ERROR: Not enough args to dk_alias: $_dk_an)"
+  goto _dk_aliasend
+endif
+
+if ( "$_dk_op" == "use" ) then # Create a new alias, saving old alias value.
+  set _dk_wco = ( `alias $_dk_an | dk_wc` )
+  if ( $_dk_wco[1] > 0 ) then # Need to save the old alias value.
+    if ( $_dk_wco[1] == 1 ) then # Old alias is single-line.
+      alias _dk_sal_$_dk_an `alias $_dk_an`
+    else # Old alias value is multi-line.
+      alias $_dk_an | dk_sed -e '1s:^:'\'':' \
+                             -e '1s:^:alias '"_dk_sal_$_dk_an :" \
+                             -e '$s:$:'\'':' \
+                             -e 's:\\:\\\\:' \
+                             -e 's:\!:\\\!:g' >! /tmp/dk_alias.$$
+      source /tmp/dk_alias.$$
+      /bin/rm -f /tmp/dk_alias.$$
+    endif
+  endif
+  if ( $_dk_wcn[1] == 1 ) then # New alias is single-line.
+    alias $_dk_an "`alias _dk_av`"
+  else # New alias is multi-line.
+    alias _dk_av | dk_sed -e '1s:^:'\'':' \
+                          -e '1s:^:alias '"$_dk_an :" \
+                          -e '$s:$:'\'':' \
+                          -e 's:\\:\\\\:' \
+                          -e 's:\!:\\\!:g' >! /tmp/dk_alias.$$
+    source /tmp/dk_alias.$$
+    /bin/rm -f /tmp/dk_alias.$$
+  endif
+else # unalias: Restore any prior alias value, or else unalias the name.
+  set _dk_wco = ( `alias _dk_sal_$_dk_an | dk_wc` )
+  if ( $_dk_wco[1] > 0 ) then # Need to restore the old alias value.
+    if ( $_dk_wco[1] == 1 ) then # Old alias is single-line.
+      alias $_dk_an "`alias _dk_sal_$_dk_an`"
+    else # Old alias value is multi-line.
+      alias _dk_sal_$_dk_an | dk_sed -e '1s:^:'\'':' \
+                                     -e '1s:^:alias '"$_dk_an :" \
+                                     -e '$s:$:'\'':' \
+                                     -e 's:\\:\\\\:' \
+                                     -e 's:\!:\\\!:g' >! /tmp/dk_alias.$$
+      source /tmp/dk_alias.$$
+      /bin/rm -f /tmp/dk_alias.$$
+    endif
+  else # No old value found for this alias.
+    unalias "$_dk_an"
+  endif
+  unalias "_dk_sal_$_dk_an"
+endif
+
+_dk_aliasend:
+unalias _dk_av dk_wc
+unset _dk_wco _dk_wcn _dk_an

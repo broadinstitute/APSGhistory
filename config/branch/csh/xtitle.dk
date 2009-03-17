@@ -1,0 +1,40 @@
+#c shell
+#d Decorate the title bar of your xterms.
+
+if ( $?prompt ) then
+  setenv HOSTNAME `hostname | sed -e 's/\..*$//'` # strip domain name.
+  if ( $_dk_op == "use" ) then
+    if ($?TERM) then
+      switch ($TERM)
+      case xterm*:
+        set do_title=yes
+        if ($?XBOOT) then
+          if ("$XBOOT" == "encrypted") then
+            if (! $?XBOOT2) then
+              setenv XBOOT2 "child"
+              set do_title=no
+            endif
+          endif
+        endif
+        if ("$do_title" == "yes") then
+	  set _dk_user = "unknown"
+	  if( $?USER ) then
+	    set _dk_user = $USER
+	  else if( $?LOGNAME ) then
+	    set _dk_user = $LOGNAME
+	  endif
+          alias xttitle 'echo -n "]0;${_dk_user}@${HOSTNAME}: ${cwd}"'
+          alias cd    'cd \!* ; xttitle'
+          alias pushd 'pushd \!* ; xttitle'
+          alias popd  'popd \!* ; xttitle'
+        endif
+        unset do_title
+        breaksw
+      endsw
+    endif
+  else # unuse this package.
+    unalias xttitle cd pushd popd
+    unset _dk_user
+    echo -n "]0;xterm" # restore default title.
+  endif
+endif

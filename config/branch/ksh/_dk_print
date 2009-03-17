@@ -1,0 +1,2 @@
+# ksh version
+function _dk_print { print "$@"; }

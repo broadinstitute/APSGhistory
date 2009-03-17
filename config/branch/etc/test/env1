@@ -1,4 +1,5 @@
 #!/bin/sh
 # Diff the current environment against the initial one, and clean up.
-../envdiff
-/bin/rm -f /tmp/env_*
+user=${USER:-$LOGNAME}
+../envdiff -test
+/bin/rm -f /tmp/env_${user}_*

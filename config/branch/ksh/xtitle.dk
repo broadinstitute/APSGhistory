@@ -1,0 +1,26 @@
+#c shell
+#d A functional title bar for your xterms
+
+function xttitle
+{ cd "$@" && print -nr -- "]0;${USER}@${_dk_Host%%.*}: ${PWD}"; }
+
+if [[ -o interactive ]]; then
+  if [[ $_dk_op = "use" && $TERM = xterm* ]]; then
+    do_title=yes
+    if [[ "$XBOOT" = "encrypted" ]]; then
+      if [[ -z $XBOOT2 ]]; then
+        setenv XBOOT2 child
+        do_title=no
+      fi
+    fi
+    if [[ $do_title = "yes" ]]; then
+      _dk_Host=${_dk_Host:-$(hostname)}
+      alias cd=xttitle
+    fi
+    unset do_title
+  else # unuse this package.
+    unalias cd
+    unset _dk_Host
+    print -nr -- "]0;xterm" # reset default title.
+  fi
+fi

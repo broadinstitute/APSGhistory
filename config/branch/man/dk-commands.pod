@@ -6,15 +6,15 @@ The reference document for all Dotkit commands, functions and special variables.
 
 =head2 Dotkit commands for interactive or shell script use
 
-use [ B<-alqv> ] [ I<pkg> ... ]
+use   [ B<-alqv> ] [ I<pkg> ... ]
 
 unuse [ B<-alqv> ] [ I<pkg> ... ]
 
 reuse [ B<-alqv> ] [ I<pkg> ... ]
 
-alter [ B<-a> ] I<VARIABLE> I<COMPONENT> [ I<SEPARATOR> ]
+alter   [ B<-a> ] I<VARIABLE> I<COMPONENT> [ I<SEPARATOR> ]
 
-unalter I<VARIABLE> I<COMPONENT> [ I<SEPARATOR> ]
+unalter [ B<-a> ] I<VARIABLE> I<COMPONENT> [ I<SEPARATOR> ]
 
 car I<WORDLIST_VALUE> [ I<NTH> ] [ I<SEPARATOR> ]
 
@@ -52,7 +52,7 @@ setenv _dk_ok "I<CUSTOM REPLY>"
 
 setenv _dk_hide 0|1
 
-setenv _dk_pream "I<PREFIX>"
+setenv _dk_opt_a 0|1
 
 =head1 DESCRIPTION
 
@@ -158,11 +158,11 @@ This command is shorthand for the pair of operations:
 It has the effect of re-reading I<pkg> and moving it to the front of the list
 of packages in use.
 
-=item alter I<VARIABLE> I<COMPONENT> [ I<SEPARATOR> ]
+=item alter   [ B<-a> ] I<VARIABLE> I<COMPONENT> [ I<SEPARATOR> ]
 
-=item unalter I<VARIABLE> I<COMPONENT> [ I<SEPARATOR> ]
+=item unalter [ B<-a> ] I<VARIABLE> I<COMPONENT> [ I<SEPARATOR> ]
 
-Add (alter) or remove (unalter) one component
+Add (alter) or remove (unalter) components
 to or from the named I<VARIABLE>,
 a list of zero or more components delimited by I<SEPARATOR>,
 which defaults to the value of I<DK_IFS>,
@@ -175,7 +175,7 @@ I<COMPONENT>, respectively.
 
 I<Alter> prepends I<COMPONENT> to I<VARIABLE>,
 unless the B<-a> (append) option is given.
-I<Unalter> removes the I<COMPONENT>, whatever its location.
+I<Unalter> removes the first or last (B<-a>) instance of I<COMPONENT>.
 
 =item car I<WORDLIST_VALUE> [ I<NTH> ] [ I<SEPARATOR> ]
 
@@ -211,7 +211,7 @@ personal script will yield incorrect results.)
 I<Dk_alter> adds to, in the case of I<use>, or deletes from,
 in the case of I<unuse>,
 the given component for the given I<VARIABLE>.
-I<VARIABLE> is a list of zero or more
+The value of I<VARIABLE> is a list of zero or more
 components, separated by I<SEPARATOR>,
 such as the I<PATH> environment variable.
 The default I<SEPARATOR> is the value of I<DK_IFS>,
@@ -224,6 +224,14 @@ For any given I<VARIABLE>, I<SEPARATOR> is a constant value.
 The [t]csh implementation of I<dk_alter> may temporarily modify
 the contents of I<VARIABLE>,
 converting SPACE characters to `^B' (Control-B).
+
+It is possible to supply multiple components to this command.
+E.g., the following syntax works with the commonly expected meaning:
+
+  dk_alter PATH /bin:/usr/bin
+
+Multiple components are added or removed as a group, in the order
+that they appear in the command line.
 
 =item dk_setenv I<VARIABLE> [ I<VALUE> ]
 
@@ -282,20 +290,41 @@ set it to the the given default I<VALUE>,
 
 =item dk_alias I<ALIAS_NAME> I<'ALIAS_DEFINITION'>
 
-Create (or remove, in the case of I<unuse>),
+Create (or restore/remove, in the case of I<unuse>),
 the alias I<ALIAS_NAME> with the given definition.
 The syntax of I<dk_alias> is essentially identical to that of the
-csh or tcsh I<alias> command,
-except that alias arguments are not allowed.
-(To be precise, arguments *can* be given,
-but such syntax cannot, at present,
-be part of a shell-independent dotkit.)
+csh or tcsh I<alias> command.
+Alias definitions that include arguments
+(words of the form I<\!:1>, etc.) are allowed,
+and will be processed correctly by I<csh> or I<tcsh>,
+but are quietly ignored by I<bash> or I<ksh>.
 
-Dotkits containing the I<dk_alias> command normally should
-be marked as I<idempotent> by appending '++' to the
+If I<ALIAS_NAME> has a pre-existing value,
+it is saved during a I<use> operation in a new alias
+named I<_dk_sal_ALIAS_NAME>.
+A subsequent I<unuse> operation will restore the original alias value.
+
+Dotkits containing the I<dk_alias> command typically
+are marked as I<idempotent> by appending '++' to the
 dotkit name (e.g., I<foo++.dk>.)
 This allows Dotkit to read the package more than once,
 a requirement if subshells are to receive proper alias definitions.
+
+Multi-line alias definitions are allowed.
+Proper quoting of multi-line definitions can occasionally be tricky
+with older versions of I<csh>.
+The simplest syntax is of the form:
+
+  dk_alias foofer 'test "$foo" = "XX" && \\
+                   echo "foo is XX" || \\
+                   echo "foo is not XX"'
+
+However, old versions of csh may require that each line be
+separately quoted, with a single backslash, as follows.
+
+  dk_alias foofer 'test "$foo" = "XX" &&' \
+                  'echo "foo is XX" ||' \
+                  'echo "foo is not XX"'
 
 =item dk_cev I<VARIABLE>
 
@@ -389,7 +418,7 @@ located at $DK_ROOT/etc/where.
   setenv _dk_err "<error message>"
   setenv _dk_ok "<custom reply>"
   setenv _dk_hide 0|1
-  setenv _dk_pream "PREFIX"
+  setenv _dk_opt_a 0|1
 
 The I<_dk_err> variable is used to indicate that something
 went wrong while reading a package file.
@@ -421,15 +450,17 @@ Obviously, such a package needs to be written with re-use in mind,
 since hiding it also prevents Dotkit from ignoring it in
 any future "use" request.
 
-The I<_dk_pream> variable allows a package author to over-rule
+The I<_dk_opt_a> variable allows a package author to over-rule
 the B<-a> flag if necessary, or conversely, to force an append operation
 even if the user does not provide B<-a>.
 Typical use is as follows:
 
   # Force prepend "bar" to "foo".
-  dk_test "$_dk_pream" = "Appending" && \
-    setenv _dk_pream "Prepending"
+  setenv _dk_opt_a 0
   dk_alter foo bar
+  # Force append "/usr/bin" to PATH.
+  setenv _dk_opt_a 1
+  dk_alter PATH /usr/bin
 
 Note the leading underscore in the names of these variables,
 and note that their value is properly set using I<setenv>,
@@ -530,19 +561,19 @@ variable.
 
 =head1 BUGS
 
-It would be nice if the I<dk_alias> command would save and
-restore alias definitions,
-like I<dk_setenv> does for environment variables.
 It would be nice if I<dk_alias> accepted arguments for all shells,
 and wrote an appropriate shell function in the case of bash or ksh.
+Some versions of ksh from AT&T may not properly
+save and restore aliases whose name
+begins with a literal '+' or '-' character.
 
 Handling of null (empty) components in I<dk_alter>, I<alter>, I<unalter>
 is inconsistent and sometimes incorrect.
-Adding a null component to an empty wordlist produces a double null;
-removing one null component then removes them both.
-Once added, a null component is difficult to remove for the [t]csh version.
+Adding a null component to an empty wordlist produces an empty result.
+Attempting to add more than one null component to a wordlist
+may produce incorrect results.
 Null components in a context where the SEPARATOR character is whitespace
-will often produce incorrect results.
+may produce incorrect results.
 
 =head1 AUTHOR
 
@@ -553,7 +584,7 @@ has made additional major contributions.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Regents of the University of California.
+Copyright (c) 2007, Lawrence Livermore National Security, LLC.
 See the file named "Copyright" for the full text of the copyright notice.
 
 =head1 SEE ALSO

@@ -244,6 +244,9 @@ and arrange for that package to over-ride a "generic" version
 whenever someone is running on the given architecture,
 or with the given shell.
 Most packages are independent of shell and SYS_TYPE.
+
+It is also possible to load a package by giving an absolute
+path to the dotkit (but leave off the trailing I<.dk>.)
 For more on the package search process,
 see the dotkit(7) man page.
 
@@ -295,10 +298,11 @@ but occasionally subtle, art of writing package files.
 =head1 BUGS
 
 Unuse removes the I<first> instance of a given component from
-PATH, MANPATH, etc.
-(There could be more than one if your PATH was not empty
+PATH, MANPATH, etc.,
+or the I<last> instance if the B<-a> flag is given.
+(There could be more than one instance if your PATH was not empty
 when Dotkit was initialized,
-or if two packages happened to include the same component.)
+or if two or more packages happened to include the same component.)
 This is usually correct,
 but can be wrong in a few cases.
 
@@ -317,7 +321,7 @@ has made additional major contributions.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2004, The Regents of the University of California.
+Copyright (c) 2007, Lawrence Livermore National Security, LLC.
 See the file named "Copyright" for the full text of the copyright notice.
 
 =head1 SEE ALSO

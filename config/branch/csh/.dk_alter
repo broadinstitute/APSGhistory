@@ -14,7 +14,7 @@ endif
 
 if ( "$_dk_op" == "use" ) then
 
-  if ( ! $?_dk_pream ) setenv _dk_pream "Prepending"
+  #if ( ! $?_dk_opt_a ) setenv _dk_opt_a 0
   eval set _dk_ss = '$?'$_dk_aa[1]
   if ($_dk_ss) then
     eval set _dk_v1s = \"'$'$_dk_aa[1]\"
@@ -26,7 +26,7 @@ if ( "$_dk_op" == "use" ) then
       endif
       set _dk_v1x = ( `echo "$_dk_v1s" | dk_tr "$_dk_aa[3]" ' '` )
       if($#_dk_v1x == 0) set _dk_v1x = "$_dk_aa[3]"
-      if ( "$_dk_pream" == "Prepending") then
+      if ( "$_dk_opt_a" == 0) then
         if( "$_dk_v1x[1]" == '.') then
           if ($#_dk_v1x > 1) then
             set _dk_v1x = ( . "$_dk_aa[2]" $_dk_v1x[2-] )
@@ -60,56 +60,86 @@ if ( "$_dk_op" == "use" ) then
     setenv $_dk_aa[1] "$_dk_aa[2]"
   endif
 else # unuse
-# To help keep the variables straight, the code below is commented
-# with a specific example.  The various pieces are shown in
-# the variables below.  Suppose the initial value of MANPATH is
-# /opt/man:/foo/bar:/usr/man:/local/man, and the action statement was
-# "dk_alter MANPATH /foo/bar".  The code below is going to tear out
-# /foo/bar from MANPATH.  In referring to the variables, the leading
-# _dk_ is dropped by convention.
-
   eval set _dk_ss = '$?'$_dk_aa[1] # Set ss to 0 or 1.
-  if ($_dk_ss) then # MANPATH is already set.
+  if ($_dk_ss) then # dk_alter's variable is set to some value.
+    # set v1s to the current value of the variable.
     eval set _dk_v1s = \"'$'$_dk_aa[1]\"
     if ("$_dk_aa[3]" != ' ') then
       set _dk_v1s = `echo "$_dk_v1s" | dk_tr ' ' ''`
       set _dk_tmp = `echo "$_dk_aa[2]" | dk_tr ' ' ''`
       set _dk_aa = ( $_dk_aa[1] "$_dk_tmp" "$_dk_aa[3]" )
     endif
-    # set v1s to "/opt/man:/foo/bar:/usr/man:/local/man"
-    set _dk_x = (`echo "$_dk_v1s" | dk_tr "$_dk_aa[3]" ' '`)
-    if($#_dk_x == 0) set _dk_x = ""
-    # set x to ( /opt/man /foo/bar /usr/man /local/man )
-    if ($#_dk_x > 1) then # MANPATH has more than 1 component.
-      if ( "$_dk_x[1]" == "$_dk_aa[2]") then
-        set _dk_nx = $_dk_x[2]
-        shift _dk_x
-      else
-        set _dk_nx = $_dk_x[1]
-      endif
-      shift _dk_x
-      foreach _dk_comp ($_dk_x)
-        if ( "$_dk_comp" == "$_dk_aa[2]" ) then
-          set _dk_aa[2] = JunkjunkJunkjunk # Only delete the 1st match.
-        else
-          set _dk_nx = ( "$_dk_nx" "$_dk_comp" )
-        endif
+    # Turn v1s into a wordlist in x.
+    set _dk_xx = `echo "$_dk_v1s" | dk_sed -e ':st' -e "s/^\(['' ]*\)${_dk_aa[3]}/\1'' /;t st" -e ':fi' -e 's/'"${_dk_aa[3]}""\([ '']*\)"'$'"/ ''\1/;t fi" -e ':mi' -e "s/\([ '']*\)${_dk_aa[3]}${_dk_aa[3]}/\1 '' /g;t mi" -e "s/$_dk_aa[3]/ /g"`
+    eval set _dk_x = \( $_dk_xx \)
+    if($#_dk_x == 0) set _dk_x = ("")
+    # Turn the value to be removed into a wordlist in y.
+    set _dk_yy = `echo "$_dk_aa[2]" | dk_sed -e ':st' -e "s/^\(['' ]*\)${_dk_aa[3]}/\1'' /;t st" -e ':fi' -e 's/'"${_dk_aa[3]}""\([ '']*\)"'$'"/ ''\1/;t fi" -e ':mi' -e "s/\([ '']*\)${_dk_aa[3]}${_dk_aa[3]}/\1 '' /g;t mi" -e "s/$_dk_aa[3]/ /g"`
+    eval set _dk_y = \( $_dk_yy \)
+    if($#_dk_y == 0) set _dk_y = ("")
+    if ("$_dk_opt_a" == 1) then # Reverse the string and pattern.
+      @ _dk_i = 1
+      @ _dk_n = $#_dk_x / 2
+      while ( $_dk_i <= $_dk_n )
+        @ _dk_j = ( $#_dk_x - $_dk_i ) + 1
+        set _dk_tmp = "$_dk_x[$_dk_i]"
+        set _dk_x[$_dk_i] = "$_dk_x[$_dk_j]"
+        set _dk_x[$_dk_j] = "$_dk_tmp"
+        @ _dk_i++
       end
-      unset _dk_comp
-      if ("$_dk_aa[3]" != ' ') then
-        setenv $_dk_aa[1] "`echo '$_dk_nx' | dk_tr ' ' '$_dk_aa[3] '`"
-      else
-        setenv $_dk_aa[1] "$_dk_nx"
+      @ _dk_i = 1
+      @ _dk_n = $#_dk_y / 2
+      while ( $_dk_i <= $_dk_n )
+        @ _dk_j = ( $#_dk_y - $_dk_i ) + 1
+        set _dk_tmp = "$_dk_y[$_dk_i]"
+        set _dk_y[$_dk_i] = "$_dk_y[$_dk_j]"
+        set _dk_y[$_dk_j] = "$_dk_tmp"
+        @ _dk_i++
+      end
+    endif
+    @ _dk_st = 1
+    @ _dk_k = 1
+    @ _dk_i = 1
+    eval set _dk_na = \( $_dk_xx \)
+    set _dk_ns = ""
+    while ( $_dk_i <= $#_dk_x )
+      set _dk_na[$_dk_k] = "$_dk_x[$_dk_i]"
+      @ _dk_k++
+      if ( $_dk_st <= $#_dk_y ) then
+        if ( "$_dk_x[$_dk_i]" == "$_dk_y[$_dk_st]" ) then
+          @ _dk_st++
+          if ( $_dk_st > $#_dk_y ) then
+            @ _dk_k -= $#_dk_y
+          endif
+        endif
       endif
-      # setenv MANPATH /opt/man:/usr/man:/local/man
-    else if ($#_dk_x == 1) then # MANPATH has exactly 1 component now.
-      if ( "$_dk_x[1]" == "$_dk_aa[2]") then # if it matches, remove it.
-        setenv $_dk_aa[1] ""
+      @ _dk_i++
+    end
+    @ _dk_k--
+    @ _dk_j = 1
+    if ( $_dk_k > 0) then
+      set _dk_ns="$_dk_na[$_dk_j]"
+      @ _dk_j++
+      if ("$_dk_opt_a" == 1) then # Un-reverse the string.
+        while ($_dk_j <= $_dk_k)
+          set _dk_ns="${_dk_na[$_dk_j]} ${_dk_ns}"
+          @ _dk_j++
+        end
+      else
+        while ($_dk_j <= $_dk_k)
+          set _dk_ns="${_dk_ns} ${_dk_na[$_dk_j]}"
+          @ _dk_j++
+        end
       endif
     endif
+    if ("$_dk_aa[3]" != ' ') then
+      setenv $_dk_aa[1] "`echo '$_dk_ns' | dk_tr ' ' '$_dk_aa[3] '`"
+    else
+      setenv $_dk_aa[1] "$_dk_ns"
+    endif
   endif
-  unset _dk_ss _dk_v1s _dk_nx _dk_x
+  unset _dk_st _dk_ns _dk_x _dk_xx _dk_y _dk_yy _dk_i _dk_j _dk_k _dk_ts _dk_na
 endif
-unset _dk_comp _dk_aa _dk_ss _dk_v1s _dk_v1x _dk_n _dk_tmp _dk_ifs
 
 _dk_alterend:
+unset _dk_aa _dk_ss _dk_v1s _dk_v1x _dk_n _dk_tmp _dk_ifs

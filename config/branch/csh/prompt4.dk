@@ -1,0 +1,17 @@
+#c shell
+#d Prompt with "hostname(command_number) ".
+
+if ( $_dk_op == "use" ) then
+  unuse -q `dk_rep 'prompt*' 'envdiff'`
+  if ( $?prompt ) then
+    set oldprompt = "$prompt"
+  endif
+  set _h = `hostname | sed -e 's/\..*$//'` # strip domain name.
+  set prompt = "${_h}(\!) "
+  unset _h
+else # unuse
+  if ( $?oldprompt ) then
+    set prompt = "$oldprompt"
+    unset oldprompt
+  endif
+endif

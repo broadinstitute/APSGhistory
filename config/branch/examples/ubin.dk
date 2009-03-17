@@ -1,0 +1,6 @@
+#c shell
+#d Add /usr/{bin,[man,share/man]} to PATH, MANPATH
+
+dk_alter PATH /usr/bin
+dk_test -d /usr/share/man && dk_alter MANPATH /usr/share/man
+dk_test -d /usr/man && dk_alter MANPATH /usr/man

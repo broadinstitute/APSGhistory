@@ -1,0 +1,4 @@
+#c shell
+#d OS-X: Add /sw/sbin to PATH
+
+dk_alter PATH /sw/sbin

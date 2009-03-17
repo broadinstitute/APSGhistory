@@ -19,7 +19,7 @@ test=`swhere test` || { echo "echo \"test not found\""; exit 1; }
 # Set DK_ROOT here, if you wish, to reflect your site's installation
 # directory.  Otherwise, it is computed using the path by which init
 # was called.  (You can also set DK_ROOT before calling .../dotkit/init.)
-#DK_ROOT=/broad/tools/dotkit
+#DK_ROOT=
 # ****************************************************************************
 
 setDK_ROOT=

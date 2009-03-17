@@ -1,0 +1,7 @@
+#c shell
+#d Set EDITOR, FCEDIT as "emacs" if available.
+
+unuse -q emacs vimvi
+
+dk_setenv EDITOR `dk_where emacs`
+dk_setenv FCEDIT $EDITOR

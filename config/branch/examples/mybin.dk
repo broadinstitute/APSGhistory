@@ -1,0 +1,11 @@
+#c shell
+#d Add ~/bin or $SYS_TYPE variants to PATH, MANPATH
+
+dk_test -d $HOME/bin && dk_alter PATH $HOME/bin
+dk_test -d $HOME/man && dk_alter MANPATH $HOME/man
+
+dk_test -d $HOME/$SYS_TYPE/bin && dk_alter PATH $HOME/$SYS_TYPE/bin
+dk_test -d $HOME/$SYS_TYPE/man && dk_alter MANPATH $HOME/$SYS_TYPE/man
+
+dk_test -d $HOME/bin/$SYS_TYPE && dk_alter PATH $HOME/bin/$SYS_TYPE
+dk_test -d $HOME/man/$SYS_TYPE && dk_alter MANPATH $HOME/man/$SYS_TYPE

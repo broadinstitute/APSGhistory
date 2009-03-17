@@ -7,3 +7,7 @@ echo "R: starting"
 dk_alter foo -L/foo1 ' '
 echo "In R, in between dk_alter, foo=$foo"
 dk_alter foo -L/foo2 ' '
+
+echo "Checking multiple value dk_alter handling"
+dk_alter foo "/foo/bar:/bar/foo"
+echo "R: ending"

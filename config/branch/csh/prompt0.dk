@@ -1,0 +1,15 @@
+#c shell
+#d The canonical C-shell prompt: "% "
+
+if ( $_dk_op == "use" ) then
+  unuse -q `dk_rep 'prompt*' 'envdiff'`
+  if ( $?prompt ) then
+    set oldprompt = "$prompt"
+  endif
+  set prompt = '% '
+else # unuse
+  if ( $?oldprompt ) then
+    set prompt = "$oldprompt"
+    unset oldprompt
+  endif
+endif

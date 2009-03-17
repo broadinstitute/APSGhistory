@@ -1,0 +1,16 @@
+#c shell/dotkit
+#d TAB-completion for dotkit names in use commands
+
+if ( $_dk_shell == "tcsh" ) then
+  if ( $_dk_op == "use" ) then
+    alias dk_complete '$DK_ROOT/etc/use-usage 1'
+    complete use   'C/*/`dk_complete`/'
+    complete unuse 'C/*/`dk_complete`/'
+    complete reuse 'C/*/`dk_complete`/'
+  else
+    unalias dk_complete
+    uncomplete use
+    uncomplete unuse
+    uncomplete reuse
+  endif
+endif

@@ -1,0 +1,8 @@
+#c shell
+#d Set EDITOR, FCEDIT as "vim" if available, or fall back to "vi".
+
+unuse -q emacs vimvi
+
+dk_setenv EDITOR `dk_where vim` || dk_setenv EDITOR `dk_where vi`
+dk_setenv FCEDIT $EDITOR
+dk_setenv VISUAL $EDITOR

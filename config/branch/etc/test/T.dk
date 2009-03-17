@@ -1,0 +1,16 @@
+#c test
+#d test
+
+dk_alias myls 'ls -CF'
+
+dk_alias myecho++ 'cd /usr/\!:1 ;' \
+                   'echo "in cwd=$cwd";' \
+                   '/bin/ls -1'
+
+dk_alias a2 'test "$foo" = "XX" &&' \
+             'echo "foo is XX" ||' \
+             'echo "foo is not XX"'
+
+dk_alias +++ 'pushd'
+
+dk_alias --- 'popd'

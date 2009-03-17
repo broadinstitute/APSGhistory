@@ -1,0 +1,6 @@
+#c shell
+#d OS-X: Add /usr/X11R6/{bin,man} to PATH, MANPATH
+
+dk_alter PATH /usr/X11R6/bin
+dk_alter MANPATH  /usr/X11R6/man
+
