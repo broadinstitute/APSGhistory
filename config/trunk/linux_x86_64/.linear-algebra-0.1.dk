@@ -1,9 +1,9 @@
-#c testing
-#d I am a test dotkit, do not use me. You 
-#d have been warned.
+#c libraries
+#d Collection of Linear Algebra Libraries
+#d ATLAS, LAPACK, BLAS, XBLAS, ...
 
 # Remove existing linear-algebra kits.
-unuse -q `dk_rep 'linear-algebra-*'`
+unuse -q `dk_rep '.linear-algebra-*'`
 
 # Set up environment for using library
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1_${ARCH_TYPE}/bin
