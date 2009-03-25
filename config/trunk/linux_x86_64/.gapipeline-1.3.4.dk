@@ -1,5 +1,5 @@
 #c applications
-#d GAPipeline 1.3.2
+#d GAPipeline 1.3.4
 
 # Dependencies
 dk_op -q .gcc-4.3.3-libs
