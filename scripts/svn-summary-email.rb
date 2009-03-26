@@ -1,4 +1,4 @@
-#!/util/bin/ruby
+#!/usr/bin/env ruby
 
 require 'etc'
 require 'parsedate'
@@ -7,9 +7,9 @@ $repository, $revision, $pattern, *$recipients = ARGV
 
 raise "usage: #{$0} REPOSITORY REVISION PATTERN RECIPIENTS" unless $repository and $revision and $pattern and $recipients
 
-# puts "checking #{$repository}:#{$revision} for /#{$pattern}/ and mailing #{$recipients} if found"
+$pattern = Regexp.new($pattern, Regexp::IGNORECASE)
 
-$pattern = Regexp.new($pattern)
+# puts "checking #{$repository}:#{$revision} for /#{$pattern}/ and mailing #{$recipients} if found"
 
 # gather commit data with reckless disregard for fork() efficiency
 
