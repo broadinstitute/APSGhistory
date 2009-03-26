@@ -4,7 +4,7 @@
 dk_alter PATH /broad/tools/apps/schrodinger
 dk_alter SCHRODINGER /broad/tools/apps/schrodinger
 dk_alter LM_LICENSE_FILE /broad/tools/apps/schrodinger/schrodinger.license
-dk_setenv PSP_BLAST_DIR /broad/tools/apps/NCBI_blast/ncbi-blast-2.2.18+_x86_64/bin
+dk_setenv PSP_BLAST_DIR /broad/tools/apps/NCBI_blast/blast-2.2.18_x86_64
 dk_setenv PSP_BLASTDB /broad/data/psp_blastdb
 dk_setenv SCHRODINGER_PDB /broad/data/psp_pdb
 
