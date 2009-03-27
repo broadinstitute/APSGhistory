@@ -7,4 +7,4 @@
 # (per RT #147945) summarize commits of files controlling inclusion of
 # third-party objects
 
-/broad/tools/scripts/svn-summary-email.rb "$@" '^/main/sequence/.*/(profiles|pom).xml$' releng@broad.mit.edu
+/broad/tools/scripts/svn-summary-email.rb "$@" '^main/sequence/.*/(profiles|pom).xml$' releng@broad.mit.edu
