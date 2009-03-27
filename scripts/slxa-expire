@@ -12,7 +12,7 @@ from subprocess import *
 fromaddr = 'apsg@broad.mit.edu'
 toaddr = 'solexa-image-expiry@broad.mit.edu'
 
-expire_days = 14
+expire_days = 7
 notice_days = 6
 
 utc = pytz.utc
