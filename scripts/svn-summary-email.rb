@@ -1,4 +1,5 @@
-#!/usr/bin/env ruby
+#!/util/bin/ruby
+# /usr/bin/env can't find ruby with the default paths
 
 require 'etc'
 require 'parsedate'
@@ -17,7 +18,10 @@ $pattern = Regexp.new($pattern, Regexp::IGNORECASE)
 	 `svnlook #{command} #{$repository} --revision=#{$revision}`.split(%r{\r?\n})
 }
 
-exit 0 if changed.grep($pattern).empty?
+# check *only* the paths of changed files (not the full line, which
+# includes status) against the supplied PATTERN
+
+exit 0 if changed.map { |line| line.sub(/^.\s+/,'') }.grep($pattern).empty?
 
 # translate author into email address
 
