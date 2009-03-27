@@ -10,7 +10,8 @@ skipdirs = [ 'basecalls', 'jobs' ]
 path_prefixes = { 'ab-saa' : 'Solid0048',
                   'ab-sab' : 'Solid0038',
                   'ab-sac' : 'Solid0060',
-                  }
+                  'ab-sah' : 'Solid0163',
+		  }
 
 orig_stdout = sys.stdout
 
