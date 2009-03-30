@@ -1,4 +1,4 @@
 #c bio-tools
 #d polyTedh suite 
 
-dk_alter /prodinfo/prodapps/polyTedh
+dk_alter PATH /prodinfo/prodapps/polyTedh
