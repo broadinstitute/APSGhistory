@@ -1,0 +1,11 @@
+#c applications
+#d PSIPRED is a  simple and accurate secondary structure 
+#d prediction method, incorporating two feed-forward neural 
+#d networks which perform an analysis on output obtained 
+#d from PSI-BLAST (Position Specific Iterated - BLAST).
+
+# Make us the only loaded version.
+unuse -q `dk_rep "PSIPRED*"`
+
+dk_op -q .psipred-2.6.1
+
