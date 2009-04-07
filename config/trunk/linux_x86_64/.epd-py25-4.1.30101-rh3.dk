@@ -1,0 +1,16 @@
+#c applications
+#d Enthought Python
+
+unuse -q `dk_rep ".epd*"`
+
+# We lack a compatible readline
+dk_op -q .readline-4.3
+
+# Environment
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/epd_py25_4.1.30101_rh3/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/epd_py25_4.1.30101_rh3/share/man
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/epd_py25_4.1.30101_rh3/lib
+
+
+
+
