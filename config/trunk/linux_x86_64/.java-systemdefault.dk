@@ -1,0 +1,14 @@
+#c languages
+#d Default locally installed Java Development Kit
+#d Local disk location: /usr/java/default
+
+# Clean up any previous java dotkits
+unuse -q `dk_rep "*.java-*"`
+
+# Set JAVA_HOME
+dk_setenv JAVA_HOME /usr/java/default
+
+# Prepend to various paths
+dk_alter PATH /usr/java/default/bin
+dk_alter MANPATH /usr/java/default/man
+

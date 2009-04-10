@@ -1,0 +1,9 @@
+#c languages
+#d Deprecated. Please use some other Java dotkit.
+
+use .deprecated++
+
+echo -e "\n\nLoading system default java, this may not be "
+echo -e "portable across nodes or consistent across nodes.\n\n"
+
+dk_op .java-systemdefault

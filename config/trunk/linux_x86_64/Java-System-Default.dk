@@ -1,0 +1,4 @@
+#c languages
+#d Locally installed default Java version.
+
+dk_op -q .java-systemdefault
