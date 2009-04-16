@@ -2,7 +2,7 @@
 # Make your changes to $HOME/.my.bashrc instead.
 
 # Set up dotkit
-eval `/broad/tools/dotkit/init`
+eval `/broad/tools/dotkit-dev/init`
 
 # Install Default dotkit
 use -q default

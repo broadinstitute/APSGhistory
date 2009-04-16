@@ -25,12 +25,19 @@ done
 # Display a menu
 echo "Select an option:"
 echo "  1 - Use classic startup scripts."
-echo "  2 - Use dotkit startup scripts."
+echo
+echo "  2 - Use dotkit startup scripts. You may want"
+echo "      to modify your .my.cshrc and/or .my.bash*" 
+echo "      files to use dotkit functions."
+echo
+echo "  3 - Use dotkit-dev startup scripts. "
+echo "      WARNING: This is development and is "
+echo "               subject to rapid changes."
 echo "  q - Quit."
 echo 
 
 # Collect response
-read -p " (1,2,q): " RESPONSE
+read -p " (1,2,3,q): " RESPONSE
 
 case "$RESPONSE" in
   "1" )
@@ -39,6 +46,8 @@ case "$RESPONSE" in
   "2" )
     install dotkit
     ;;
+  "3" )
+    install dotkit-dev
   * ) 
     echo "No change made."
     ;;

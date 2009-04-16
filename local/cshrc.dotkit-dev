@@ -2,7 +2,7 @@
 # Make your changes to $HOME/.my.cshrc instead.
 
 # Set up dotkit
-setenv DK_ROOT /broad/tools/dotkit
+setenv DK_ROOT /broad/tools/dotkit-dev
 eval `$DK_ROOT/init`
 
 use -q default
