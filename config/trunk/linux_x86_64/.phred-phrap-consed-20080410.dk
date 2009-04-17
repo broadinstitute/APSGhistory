@@ -8,7 +8,6 @@ unuse -q `dk_rep "*consed*"`
 unuse -q `dk_rep "*phred*"`
 unuse -q `dk_rep "*phrap*"`
 
-
 # Phred Parameter File Location
 dk_setenv PHRED_PARAMETER_FILE /broad/tools/Linux/x86_64/pkgs/phred-phrap-consed_20080410/phred/phredpar.dat
 
