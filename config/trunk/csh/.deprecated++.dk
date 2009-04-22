@@ -1,0 +1,28 @@
+#c IT/Systems
+#d display a deprecation warning
+
+set PKG = `basename $_dk_save_self0`
+
+echo
+echo
+echo "WARNING: "
+echo 
+echo "The $PKG dotkit is deprecated. "
+echo "This can happen for two reasons:"
+echo "  1) The package is old and is being "
+echo "     removed."
+echo "  2) Dotkit for package does not conform to"
+echo "     dotkit naming standards and is being "
+echo "     replaced or renamed."
+echo ""
+echo " 'use -l' will produce a list of all major "
+echo "packages that are available."
+echo ""
+echo " 'use -al' will list all packages, libraries"
+echo "and any dotkits that are available."
+echo ""
+echo "If the application or version you need "
+echo "is not listed you can request it at"
+echo "   help@broad.mit.edu"
+echo 
+echo
