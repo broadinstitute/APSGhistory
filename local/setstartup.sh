@@ -48,6 +48,7 @@ case "$RESPONSE" in
     ;;
   "3" )
     install dotkit-dev
+    ;;
   * ) 
     echo "No change made."
     ;;
