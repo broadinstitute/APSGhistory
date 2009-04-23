@@ -19,10 +19,14 @@ SYS_TYPE=unknown
 guess=
 
 case "$us$um" in
-  sunos*)
+  aix*) SYS_TYPE="aix_4";;
+  osf*)
     case "$ur" in
-      5.10) SYS_TYPE="solaris_10_i86pc";;
+      v4.*) SYS_TYPE="tru64_4";;
+      v5.*) SYS_TYPE="tru64_5";;
+      *) guess="tru64_5"
     esac;;
+  sunos*) SYS_TYPE="solaris_8_s64";;
   darwin*i386)
     case "$ur" in
       8.*) SYS_TYPE="macos_104_x86";;
@@ -41,9 +45,6 @@ case "$us$um" in
     if test -f /etc/fedora-release; then
       dtype=fedora
       rn=`sed 's/.*elease \([0-9][0-9]*\).*/\1/' /etc/fedora-release`
-    elif test -f /etc/SuSE-release; then
-      dtype=suse
-      # rn=? Parse SuSE release here.
     elif test -f /etc/redhat-release; then
       dtype=`sed -e 's/.*[Ee]nterprise.*/rhe/' \
                  -e 's/.*[Ll]inux.*/redhat/' /etc/redhat-release`
@@ -54,11 +55,13 @@ case "$us$um" in
       *64) ar=x86_64;;
     esac
     if test -z "$dtype"; then
-      guess="linux_${ar:-unknown}"
+      guess="rhe_3_${ar:-unknown}"
     else
       SYS_TYPE="${dtype}_${rn:-00}_${ar:-unknown}"
     fi
     ;;
+  irix*) SYS_TYPE="irix_6.5_64";;
+  hp-ux*) SYS_TYPE="hpux_11";;
   *) echo "SYS_TYPE: system type unknown: $us $um $ur" >&2 ;;
 esac
 
