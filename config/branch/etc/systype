@@ -38,13 +38,26 @@ case "$us$um" in
     esac;;
   linux*86*)
     dtype= rn= ar=
+
+    # Fedora Tests
     if test -f /etc/fedora-release; then
       dtype=fedora
       rn=`sed 's/.*elease \([0-9][0-9]*\).*/\1/' /etc/fedora-release`
+    
+    # SuSE tests
     elif test -f /etc/SuSE-release; then
-      dtype=suse
-      # rn=? Parse SuSE release here.
+      if `grep -i "enterprise" /etc/SuSE-release`; then
+         #dtype=sles if you want to differentiate between opensuse and SLES.
+         dtype=suse
+      else 
+         dtype=suse
+      fi
+      rn=`grep VERSION /etc/SuSE-release | sed 's/.*VERSION = \([0-9]*\).*/\1/'`
+
+    # Redhat/CentOS tests 
+    # We treat CentOS == RedHat
     elif test -f /etc/redhat-release; then
+#      if `grep -i "CentOS" /etc/redhat-release`
       dtype=`sed -e 's/.*[Ee]nterprise.*/rhe/' \
                  -e 's/.*[Ll]inux.*/redhat/' /etc/redhat-release`
       rn=`sed 's/.*elease \([0-9][0-9]*\).*/\1/' /etc/redhat-release`
