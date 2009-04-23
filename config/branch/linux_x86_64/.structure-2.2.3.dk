@@ -1,0 +1,11 @@
+#c applications
+#d The program structure is a free software package for using
+#d multi-locus genotype data to investigate population structure.
+#d http://pritch.bsd.uchicago.edu/structure.html
+
+unuse `dk_rep ".structure-*"`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/structure-2.2.3/bin
+
+ 
+

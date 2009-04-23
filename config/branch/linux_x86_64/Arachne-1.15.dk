@@ -1,5 +1,0 @@
-#c arachne-1.15
-#d Setup for executing arachne v1.15 binaries
-
-dk_op -q .arachne-1.15.0
-

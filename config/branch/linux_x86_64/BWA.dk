@@ -1,0 +1,6 @@
+#c applications/biotools
+#d bwa - Burrows-Wheeler Alignment Tool 
+
+unuse -q `dk_rep "BWA*"`
+
+dk_op -q .bwa-0.4.6

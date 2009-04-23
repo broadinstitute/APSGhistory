@@ -1,0 +1,9 @@
+#c applications
+#d Gnuplot  is a portable command-line driven interactive
+#d data and function plotting utility
+#d http://www.gnuplot.info/
+
+unuse -q `dk_rep "Gnuplot*"`
+
+dk_op -q .gnuplot-4.2.4
+

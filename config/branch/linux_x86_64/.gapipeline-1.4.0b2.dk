@@ -11,8 +11,8 @@ dk_op -q .fftw3-3.1.3-single
 dk_op -q .ghostscript-8.64
 
 # Environement for running GAPipeline.
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/GAPipeline_1.3.4/bin
-dk_alter PERL5LIB /broad/tools/Linux/x86_64/pkgs/GAPipeline_1.3.4/lib/perl
-dk_alter PYTHONPATH /broad/tools/Linux/x86_64/pkgs/GAPipeline_1.3.4/lib/python
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/GAPipeline_1.4.0b2/bin
+dk_alter PERL5LIB /broad/tools/Linux/x86_64/pkgs/GAPipeline_1.4.0b2/lib/perl
+dk_alter PYTHONPATH /broad/tools/Linux/x86_64/pkgs/GAPipeline_1.4.0b2/lib/python
 
 

@@ -1,7 +1,0 @@
-#c versioned-bio-tools
-#d Add arachne v1.7 to path
-
-dk_alter PATH /wga/scr8/jmaguire/releases/ReleaseArachne-1-7/bin_x86_64_suse
-dk_setenv SOLEXA_PIPELINE_DIR /slxa/pipelineOutput/farm
-dk_alter LD_LIBRARY_PATH .:/util/gcc-4.1.1/lib64:/util/gcc-4.1.1/lib/gcc/x86_64-unknown-linux-gnu/4.1.1:/util/gcc-4.1.1/lib/:/util/lib
-

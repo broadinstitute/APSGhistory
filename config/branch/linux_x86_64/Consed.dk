@@ -1,0 +1,9 @@
+#c applications
+#d Phrep Phrad and Consed
+#d http://www.phrap.org/phredphrapconsed.html
+
+unuse -q `dk_rep 'Consed*'`
+
+dk_op -q .phred-phrap-consed-20080410
+
+

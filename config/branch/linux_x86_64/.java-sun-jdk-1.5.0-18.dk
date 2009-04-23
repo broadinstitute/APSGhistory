@@ -1,0 +1,14 @@
+#c languages
+#d java Sun JDK 1.5.0 patch 18.
+
+# Clean any old java's lying around
+unuse `dk_rep "*.java-*"`
+
+# Set JAVA_HOME
+dk_setenv JAVA_HOME /broad/tools/Linux/x86_64/pkgs/jdk_1.5.0_18
+
+# Prepend us to the correct places
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/jdk_1.5.0_18/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/jdk_1.5.0_18/man
+
+

@@ -1,0 +1,16 @@
+#c libraries
+#d jpeg
+
+# Clear out any versions lingering around
+unuse -q `dk_rep '*jpeg-*'`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/jpeg_6b/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/jpeg_6b/share/man
+
+# For dynamic linking at runtime
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/jpeg_6b/lib
+
+# For gcc
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/jpeg_6b/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/jpeg_6b/include
+

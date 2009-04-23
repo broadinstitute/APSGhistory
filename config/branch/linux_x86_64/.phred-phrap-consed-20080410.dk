@@ -1,0 +1,20 @@
+#c applications
+#d Phred/Phrap/Consed
+#d http://www.phrap.org/phredphrapconsed.html
+
+# Remove anything even remotely resempling a 
+# package with these tools
+unuse -q `dk_rep "*consed*"`
+unuse -q `dk_rep "*phred*"`
+unuse -q `dk_rep "*phrap*"`
+
+# Phred Parameter File Location
+dk_setenv PHRED_PARAMETER_FILE /broad/tools/Linux/x86_64/pkgs/phred-phrap-consed_20080410/phred/phredpar.dat
+
+# Consed Home
+dk_setenv CONSED_HOME /broad/tools/Linux/x86_64/pkgs/phred-phrap-consed_20080410/
+
+# Prepend us to the correct places
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/phred-phrap-consed_20080410/bin
+
+

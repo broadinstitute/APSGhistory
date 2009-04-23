@@ -1,5 +1,5 @@
 #c versioned-languages
-#d Python 2.6.1
+#d Python 2.6 snapshot
 
 # Clear out any python versions lingering around
 unuse -q `dk_rep 'python*'`
@@ -19,8 +19,8 @@ dk_op -q .mysql-5.1.30
 dk_op -q .jpeg-6b
 
 # Python locations.
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/python_2.6.1/bin
-dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/python_2.6.1/lib
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/python_2.6_snapshot/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/python_2.6_snapshot/lib
 
 # Architecture dependent packages are here
 # This allows per-cpu vendor specific packages.

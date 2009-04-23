@@ -1,0 +1,8 @@
+#c applications/biotools
+#d Maq (http://maq.sourceforge.net/)
+#d Maq stands for Mapping and Assembly with Quality. It builds
+#d assembly by mapping short reads to reference sequences.
+
+unuse -q `dk_rep ".maq-*"`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/maq_0.7.1/bin 

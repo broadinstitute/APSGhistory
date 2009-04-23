@@ -1,0 +1,9 @@
+#c versioned-bio-tools
+#d set up environment for 454 xlr v2.0.00.20 processing
+
+dk_alter PATH /prodinfo/prod3pty/454/XLRoffRig/v2.0.00.22-64/bin:/prodinfo/prod3pty/454/XLRoffRig/v2.0.00.22-64/gsRunProcessor/usr/bin:/prodinfo/prod3pty/454/XLRoffRig/v2.0.00.22-64/gsReporter/usr/bin:/prodinfo/prod3pty/454/XLRoffRig/v2.0.00.22-64/gsRunProcessorManager/usr/bin:/prodinfo/prod3pty/454/XLRoffRig/openmpi/openmpi-1.2.6/bin
+dk_alter LD_LIBRARY_PATH /prodinfo/prod3pty/454/XLRoffRig/openmpi/openmpi-1.2.6/lib
+dk_setenv OPAL_PREFIX /prodinfo/prod3pty/454/XLRoffRig/openmpi/openmpi-1.2.6
+dk_setenv GS_LAUNCH_MODE MPI
+dk_setenv GS_MPIARGS_COMMAND "echo -np 16 -host node1064,node1065,node1066,node1067,node1068,node1069"
+dk_setenv GS_CACHEDIR /local/scratch
