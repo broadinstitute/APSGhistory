@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Usage:
 #   SYS_TYPE=`/path/to/systype`          in sh, ksh, zsh, bash
 #   setenv SYS_TYPE `/path/to/systype`   in csh, tcsh
@@ -38,7 +38,7 @@ case "$us$um" in
     esac;;
   freebsd*)
     rn=`echo $ur | sed 's/\([0-9]*\)\..*/\1/'`
-    SYS_TYPE="freebsd_$rn_$um"
+    SYS_TYPE="freebsd_${rn}_${um}"
     ;;   
   linux*86*)
     dtype= rn= ar=

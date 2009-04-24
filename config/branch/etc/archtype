@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Usage:
 #   ARCH_TYPE=`/path/to/archtype`          in sh, ksh, zsh, bash
 #   setenv ARCH_TYPE `/path/to/archtype`   in csh, tcsh
