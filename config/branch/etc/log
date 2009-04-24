@@ -1,0 +1,24 @@
+#!/bin/sh
+# Implement a logging function for Dotkit.  If Dotkit finds an executable
+# file at $DK_ROOT/etc/log, it assumes this file is a logging program,
+# and executes it.
+# Arguments passed to this script are as follows:
+# $1: _dk_self, the full pathname to the Dotkit just read.
+# $2: _dk_op, the current Dotkit operation - use or unuse.
+
+PATH=/usr/bin:/bin
+export PATH
+
+# Define some information you want to log.
+info=`date "+%F-%T"`"|$1|$2|$_dk_shell"
+
+# Where to put logfiles.
+_dk_logroot=/broad/tools/dotkit-log
+_dk_logfile=${_dk_logroot}/${LOGNAME}.log
+
+# Create log file if it doesn't exist
+test -w ${_dk_logfile} || touch ${_dk_logfile} && chmod 0600 ${_dk_logfile} 
+
+# Write log entry
+echo ${info} >> ${_dk_logfile}
+
