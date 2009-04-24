@@ -36,6 +36,10 @@ case "$us$um" in
       9.*) SYS_TYPE="macos_105";;
       *) guess="macos_10a"
     esac;;
+  freebsd*)
+    rn=`echo $ur | sed 's/\([0-9]*\)\..*/\1/'`
+    SYS_TYPE="freebsd_$rn_$um"
+    ;;   
   linux*86*)
     dtype= rn= ar=
 
