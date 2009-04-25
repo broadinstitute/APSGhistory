@@ -61,9 +61,7 @@ case "$us$um" in
     # Redhat/CentOS tests 
     # We treat CentOS == RedHat
     elif test -f /etc/redhat-release; then
-#      if `grep -i "CentOS" /etc/redhat-release`
-      dtype=`sed -e 's/.*[Ee]nterprise.*/rhe/' \
-                 -e 's/.*[Ll]inux.*/redhat/' /etc/redhat-release`
+      dtype=redhat
       rn=`sed 's/.*elease \([0-9][0-9]*\).*/\1/' /etc/redhat-release`
     fi
     case "$um" in
