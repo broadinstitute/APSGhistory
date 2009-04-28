@@ -1,0 +1,20 @@
+HASH_DIR := /broad/hptmp/apsg
+
+# Sprawling pipeline to:
+#
+# - update hashes for every file in 1000genomes/data
+# - clean up files from interrupted hashing attempts / hashes of temporary ascp files
+# - remove hashes for files not present
+# - combine remaining hash files into a MANIFEST
+
+MANIFEST.broad: $(addprefix ${HASH_DIR}/,$(addsuffix .md5,$(shell find 1000genomes/data -type f)))
+	find ${HASH_DIR}/1000genomes/data  \( \( -name '*.partial' -o -name '*.apsx.md5' \) -exec rm {} \; \) -o \( -name '*.md5' -print0 \) | \
+ 	  perl -0lne '$$hash = $$_; s!^${HASH_DIR}/(.*)\.md5\0?$$!/broad/gold_standard/$$1!; if (-e) { print $$hash } else { unlink $$hash }' | \
+	  xargs -r -0 cat | sort -k2,999 > MANIFEST.broad
+
+.PRECIOUS: %.md5
+
+${HASH_DIR}/%.md5: %
+	mkdir -p $(dir $@)
+	bsub -o /dev/null -g /apsg/gold_standard -R 'rusage[hydrogen_io=2]' -R 'rusage[thumper19_io=2]' -q short -K -E 'cd '$(dir $@) -E 'cd /broad/gold_standard' 'md5sum $? > $@.partial && mv $@.partial $@' >/dev/null 2>&1
+
