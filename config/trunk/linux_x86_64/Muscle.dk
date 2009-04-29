@@ -1,0 +1,10 @@
+#c applications
+#d MUSCLE is public domain multiple alignment software for 
+#d protein and nucleotide sequences. MUSCLE stands for 
+#d multiple sequence comparison by log-expectation. 
+#d http://www.drive5.com/muscle/muscle.html
+
+unuse -q `dk_rep "Muscle*"`
+
+dk_op -q .muscle-3.7
+
