@@ -1,0 +1,8 @@
+#c applications
+#d PHYLIP is a free package of programs for inferring phylogenies.
+#d http://evolution.genetics.washington.edu/phylip.html
+
+unuse -q `dk_rep "*phylip*"`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/phylip_3.68/exe
+
