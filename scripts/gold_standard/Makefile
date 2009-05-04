@@ -1,14 +1,15 @@
 # management port for local asperacentral process (get manually from netstat after restart)
 ASCP_PORT    := 39188
 ASCP_SOURCE  := anonftp\@ftp-private.ncbi.nih.gov
-ASCP_OPTIONS := $(if $(filter -s,${MFLAGS}),-q) -k 1 -m 80M -l 100M -QT -i /opt/aspera/connect/etc/asperaweb_id_dsa.putty -M ${ASCP_PORT}
+ASCP_OPTIONS := $(if $(filter -s,${MAKEFLAGS}),-q) -k 1 -m 80M -l 100M -QT -i /opt/aspera/connect/etc/asperaweb_id_dsa.putty -M ${ASCP_PORT}
 
 FTP_SOURCE   := ftp-trace.ncbi.nih.gov
-CURL_OPTIONS := $(if $(filter -s,${MFLAGS}),-s) -S
+CURL_OPTIONS := $(if $(filter -s,${MAKEFLAGS}),-s) -S
 
-T := $(if $(filter -s,${MFLAGS}),--verbose)
+T := $(if $(filter -s,${MAKEFLAGS}),,--verbose)
 
 sync: sync-plan
+	for file in `sed -re '/^REMOVED: /d;s/^(CHANGED|ADDED): *//' sync-plan`; do mkdir -p `dirname $$file`; done
 	sed -re '/^REMOVED: /d;s/^(CHANGED|ADDED): *//' sync-plan | xargs -r $T -n1 -IPATH ascp ${ASCP_OPTIONS} ${ASCP_SOURCE}:/PATH PATH
 
 sync-plan: MANIFEST.ncbi MANIFEST.broad
@@ -37,7 +38,7 @@ mail-download-plan: sync-plan
 
 mail-deletion-plan: sync-plan /broad/1KG/gold_standard_preserve
 	(egrep '^(REMOVED): ' sync-plan | grep -qF "$$(cat /broad/1KG/gold_standard_preserve)") && \
-	      egrep '^(REMOVED): ' sync-plan | awk '{ print $2 }' | grep -vF "$$(cat /broad/1KG/gold_standard_preserve)" \
+	      egrep '^(REMOVED): ' sync-plan | awk '{ print $$2 }' | grep -vF "$$(cat /broad/1KG/gold_standard_preserve)" \
 	      | mail -s '1000genomes mirror files to delete' broad-1kg-downloads@broad.mit.edu
 
 nightly: mail-download-plan sync clean
