@@ -1,6 +1,19 @@
 # System-supplied file - DO NOT EDIT!!
 # Make your changes to $HOME/.my.cshrc instead.
 
+# Init 
+setenv DK_ROOT /broad/tools/dotkit
+eval `$DK_ROOT/init -c`
+
+if ( ! $?RUN_ONCE ) then
+  setenv RUN_ONCE 1
+  # Things that run once at login go here
+  use -q default
+endif
+
+# Things that get loaded in every shell
+use -q default++
+
 # Source user configuration
 if (-f $HOME/.my.cshrc) then
 	source $HOME/.my.cshrc
