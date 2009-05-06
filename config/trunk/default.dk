@@ -7,9 +7,6 @@
 # Set up a basic PATH
 dk_op -q .path
 
-# Set the prompt
-dk_op -q .prompt
-
 # Set LANG
 dk_op -q .lang
 
