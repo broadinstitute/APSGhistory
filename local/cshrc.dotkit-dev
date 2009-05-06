@@ -1,12 +1,6 @@
 # System-supplied file - DO NOT EDIT!!
 # Make your changes to $HOME/.my.cshrc instead.
 
-# Set up dotkit
-setenv DK_ROOT /broad/tools/dotkit-dev
-eval `$DK_ROOT/init`
-
-use -q default
-
 # Source user configuration
 if (-f $HOME/.my.cshrc) then
 	source $HOME/.my.cshrc

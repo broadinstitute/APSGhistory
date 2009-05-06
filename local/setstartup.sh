@@ -4,7 +4,7 @@
 DATE=`date "+%Y%m%d%H%M%S"`
 
 # Files to replace
-FILES="bash_login bashrc cshrc"
+FILES="bash_login bashrc cshrc login"
 
 # Where we keep templates.
 SRCDIR="/broad/tools/NoArch/pkgs/local"
