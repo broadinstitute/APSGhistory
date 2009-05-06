@@ -1,0 +1,13 @@
+#c IT/Systems
+#d Collection of default environment settings for basic user 
+#d setup. This is meant to *REPLACE* current startup scripts.
+#d Do not use unless you know what you are doing!
+#d This ++ version is for aliases and dotkits which are reloadable.
+
+# Set the prompt
+dk_op -q .prompt
+
+# Set up common aliases
+dk_op -q .aliases++
+
+
