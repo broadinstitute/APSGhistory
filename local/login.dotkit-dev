@@ -3,12 +3,6 @@
 
 # $Id: .login,v 1.1 1999/02/26 22:13:49 ckd Exp $
 
-# Set up dotkit
-setenv DK_ROOT /broad/tools/dotkit
-eval `$DK_ROOT/init`
-
-use -q default
-
 # Source user configuration
 if (-f $HOME/.my.login) then
 	source $HOME/.my.login
