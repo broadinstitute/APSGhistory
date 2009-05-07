@@ -1,0 +1,9 @@
+#c bio-tools
+#d PAUP v4b10  
+#d Phylogenetic Analysis Using Parsimony
+#d http://paup.csit.fsu.edu/about.html
+
+unuse -q `dk_rep "*paup*"`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/paup_4.0b10
+

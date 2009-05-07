@@ -1,5 +1,5 @@
-#c arachne-1.15
-#d Setup for executing arachne v1.15 binaries
+#c arachne
+#d Setup for executing latest archne binaries
 
-dk_op -q .arachne-1.15.0
+dk_op -q .arachne-1.16.0
 

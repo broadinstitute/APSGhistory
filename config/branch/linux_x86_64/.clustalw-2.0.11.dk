@@ -1,0 +1,12 @@
+#c applications
+#d Clustal: Multiple Sequence Alignment
+#d Multiple alignment of nucleic acid and protein sequences 
+#d http://www.clustal.org/
+
+unuse -q `dk_rep "*clustal*"`
+
+# We need the libraries.
+dk_op -q .gcc-libs-4.3.3
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/clustalw_2.0.11/bin
+

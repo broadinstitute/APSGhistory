@@ -1,0 +1,14 @@
+#c applications
+#d xfig is an interactive drawing tool.
+#d http://xfig.org/userman/
+
+# Remove existing xfig packages
+unuse -q `dk_rep "*xfig-*"`
+
+# Set up xfig
+dk_alter PATH          /broad/tools/Linux/x86_64/pkgs/xfig_3.2.5/bin
+
+dk_alter XAPPLRESDIR   /broad/tools/Linux/x86_64/pkgs/xfig_3.2.5/usr/X11R6/lib/X11/app-defaults
+dk_alter XFIGLIBDIR    /broad/tools/Linux/x86_64/pkgs/xfig_3.2.5/_DATA/xfig
+
+dk_alias xfig  'xfig -k /broad/tools/Linux/x86_64/pkgs/xfig_3.2.5/_DATA/xfig/CompKeyDB '

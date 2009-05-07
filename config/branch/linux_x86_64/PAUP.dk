@@ -1,0 +1,9 @@
+#c applications
+#d PAUP v4b10  
+#d Phylogenetic Analysis Using Parsimony
+#d http://paup.csit.fsu.edu/about.html
+
+unuse -q `dk_rep "*PAUP*"`
+
+dk_op -q .paup-4.0b10
+

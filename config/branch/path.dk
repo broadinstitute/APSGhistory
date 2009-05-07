@@ -1,3 +1,6 @@
+#c system
+#d Set PATH to be a very basic Unix-like path.
+
 setenv PATH /usr/bin:/bin:/usr/X11R6/bin:/usr/bin/X11
 setenv LD_LIBRARY_PATH 
 

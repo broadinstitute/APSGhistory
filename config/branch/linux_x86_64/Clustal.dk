@@ -1,0 +1,9 @@
+#c applications
+#d Clustal: Multiple Sequence Alignment
+#d Multiple alignment of nucleic acid and protein sequences 
+#d http://www.clustal.org/
+
+unuse -q `dk_rep "*Clustal*"`
+
+dk_op -q .clustalw-2.0.11
+

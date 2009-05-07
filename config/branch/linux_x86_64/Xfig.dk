@@ -1,0 +1,9 @@
+#c applications
+#d xfig is an interactive drawing tool.
+#d http://xfig.org/userman/
+
+# Remove existing xfig packages
+unuse -q `dk_rep "*Xfig*"`
+
+dk_op -q .xfig-3.2.5
+

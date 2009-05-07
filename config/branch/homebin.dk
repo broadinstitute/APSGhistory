@@ -1,0 +1,6 @@
+#c system
+#d Add user $HOME/bin to path.
+
+dk_alter PATH $HOME/bin
+ 
+

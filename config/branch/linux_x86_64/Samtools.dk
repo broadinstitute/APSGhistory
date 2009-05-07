@@ -1,0 +1,6 @@
+#c applications
+#d Samtools (current)
+
+dk_op -q .samtools-current
+
+
