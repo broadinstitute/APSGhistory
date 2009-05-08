@@ -1,6 +1,16 @@
 # System-supplied file - DO NOT EDIT!!
 # Make your changes to $HOME/.my.bash_login instead.
 
+# SuSE breaks bash startup by sourcing ~/bashrc from /etc/profile. 
+# Since .bashrc is written such that sourcing it multiple times should 
+# be harmless, we source it from here so non-SuSE machines will have
+# it sourced at login.
+
+# Source user configuration
+if [ -f $HOME/.bashrc ]; then
+        . $HOME/.bashrc
+fi
+
 # Source user configuration
 if [ -f $HOME/.my.bash_login]; then
 	. $HOME/.my.bash_login
