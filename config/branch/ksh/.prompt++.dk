@@ -1,15 +1,18 @@
 #c IT/Systems
 #d Set the system prompt
 
-#dk_setenv PROMPT_COMMAND 'echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
+# Brief description of escape sequences below.
+# SET TITLEBAR: "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"
+#
+# SET PROMPT: "\[\033[01;32m\]\u@\h \[\033[01;34m\]\w \$ \[\033[00m\]"
+#                     green   user@host     blue    pwd $/user or #/root    unset color
 
 case $TERM in
   xterm*)
-    local TITLEBAR="\033]0;${USER}@${HOSTNAME}: ${PWD}\007"
+    dk_setenv PS1 '\033]0;${USER}@${HOSTNAME}: ${PWD}\007\[\033[01;32m\]\u@\h \[\033[01;34m\]\w \$ \[\033[00m\]'
     ;;
   *)
-    local TITLEBAR=""
+    dk_setenv PS1 '\[\033[01;32m\]\u@\h \[\033[01;34m\]\w \$ \[\033[00m\]'
     ;;
 esac
 
-dk_setenv PS1 '${TITLEBAR}\[\033[01;32m\]\u@\h \[\033[01;34m\]\w \$ \[\033[00m\]'
