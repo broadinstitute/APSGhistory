@@ -1,0 +1,6 @@
+#c languages
+#d GHC, the Glasgow Haskell Compiler
+#d http://www.haskell.org/ghc/
+#d Latest release.
+
+dk_op -q .ghc-6.8.3

@@ -1,5 +1,5 @@
 #c applications
-#d Phrep Phrad and Consed
+#d Phrep Phrap PolyPhred and Consed
 #d http://www.phrap.org/phredphrapconsed.html
 
 unuse -q `dk_rep 'Consed*'`
