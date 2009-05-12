@@ -19,10 +19,6 @@ dk_op -q .broad
 # Set up local scripts and tools
 dk_op -q .local
 
-# Add X11 to path, this should check for the existance of X11
-# as well as use the correct path for each distro/OS
-dk_op -q .X11
-
 # Source the LSF setup file.
 # LSF related aliases go in this dotkit.
 dk_op -q .lsf-7.0
