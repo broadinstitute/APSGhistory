@@ -1,0 +1,5 @@
+#c bio-tools
+#d Gromacs molecular dynamics tool
+#d www.gromacs.org
+
+dk_op -q .gromacs-4.0.5
