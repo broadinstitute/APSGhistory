@@ -10,6 +10,7 @@ OPTIONS="-e -a -v -L --loop "
 # -c Continue tranfers of possible
 # -e Delete local files if not present on remote site
 # -a same as --allow-chown --allow-suid --no-umask, e.g. archive mode
+# -L get symlinks as files
 # --loop  Keep looping over files until mirror is complete.
 
 # Make sure DST exists and is writeable. 
@@ -33,7 +34,8 @@ fi
 # the update starts as soon as the mirror 
 # finishes.
 cat << EOF | $LFTP
-set cmd:at-exit "/broad/data/ncbi/scripts/ncbi-updatedb.sh"
 mirror $OPTIONS $SRC $DST
 EOF
+
+echo "/broad/data/ncbi/scripts/ncbi-update-db.sh" | at "6:00pm Sunday"
 

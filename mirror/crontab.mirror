@@ -1,5 +1,13 @@
 # ALL MAIL goes to jbh
 MAILTO=jbh@broad.mit.edu
+SHELL=/bin/bash
 
-# lftp command to mirror ncbi data 
-0 0 * * 0           lftp -c "mirror -c -e -a -n --loop ftp://ftp.ncbi.nih.gov/blast/db /broad/data/ncbi/db"
+# mirror ncbi data every Friday night at 8 PM.
+# This script submits a job to at to update the 
+# data directories at 6PM on Sunday.
+0 20 * * Fri      /broad/data/ncbi/scripts/ncbi-update-db-mirror.sh 
+
+# Script to update taxonomy files.
+0 18 * * Sun      /broad/data/ncbi/scripts/ncbi-update-taxonomy.sh
+
+
