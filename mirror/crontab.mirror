@@ -1,0 +1,5 @@
+# ALL MAIL goes to jbh
+MAILTO=jbh@broad.mit.edu
+
+# lftp command to mirror ncbi data 
+0 0 * * 0           lftp -c "mirror -c -e -a -n --loop ftp://ftp.ncbi.nih.gov/blast/db /broad/data/ncbi/db"
