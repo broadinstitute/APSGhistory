@@ -9,7 +9,6 @@ eval `$DK_ROOT/init -c`
 # This section loads the appropriate dotkits given how the shell is started
 if ( $?loginsh ) then
   # Login Shell
-  echo "Login shell: Adding defaults..."
   # default dotkit contains Broad default applications these should load once
   use -q default
 endif
