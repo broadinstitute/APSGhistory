@@ -10,7 +10,7 @@
 if [ -f $HOME/.bashrc ]; then
         . $HOME/.bashrc
 fi
-
+      
 # Source user configuration
 if [ -f $HOME/.my.bash_login ]; then
 	. $HOME/.my.bash_login

@@ -1,8 +1,6 @@
 # System-supplied file - DO NOT EDIT!!
 # Make your changes to $HOME/.my.login instead.
 
-# $Id: .login,v 1.1 1999/02/26 22:13:49 ckd Exp $
-
 # Source user configuration
 if (-f $HOME/.my.login) then
 	source $HOME/.my.login

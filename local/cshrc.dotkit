@@ -1,18 +1,25 @@
 # System-supplied file - DO NOT EDIT!!
 # Make your changes to $HOME/.my.cshrc instead.
 
-# Init 
+# Init Dotkit in every shell
 setenv DK_ROOT /broad/tools/dotkit
 eval `$DK_ROOT/init -c`
 
-if ( ! $?RUN_ONCE ) then
-  setenv RUN_ONCE 1
-  # Things that run once at login go here
+# Rather than use .login, test for things to include for logins here.
+# This section loads the appropriate dotkits given how the shell is started
+if ( $?loginsh ) then
+  # Login Shell
+  echo "Login shell: Adding defaults..."
+  # default dotkit contains Broad default applications these should load once
   use -q default
 endif
 
-# Things that get loaded in every shell
-use -q default++
+if ( $?prompt ) then
+  # Interactive shell
+  # default++ dotkit contains broad aliases and settings that get loaded 
+  # for all interactive shells (must be reusable dotkits ++)
+  use -q default++
+endif
 
 # Source user configuration
 if (-f $HOME/.my.cshrc) then
