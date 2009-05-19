@@ -6,7 +6,7 @@ files.each { |file|
     host, path = `/bin/df #{file}`.split("\n")[1].split[0].split(":")
     case host
     when 'nitrogen'
-       $stderr.puts "[#{file} is mounted via nitrogen; consult systems group]" 
+       $stderr.puts "#{host}:#{path} (for #{file}) is mounted indirectly; ask help@broad for the correct resource" 
     else
        puts "#{host}_io"
     end
