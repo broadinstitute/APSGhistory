@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+
+files = ARGV
+
+files.each { |file|
+    host, path = `/bin/df #{file}`.split("\n")[1].split[0].split(":")
+    case host
+    when 'nitrogen'
+       $stderr.puts "[#{file} is mounted via nitrogen; consult systems group]" 
+    else
+       puts "#{host}_io"
+    end
+}
