@@ -1,12 +1,43 @@
 #!/usr/bin/env ruby
 
 files = ARGV
+nitrogen_resources = nil
 
 files.each { |file|
-    host, path = `/bin/df #{file}`.split("\n")[1].split[0].split(":")
+    source = `/bin/df #{file}`.split("\n")[1].split[0]
+    host, path = source.split(":")
+
+    unless host and path
+       $stderr.puts "#{source} (for #{file}) is not a network path;  no resource available"
+       next
+    end
+
     case host
     when 'nitrogen'
-       $stderr.puts "#{host}:#{path} (for #{file}) is mounted indirectly; ask help@broad for the correct resource" 
+       unless nitrogen_resources
+          nitrogen_resources = {}
+          File.open('/sysman/install/broad/nitrogen-resources') { |file|
+             file.each { |line|
+	        nitrogen_path, *resources = line.split
+	        nitrogen_resources[nitrogen_path] = resources
+	     }
+          }
+       end
+       resources = nitrogen_resources[path]
+       unless resources
+       	  candidates = nitrogen_resources.keys.select { |mount| path =~ %r{^#{mount}/} }
+	  case candidates.size
+	  when 0
+            $stderr.puts "#{host}:#{path} (for #{file}) not found; ask help@broad for the correct resource" 
+            next
+	  when 1
+	    resources = nitrogen_resources[candidates.first]
+	  else
+	    $stderr.puts "#{host}:#{path} (for #{file}) ambiguous; ask help@broad for the correct resource"
+            next
+          end
+       end
+       puts resources
     else
        puts "#{host}_io"
     end
