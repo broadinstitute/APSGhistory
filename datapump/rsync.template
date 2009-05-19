@@ -1,45 +1,47 @@
 #!/bin/bash
 #PBS -V
 #PBS -j oe
-#PBS -o /data/results/output/%JOBNAME%
+#PBS -o ${SRCROOT}/output/%JOBNAME%
 #PBS -N %JOBNAME%
 #PBS -l nodes=3:ppn=2
 #PBS -l walltime=96:00:00
 
+SRCROOT=%SRCROOT%
+DSTROOT=%DSTROOT%
 
-SOLID=%SOLID%
+INSTRUMENT=%INSTRUMENT%
 RUN=%RUN%
 
 # Timestamp
 echo "Start: "`date`
 
 # Working directory is root of source.
-cd /data/results/
+cd ${SRCROOT}
 
-# Sanity Check that $SOLID and $RUN make sense. This
+# Sanity Check that $INSTRUMENT and $RUN make sense. This
 # makes the job rerunnable as it will simply exit if
 # the source directory doesn't exist.
-if [ "x${SOLID}" = "x" ] || [ "x${RUN}" = "x" ]; then
+if [ "x${INSTRUMENT}" = "x" ] || [ "x${RUN}" = "x" ]; then
   echo "Empty values for instrument and/or run names."
   exit 1
 fi
 
-if [ ! -d ${SOLID}/${RUN} ]; then
-  echo "${SOLID}/${RUN} not found in `pwd`"
+if [ ! -d ${INSTRUMENT}/${RUN} ]; then
+  echo "${INSTRUMENT}/${RUN} not found in `pwd`"
   exit 2
 fi 
 
-for dir in `find ${SOLID}/${RUN} -depth -type d`
+for dir in `find ${INSTRUMENT}/${RUN} -depth -type d`
 do
   echo -e "\n\nProcessing $dir"
 
   # Check for existance of target, create if missing
-  if [ ! -d /data/results_new/$dir ]; then
+  if [ ! -d ${DSTROOT}/$dir ]; then
       echo "Creating target: $dir"
-      mkdir -p /data/results_new/$dir
+      mkdir -p ${DSTROOT}/$dir
   fi
   
-  rsync -a $dir/* /data/results_new/$dir
+  rsync -a $dir/* ${DSTROOT}/$dir
   RSYNC=$?
 
   # Since we do depth first, any errors should propogate
@@ -47,7 +49,7 @@ do
   # never delete anything that doesn't get successfully rsync'd
   if [ "x$RSYNC" = "x0" ]; then
     echo "${dir} transferred succesfully, *DELETING*."
-    pushd /data/results
+    pushd ${SRCROOT}
     rm -rfv ${dir}
     popd
 
@@ -57,10 +59,10 @@ do
 done
 
 # Final Rsync of run
-rsync -a /data/results/${SOLID}/${RUN} /data/results_new/${SOLID}/
+rsync -a ${SRCROOT}/${INSTRUMENT}/${RUN} ${DSTROOT}/${INSTRUMENT}/
 
 if [ "x$?" = "x0" ]; then 
-  pushd /data/results/${SOLID}
+  pushd ${SRCROOT}/${INSTRUMENT}
   rm -rfv ${RUN}
   popd
 fi
