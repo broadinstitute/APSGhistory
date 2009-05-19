@@ -1,0 +1,35 @@
+#!/bin/bash
+#PBS -V
+#PBS -j oe
+#PBS -o /data/results/output/%JOBNAME%
+#PBS -N %SOLID%
+#PBS -l nodes=1:ppn=2
+#PBS -l walltime=96:00:00
+
+
+SOLID=%SOLID%
+
+# Timestamp
+echo "Start: "`date`
+
+# Working directory is root of source.
+cd /data/results/
+
+# Sanity Check that $SOLID and $RUN make sense. This
+# makes the job rerunnable as it will simply exit if
+# the source directory doesn't exist.
+if [ "x${SOLID}" = "x" ] ; then
+  echo "Empty values for instrument name."
+  exit 1
+fi
+
+if [ ! -d ${SOLID} ]; then
+  echo "${SOLID} not found in `pwd`"
+  exit 2
+fi 
+
+find ${SOLID} -depth -noleaf > /data/results_new/${SOLID}.files.list
+
+echo "Find returned $?"
+
+echo "Finish: "`date`

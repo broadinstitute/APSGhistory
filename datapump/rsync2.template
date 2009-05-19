@@ -1,0 +1,21 @@
+#!/bin/bash
+#PBS -V
+#PBS -j oe
+#PBS -o /data/results_new/output/RSYNC-%RUN%
+#PBS -N RSYNC-%RUN%
+#PBS -l nodes=1:ppn=1
+#PBS -l walltime=96:00:00
+
+
+FILES=%FILES%
+
+# Timestamp
+echo "Start: "`date`
+
+# Working directory is root of source.
+pushd /data/results/
+
+rsync --files-from=%FILES% -av /data/results /data/results_new
+
+echo "End: "`date`
+
