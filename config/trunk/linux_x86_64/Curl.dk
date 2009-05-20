@@ -1,0 +1,8 @@
+#c utilities
+#d curl, v7.19.0
+
+# Remove any Curl packages in use
+unuse -q `dk_rep 'Curl*'`
+
+dk_op -q .curl-7.19.0
+
