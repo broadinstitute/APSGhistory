@@ -31,7 +31,7 @@ case "$us$um" in
     esac;;
   linux*)
     case "$um" in
-      i[36]86) ar=ia32;;
+      i[3456]86) ar=ia32;;
       ia64) ar=ia64;;
       *) ar=x86_64;;
     esac
