@@ -10,12 +10,12 @@ dupes = {}
 
 ARGF.each { |line|
    case line
-   when /^\s*volume\s+(\S+)/
+   when %r{^\s*volume\s+(/\S+)}
       table[volume] = resources if volume
       volume, resources = $1, []
-   when /^\s*filer\s+(\S+)/
+   when %r{^\s*filer\s+(\S+)}
       resources << $1 + '_io'
-   when /^\s*export\s+\S+\s+(\S+)\s+as\s+(\S+)\s+/
+   when %r{^\s*export\s+\S+\s+(/\S+)\s+as\s+(/\S+)\s+}
       dupes[$2] = $1
    end
 }
