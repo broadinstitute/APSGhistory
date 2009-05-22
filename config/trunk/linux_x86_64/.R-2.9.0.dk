@@ -1,0 +1,11 @@
+#c versioned-languages
+#d R v2.9.0 
+
+unuse -q `dk_rep ".R-*"`
+
+# This package was built with gcc-4.3.3
+dk_op -q .gcc-libs-4.3.3
+dk_op -q .linear-algebra-0.1
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/R_2.9.0/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/R_2.9.0/lib64

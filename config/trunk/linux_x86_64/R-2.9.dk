@@ -1,0 +1,8 @@
+#c languages
+#d R is a free software environment for statistical computing and graphics.
+#d http://www.r-project.org/
+
+unuse -q `dk_rep 'R-*'`
+
+dk_op -q .R-2.9.0
+
