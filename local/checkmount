@@ -1,0 +1,166 @@
+#!/bin/bash
+
+# checkmount.sh 
+#
+
+#
+# jbh - 2009-04-16
+#
+
+# usage
+function usage () {
+  echo "usage: $0 [OPTION] path"
+  echo "  -n EMAIL    Send mail to EMAIL if check fails."
+  echo "  -v          Be verbose and show output of each test."
+  echo "  path        Full path to check."
+  echo 
+  echo "$0 performs several checks on a path to determine:"
+  echo "   a) does 'stat path' return within 10 seconds?"
+  echo " if a fails, then: "
+  echo "   b) is the path rooted on a volume in the Broad automount"
+  echo "      volumes availble from NIS?"
+  echo "   c) is the path on a currently mounted NFS volume?"
+  echo 
+  echo "The return code is 0 if path accessible* or the sum of:"
+  echo "  1 - if attempted access times out."
+  echo "  2 - if path is on autofs controlled volume."
+  echo "  4 - if path is on a currently mounted volume."
+  echo " OR"
+  echo "  8 - if ran with incorrect arguments."
+  echo 
+  echo " * Note that 'accessible' means the path is not blocked by "
+  echo "   a broken NFS mount, but there is no check for existence "
+  echo "   or if permissions would block creation. "
+  echo 
+  
+  exit 8
+}
+
+# verbose
+# Echo argument if VERBOSE is defined.
+function verbose () {
+  if [ ! -z "$VERBOSE" ]; then
+    echo $1 >&2
+  fi
+}
+
+# Recursive function to find the NFS mountpoint 
+function isNfsMount () {
+  local MPINFO
+  local MPRESULT
+  # check if arg is an nfs mountpoint
+  MPINFO=`mount | grep $1 | grep "type nfs"`
+  MPRESULT=$?
+  if [ $MPRESULT == 0 ]; then 
+    local NFS=`echo $MPINFO | awk '{print $1}'`
+    verbose "Mounted at $NFS"
+    return 0
+  fi
+
+  # Drop down one level
+  local MP=`dirname $1`
+  if [ "x$MP" == "x/" ]; then
+    # If we are all the way to /, exit with error. 
+    return 1
+  else
+    # Check next level down.
+    isNfsMount ${MP}
+    return $?
+  fi
+}
+
+function isAutofsMount () {
+  local MPINFO
+  local MPRESULT
+  # This function should parse the ypcat output to verify this is a broad automount.
+  YPCAT="cat ypcat-mounts.byname "
+  # check if arg is an nfs mountpoint
+  MPINFO=`$YPCAT | grep  " $1 " `
+  MPRESULT=$?
+  if [ $MPRESULT == "0" ]; then
+    local SOURCE=`echo $MPINFO | awk '{print $1}'`
+    verbose "Filesystem source is $SOURCE"
+    return 0
+  fi
+
+  # Drop down one level
+  local MP=`dirname $1`
+  if [ "x$MP" == "x/" ]; then
+    # If we are all the way to /, exit with error. 
+    return 1
+  else
+    # Check next level down.
+    isAutofsMount ${MP}
+    return $?
+  fi
+}
+
+function isAccessible () {
+  # Verify that this is not a hung NFS mount (or hung mount 
+  # of any kind, i guess. Use a 10 second timeout. That should 
+  # be plenty for an automount to take place if necessary and 
+  # return something. The something should be the number 1
+  # even if the path is non-existant.i
+  local RESULT
+  RESULT=0
+  read -t10 RESULT < <( ls -ld $1 2>&1 | wc -l )
+
+  # Collect the result of the read. 
+  # 0 means it was successful, that is, it did not block and/or timeout.
+  # 1 means it timed out.
+  READ=$?
+
+  return $READ
+}
+
+
+######################################################################
+# Main Program
+
+# Process arguments
+while getopts "nv" OPTION; do
+  case $OPTION in 
+    n ) NOTIFY=true ;;
+    v ) VERBOSE=true ;;
+    * ) 
+      echo "$0: Bad argument to script." 
+      exit 1
+      ;;
+  esac
+done
+# Put rest of args in place to check all paths given.
+shift $((OPTIND-1))
+
+# Check for at least one path argument
+if [ "x$1" == "x" ]; then
+  echo "$0: No path given."
+  exit 1
+fi
+ 
+RETURN=0
+# Check the path
+if isAccessible $1; then
+  # Path looks ok, return success.
+  verbose "$1 is accessible (no hang or timeout during access attempt.)"
+  exit 0
+else
+  # Path wasn't accessible, do some further checking.
+  verbose "$1 is NOT accessible, hang or timeout occured."
+  let RETURN=RETURN+1
+  
+  # Check if in autofs map
+  if isAutofsMount $1 ; then
+    verbose "$1 appears to be a Broad AutoFS mounted Filesystem."
+    let RETURN=RETURN+2
+  else
+    verbose "$1 does not appear to be a Broad AutoFS mounted Filesystem."
+  fi
+
+  if isNfsMount $1; then
+    verbose "$1 is mounted via NFS."
+    let RETURN=RETURN+4
+  else
+    verbose "$1 is not a mounted NFS filesystem."
+  fi
+fi
+exit $RETURN
