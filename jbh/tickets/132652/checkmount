@@ -15,16 +15,23 @@ function usage () {
   echo "  path        Full path to check."
   echo 
   echo "$0 performs several checks on a path to determine:"
-  echo "   a) is the path rooted on a volume in the Broad automount"
-  echo "      volumes availbel from NIS?"
-  echo "   b) does 'stat path' return within 10 seconds?"
+  echo "   a) does 'stat path' return within 10 seconds?"
+  echo " if a fails, then: "
+  echo "   b) is the path rooted on a volume in the Broad automount"
+  echo "      volumes availble from NIS?"
   echo "   c) is the path on a currently mounted NFS volume?"
   echo 
-  echo "The return code is the sum of:"
+  echo "The return code is 0 if path accessible* or the sum of:"
   echo "  1 - if attempted access times out."
-  echo "  2 - if path is not on autofs controlled volume."
+  echo "  2 - if path is on autofs controlled volume."
   echo "  4 - if path is on a currently mounted volume."
+  echo " OR"
   echo "  8 - if ran with incorrect arguments."
+  echo 
+  echo " * Note that 'accessible' means the path is not blocked by "
+  echo "   a broken NFS mount, but there is no check for existence "
+  echo "   or if permissions would block creation. "
+  echo 
   
   exit 8
 }
@@ -94,7 +101,8 @@ function isAccessible () {
   # be plenty for an automount to take place if necessary and 
   # return something. The something should be the number 1
   # even if the path is non-existant.i
-  unset RESULT
+  local RESULT
+  RESULT=0
   read -t10 RESULT < <( ls -ld $1 2>&1 | wc -l )
 
   # Collect the result of the read. 
@@ -131,23 +139,28 @@ fi
  
 RETURN=0
 # Check the path
-if isAutofsMount $1 ; then
-  verbose "$1 appears to be a Broad AutoFS mounted Filesystem."
-else
-  verbose "$1 does not appear to be a Broad AutoFS mounted Filesystem."
-fi
-
 if isAccessible $1; then
+  # Path looks ok, return success.
   verbose "$1 is accessible (no hang or timeout during access attempt.)"
+  exit 0
 else
+  # Path wasn't accessible, do some further checking.
   verbose "$1 is NOT accessible, hang or timeout occured."
-  RETURN=1
-fi
+  let RETURN=RETURN+1
+  
+  # Check if in autofs map
+  if isAutofsMount $1 ; then
+    verbose "$1 appears to be a Broad AutoFS mounted Filesystem."
+    let RETURN=RETURN+2
+  else
+    verbose "$1 does not appear to be a Broad AutoFS mounted Filesystem."
+  fi
 
-if isNfsMount $1; then
-  verbose "$1 is mounted via NFS."
-else
-  verbose "$1 is not a mounted NFS filesystem."
+  if isNfsMount $1; then
+    verbose "$1 is mounted via NFS."
+    let RETURN=RETURN+4
+  else
+    verbose "$1 is not a mounted NFS filesystem."
+  fi
 fi
-
 exit $RETURN
