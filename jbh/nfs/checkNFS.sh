@@ -1,11 +1,33 @@
 #!/bin/bash
 
-# This script verifies NFS mounts exist and are mounted correctly. 
-# It does not guarantee that a path is valid, just that it's underlying
-# NFS mount is valid and working.
+# checkmount.sh 
+#
+
 #
 # jbh - 2009-04-16
 #
+
+# usage
+function usage () {
+  echo "usage: $0 [OPTION] path"
+  echo "  -n EMAIL    Send mail to EMAIL if check fails."
+  echo "  -v          Be verbose and show output of each test."
+  echo "  path        Full path to check."
+  echo 
+  echo "$0 performs several checks on a path to determine:"
+  echo "   a) is the path rooted on a volume in the Broad automount"
+  echo "      volumes availbel from NIS?"
+  echo "   b) does 'stat path' return within 10 seconds?"
+  echo "   c) is the path on a currently mounted NFS volume?"
+  echo 
+  echo "The return code is the sum of:"
+  echo "  1 - if attempted access times out."
+  echo "  2 - if path is not on autofs controlled volume."
+  echo "  4 - if path is on a currently mounted volume."
+  echo "  8 - if ran with incorrect arguments."
+  
+  exit 8
+}
 
 # verbose
 # Echo argument if VERBOSE is defined.
@@ -17,20 +39,21 @@ function verbose () {
 
 # Recursive function to find the NFS mountpoint 
 function isNfsMount () {
+  local MPINFO
+  local MPRESULT
   # check if arg is an nfs mountpoint
   MPINFO=`mount | grep $1 | grep "type nfs"`
   MPRESULT=$?
   if [ $MPRESULT == 0 ]; then 
-    NFS=`echo $MPINFO | awk '{print $1}'`
+    local NFS=`echo $MPINFO | awk '{print $1}'`
     verbose "Mounted at $NFS"
     return 0
   fi
 
   # Drop down one level
-  MP=`dirname $1`
+  local MP=`dirname $1`
   if [ "x$MP" == "x/" ]; then
     # If we are all the way to /, exit with error. 
-    verbose "Hit bottom at $MP."
     return 1
   else
     # Check next level down.
@@ -40,8 +63,29 @@ function isNfsMount () {
 }
 
 function isAutofsMount () {
- # This function shoudl parse the ypcat output to verify this is a broad automount.
- return 1
+  local MPINFO
+  local MPRESULT
+  # This function should parse the ypcat output to verify this is a broad automount.
+  YPCAT="cat ypcat-mounts.byname "
+  # check if arg is an nfs mountpoint
+  MPINFO=`$YPCAT | grep  " $1 " `
+  MPRESULT=$?
+  if [ $MPRESULT == "0" ]; then
+    local SOURCE=`echo $MPINFO | awk '{print $1}'`
+    verbose "Filesystem source is $SOURCE"
+    return 0
+  fi
+
+  # Drop down one level
+  local MP=`dirname $1`
+  if [ "x$MP" == "x/" ]; then
+    # If we are all the way to /, exit with error. 
+    return 1
+  else
+    # Check next level down.
+    isAutofsMount ${MP}
+    return $?
+  fi
 }
 
 function isAccessible () {
@@ -94,9 +138,9 @@ else
 fi
 
 if isAccessible $1; then
-  verbose "$1 is accessible."
+  verbose "$1 is accessible (no hang or timeout during access attempt.)"
 else
-  verbose "$1 is NOT accessible."
+  verbose "$1 is NOT accessible, hang or timeout occured."
   RETURN=1
 fi
 

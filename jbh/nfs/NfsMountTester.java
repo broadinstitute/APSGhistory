@@ -4,7 +4,7 @@ class NfsMountTester {
   
   static boolean checkNfsMount(String path) throws IOException {
     
-    String command = "/broad/tools/NoArch/pkgs/local/checkNFS.sh -q " + path;
+    String command = "/broad/tools/NoArch/pkgs/local/checkNFS.sh " + path;
     
     Process proc = Runtime.getRuntime().exec(command);
 
@@ -17,27 +17,28 @@ class NfsMountTester {
   
     try {
       if (proc.waitFor() != 0) { 
-         System.err.println("exit value = " + proc.exitValue());
+         return false;
       }
     }
     catch (InterruptedException e) {
       System.err.println(e);
     }
+    return true;
   }
-
-
 
   public static void main (String[] args) {
       
     for (int i = 0; i < args.length; i++){
-      System.out.println(args[i]);
       try {
-        checkNfsMount(args[i]);
+        if (checkNfsMount(args[i])) {
+          System.out.println( args[i] + " is a valid, accessible path.");
+        } else {
+          System.out.println( args[i] + " is not a valid, accessible path.");
+        }
       } 
       catch (IOException e) {
                 e.printStackTrace();  
       }
-
     }
   }
 }
