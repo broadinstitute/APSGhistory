@@ -73,7 +73,7 @@ function isAutofsMount () {
   local MPINFO
   local MPRESULT
   # This function should parse the ypcat output to verify this is a broad automount.
-  YPCAT="cat ypcat-mounts.byname "
+  YPCAT="ypcat mounts.byname"
   # check if arg is an nfs mountpoint
   MPINFO=`$YPCAT | grep  " $1 " `
   MPRESULT=$?
