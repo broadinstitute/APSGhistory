@@ -25,7 +25,7 @@ COLOR_WHITE='1;37'
 COLOR_NONE='0'
 
 function load_color () {
-  local LOAD=`uptime | sed -e "s/.*load average: \(.*\...\), \(.*\...\), \(.*\...\)/\1/" -e "s/ //g" `
+  local LOAD=`uptime | sed -e "s/.*load averag.*: \(.*\...\), \(.*\...\), \(.*\...\)/\1/" -e "s/ //g" `
   local LOAD_SCALED=`echo -en "scale=0\n$LOAD/0.01\nquit\n" | bc `
 
   local LOAD_LOW_THRESHOLD="50"

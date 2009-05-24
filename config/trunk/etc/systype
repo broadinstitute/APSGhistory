@@ -37,6 +37,9 @@ case "$us$um" in
     esac
     SYS_TYPE="linux_$ar"
     ;;
+  freebsd*)
+    SYS_TYPE=freebsd
+    ;;
   *) echo "SYS_TYPE: system type unknown: $us $um $ur" >&2 ;;
 esac
 
