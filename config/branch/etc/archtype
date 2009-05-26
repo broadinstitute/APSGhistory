@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Usage:
 #   ARCH_TYPE=`/path/to/archtype`          in sh, ksh, zsh, bash
 #   setenv ARCH_TYPE `/path/to/archtype`   in csh, tcsh
@@ -12,8 +12,8 @@ if [ -r /etc/home.config ]; then
   exit
 fi
 
-# For now we only care about x86_64
-if ! [[ $SYS_TYPE =~ "x86_64" ]]; then
+# For now we only care about linux_x86_64
+if [ "x$SYS_TYPE" != "xlinux_x86_64" ]; then
   ARCH_TYPE=unknown
   echo $ARCH_TYPE
   exit

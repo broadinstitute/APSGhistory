@@ -18,6 +18,3 @@ set prompt = "${user}@%m:%~ > "
 # Force an xterm title set to get things started.
 set_title
 
-
-
-

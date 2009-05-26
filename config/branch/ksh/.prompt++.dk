@@ -1,18 +1,10 @@
 #c IT/Systems
 #d Set the system prompt
 
-# Brief description of escape sequences below.
-# SET TITLEBAR: "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"
-#
-# SET PROMPT: "\[\033[01;32m\]\u@\h \[\033[01;34m\]\w \$ \[\033[00m\]"
-#                     green   user@host     blue    pwd $/user or #/root    unset color
+# We unuse any exisiting prompt packages, just to keep
+# loaded dotkit list clean
+unuse  -q `dk_rep '*prompt*'`
 
-case $TERM in
-  xterm*)
-    dk_setenv PS1 '\033]0;${USER}@${HOSTNAME}: ${PWD}\007\[\033[01;32m\]\u@\h \[\033[01;34m\]\w \$ \[\033[00m\]'
-    ;;
-  *)
-    dk_setenv PS1 '\[\033[01;32m\]\u@\h \[\033[01;34m\]\w \$ \[\033[00m\]'
-    ;;
-esac
+dk_setenv PROMPT_COMMAND 'echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"'
+dk_setenv PS1 '\[\033[01;32m\]\u@\h \[\033[01;34m\]\w \$ \[\033[00m\]'
 

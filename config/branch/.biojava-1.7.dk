@@ -1,0 +1,18 @@
+#c tools
+#d biojava-1.7
+
+# Clean out old biojava
+unuse -q `dk_rep "*biojava*"`
+
+# Set up biojava.
+dk_alter CLASSPATH /broad/tools/NoArch/pkgs/biojava_1.7/apps-1.7.jar
+dk_alter CLASSPATH /broad/tools/NoArch/pkgs/biojava_1.7/biojava-1.7.jar
+dk_alter CLASSPATH /broad/tools/NoArch/pkgs/biojava_1.7/bytecode.jar
+dk_alter CLASSPATH /broad/tools/NoArch/pkgs/biojava_1.7/commons-cli.jar
+dk_alter CLASSPATH /broad/tools/NoArch/pkgs/biojava_1.7/commons-collections-2.1.jar
+dk_alter CLASSPATH /broad/tools/NoArch/pkgs/biojava_1.7/commons-dbcp-1.1.jar
+dk_alter CLASSPATH /broad/tools/NoArch/pkgs/biojava_1.7/commons-pool-1.1.jar
+dk_alter CLASSPATH /broad/tools/NoArch/pkgs/biojava_1.7/demos-1.7.jar
+dk_alter CLASSPATH /broad/tools/NoArch/pkgs/biojava_1.7/jgrapht-jdk1.5.jar
+dk_alter CLASSPATH /broad/tools/NoArch/pkgs/biojava_1.7/junit-4.4.jar
+
