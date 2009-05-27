@@ -1,14 +1,21 @@
 #!/bin/bash
 
-# ignore commits not touching main/releng
+# For testing, we want this to work on revisions as well as
+# transactions, so infer which it is that we're looking at.
 
-svnlook dirs-changed -t $2 $1 | grep -q '^main/releng' || exit 0
+T=${2//[0-9]}
+T=${T:+-t}
+T=${T:--r}
+
+# ignore commits not touching main, branches, or tags
+
+/util/bin/svnlook dirs-changed $T $2 $1 | /usr/bin/egrep -q '^(main|branches|tags)(/|$)' || exit 0
 
 # ensure that a JIRA issue number is present
 
-svnlook log -t $2 $1 | egrep -q '\b[A-Z]{3}-[0-9]+\b' && exit 0
+/util/bin/svnlook log $T $2 $1 | /usr/bin/egrep -q '\b[A-Z]{3}-[0-9]+\b' && exit 0
 
-cat 1>&2 <<EOF
+/bin/cat 1>&2 <<EOF
 Please include in the commit message a reference to the appropriate 
 Jira issues, for example "SQU-999" or "FIN-1234".
 EOF
