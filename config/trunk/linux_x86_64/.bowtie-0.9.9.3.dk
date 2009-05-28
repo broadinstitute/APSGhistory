@@ -1,0 +1,12 @@
+#c applications/biotools
+#d Bowtie is an ultrafast, memory-efficient short read aligner 
+#d geared toward quickly aligning large sets of short DNA sequences 
+#d (reads) to large genomes. 
+
+unuse -q `dk_rep ".bowtie-*"`
+
+# I'm built with GCC-4.3 goodness baked inside!
+dk_op -q .gcc-libs-4.3.3
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/bowtie_0.9.9.3
+

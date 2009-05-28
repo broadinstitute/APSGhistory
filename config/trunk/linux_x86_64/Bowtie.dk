@@ -1,0 +1,9 @@
+#c applications/biotools
+#d Bowtie is an ultrafast, memory-efficient short read aligner 
+#d geared toward quickly aligning large sets of short DNA sequences 
+#d (reads) to large genomes. 
+#d http://bowtie-bio.sourceforge.net/manual.shtml
+
+unuse -q `dk_rep "Bowtie*"`
+
+dk_op -q .bowtie-0.9.9.3

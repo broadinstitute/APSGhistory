@@ -1,0 +1,9 @@
+#c applications/biotools
+#d TopHat is a program that aligns RNA-Seq reads to a genome 
+#d in order to identify exon-exon splice junctions. It is built 
+#d on the ultrafast short read mapping program Bowtie.
+#d http://tophat.cbcb.umd.edu/manual.html
+
+unuse -q `dk_rep "TopHat*"`
+
+dk_op -q .tophat-1.0.8
