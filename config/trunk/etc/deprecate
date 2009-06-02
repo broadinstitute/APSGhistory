@@ -9,7 +9,7 @@ function notify {
   MAILCMD=`which mail 2> /dev/null` || MAILCMD=`which mailx 2> /dev/null`
   if [ -n "$MAILCMD" -a -x $MAILCMD ]; then
     # Dump the env to see if there is anything useful to be gleaned from it.
-    set | $MAILCMD -s "DOTKIT ERROR: deprecate called incorrectly." $DK_ADMIN
+    set | $MAILCMD -s "${1-'DOTKIT: Unspecified Error.'}" $DK_ADMIN
   fi
 }
 
@@ -19,11 +19,12 @@ DK_ADMIN=jbh@broad.mit.edu
 export PKG=$1
 export OP=$2
 export LOGFILE=/broad/tools/dotkit-log/$USER-deprecated
+export LOCKFILE=$LOGFILE.lock
 export DATE=`date "+%Y-%m-%d %H:%M:%S"`
 
 # Make sure we have some kind of arguments.
 if [ -z "$1" -o -z "$2" ]; then
-  notify
+  notify "DOTKIT: Argument error."
   exit
 fi
 
@@ -43,7 +44,17 @@ if [[ "$OP" = "use" ]]; then
   # Attempt to get exclusive access to the logfile, 
   # but only try for two seconds before giving up
   # we do not want to block forever
-  flock -w 2 $LOGFILE -c "echo $DATE $HOST $USER:$UID $REALID $PKG >> $LOGFILE" 
+  
+  # SuSE no-likey flock. 
+  #  flock -w 2 $LOGFILE -c "echo $DATE $HOST $USER:$UID $REALID $PKG >> $LOGFILE" 
+
+  lockfile -1 -l 16 -r 1 -s 2 $LOCKFILE
+  if [[ "$?" == "0" ]]; then
+    echo $DATE $HOST $USER:$UID $REALID $PKG >> $LOGFILE
+    rm -rf $LOCKFILE
+  else
+    notify "DOTKIT: Lockfile Error."
+  fi
 fi
 
 
