@@ -259,7 +259,8 @@ f_maintainer()
   if test -f $DK_ROOT/etc/DK_MAINTAINER; then
   cat << EOF
 =========================  QUESTIONS?  ===========================
-Problems or questions?  Please contact the Dotkit site maintainer:
+Problems or questions or software requests?  Please contact the 
+Dotkit site maintainer:
 `cat $DK_ROOT/etc/DK_MAINTAINER`
 EOF
   fi
