@@ -1,0 +1,13 @@
+#c applications/biotools
+#d Velvet is a de novo genomic assembler specially designed for 
+#d short read sequencing technologies, such as Solexa or 454, 
+#d developed by Daniel Zerbino and Ewan Birney at the European 
+#d Bioinformatics Institute (EMBL-EBI), near Cambridge, in the 
+#d United Kingdom.
+#d http://www.ebi.ac.uk/~zerbino/velvet/
+
+unuse -q `dk_rep ".velvet-*"`
+unuse -q `dk_rep "Velvet*"`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/velvet_0.7.31
+

@@ -3,6 +3,6 @@
 
 # Run the deprecate script so we can track usage of this dotkit and notify 
 # users to starrrt usssing the correct dotkit.
-#$DK_ROOT/etc/deprecate $_dk_p $_dk_op 
+$DK_ROOT/etc/deprecate $_dk_p $_dk_op 
 
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/gnuplot/bin

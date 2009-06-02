@@ -1,0 +1,12 @@
+#c applications/biotools
+#d The Short Sequence Assembly by K-mer search and 3' read 
+#d Extension (SSAKE) is a genomics application for aggressively 
+#d assembling millions of short nucleotide sequences by 
+#d progressively searching for perfect 3'-most k-mers using a 
+#d DNA prefix tree.
+#d http://www.bcgsc.ca/platform/bioinfo/software/ssake
+ 
+unuse -q `dk_rep ".ssake-*"`
+unuse -q `dk_rep "SSAKE*"`
+
+dk_op -q .ssake-3.4
