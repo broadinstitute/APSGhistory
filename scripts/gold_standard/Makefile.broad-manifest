@@ -1,20 +1,25 @@
-HASH_DIR := /broad/hptmp/apsg
+HASH_DIR  := /broad/hptmp/apsg
+
+LOCAL_DIR := /broad/gold_standard
+# must be run from ${LOCAL_DIR}!
 
 # Sprawling pipeline to:
 #
-# - update hashes for every file in 1000genomes/data
+# - update hashes for every file in 1000genomes/ftp/data
 # - clean up files from interrupted hashing attempts / hashes of temporary ascp files
 # - remove hashes for files not present
 # - combine remaining hash files into a MANIFEST
+# - replace paths in MANIFEST to reflect the latest whims of NCBI
 
-MANIFEST.broad: $(addprefix ${HASH_DIR}/,$(addsuffix .md5,$(shell find 1000genomes/data -type f)))
-	find ${HASH_DIR}/1000genomes/data  \( \( -name '*.partial' -o -name '*.apsx.md5' \) -exec rm {} \; \) -o \( -name '*.md5' -print0 \) | \
- 	  perl -0lne '$$hash = $$_; s!^${HASH_DIR}/(.*)\.md5\0?$$!/broad/gold_standard/$$1!; if (-e) { print $$hash } else { unlink $$hash }' | \
+MANIFEST.broad: $(addprefix ${HASH_DIR}/,$(addsuffix .md5,$(shell find 1000genomes/ftp/data -type f)))
+	find ${HASH_DIR}/1000genomes/ftp/data  \( \( -name '*.partial' -o -name '*.apsx.md5' \) -exec rm {} \; \) -o \( -name '*.md5' -print0 \) | \
+ 	  perl -0lne '$$hash = $$_; s!^${HASH_DIR}/(.*)\.md5\0?$$!${LOCAL_DIR}/$$1!; if (-e) { print $$hash } else { unlink $$hash }' | \
 	  xargs -r -0 cat | sort -k2,999 > MANIFEST.broad
+	perl -i -pe 's!1000genomes/data!1000genomes/ftp/data!' MANIFEST.broad
 
 .PRECIOUS: %.md5
 
 ${HASH_DIR}/%.md5: %
 	mkdir -p $(dir $@)
-	bsub -o /dev/null -g /apsg/gold_standard -R 'rusage[hydrogen_io=2]' -R 'rusage[thumper19_io=2]' -q short -K -E 'cd '$(dir $@) -E 'cd /broad/gold_standard' 'md5sum $? > $@.partial && mv $@.partial $@' >/dev/null 2>&1
+	bsub -o /dev/null -g /apsg/gold_standard -R 'rusage[hydrogen_io=2]' -R 'rusage[thumper19_io=2]' -q short -K -E 'cd '$(dir $@) -E 'cd ${LOCAL_DIR}' 'md5sum $? > $@.partial && mv $@.partial $@' >/dev/null 2>&1
 
