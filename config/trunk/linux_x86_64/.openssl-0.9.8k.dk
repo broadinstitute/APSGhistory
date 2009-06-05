@@ -1,0 +1,15 @@
+#c libraries
+#d OpenSSL
+
+unuse -q `dk_rep ".openssl-[0-9].*"`
+
+# Set up environment for using library
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/openssl_0.9.8k/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/openssl_0.9.8k/lib
+
+# Set up build env.
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/openssl_0.9.8k/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/openssl_0.9.8k/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/openssl_0.9.8k/include
+
+
