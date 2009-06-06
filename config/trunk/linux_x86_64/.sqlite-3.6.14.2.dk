@@ -1,0 +1,17 @@
+#c applications
+#d SQLite
+
+# Remove any currently used versions
+unuse -q `dk_rep '.sqlite-*'`
+
+# Set up environment for using library
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/sqlite_3.6.14.2/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/sqlite_3.6.14.2/lib
+
+
+# Set up build environment
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/sqlite_3.6.14.2/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/sqlite_3.6.14.2/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/sqlite_3.6.14.2/include
+
+
