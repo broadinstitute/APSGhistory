@@ -1,0 +1,12 @@
+#c libraries
+#d libsigsegv
+
+# Set up environment for using library
+dk_alter LD_LIBRARY_PATH  /broad/tools/Linux/x86_64/pkgs/libsigsegv_2.6/lib
+
+# Set up build env.
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/libsigsegv_2.6/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/libsigsegv_2.6/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/libsigsegv_2.6/include
+
+

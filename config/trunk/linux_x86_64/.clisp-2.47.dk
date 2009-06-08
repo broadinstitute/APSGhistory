@@ -1,0 +1,16 @@
+#c versioned-languages
+#d Common LISP
+
+# Clear out any clisp versions lingering around
+unuse -q `dk_rep 'CLISP*'`
+unuse -q `dk_rep '.clisp*'`
+
+# Packages python needs
+dk_op -q .gcc-libs-4.3.3
+dk_op -q .readline-4.3
+dk_op -q .libsigsegv-2.6
+
+# Python locations.
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/clisp_2.47/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/clisp_2.47/lib
+

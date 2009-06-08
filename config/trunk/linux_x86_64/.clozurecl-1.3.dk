@@ -1,0 +1,12 @@
+#c versioned-languages
+#d Common LISP
+
+# Clear out any clisp versions lingering around
+unuse -q `dk_rep 'ClozureCL*'`
+unuse -q `dk_rep '.clozurecl*'`
+
+# Environment 
+dk_setenv CCL_DEFAULT_DIRECTORY /broad/tools/Linux/x86_64/pkgs/ClozureCL_1.3/ccl
+
+# Alias to start ClozureCL
+dk_alias ccl '/broad/tools/Linux/x86_64/pkgs/ClozureCL_1.3/ccl/scripts/ccl64'

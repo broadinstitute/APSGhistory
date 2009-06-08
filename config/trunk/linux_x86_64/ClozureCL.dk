@@ -1,0 +1,8 @@
+#c languages
+#d Clozure CL is a free Common Lisp implementation.
+#d http://trac.clozure.com/openmcl
+
+unuse -q `dk_rep 'ClozureCL*'`
+
+dk_op -q .clozurecl-1.3
+

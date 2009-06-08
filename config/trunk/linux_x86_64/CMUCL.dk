@@ -1,0 +1,11 @@
+#c languages
+#d CMUCL is a free implementation of the Common Lisp 
+#d programming language which runs on most major Unix 
+#d platforms. It mainly conforms to the ANSI Common Lisp 
+#d standard.
+#d http://www.cons.org/cmucl/
+
+unuse -q `dk_rep 'CMUCL*'`
+
+dk_op -q .cmucl-19f
+

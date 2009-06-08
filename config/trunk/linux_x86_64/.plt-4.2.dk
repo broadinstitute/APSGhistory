@@ -1,0 +1,18 @@
+#c versioned-languages
+#d PLT Scheme
+
+# Clear out any versions lingering around
+unuse -q `dk_rep 'PLT-Scheme*'`
+unuse -q `dk_rep '.plt*'`
+
+# Packages python needs
+dk_op -q .gcc-libs-4.3.3
+dk_op -q .jpeg-6b
+dk_op -q .readline-4.3
+dk_op -q .cairo-1.8.6
+dk_op -q .libpng-1.2.34
+
+# Python locations.
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/plt_4.2/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/plt_4.2/lib
+

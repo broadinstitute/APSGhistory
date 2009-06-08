@@ -1,0 +1,10 @@
+#c languages
+#d PLT Scheme is an innovative programming language 
+#d that builds on a rich academic and practical tradition.
+#d http://plt-scheme.org/
+
+unuse -q `dk_rep 'PLT-Scheme*'`
+
+dk_op -q .plt-4.2
+
+
