@@ -1,6 +1,5 @@
 #c groups
-#d group of dotkits under development or 
-#d packages being tested.
+#d dotkits from the future.
 
 dk_alter DK_NODE $DK_ROOT/group=future
 

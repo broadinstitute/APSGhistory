@@ -1,8 +1,9 @@
-#c tools
+#c devel
 #d biojava-1.7
 
 # Clean out old biojava
-unuse -q `dk_rep "*biojava*"`
+unuse -q `dk_rep "BioJava*"`
+unuse -q `dk_rep ".biojava*"`
 
 # Set up biojava.
 dk_alter CLASSPATH /broad/tools/NoArch/pkgs/biojava_1.7/apps-1.7.jar

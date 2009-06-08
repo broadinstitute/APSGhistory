@@ -1,9 +1,9 @@
-#c IT/Systems
+#c systems
 #d Collection of default environment settings for basic user 
 #d setup. This is meant to *REPLACE* current startup scripts.
 #d Do not use unless you know what you are doing!
 
-# Things which make permanenet changes come first.
+# Things which make permanent changes come first.
 # Set up a basic PATH
 dk_op -q .path
 

@@ -1,8 +1,9 @@
-#c utilities
+#c devel
 #d Apache Ant 1.7.1
 
 # Remove any comepeting ant versions.
-unuse -q `dk_rep '.ant-.*'`
+unuse -q `dk_rep 'Ant*'`
+unuse -q `dk_rep '.ant-*'`
 
 dk_alter PATH /broad/tools/NoArch/pkgs/apache-ant_1.7.1/bin
 dk_setenv ANT_HOME /broad/tools/NoArch/pkgs/apache-ant_1.7.1

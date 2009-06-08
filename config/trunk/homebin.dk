@@ -1,6 +1,8 @@
-#c system
+#c systems
+#d Deprecated!! Please 'use homebin++' instead.
 #d Add user $HOME/bin to path.
 
-dk_alter PATH $HOME/bin
- 
+# Deprecated.
+$DK_ROOT/etc/deprecate $_dk_p $_dk_op 
 
+dk_alter PATH $HOME/bin

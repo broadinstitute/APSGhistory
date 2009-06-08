@@ -1,10 +1,11 @@
-#c languages
+#c devel
 #d BioJava is an open-source project dedicated to providing a 
 #d Java framework for processing biological data.
 #d http://biojava.org/wiki/Main_Page
 
 # One Biojava at a time, please.
 unuse -q `dk_rep 'BioJava*'`
+unuse -q `dk_rep '.biojava-*'`
 
 # grab latest hidden biojava package.
 dk_op -q .biojava-1.7
