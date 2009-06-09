@@ -1,0 +1,10 @@
+#c applications
+#d Graphviz is open source graph visualization software.
+#d http://www.graphviz.org/
+
+unuse -q `dk_rep 'Graphviz*'`
+unuse -q `dk_rep 'graphviz*'`
+unuse -q `dk_rep '.graphviz*'`
+
+dk_op -q .graphviz-2.22.2
+
