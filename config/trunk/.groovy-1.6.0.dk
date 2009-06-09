@@ -1,7 +1,9 @@
-#c devel-tools
+#c devel
 #d groovy v 1.6.0
-
+#rootpath /broad/tools/NoArch/pkgs/groovy_1.6.0
+#
 # Clean out old groovys
+unuse -q `dk_rep "Groovy*"` 
 unuse -q `dk_rep "*groovy*"`
 
 # Set up groovy.

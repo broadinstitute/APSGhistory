@@ -1,7 +1,11 @@
-#c devel-tools
+#c devel
 #d groovy v 1.5.7
-
+#rootpath /broad/tools/NoArch/pkgs/groovy_1.5.7
+#
 # Clean out old groovys
+unuse -q `dk_rep "Groovy*"`
+# This should be ".grooovy*" but some legacy groovy*.dk kits 
+# were still around at the time of this being conformatized.
 unuse -q `dk_rep "*groovy*"`
 
 # Set up groovy.

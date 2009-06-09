@@ -1,5 +1,6 @@
 #c devel
 #d biojava-1.7
+#rootpath /broad/tools/NoArch/pkgs/biojava_1.7/
 
 # Clean out old biojava
 unuse -q `dk_rep "BioJava*"`

@@ -1,0 +1,7 @@
+#c systems
+#d Add user $HOME/bin to path.
+
+# This kit does the actual PATH mod for homebin++
+dk_alter PATH $HOME/bin
+ 
+
