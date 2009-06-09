@@ -1,8 +1,7 @@
 #c systems
-#d Deprecated!! Please 'use homebin++' instead.
 #d Add user $HOME/bin to path.
-
-# Deprecated.
-$DK_ROOT/etc/deprecate $_dk_p $_dk_op 
+#d You may want to load this last or "reuse homebin" after
+#d use'ing any dotkits which may conflict with things in 
+#d $HOME/bin
 
 dk_alter PATH $HOME/bin
