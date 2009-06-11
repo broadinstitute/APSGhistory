@@ -1,5 +1,8 @@
 #c applications
 #d Samtools (current)
+#d DEPRECATED 2009-06-11
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op 
+use -q .deprecated++
 
 # Environement for running Samtools.
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/samtools-current/bin
