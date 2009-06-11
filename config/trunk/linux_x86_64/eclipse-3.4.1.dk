@@ -1,9 +1,16 @@
 #c development-tools
 #d Eclipse Classis SDK
-#d DEPRECATED. 'use eclipse' instead of calling this package directly.
+#d DEPRECATED 2009-06-10
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
+use -q .deprecated++
 
-echo -e "\nThis package is deprecated. Please 'use Eclipse-3.4' instead"
-echo "to get the latest APSG supported version of Eclipse 3.4."
+
+setenv _dk_ok "(ok)
+
+This package is deprecated. Please 'use Eclipse-3.4' instead
+to get the latest APSG supported version of Eclipse 3.4.
+
+"
 
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/eclipse_3.4.1
 

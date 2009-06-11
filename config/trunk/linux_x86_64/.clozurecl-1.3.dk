@@ -1,6 +1,7 @@
 #c versioned-languages
 #d Common LISP
-
+#rootpath /broad/tools/Linux/x86_64/pkgs/ClozureCL_1.3
+#
 # Clear out any clisp versions lingering around
 unuse -q `dk_rep 'ClozureCL*'`
 unuse -q `dk_rep '.clozurecl*'`

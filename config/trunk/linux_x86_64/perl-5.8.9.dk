@@ -1,8 +1,10 @@
 #c versioned-languages
 #d Perl 5.8.9
+#d DEPRECATED 2009-06-10
+#
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
+use -q .deprecated++
 
-echo "The perl-5.8.9 dotkit is deprecated. Please 'use Perl-5.8'"
-echo "to always get the latest APSG supported Perl 5.8.x release."
 
 dk_op -q .perl-5.8.9
 

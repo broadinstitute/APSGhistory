@@ -1,6 +1,7 @@
-#c versioned-languages
+#c devel
 #d Common LISP
-
+#rootpath /broad/tools/Linux/x86_64/pkgs/clisp_2.47
+#
 # Clear out any clisp versions lingering around
 unuse -q `dk_rep 'CLISP*'`
 unuse -q `dk_rep '.clisp*'`

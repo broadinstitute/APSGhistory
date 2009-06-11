@@ -1,8 +1,8 @@
 #c applications
 #d Eclipse IDE
+#d DEPRECATED 2009-06-10
 
-echo -e "\nThis package is deprecated. Please use 'Eclipse-N.M'"
-echo "where N.M is the version you need. Currently this is"
-echo "Eclipse-3.4"
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
 
-# dk_op -q .eclipse-3.4.1
+use -q .deprecated++
+

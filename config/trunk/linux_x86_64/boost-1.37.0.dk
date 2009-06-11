@@ -1,9 +1,8 @@
 #c libraries
 #d BOOST http://www.boost.org/
-
-echo -e "\nThis dotkit is deprecated. Please refer to the boost "
-echo -e "hidden dotkits to use the boost libraries. A list of"
-echo -e "these can be found with 'use -al | grep boost'."
+#d DEPRECATED 2009-06-10
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
+use -q .deprecated++
 
 dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/boost-1.37.0/lib
 

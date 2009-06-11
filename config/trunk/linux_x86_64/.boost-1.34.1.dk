@@ -1,5 +1,8 @@
 #c libraries
 #d BOOST http://www.boost.org/
+#rootpath /broad/tools/Linux/x86_64/pkgs/boost_1.34.1
+
+unuse -q `dk_rep ".boost-*"`
 
 # Runtime
 dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/boost_1.34.1/lib

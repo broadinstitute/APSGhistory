@@ -1,5 +1,9 @@
 #c arachne-1.15
 #d Setup for executing arachne v1.15 binaries
+#rootpath /wga/scr2/ArachneReleases/ReleaseArachne-1-15
+
+unuse -q `dk_rep ".arachne*"`
+unuse -q `dk_rep "Arachne*"`
 
 # Dependencies
 dk_op -q .boost-1.38.0

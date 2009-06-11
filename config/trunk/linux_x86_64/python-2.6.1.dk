@@ -1,12 +1,8 @@
 #c versioned-languages
 #d Python 2.6.1
+#d DEPRECATED 2009-06-10
+#
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
+use -q .deprecated++
 
-# Clear out any python versions lingering around
-echo -e "\nThis package is deprecated. Please "
-echo -e "'use Python-2.6' to get the latest supported"
-echo -e "version of python 2.6.x."
-
-unuse -q `dk_rep 'python*'`
-
-dk_op -q .python-2.6.1
 

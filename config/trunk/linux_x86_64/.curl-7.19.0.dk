@@ -1,8 +1,11 @@
 #c utilities
 #d Add curl 7.19.0 to path
-
+#/broad/tools/Linux/x86_64/pkgs/curl/curl-7.19.0
+#rootpath /broad/tools/Linux/x86_64/pkgs/curl/curl-7.19.0
+#
 # Remove existing curl packages
-unuse -q `dk_rep "*curl-*"`
+unuse -q `dk_rep "Curl*"`
+unuse -q `dk_rep ".curl-*"`
 
 # Set up curl
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/curl/curl-7.19.0/bin

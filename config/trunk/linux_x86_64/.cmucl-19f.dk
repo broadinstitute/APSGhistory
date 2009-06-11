@@ -1,6 +1,7 @@
 #c versioned-languages
 #d CMU LISP
-
+#rootpath /broad/tools/Linux/x86_64/pkgs/cmucl_19f
+#
 # Clear out any cmu lisp versions lingering around
 unuse -q `dk_rep 'CMUCL*'`
 unuse -q `dk_rep '.cmucl*'`
