@@ -1,6 +1,10 @@
 #c applications
-#d Samtools (current)
+#d Samtools
+#d Samtools is a set of utilities that manipulate alignments in 
+#d the BAM format. It imports from and exports to the SAM (Sequence 
+#d Alignment/Map) format, does sorting, merging and indexing, and 
+#d allows to retrieve reads in any regions swiftly.
+#d http://samtools.sourceforge.net/samtools.shtml
 
-dk_op -q .samtools-current
-
+dk_op -q .samtools-0.1.4
 

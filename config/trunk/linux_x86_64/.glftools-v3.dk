@@ -1,0 +1,10 @@
+#c applications
+#d glf tools
+
+unuse -q Glftools  
+unuse -q `dk_rep ".glftools-*"`
+
+# Built with gcc-4.3.3 goodness baked inside.
+use -q .gcc-libs-4.3.3
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/glftools_v3
