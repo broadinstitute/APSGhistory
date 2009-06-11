@@ -1,4 +1,5 @@
 #c languages
 #d use version 7.6 of the MATLAB language
+#rootpath /broad/tools/apps/matlab76
 
 dk_alter PATH /broad/tools/apps/matlab76/bin
