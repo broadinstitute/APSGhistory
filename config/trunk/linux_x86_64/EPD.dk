@@ -1,4 +1,4 @@
-#c languages
+#c devel
 #d The Enthought Python Distribution (EPD) provides the popular
 #d and easy-to-use Python environment bundled with additional 
 #d modules that make it ideal for interactive technical 
@@ -6,8 +6,6 @@
 
 unuse -q `dk_rep 'Python-*'`
 unuse -q `dk_rep 'EPD*'`
-
-
 
 dk_op -q .epd-py25-4.1.30101-rh3
 

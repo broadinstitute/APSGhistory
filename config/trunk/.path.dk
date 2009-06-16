@@ -1,5 +1,18 @@
 #c systems
-#d Set basic common unix system path
+#d Set PATH to be a very basic Unix-like path.
+#d Warning! Do not use this dotkit unless you are
+#d sure you know what you are doing. It should only
+#d be used *VERY* early in the login/dotkit sequence.
+#d The will reset the path to a generic Unix default
+#d value.
 
-dk_setenv PATH /usr/bin:/bin:/usr/local/bin
+# Logic is that anything in /usr/bin supercedes /bin and last check in /usr/local/bin
+setenv PATH /usr/bin:/bin:/usr/local/bin
+
+# Ensure LD_LIBRARY_PATH is free of cruft.
+setenv LD_LIBRARY_PATH 
+
+# Should probably clear out some other generic PATH variables too
+setenv LIBRARY_PATH
+setenv MANPATH
 
