@@ -1,8 +1,9 @@
 127.0.0.1		localhost localhost.localdomain
 
 
-10.128.0.2			perceus perceus.broadinstitute.org
-
+10.128.0.2			perceus   perceus.broadinstitute.org
+10.128.0.17                     aneris    aneris.broadinstitute.org
+10.128.0.33                     vaquero   vaquero.broadinstitute.org
 
 10.128.5.0     seq-0000
 10.128.5.1     seq-0001
@@ -14,4 +15,17 @@
 10.128.5.7     seq-0007
 10.128.5.8     seq-0008
 10.128.5.9     seq-0009
+
+10.128.9.0     vseq-0000
+10.128.9.1     vseq-0001
+10.128.9.2     vseq-0002
+10.128.9.3     vseq-0003
+10.128.9.4     vseq-0004
+10.128.9.5     vseq-0005
+10.128.9.6     vseq-0006
+10.128.9.7     vseq-0007
+10.128.9.8     vseq-0008
+10.128.9.9     vseq-0009
+
+10.128.13.0    kvm-0000
 
