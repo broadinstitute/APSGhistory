@@ -1,4 +1,4 @@
-#c applications/queue
+#c applications
 #d Load Sharing Facility
 
 # Only one LSF to bind them.

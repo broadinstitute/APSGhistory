@@ -1,0 +1,9 @@
+#c applications
+#d ImageMagick
+#d ImageMagick is a software suite to create, 
+#d edit, and compose bitmap images.
+
+unuse -q `dk_rep "Imagemagick*"`
+
+dk_op -q .imagemagick-6.4.9-10
+
