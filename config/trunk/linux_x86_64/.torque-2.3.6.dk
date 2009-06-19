@@ -1,0 +1,25 @@
+#c applications
+#d TORQUE is an open source resource manager providing control 
+#d over batch jobs and distributed compute nodes.
+#d Use this dotkit if you need to sumbit jobs to a PBS 
+#d cluster.
+
+unuse -q `dk_rep "Torque*"`
+unuse -q `dk_rep ".torque-*"`
+
+# Environment
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/torque_2.3.6/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/torque_2.3.6/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/torque_2.3.6/include
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/torque_2.3.6/lib
+
+dk_setenv _dk_ok "(ok)
+
+You must also use a cluster dotkit to select a default PBS cluster. 
+Available options are:
+
+  use Aneris  # Sequencing Cluster
+
+"
+
+

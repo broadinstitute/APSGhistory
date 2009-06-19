@@ -1,0 +1,8 @@
+#c applications
+#d SQLite
+
+# Remove any currently used versions
+unuse -q `dk_rep 'SQLite*'`
+
+dk_op -q .sqlite-3.6.14.2
+

@@ -1,0 +1,17 @@
+#c libraries
+#d ARPACK is a collection of Fortran77 subroutines designed to 
+#d solve large scale eigenvalue problems. ARPACK++ is an 
+#d object-oriented version of the ARPACK package. This dotkit 
+#d covers them both.
+#d http://www.caam.rice.edu/software/ARPACK/
+
+unuse -q `dk_rep '.arpack*'`
+unuse -q ARPACK
+
+# Set up environment for using library
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/ARPACK_96/
+
+# Set up build env.
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/ARPACK_96/
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/ARPACK_96/arpack++/include
+

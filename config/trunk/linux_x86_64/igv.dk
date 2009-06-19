@@ -1,0 +1,11 @@
+#c applications
+#d The Integrative Genomics Viewer (IGV) is a high-performance 
+#d visualization tool for interactive exploration of large, 
+#d integrated datasets. 
+
+# This is non versioned and maintained by the igv developers. 
+# The PATH points to the always-latest version they pushed into 
+# broad/tools
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/igv
+

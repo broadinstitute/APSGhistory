@@ -1,0 +1,9 @@
+#c applications
+#d TORQUE is an open source resource manager providing control 
+#d over batch jobs and distributed compute nodes.
+#d Use this dotkit if you need to sumbit jobs to a PBS 
+#d cluster.
+
+unuse -q `dk_rep "Torque*"`
+
+dk_op -q .torque-2.3.6
