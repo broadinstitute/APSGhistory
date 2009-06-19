@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+failed = false
+
 files = ARGV
 nitrogen_resources = nil
 
@@ -9,6 +11,7 @@ files.each { |file|
 
     unless host and path
        $stderr.puts "#{source} (for #{file}) is not a network path;  no resource available"
+       failed = true
        next
     end
 
@@ -28,12 +31,14 @@ files.each { |file|
        	  candidates = nitrogen_resources.keys.select { |mount| path =~ %r{^#{mount}/} }
 	  case candidates.size
 	  when 0
-            $stderr.puts "#{host}:#{path} (for #{file}) not found; ask help@broad for the correct resource" 
+            $stderr.puts "#{host}:#{path} (for #{file}) not found; ask help@broad for the correct resource"
+	    failed = true
             next
 	  when 1
 	    resources = nitrogen_resources[candidates.first]
 	  else
 	    $stderr.puts "#{host}:#{path} (for #{file}) ambiguous; ask help@broad for the correct resource"
+	    failed = true
             next
           end
        end
@@ -42,3 +47,5 @@ files.each { |file|
        puts "#{host}_io"
     end
 }
+
+exit (failed ? 17 : 0)
