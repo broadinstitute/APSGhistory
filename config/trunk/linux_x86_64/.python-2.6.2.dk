@@ -1,5 +1,6 @@
-#c versioned-languages
+#c devel
 #d Python 2.6.2
+#rootpath /broad/tools/Linux/x86_64/pkgs/python_2.6.2
 
 # Clear out any python versions lingering around
 unuse -q `dk_rep 'python*'`
