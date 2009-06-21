@@ -1,15 +1,15 @@
 # management port for local asperacentral process (get manually from netstat after restart)
 ASCP_PORT    := 39188
 ASCP_SOURCE  := anonftp\@ftp-private.ncbi.nih.gov
-ASCP_OPTIONS := $(if $(filter -s,${MAKEFLAGS}),-q) -k 1 -m 80M -l 350M -QT -i /opt/aspera/connect/etc/asperaweb_id_dsa.putty -M ${ASCP_PORT}
+ASCP_OPTIONS := $(if $(filter s,${MAKEFLAGS}),-q) -k 1 -m 80M -l 350M -QT -i /opt/aspera/connect/etc/asperaweb_id_dsa.putty -M ${ASCP_PORT}
 
 FTP_SOURCE   := ftp-trace.ncbi.nih.gov
-CURL_OPTIONS := $(if $(filter -s,${MAKEFLAGS}),-s) -S
+CURL_OPTIONS := $(if $(filter s,${MAKEFLAGS}),-s) -S
 
 LOCAL_PATH  := /broad/gold_standard/1000genomes/ftp
 REMOTE_PATH := 1000genomes/ftp
 
-T := $(if $(filter -s,${MAKEFLAGS}),,--verbose)
+T := $(if $(filter s,${MAKEFLAGS}),,--verbose)
 
 sync: sync-plan
 	for file in `sed -re '/^REMOVED: /d;s/^(CHANGED|ADDED): *//' sync-plan`; do mkdir -p `dirname $$file`; done
