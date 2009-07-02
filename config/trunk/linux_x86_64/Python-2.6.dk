@@ -4,5 +4,5 @@
 #d Latest release in 2.6 series.
 unuse -q `dk_rep 'Python-*'`
 
-dk_op -q .python-2.6.1
+dk_op -q .python-2.6.2
 

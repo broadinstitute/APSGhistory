@@ -1,0 +1,8 @@
+#c applications
+#d The FASTX-Toolkit is a collection of command line tools 
+#d for Short-Reads FASTA/FASTQ files preprocessing. 
+#d http://hannonlab.cshl.edu/fastx_toolkit/index.html
+
+unuse -q `dk_rep "Fastx-Toolkit*"`
+
+dk_op -q .fastx_toolkit-0.0.8

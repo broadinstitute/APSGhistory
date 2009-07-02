@@ -1,0 +1,15 @@
+#c applications
+#d The FASTX-Toolkit is a collection of command line tools 
+#d for Short-Reads FASTA/FASTQ files preprocessing. 
+#d http://hannonlab.cshl.edu/fastx_toolkit/index.html
+
+unuse -q `dk_rep "Fastx-Toolkit*"`
+unuse -q `dk_rep ".fastx_toolkit-*"`
+
+# I'm built with GCC-4.3 goodness baked inside!
+dk_op -q .gcc-libs-4.3.3
+
+# Environment
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/fastx-toolkit_0.0.8/bin
+
+
