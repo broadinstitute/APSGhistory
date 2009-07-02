@@ -1,4 +1,8 @@
-#c bio-tools
+#c applications
 #d JRI v0.4 using R-2.6.1 and java 1.5
-
+#FIXME
+#  What is this? better description.
+#  Hidden versioned dotkit needed.
+#  Upgrade? Dependencies? R, Java?
+#
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/JRI

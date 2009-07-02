@@ -1,7 +1,7 @@
 #c applications
 #d MySQL 5.1.30
-
-echo -e "\n\nThis dotkit have been deprecated. Please 'use MySQL-1.5'"
-echo -e "(note uppercase S) to get the latest supported MySQL tools"
+#d DEPRECATED 2009-06-10
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
+use -q .deprecated++
 
 dk_op -q .mysql-5.1.30

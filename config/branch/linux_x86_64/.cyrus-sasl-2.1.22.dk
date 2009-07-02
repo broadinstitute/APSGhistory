@@ -1,8 +1,10 @@
 #c libraries
 #d Cyrus SASL API implentation
+#rootpath /broad/tools/Linux/x86_64/pkgs/cyrus-sasl-2.1.22
+#
+unuse -q `dk_rep ".cyrus-sasl*"`
 
-unuse -q `dk_rep "\.cyrus-sasl*"`
-
+# Dependencies
 dk_op -q .db-4.7.25
 dk_op -q .gdbm-1.8.3
 

@@ -1,9 +1,7 @@
 #c libraries
-#d Deprecated!!
+#d DEPRECATED 2009-06-10
 
-echo -e "\n\nDeprecated! Please 'use linear-algebra' to get" 
-echo -e "latest version of these libraries or use hidden "
-echo -e "dotkit ('use -al' to list all) to access a specific"
-echo -e "version."
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
+use -q .deprecated++
 
 dk_op -q .linear-algebra-0.1

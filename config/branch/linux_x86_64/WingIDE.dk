@@ -1,0 +1,11 @@
+#c devel
+#d Wing IDE is the most advanced Python IDE available today. 
+#d Wing's powerful debugging and code intelligence capabilities 
+#d will turbo-charge your Python development. Wing supports 
+#d web, GUI, and script development using Django, Turbogears, 
+#d Google App Engine, web2py, Zope, Plone, mod_wsgi, mod_python, 
+#d wxPython, PyQt, PyGtk, TkInter, and many other Python packages.
+
+unuse -q `dk_rep ".wingide-*"`
+
+dk_op -q .wingide-3.1.8.1

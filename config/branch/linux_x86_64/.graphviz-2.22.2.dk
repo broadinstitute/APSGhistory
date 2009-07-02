@@ -1,0 +1,24 @@
+#c versioned-graphics
+#d Graphviz graphics tools v2.22.2
+#rootpath /broad/tools/Linux/x86_64/pkgs/graphviz_2.22.2
+
+unuse -q `dk_rep 'Graphviz*'`
+unuse -q `dk_rep 'graphviz*'`
+unuse -q `dk_rep '.graphviz*'`
+
+# Lots of depends.
+use -q .gcc-libs-4.3.3
+use -q .expat-2.0.1
+use -q .zlib-1.2.3
+use -q .pango-1.20.5
+use -q .cairo-1.8.6
+use -q .freetype-2.3.8
+use -q .fontconfig-2.6.0
+use -q .gtk+-2.14.7
+use -q .jpeg-6b
+use -q .tcl-tk-8.5.6 
+
+# graphviz locations.
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/graphviz_2.22.2/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/graphviz_2.22.2/lib
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/graphviz_2.22.2/share/man

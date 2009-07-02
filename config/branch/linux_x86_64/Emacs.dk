@@ -1,0 +1,7 @@
+#c applications
+#d GNU Emacs is an extensible, customizable text editor--and more.
+#d http://www.gnu.org/software/emacs/
+
+unuse -q `dk_rep "Emacs*"`
+
+dk_op -q .emacs-22.3

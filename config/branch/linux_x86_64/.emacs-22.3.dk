@@ -1,0 +1,19 @@
+#c applications
+#d Emacs 22.3
+#rootpath /broad/tools/Linux/x86_64/pkgs/emacs_22.3
+# Clear out any emacs versions lingering around
+unuse -q `dk_rep ".emacs-*"`
+unuse -q `dk_rep "Emacs*"`
+
+# Packages emacs needs
+dk_op -q .gtk+-2.14.7
+dk_op -q .gcc-libs-4.3.3
+dk_op -q .jpeg-6b
+dk_op -q .libpng-1.2.34
+
+# Emacs locations.
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/emacs_22.3/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/emacs_22.3/share/man
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/emacs_22.3/lib
+
+

@@ -1,0 +1,11 @@
+#c applications/biotools
+#d VCAKE is a genetic sequence assembler capable of assembling 
+#d millions of small nucleotide reads even in the presence of 
+#d sequencing error. This software is currently geared towards 
+#d de novo assembly of Illumina's Solexa Sequencing data.
+#d http://sourceforge.net/projects/vcake
+
+unuse -q `dk_rep ".vcakec-*"`
+unuse -q `dk_rep "VCAKEc*"`
+
+dk_op -q .vcakec-2.0

@@ -1,4 +1,34 @@
-#c languages
+#c devel
 #d Locally installed default Java version.
+#DEPRECATED 2009-06-17
+
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
+
+unuse -q `dk_rep "Java-*"`
 
 dk_op -q .java-systemdefault
+
+setenv _dk_ok "(ok) 
+
+This dotkit is deprecated. To choose a specific locally installed
+Java release, please add the appropriate environment settings to 
+your startup files or scripts. 
+
+Bash Example for .my.bashrc:
+
+MYHOST=\`hostname -s\`
+if [[ \"\$MYHOST\" == \"node110\" ]]; then
+  JAVA_HOME=/usr/java/default
+  PATH=\$JAVA_HOME/bin:\$PATH
+  MANPATH=\$MANPATH:\$JAVA_HOME/man
+  export JAVA_HOME PATH MANPATH
+else 
+  use -q Java-1.6
+fi
+
+This snippet would set up the system default Java on node110 and 
+use the central Java 1.6 dotkit on any other node.
+
+"
+
+

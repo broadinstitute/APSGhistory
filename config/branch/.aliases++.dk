@@ -1,4 +1,4 @@
-#c IT/Systems
+#c systems
 #d Common aliases for users.
 
 dk_alias finger 'finger -M'

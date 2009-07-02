@@ -1,6 +1,14 @@
-#c system
+#c systems
 #d Set PATH to be a very basic Unix-like path.
+#d Warning! Do not use this dotkit unless you are
+#d sure you know what you are doing. It should only
+#d be used *VERY* early in the login/dotkit sequence.
 
+# Clean PATH
 setenv PATH /usr/bin:/bin:/usr/X11R6/bin:/usr/bin/X11
+
+# Empty LD_LIBRARY_PATH
 setenv LD_LIBRARY_PATH 
+
+# Should probably clear out some other variables too
 

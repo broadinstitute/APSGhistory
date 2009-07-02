@@ -4,10 +4,9 @@
 #d 'use GCC-4.3' to get the latest version of gcc-4.3.x
 #d or 'use .gcc-4.3.3' to access the hidden minor version
 #d dotkit.
-
-echo "The gcc-4.3.3 dotkit is deprecated. Please 'use GCC-4.3'"
-echo "to get the latest gcc-4.3.x or 'use .gcc-4.3.3' to access"
-echo "the hidden 4.3.3 specific dotkit."
+#d DEPRECATED 2009-06-10
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
+use -q .deprecated++
 
 # Clear out exisitng gcc varsions.
 unuse -q `dk_rep 'gcc-*'`

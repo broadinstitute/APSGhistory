@@ -1,8 +1,10 @@
 #c applications
 #d MaToGff 0.2.06
+#rootpath /broad/tools/NoArch/pkgs/MaToGff_0.2.06
 
 # Clean out old matogff's
-unuse -q `dk_rep ".matogff-*"`
+unuse -q `dk_rep "MaToGff*"`
+unuse -q `dk_rep ".matogff*"`
 
 # Set up matogff
 dk_alter PATH /broad/tools/NoArch/pkgs/MaToGff_0.2.06/bin

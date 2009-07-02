@@ -1,6 +1,8 @@
 #c applications
 #d GAPipeline 1.3.2
-
+#d DEPRECATED 2009-06-10
+#
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
 use .deprecated++
 
 dk_op -q .gapipeline-1.3.2

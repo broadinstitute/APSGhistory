@@ -1,7 +1,6 @@
-#c IT/Systems
-#d Set the LDFLAGS Variable with -L arguments for everything
-# in LIBRARY_PATH for building things that don't honor LIBRARY_PATH
-# but do check for LDFLAGS. This package can be used multiple times
-# and will reset LDFLAGS each time it is ran.
+#c systems
+#d Idempotent dotkit which converts everything in $LIBRARY_PATH 
+#d into an LDFLAGS setting which (hopefully) helpd gcc/ld find
+#d all the libraries included from /broad/tools via dotkit.
 
 dk_setenv LDFLAGS "-L`echo $LIBRARY_PATH | sed -e 's/:/ -L/g'`"

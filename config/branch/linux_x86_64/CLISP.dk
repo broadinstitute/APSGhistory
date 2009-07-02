@@ -1,0 +1,10 @@
+#c devel
+#d Common Lisp is a high-level, general-purpose, 
+#d object-oriented, dynamic, functional programming 
+#d language.
+#d http://www.gnu.org/software/clisp/
+
+unuse -q `dk_rep 'CLISP*'`
+
+dk_op -q .clisp-2.47
+

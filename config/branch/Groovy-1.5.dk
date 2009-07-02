@@ -1,10 +1,11 @@
-#c languages
-#d Goovy is an agile dynamic language for the Java Platform
+#c devel
+#d Groovy is an agile dynamic language for the Java Platform
 #d http://groovy.codehaus.org/
 #d Latest release in 1.5  series.
 
 # One Groovy at a time, please.
-unuse -q `dk_rep 'Groovy-*'`
+unuse -q `dk_rep 'Groovy*'`
+unuse -q `dk_rep '.groovy-*'`
 
 # grab latest hidden groovy package.
 dk_op -q .groovy-1.5.7

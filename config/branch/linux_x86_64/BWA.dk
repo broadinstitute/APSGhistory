@@ -1,6 +1,9 @@
-#c applications/biotools
-#d bwa - Burrows-Wheeler Alignment Tool 
+#c applications
+#d BWA - Burrows-Wheeler Alignment Tool 
+#d BWA is a fast light-weighted tool that aligns short sequences 
+#d to a sequence database, such as the human reference genome.
+#d http://maq.sourceforge.net/bwa-man.shtml
 
 unuse -q `dk_rep "BWA*"`
 
-dk_op -q .bwa-0.4.6
+dk_op -q .bwa-0.4.9

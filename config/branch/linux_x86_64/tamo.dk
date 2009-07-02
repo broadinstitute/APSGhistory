@@ -3,4 +3,4 @@
 
 dk_alter TAMO /broad/tools/Linux/x86_64/lib/python2.4/site-packages/TAMO
 dk_alter TAMO /broad/tools/Linux/x86_64/lib/python2.4/site-packages/TAMO/*
-dk_op  python-2.4.2
+dk_op -q python-2.4.2

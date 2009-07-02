@@ -1,6 +1,7 @@
-#c system
+#c systems
 #d Add user $HOME/bin to path.
+#d You may want to load this last or "reuse homebin" after
+#d use'ing any dotkits which may conflict with things in 
+#d $HOME/bin
 
 dk_alter PATH $HOME/bin
- 
-

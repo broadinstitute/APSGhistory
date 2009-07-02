@@ -1,7 +1,7 @@
-#c bio-tools
+#c applications
 #d consed v15.0, phredphrap, crossmatch and utility scripts 
 
-use .deprecated++
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
 
-# dk_alter PATH /broad/tools/Linux/x86_64/genome/bin
-# dk_setenv CONSED_HOME /broad/tools/Linux/x86_64/genome
+#dk_alter PATH /broad/tools/Linux/x86_64/genome/bin
+#dk_setenv CONSED_HOME /broad/tools/Linux/x86_64/genome

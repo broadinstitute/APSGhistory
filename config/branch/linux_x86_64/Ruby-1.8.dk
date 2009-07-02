@@ -1,0 +1,11 @@
+#c languages
+#d A dynamic, open source programming language with a focus 
+#d on simplicity and productivity. It has an elegant syntax 
+#d that is natural to read and easy to write.
+#d http://www.ruby-lang.org/en/
+
+unuse -q `dk_rep 'Ruby-*'`
+
+dk_op -q .ruby-1.8.7-p160
+
+

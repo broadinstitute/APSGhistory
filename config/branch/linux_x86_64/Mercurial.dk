@@ -1,0 +1,11 @@
+#c utilities
+#d Mercurial
+#d    (n) a fast, lightweight Source Control Management system 
+#d        designed for efficient handling of very large distributed 
+#d        projects.
+#d http://www.selenic.com/mercurial/wiki/
+
+unuse -q `dk_rep ".mercurial-*"`
+unuse -q `dk_rep "Mercurial*"`
+
+dk_op -q .mercurial-1.2.1

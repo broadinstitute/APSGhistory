@@ -1,9 +1,13 @@
-#c versioned-languages
+#c applications
 #d R v2.9.0 
+#rootpath /broad/tools/Linux/x86_64/pkgs/R_2.9.0
 
-unuse -q `dk_rep ".R-*"`
+# Mutually exclusive with other R packages.
+unuse -q `dk_rep "R"`
+unuse -q `dk_rep "R-2*"`
+unuse -q `dk_rep ".R-2*"`
 
-# This package was built with gcc-4.3.3
+# Dependencies
 dk_op -q .gcc-libs-4.3.3
 dk_op -q .linear-algebra-0.1
 

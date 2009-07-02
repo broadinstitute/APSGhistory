@@ -1,6 +1,8 @@
 #c applications
 #d Eclipse IDE
-
+#FIXME
+# Improved description needed.
+#
 unuse -q `dk_rep "Eclipse*"`
 
 # Get latest 3.4 eclipse

@@ -1,0 +1,9 @@
+#c applications
+#d XEmacs is a highly customizable open source text editor and 
+#d application development system.
+#d http://www.xemacs.org/index.html
+
+unuse -q `dk_rep "XEmacs*"`
+
+dk_op -q .xemacs-21.5.29
+

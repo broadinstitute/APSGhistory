@@ -1,6 +1,8 @@
 #c languages
 #d GAPipline
-
+#FIXME
+#  Improved description needed.
+#
 unuse -q `dk_rep 'GAPipeline-*'`
 
 dk_op -q .gapipeline-1.3.4

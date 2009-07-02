@@ -1,0 +1,10 @@
+#c devel
+#d Steele Bank Common LISP
+#d Steel Bank Common Lisp (SBCL) is a high performance 
+#d Common Lisp compiler.
+
+unuse -q `dk_rep 'SBCL*'`
+unuse -q `dk_rep '.sbcl-*'`
+
+dk_op -q .sbcl-1.0.29
+

@@ -1,4 +1,4 @@
-#c utilities
+#c devel
 #d Apache Ant, 1.7
 #d Apache Ant is a Java-based build tool. In 
 #d theory, it is kind of like make, without make's 
@@ -6,7 +6,9 @@
 #d http://ant.apache.org/manual/index.html
 
 # Remove any Ant packages in use
-unuse -q `dk_rep 'Ant-.*'`
+unuse -q `dk_rep 'Ant-*'`
+unuse -q `dk_rep '.ant-*'`
 
+# Load latest Ant in 1.7 series.
 dk_op -q .ant-1.7.1
 

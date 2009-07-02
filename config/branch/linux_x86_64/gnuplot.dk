@@ -1,6 +1,8 @@
 #c bio-tools
 #d gnuplot v4.2.2  
 
-dk_op -q .deprecated++
+# Run the deprecate script so we can track usage of this dotkit and notify 
+# users to start using the correct dotkit.
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op 
 
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/gnuplot/bin

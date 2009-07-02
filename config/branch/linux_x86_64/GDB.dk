@@ -1,0 +1,12 @@
+#c devel
+#d GDB
+#d GDB lets you to see what is going on `inside' another 
+#d program while it executes--or what another program was 
+#d doing at the moment it crashed. 
+#d http://directory.fsf.org/project/gdb/
+
+# Clear out exisitng gdb versions.
+unuse -q `dk_rep "[Gg][Dd][Bb]"`
+unuse -q `dk_rep '*gdb-*'`
+
+dk_op -q .gdb-6.8

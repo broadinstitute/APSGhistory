@@ -1,6 +1,9 @@
-#c languages
+#c devel
 #d Sun JDK 1.6
 #d http://java.com/
-#d Latest release of 1.6.
+#d Latest  installed release of 1.6.
+
+unuse -q `dk_rep "Java*"`
+unuse -q `dk_rep ".java-*"`
 
 dk_op -q .java-sun-jdk-1.6.0-12

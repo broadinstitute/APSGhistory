@@ -1,0 +1,14 @@
+#c devel
+#d Steele Bank Common LISP
+#d Steel Bank Common Lisp (SBCL) is a high performance 
+#d Common Lisp compiler.
+#rootpath /broad/tools/Linux/x86_64/pkgs/sbcl_1.0.29
+#
+# Clear out any clisp versions lingering around
+unuse -q `dk_rep 'SBCL*'`
+unuse -q `dk_rep '.sbcl-*'`
+
+dk_setenv SBCL_HOME /broad/tools/Linux/x86_64/pkgs/sbcl_1.0.29/lib/sbcl
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/sbcl_1.0.29/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/sbcl_1.0.29/lib
+

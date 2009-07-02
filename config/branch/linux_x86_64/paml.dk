@@ -2,5 +2,10 @@
 #d PAML v4  
 
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/paml4/bin
-setenv _dk_ok "(ok) Note: paml expects .ctl files in your current working directory. Example files can be found at /broad/tools/Linux/x86_64/pkgs/paml4"
+setenv _dk_ok "(ok) 
+
+Note: paml expects .ctl files in your current working directory. 
+Example files can be found at /broad/tools/Linux/x86_64/pkgs/paml4
+
+"
 

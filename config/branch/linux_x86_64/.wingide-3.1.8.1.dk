@@ -1,0 +1,22 @@
+#c devel
+#d Wing IDE is the most advanced Python IDE available today. 
+#d Wing's powerful debugging and code intelligence capabilities 
+#d will turbo-charge your Python development. Wing supports 
+#d web, GUI, and script development using Django, Turbogears, 
+#d Google App Engine, web2py, Zope, Plone, mod_wsgi, mod_python, 
+#d wxPython, PyQt, PyGtk, TkInter, and many other Python packages.
+#rootpath /broad/tools/Linux/x86_64/pkgs/wingide_3.1.8.1
+
+unuse -q `dk_rep "WingIDE"`
+unuse -q `dk_rep ".wingide-*"`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/wingide_3.1.8.1/bin
+
+dk_setenv _dk_ok "(ok)
+
+WingIDE is currently using a trial license. If this license is expired
+and you are unable to renew within wing, please contact help@broad.mite.edu.
+WingIDE also selfupdates, if this occurs and fails due to permissions
+contact help@broad.mit.edu to have the updates installed.
+
+"

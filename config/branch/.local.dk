@@ -1,5 +1,8 @@
-#c IT/Systems
-#d Local user/system scripts and files
+#c systems
+#d Local system scripts and files 
+#d This needs to be better handled but there was 
+#d no conforming dotkit style location for scripts.
+#rootpath /broad/tools/NoArch/pkgs/local
 
 dk_alter PATH /broad/tools/NoArch/pkgs/local
 

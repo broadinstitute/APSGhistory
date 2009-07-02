@@ -5,6 +5,7 @@
 
 # One MaToGff at a time, please.
 unuse -q `dk_rep 'MaToGff*'`
+unuse -q `dk_rep '.matogff*'`
 
 # grab latest hidden matogff package.
 dk_op -q .matogff-0.2.06

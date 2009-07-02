@@ -1,0 +1,16 @@
+#c versioned-languages
+#d Ruby
+
+# Clear out any versions lingering around
+unuse -q `dk_rep '.ruby-*'`
+unuse -q `dk_rep 'Ruby*'`
+
+# Packages ruby needs
+dk_op -q .gcc-libs-4.3.3
+dk_op -q .readline-4.3
+
+# Paths
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/ruby_1.9.1-p129/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/ruby_1.9.1-p129/share/man
+dk_alter RUBYLIB /broad/tools/Linux/x86_64/pkgs/ruby_1.9.1-p129/lib
+

@@ -14,6 +14,12 @@ dk_op -q .tcl-tk-8.5.6
 # Should this just be mysql libs?
 dk_op -q .mysql-5.1.30
 
+# For Math::GSL::*
+dk_op -q .gsl-1.12
+
+# I think we need this, some modules are built with it.
+dk_op -q .gcc-libs-4.3.3
+
 # Perl 
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/perl_gcc-4.3.2_5.8.9/bin
 dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/perl_gcc-4.3.2_5.8.9/lib
