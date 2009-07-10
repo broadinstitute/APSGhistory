@@ -1,0 +1,8 @@
+#c applications
+#d MUMmer is a system for rapidly aligning entire genomes, whether 
+#d in complete or draft form.
+#d http://mummer.sourceforge.net/
+
+unuse -q `dk_rep "MUMmer*"`
+
+dk_op -q .mummer-3.21

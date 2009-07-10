@@ -1,7 +1,8 @@
 #c libraries
 #d berkely DB libraries and tools
-
-unuse -q `dk_rep "\.db-[0-9]"`
+#rootpath /broad/tools/Linux/x86_64/pkgs/db_gcc_4.3.2_4.7.25
+#
+unuse -q `dk_rep ".db-*"`
 
 # Set up env
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/db_gcc_4.3.2_4.7.25/bin

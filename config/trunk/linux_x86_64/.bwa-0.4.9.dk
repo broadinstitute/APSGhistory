@@ -1,6 +1,7 @@
 #c applications
 #d bwa - Burrows-Wheeler Alignment Tool 
-
+#rootpath /broad/tools/Linux/x86_64/pkgs/bwa_0.4.9
+#
 unuse -q BWA  
 unuse -q `dk_rep ".bwa-*"`
 

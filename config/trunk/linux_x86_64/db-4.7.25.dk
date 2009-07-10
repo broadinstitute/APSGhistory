@@ -1,6 +1,7 @@
 #c libraries
 #d berkely DB libraries and tools
 
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/db_gcc_4.3.2_4.7.25/bin
-dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/db_gcc_4.3.2_4.7.25/lib
+unuse -q `dk_rep "db-*"`
+
+dk_op -q .db-4.7.25
 

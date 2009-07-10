@@ -2,6 +2,7 @@
 #d Bowtie is an ultrafast, memory-efficient short read aligner 
 #d geared toward quickly aligning large sets of short DNA sequences 
 #d (reads) to large genomes. 
+#rootpath /broad/tools/Linux/x86_64/pkgs/bowtie_0.9.9.3
 
 unuse -q `dk_rep "Bowtie*"`
 unuse -q `dk_rep ".bowtie-*"`
