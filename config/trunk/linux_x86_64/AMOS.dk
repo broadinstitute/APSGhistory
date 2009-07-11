@@ -1,0 +1,11 @@
+#c applications
+#d AMOS
+#d The AMOS consortium is committed to the development of 
+#d open-source whole genome assembly software.
+#d http://amos.sourceforge.net/
+
+unuse -q `dk_rep "AMOS*"`
+
+dk_op -q .amos
+
+
