@@ -1,0 +1,6 @@
+#c utilities
+#d Bash Completion
+#d Adds extended completion features to bash.
+
+dk_source /broad/tools/NoArch/pkgs/bash-completion_1.0/etc/bash-completion
+
