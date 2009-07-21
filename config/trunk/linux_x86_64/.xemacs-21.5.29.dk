@@ -12,6 +12,7 @@ dk_op -q .gcc-libs-4.3.3
 dk_op -q .jpeg-6b
 dk_op -q .libpng-1.2.34
 dk_op -q .zlib-1.2.3
+dk_op -q .db-4.7.25
 
 # XEmacs locations.
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/xemacs_21.5.29/bin

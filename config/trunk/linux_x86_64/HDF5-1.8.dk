@@ -1,0 +1,9 @@
+#c utilities
+#d HDF5
+#d HDF5 is a unique technology suite that makes possible the
+#d management of extremely large and complex data collections.
+#d http://www.hdfgroup.org/
+
+unuse -q `dk_rep "HDF5*"`
+
+dk_op -q  .hdf5-1.8.3

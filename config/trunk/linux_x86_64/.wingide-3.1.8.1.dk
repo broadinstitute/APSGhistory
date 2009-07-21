@@ -12,11 +12,4 @@ unuse -q `dk_rep ".wingide-*"`
 
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/wingide_3.1.8.1/bin
 
-dk_setenv _dk_ok "(ok)
-
-WingIDE is currently using a trial license. If this license is expired
-and you are unable to renew within wing, please contact help@broad.mite.edu.
-WingIDE also selfupdates, if this occurs and fails due to permissions
-contact help@broad.mit.edu to have the updates installed.
-
-"
+dk_setenv _dk_ok "(ok)\n\n WingIDE is currently using a trial license. If this license is expired \n and you are unable to renew within wing, please contact help@broadinstitute.org. \n WingIDE also selfupdates, if this occurs and fails due to permissions \n contact help@broad.mit.edu to have the updates installed. \n \n "

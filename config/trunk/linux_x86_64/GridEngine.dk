@@ -1,0 +1,9 @@
+#c applications
+#d The Grid Engine project is an open source community effort to
+#d facilitate the adoption of distributed computing solutions. 
+#d http://gridengine.sunsource.net/
+
+unuse -q `dk_rep 'GridEngine-*'`
+
+dk_op -q .gridengine-6.2u3
+

@@ -1,5 +1,5 @@
 #c libraries
-#d apr-1.3.3 Apache Portable Runtime
+#d OpenSSL Toolkit
 
 unuse -q `dk_rep ".openssl-[0-9].*"`
 
@@ -13,4 +13,7 @@ dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/openssl_0.9.8j/lib
 dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/openssl_0.9.8j/include
 dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/openssl_0.9.8j/include
 
+# Some things need these.
+dk_setenv OPENSSL_SOVERSION = 0.9.8j
+dk_setenv OPENSSL_HOME = /broad/tools/Linux/x86_64/pkgs/openssl_0.9.8j
 
