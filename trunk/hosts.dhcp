@@ -1,0 +1,4 @@
+# Aneris, the scheduler.
+dhcp-host=00:50:56:bb:23:cf,net:NOROUTE,10.128.0.17,aneris.broadinstitute.org
+dhcp-host=00:50:56:bb:50:f1,net:NOROUTE,10.128.0.33,vaquero.broadinstitute.org
+
