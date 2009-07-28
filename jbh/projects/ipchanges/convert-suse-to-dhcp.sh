@@ -40,7 +40,7 @@ for nic in ${DHCPNICS}
     # Get MTU 
     NICCFG=${NICCFG}`${IFCONFIG} $nic | awk '/MTU/ {print $5}' | tr ':' '='`"\n"
     # Get any ethtool options that may be in use on this node.
-    NICCFG="${NICCFG} "`egrep "ETHTOOL_OPTIONS" /etc/sysconfig/network/ifcfg-$nic`"\n" 
+    NICCFG="${NICCFG} "`egrep "ETHTOOL_OPTIONS" /$BKUPDIR/ifcfg-$nic`"\n" 
 
     echo -e $NICCFG > /etc/sysconfig/network/ifcfg-$nic
   done
