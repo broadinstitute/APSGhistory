@@ -8,7 +8,7 @@
 
 IFCONFIG=/sbin/ifconfig
 # files to back up.
-OLDCONFIG="/etc/HOSTNAME /etc/resolv.conf /etc/yp.conf /etc/defaultdomain /etc/ntp.conf /etc/sysconfig/network/dhcp /etc/hosts"
+OLDCONFIG="/etc/HOSTNAME /etc/resolv.conf /etc/yp.conf /etc/defaultdomain /etc/ntp.conf /etc/sysconfig/network/dhcp /etc/hosts /etc/sysconfig/network/routes"
 
 DATE=`date "+%s"`
 BKUPDIR=/root/dhcpconfig-${DATE}
@@ -49,6 +49,9 @@ for nic in ${DHCPNICS}
 cat << EOF > /etc/hosts
 127.0.0.1       localhost
 EOF
+
+# Empty routes
+echo " " > /etc/sysconfig/network/routes
 
 # Create a new dhcp client configuration, enable nis, ntp, resolv,conf and hostname
 cat << EOF >/etc/sysconfig/network/dhcp
