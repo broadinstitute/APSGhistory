@@ -1,0 +1,8 @@
+#c applications
+#d iMAP
+#d iMAP is a standalone aligner for SOLiD
+
+unuse -q `dk_rep "iMAP*"`
+
+dk_op -q .imap-0.2.3.0
+

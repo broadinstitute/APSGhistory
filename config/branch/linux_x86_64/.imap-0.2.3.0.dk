@@ -1,0 +1,8 @@
+#c applications
+#d iMAP
+
+dk_op -q .java-sun-jdk-1.6.0-12
+
+# Environement for running GAPipeline.
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/iMAP_0.2.3.0/bin
+

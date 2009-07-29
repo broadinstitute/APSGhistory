@@ -1,0 +1,19 @@
+#c applications
+#d MUMmer is a system for rapidly aligning entire genomes, whether 
+#d in complete or draft form.
+#d http://mummer.sourceforge.net/
+#rootpath /broad/tools/Linux/x86_64/pkgs/MUMmer_3.21
+
+unuse -q `dk_rep "MUMmer*"`
+unuse -q `dk_rep ".mummer-*"`
+
+# I'm built with GCC-4.3 goodness baked inside!
+dk_op -q .gcc-libs-4.3.3
+
+# Correct perl, just for good measure.
+dk_op -q .perl-5.8.9
+
+# Environment
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/MUMmer_3.21
+dk_setenv NUCMER /broad/tools/Linux/x86_64/pkgs/MUMmer_3.21/nucmer
+

@@ -4,6 +4,7 @@
 #d object-oriented version of the ARPACK package. This dotkit 
 #d covers them both.
 #d http://www.caam.rice.edu/software/ARPACK/
+#d rootpath /broad/tools/Linux/x86_64/pkgs/ARPACK_96
 
 unuse -q `dk_rep '.arpack*'`
 unuse -q ARPACK

@@ -1,5 +1,8 @@
-#c versioned-bio-tools
+#c applications
 #d Add brood v1.1.1 to path
+#d DEPRECATED 2009-07-08
+#
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
 
 dk_alter PATH /broad/tools/apps/brood/brood-1.1.1/openeye/arch/suse-9.1-x86_64/bin
 dk_setdef OE_LICENSE /broad/tools/apps/rocs/license/ralph_oe_license.txt

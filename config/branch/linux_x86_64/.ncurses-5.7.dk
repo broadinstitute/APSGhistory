@@ -12,5 +12,5 @@ dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/ncurses_5.7/lib
 
 # For gcc
 dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/ncurses_5.7/lib
-dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/ncurses_5.7/include
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/ncurses_5.7/include/ncurses
 

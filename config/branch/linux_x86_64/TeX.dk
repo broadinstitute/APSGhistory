@@ -1,0 +1,7 @@
+#c applications
+#d TeX is a family of typesetting tools
+unuse -q `dk_rep 'TeX-*'`
+
+dk_op -q .texlive-2008
+
+

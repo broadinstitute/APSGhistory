@@ -1,0 +1,20 @@
+#c utilities
+#d HDF5
+#d HDF5 is a unique technology suite that makes possible the
+#d management of extremely large and complex data collections.
+#rootpath /broad/tools/Linux/x86_64/pkgs/hdf5_1.8.3
+
+unuse -q `dk_rep '.hdf5-*'`
+
+dk_op -q .gcc-libs-4.3.3
+dk_op -q .zlib-1.2.3
+
+# Python locations.
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/hdf5_1.8.3/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/hdf5_1.8.3/lib
+
+# For building stuff
+dk_setenv HDF5_DIR /broad/tools/Linux/x86_64/pkgs/hdf5_1.8.3
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/hdf5_1.8.3/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/hdf5_1.8.3/include
+

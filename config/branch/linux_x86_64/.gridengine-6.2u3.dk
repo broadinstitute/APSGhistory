@@ -1,0 +1,21 @@
+#c utilities
+#d GridEngine 
+#rootpath /broad/tools/Linux/x86_64/pkgs/gridengine_6.2u3
+
+unuse -q `dk_rep '.gridengine*'`
+
+
+dk_setenv SGE_ROOT /broad/tools/gridengine_6.2u3
+
+dk_setenv ARCH `$SGE_ROOT/util/arch`
+
+dk_setenv SGE_CELL broad
+dk_setenv SGE_CLUSTER_NAME seq
+dk_setenv SGE_QMASTER_PORT 820
+dk_setenv SGE_EXECD_PORT 821
+
+dk_alter PATH $SGE_ROOT/bin/$ARCH
+dk_alter LD_LIBRARY_PATH $SGE_ROOT/lib/$ARCH
+dk_alter MANPATH $SGE_ROOT/man
+
+

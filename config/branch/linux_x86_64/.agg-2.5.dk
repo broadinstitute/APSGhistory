@@ -1,5 +1,8 @@
-#c utilities
-#d Gnu m4
+#c libraries
+#d agg - Anti-Grain Geometry
+#rootpath /broad/tools/Linux/x86_64/pkgs/agg_2.5
+#
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
 
 dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/agg_2.5
 dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/agg_2.5

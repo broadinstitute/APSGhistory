@@ -1,5 +1,8 @@
 #c versioned-bio-tools
 #d Add fred v2.2.3 to path
+#d DEPRECATED 2009-07-08
+
+$DK_ROOT/etc/deprecate $_dk_self $_dk_op
 
 dk_alter PATH /broad/tools/apps/adock-3.0/x86_64/bin
 dk_alter LD_LIBRARY_PATH /broad/tools/apps/intel/x86_64/cc/10.0.023/lib
