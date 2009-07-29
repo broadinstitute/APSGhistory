@@ -12,13 +12,10 @@ export PATH
 # Define some information you want to log.
 info=`date "+%F-%T"`"|$1|$2|$_dk_shell"
 
-# Where to put logfiles.
-_dk_logroot=/broad/tools/dotkit-log
-_dk_logfile=${_dk_logroot}/${LOGNAME}.log
+# Make sure the logger exec is around
+if [ -x /bin/logger ]; then
+  # Log info to message log.
+  /bin/logger -t dotkit "$info"
+fi
 
-# Create log file if it doesn't exist
-test -w ${_dk_logfile} || touch ${_dk_logfile} && chmod 0600 ${_dk_logfile} 
-
-# Write log entry
-echo ${info} >> ${_dk_logfile}
 
