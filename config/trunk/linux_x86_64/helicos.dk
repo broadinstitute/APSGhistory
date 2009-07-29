@@ -1,8 +1,7 @@
 #c applications
-#d Helicos Pipeline Version 0.14.1.3
+#d Helicos Pipeline Version 1.0.80
 
 dk_op -q .perl5
-dk_op -q .boost-1.38.0
 dk_op -q GCC-4.3
-source /broad/tools/Linux/x86_64/pkgs/helisphere/helisphere-0.14.1.3/helicos.bashrc
+source /broad/tools/Linux/x86_64/pkgs/helisphere/helisphere-1.0.80/helicos.bashrc
 
