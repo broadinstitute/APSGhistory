@@ -50,7 +50,7 @@ case "$us$um" in
     
     # SuSE tests
     elif test -f /etc/SuSE-release; then
-      if `grep -i "enterprise" /etc/SuSE-release`; then
+      if grep -i -q "enterprise" /etc/SuSE-release; then
          #dtype=sles if you want to differentiate between opensuse and SLES.
          dtype=suse
       else 
