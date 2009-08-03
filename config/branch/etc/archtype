@@ -13,7 +13,7 @@ if [ -r /etc/home.config ]; then
 fi
 
 # For now we only care about linux_x86_64
-if [ "x$SYS_TYPE" != "xlinux_x86_64" ]; then
+if [[ "x$SYS_TYPE" != "xsuse_9_x86_64" && "x$SYS_TYPE" != "xsuse_10_x86_64" ]]; then
   ARCH_TYPE=unknown
   echo $ARCH_TYPE
   exit
