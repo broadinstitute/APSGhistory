@@ -10,7 +10,7 @@ PATH=/usr/bin:/bin
 export PATH
 
 # Define some information you want to log.
-info=`date "+%F-%T"`"|$1|$2|$_dk_shell"
+info="|$1|$2|$_dk_shell|$USER"
 
 # Make sure the logger exec is around
 if [ -x /bin/logger ]; then
