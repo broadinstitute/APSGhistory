@@ -1,0 +1,5 @@
+#c bio-tools
+#d DeCypher command-line tools for Linux version 8.0.1
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/decypher_8.0.1.36/bin
+
