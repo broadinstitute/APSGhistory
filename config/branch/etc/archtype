@@ -12,28 +12,33 @@ if [ -r /etc/home.config ]; then
   exit
 fi
 
-# For now we only care about linux_x86_64
-if [[ "x$SYS_TYPE" != "xsuse_9_x86_64" && "x$SYS_TYPE" != "xsuse_10_x86_64" ]]; then
-  ARCH_TYPE=unknown
-  echo $ARCH_TYPE
-  exit
-fi
+OS=`uname`
 
-VENDOR=`grep vendor /proc/cpuinfo | tail -1 | awk '{print $3}'`
-
-ARCH_TYPE=unknown
-
-case "$VENDOR" in
-  GenuineIntel*)
-    ARCH_TYPE=intel
-    ;;
-  AuthenticAMD*) 
-    ARCH_TYPE=amd
-    ;;
-  *) echo "ARCH_TYPE: CPU arch type unknown: ${VENDOR}" >&2 ;;
+case "$OS" in
+  "Linux")
+     VENDOR=`grep vendor /proc/cpuinfo | tail -1 | awk '{print $3}'`
+     ARCH_TYPE=unknown
+     case "$VENDOR" in
+       GenuineIntel*)
+       ARCH_TYPE=intel
+       ;;
+       AuthenticAMD*) 
+       ARCH_TYPE=amd
+       ;;
+       *) echo "ARCH_TYPE: CPU arch type unknown: ${VENDOR}" >&2 ;;
+     esac
+     ;;
+  "SunOS")
+     ARCH_TYPE=unknown
+     ;;
+  "FreeBSD")
+     ARCH_TYPE=unknown
+     # Nothing to see here.
+     ;;
+   *)
+     echo $OS | mail -s "NEW DOTKIT OS" jbh@boradinstitute.org
+     ;;
 esac
 
 echo $ARCH_TYPE
-test "$ARCH_TYPE" != "unknown"
-exit
 
