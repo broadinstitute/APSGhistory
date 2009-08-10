@@ -2,8 +2,13 @@
 
 
 10.128.0.2			perceus   perceus.broadinstitute.org
-10.128.0.17                     aneris    aneris.broadinstitute.org
 10.128.0.129                    perceus-dev  perceus-dev.broadinstitute.org
+
+# VM Servers.
+10.128.1.0  vm-0000
+10.128.1.1  vm-0001
+10.128.1.2  vm-0002
+10.128.1.3  vm-0003
 
 
 
