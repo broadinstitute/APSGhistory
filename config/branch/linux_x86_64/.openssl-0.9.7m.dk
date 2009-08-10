@@ -1,5 +1,5 @@
 #c libraries
-#d apr-1.3.3 Apache Portable Runtime
+#d openssl
 
 unuse -q `dk_rep "\.openssl-[0-9].*"`
 

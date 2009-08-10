@@ -5,7 +5,7 @@
 unuse -q `dk_rep '.gridengine*'`
 
 
-dk_setenv SGE_ROOT /broad/tools/gridengine_6.2u3
+dk_setenv SGE_ROOT /broad/tools/gridengine
 
 dk_setenv ARCH `$SGE_ROOT/util/arch`
 

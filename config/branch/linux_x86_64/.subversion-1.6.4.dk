@@ -1,0 +1,27 @@
+#c devel-tools
+#d Add Subversion 1.6 revision control software to path
+
+# Remove existing subversion packages
+unuse -q `dk_rep "*subversion-*"`
+
+# Dependencies
+dk_op -q .apr-1.3.3
+dk_op -q .apr-util-1.3.4
+dk_op -q .db-4.7.25
+dk_op -q .neon-0.28.3
+dk_op -q .cyrus-sasl-2.1.22
+dk_op -q .openssl-0.9.8j
+dk_op -q .sqlite-3.6.14.2
+
+
+# Set up subversion
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/subversion_1.6.4/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/subversion_1.6.4/lib
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/subversion_1.6.4/share/man
+
+
+# Set up subversion Build foo
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/subversion_1.6.4/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/subversion_1.6.4/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/subversion_1.6.4/include
+

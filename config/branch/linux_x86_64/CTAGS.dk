@@ -1,0 +1,9 @@
+#c applications
+#d Ctags generates an index (or tag) file of language objects 
+#d found in source files that allows these items to be quickly 
+#d and easily located by a text editor or other utility. 
+#d http://ctags.sourceforge.net/
+
+unuse -q `dk_rep "CTAGS*"`
+
+dk_op -q .ctags-5.8
