@@ -1,0 +1,14 @@
+#c applications
+#d Maqview (http://maq.sourceforge.net/)
+#d Maqview is graphical read alignment viewer. It is specifically 
+#d designed for the Maq alignment file and allows you to see the 
+#d mismatches,
+#d http://maq.sourceforge.net/maqview.shtml
+#rootpath /broad/tools/Linux/redhat_5_x86_64/maqview_0.2.5
+
+
+unuse -q `dk_rep ".maqview-*"`
+
+dk_alter PATH /broad/tools/Linux/redhat_5_x86_64/maqview_0.2.5/bin
+
+ 
