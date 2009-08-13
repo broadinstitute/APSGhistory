@@ -1,6 +1,10 @@
-#c bio-tools
-#d openbabel v2.1.1 
+#c applications
+#d Open Babel is a chemical toolbox designed to speak the many 
+#d languages of chemical data. It's an open, collaborative 
+#d project allowing anyone to search, convert, analyze, or 
+#d store data from molecular modeling, chemistry, solid-state 
+#d materials, biochemistry, or related areas. 
+#d http://openbabel.org/wiki/Main_Page
 
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/openbabel/bin
-dk_alter PYTHONPATH /broad/tools/Linux/x86_64/pkgs/openbabel/lib/python2.4/site-packages
-dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/openbabel/lib
+dk_op -q .openbabel-2.2.3
+

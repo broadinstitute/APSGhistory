@@ -1,0 +1,13 @@
+#c applicatioins
+#d Schrodinger chemistry tools
+#rootpath /broad/tools/Linux/x86_64/pkgs/schrodinger_2009/
+
+unuse -q `dk_rep "*shrodinger*"`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/schrodinger_2009/
+dk_alter SCHRODINGER /broad/tools/Linux/x86_64/pkgs/schrodinger_2009/
+dk_alter LM_LICENSE_FILE /broad/tools/Linux/x86_64/pkgs/schrodinger_2009/schrodinger.license
+dk_setenv PSP_BLAST_DIR /broad/tools/apps/NCBI_blast/blast-2.2.18_x86_64
+dk_setenv PSP_BLASTDB /broad/data/psp_blastdb
+dk_setenv SCHRODINGER_PDB /broad/data/psp_pdb
+
