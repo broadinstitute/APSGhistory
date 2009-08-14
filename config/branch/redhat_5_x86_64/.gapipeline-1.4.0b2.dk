@@ -1,1 +1,9 @@
-../linux_x86_64/.gapipeline-1.4.0b2.dk
+#c applications
+#d GAPipeline 1.4.0b2
+
+# Environement for running GAPipeline.
+dk_alter PATH /broad/tools/Linux/redhat_5_x86_64/GAPipeline_1.4.0b2/bin
+dk_alter PERL5LIB /broad/tools/Linux/redhat_5_x86_64/GAPipeline_1.4.0b2/lib/perl
+dk_alter PYTHONPATH /broad/tools/Linux/redhat_5_x86_64/GAPipeline_1.4.0b2/lib/python
+
+
