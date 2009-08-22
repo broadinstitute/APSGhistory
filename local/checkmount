@@ -32,15 +32,13 @@ function usage () {
   echo "   a broken NFS mount, but there is no check for existence "
   echo "   or if permissions would block creation. "
   echo 
-  
-  exit 8
 }
 
 # verbose
 # Echo argument if VERBOSE is defined.
 function verbose () {
   if [ ! -z "$VERBOSE" ]; then
-    echo $1 >&2
+    echo "$1" >&2
   fi
 }
 
@@ -103,7 +101,7 @@ function isAccessible () {
   # even if the path is non-existant.i
   local RESULT
   RESULT=0
-  read -t10 RESULT < <( ls -ld $1 2>&1 | wc -l )
+  read -t10 RESULT < <( stat $1 2>&1 | wc -l )
 
   # Collect the result of the read. 
   # 0 means it was successful, that is, it did not block and/or timeout.
@@ -123,8 +121,8 @@ while getopts "nv" OPTION; do
     n ) NOTIFY=true ;;
     v ) VERBOSE=true ;;
     * ) 
-      echo "$0: Bad argument to script." 
-      exit 1
+      usage
+      exit 8
       ;;
   esac
 done

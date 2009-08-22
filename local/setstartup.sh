@@ -39,6 +39,13 @@ echo "      setup. If anything is missing, please email "
 echo "      help@broad.mit.edu to request additions."
 echo "      WARNING: This is development and is "
 echo "               subject to rapid changes."
+echo 
+echo "  4 - *NEW* Auto mode. Let the startup scripts do "
+echo "      the Right Thing(tm) based on the host. This "
+echo "      option will run dotkit (new) style startup "
+echo "      on new style hosts (RHEL/centos 4/5) and "
+echo "      classis style startup on older hosts (suse,"
+echo "      solaris and redhat 9."
 echo "  q - Quit."
 echo 
 
@@ -54,6 +61,9 @@ case "$RESPONSE" in
     ;;
   "3" )
     install dotkit-dev
+    ;;
+  "4")
+    install auto
     ;;
   * ) 
     echo "No change made."

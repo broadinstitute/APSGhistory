@@ -1,0 +1,37 @@
+# System-supplied file - DO NOT EDIT!!
+# Make your changes to $HOME/.my.bash_login instead.
+#APSG STYLE=auto
+M_TYPE=`/broad/tools/dotkit/etc/systype`
+
+# Source user configuration
+if [ -f $HOME/.bashrc ]; then
+  . $HOME/.bashrc
+fi
+
+case $M_TYPE in
+  redhat_4_x86_64|redhat_5_x86_64)
+     # new style gets mo special startup here.
+     ;;
+
+   suse_9_x86_64|suse_10_x86_64|*)
+     # Default to classic, this seems to be the easiest way to avoid breaking 
+     # unexpected systypes
+
+     # Source systemwide configuration
+     if [ -f /util/etc/login_bash ]; then
+     	. /util/etc/login_bash
+     fi
+     
+     # Source group configuration
+     PRIGRP=`groups | awk '{print $1}'`
+     if [ -f /util/etc/$PRIGRP.login_bash ]; then
+     	. /util/etc/$PRIGRP.login_bash
+     fi
+     ;;
+esac
+
+# Source user configuration
+if [ -f $HOME/.my.bash_login ]; then
+  . $HOME/.my.bash_login
+fi
+
