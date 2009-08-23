@@ -1,0 +1,3 @@
+# Hosts not managed by perceus.
+
+dhcp-host=00:1f:f3:d4:ba:a4,net:NOROUTE,10.128.0.65,pomoxis128.broadinstitute.org
