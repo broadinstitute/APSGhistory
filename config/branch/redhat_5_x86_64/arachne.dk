@@ -1,0 +1,5 @@
+#c arachne
+#d Setup for executing latest archne binaries
+
+dk_op -q .arachne-1.16.0
+

@@ -1,0 +1,13 @@
+#c devel
+#d JProfiler is an award-winning all-in-one Java profiler. 
+#d JProfiler's intuitive GUI helps you find performance 
+#d bottlenecks, pin down memory leaks and resolve threading 
+#d issues.
+#d http://www.ej-technologies.com/products/jprofiler/overview.html
+
+#rootpath /broad/tools/Linux/x86_64/pkgs/jprofiler_5.2
+
+unuse -q `dk_rep ".jprofiler-*"`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/jprofiler_5.2/bin
+

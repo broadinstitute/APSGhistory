@@ -1,0 +1,14 @@
+#c arachne-1.16
+#d Setup for executing arachne v1.16 binaries
+#rootpath /wga/scr2/ArachneReleases/ReleaseArachne-1-16
+
+unuse -q `dk_rep ".arachne*"`
+unuse -q `dk_rep "Arachne*"`
+
+# Dependencies
+dk_op -q .boost-1.39.0
+dk_op -q .gcc-libs-4.3.3
+
+# Environment
+dk_alter PATH /broad/tools/Linux/redhat_5_x86_64/pkgs/Arachne_20090814/bin
+dk_setenv SOLEXA_PIPELINE_DIR /slxa/pipelineOutput/farm

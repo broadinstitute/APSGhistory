@@ -22,5 +22,4 @@ dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gdb_6.8/lib64
 
 dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gdb_6.8/lib
 dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/gdb_6.8/lib64
-dk_alter CPATH /broad/tools/Linux/x86_64/pkgs/gcc_4.3.3/include
 

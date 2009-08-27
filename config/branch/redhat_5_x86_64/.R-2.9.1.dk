@@ -1,0 +1,12 @@
+#c applications
+#d R v2.9.1 
+#rootpath /broad/tools/Linux/redhat_5_x86_64/pkgs/R_2.9.1
+
+# Mutually exclusive with other R packages.
+unuse -q `dk_rep "R"`
+unuse -q `dk_rep "R-2*"`
+unuse -q `dk_rep ".R-2*"`
+
+dk_alter PATH /broad/tools/Linux/redhat_5_x86_64/pkgs/R_2.9.1/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/redhat_5_x86_64/pkgs/R_2.9.1/lib64
+dk_alter MANPATH /broad/tools/Linux/redhat_5_x86_64/pkgs/R_2.9.1/share/man
