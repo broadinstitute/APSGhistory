@@ -4,5 +4,5 @@
 
 unuse -q `dk_rep 'R-*'`
 
-dk_op -q .R-2.9.0
+dk_op -q .R-2.9.1
 

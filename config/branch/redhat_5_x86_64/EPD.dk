@@ -1,1 +1,11 @@
-../linux_x86_64/EPD.dk
+#c devel
+#d The Enthought Python Distribution (EPD) provides the popular
+#d and easy-to-use Python environment bundled with additional 
+#d modules that make it ideal for interactive technical 
+#d computing and cross-platform rapid application development.
+
+unuse -q `dk_rep 'Python-*'`
+unuse -q `dk_rep 'EPD*'`
+
+dk_op -q .epd-py25-4.1.30101-rh5
+

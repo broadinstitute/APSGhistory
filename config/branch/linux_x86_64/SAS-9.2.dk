@@ -1,0 +1,4 @@
+#c versioned-languages
+#d Add SAS 9.2
+
+dk_alter PATH /broad/tools/apps/sas9.2/SASFoundation/9.2

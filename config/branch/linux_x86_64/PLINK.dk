@@ -1,0 +1,7 @@
+#c applications
+#d PLINK
+#d PLINK is a free, open-source whole genome association analysis 
+#d toolset, designed to perform a range of basic, large-scale 
+#d analyses in a computationally efficient manner. 
+
+dk_op -q .plink-1.06
