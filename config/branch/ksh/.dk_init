@@ -2,8 +2,12 @@
 typeset -i _dk_rl=-1 _dk_isatty=0
 [[ -t 0 ]] && _dk_isatty=1 # 1 => stdin IS a tty.
 export _dk_rl _dk_inuse _dk_isatty
-export SYS_TYPE=${SYS_TYPE:-`$DK_ROOT/etc/systype`}
-export ARCH_TYPE=${ARCH_TYPE:-`$DK_ROOT/etc/archtype`}
+
+#export SYS_TYPE=${SYS_TYPE:-`$DK_ROOT/etc/systype`}
+#export ARCH_TYPE=${ARCH_TYPE:-`$DK_ROOT/etc/archtype`}
+
+export SYS_TYPE=`$DK_ROOT/etc/systype`
+export ARCH_TYPE=`$DK_ROOT/etc/archtype`
 
 if [[ -f "$DK_ROOT/etc/DK_NODE" ]]; then
   _dk_site="$(<$DK_ROOT/etc/DK_NODE)"

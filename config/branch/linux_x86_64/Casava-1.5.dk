@@ -1,0 +1,10 @@
+#c applications
+#d CASAVA-1.5.0a4
+#FIXME
+# Improved description needed.
+
+unuse -q `dk_rep "Casava*"`
+
+dk_op -q .casava-1.5.0a4
+
+

@@ -1,8 +1,13 @@
 # DK_ROOT *must* be set before sourcing this file.
 @ _dk_rl = -1
 setenv _dk_shell $shell:t
-if ( ! $?SYS_TYPE ) setenv SYS_TYPE `$DK_ROOT/etc/systype`
-if ( ! $?ARCH_TYPE ) setenv ARCH_TYPE `$DK_ROOT/etc/archtype`
+#if ( ! $?SYS_TYPE ) setenv SYS_TYPE `$DK_ROOT/etc/systype`
+#if ( ! $?ARCH_TYPE ) setenv ARCH_TYPE `$DK_ROOT/etc/archtype`
+
+setenv SYS_TYPE `$DK_ROOT/etc/systype`
+setenv ARCH_TYPE `$DK_ROOT/etc/archtype`
+
+
 set _dk_cat = "/usr/bin/cat"
 if ( -x /bin/cat ) set _dk_cat = "/bin/cat"
 if ( -f "$DK_ROOT/etc/DK_NODE" ) then

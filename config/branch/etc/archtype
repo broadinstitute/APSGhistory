@@ -6,6 +6,8 @@
 PATH=/bin:/usr/bin:/usr/sbin:/sbin
 export PATH
 
+ARCH_TYPE=""
+
 if [ -r /etc/home.config ]; then
   ARCH_TYPE=`grep ARCH_TYPE /etc/home.config | cut -d" " -f2`
   echo $ARCH_TYPE
@@ -36,7 +38,7 @@ case "$OS" in
      # Nothing to see here.
      ;;
    *)
-     echo $OS | mail -s "NEW DOTKIT OS" jbh@boradinstitute.org
+     echo $OS | mail -s "NEW DOTKIT OS" jbh@broadinstitute.org
      ;;
 esac
 

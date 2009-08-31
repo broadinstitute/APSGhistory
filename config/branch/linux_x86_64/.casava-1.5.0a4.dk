@@ -1,0 +1,17 @@
+#c applications
+#d Casava 1.5.0a4
+#rootpath=/broad/tools/Linux/x86_64/pkgs/CASAVA_1.5.0a4
+
+unuse `dk_rep ".casava*"`
+
+# Dependencies
+dk_op -q .gcc-4.3.3-libs
+dk_op -q .python-2.6.2
+dk_op -q .perl-5.8.9
+dk_op -q .libxml2-2.7.3
+
+# Environement for running GAPipeline.
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/CASAVA_1.5.0a4
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/CASAVA_1.5.0a4/bin
+
+

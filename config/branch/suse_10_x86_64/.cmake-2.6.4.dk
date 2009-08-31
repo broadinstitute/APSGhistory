@@ -1,0 +1,11 @@
+#c utilities
+#d CMake
+#rootpath /broad/tools/Linux/x86_64/pkgs/cmake_2.6.4
+#
+unuse -q `dk_rep ".cmake-*"`
+
+# Environment
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/cmake_2.6.4/bin
+dk_alter MANPATH /broad/tools/Linux/x86_64/pkgs/cmake_2.6.4/man
+
+
