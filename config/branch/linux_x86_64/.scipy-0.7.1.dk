@@ -1,0 +1,7 @@
+#c libraries
+#d scipy
+
+# Clear out any versions lingering around
+unuse -q `dk_rep '*scipy-*'`
+
+dk_alter PYTHONPATH /broad/tools/Linux/x86_64/pkgs/scipy_0.7.1/lib/python2.6/site-packages

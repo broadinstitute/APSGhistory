@@ -6,11 +6,11 @@
 unuse -q `dk_rep '.linear-algebra-*'`
 
 # Set up environment for using library
-dk_alter PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1_${ARCH_TYPE}/bin
-dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1_${ARCH_TYPE}/lib
+#dk_alter PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1/lib
 
 # Set up build env.
-dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1_${ARCH_TYPE}/lib
-dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1_${ARCH_TYPE}/include
-dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1_${ARCH_TYPE}/include
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1/include
 

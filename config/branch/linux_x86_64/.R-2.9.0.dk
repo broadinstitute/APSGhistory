@@ -10,6 +10,7 @@ unuse -q `dk_rep ".R-2*"`
 # Dependencies
 dk_op -q .gcc-libs-4.3.3
 dk_op -q .linear-algebra-0.1
+dk_op -q .cairo-1.8.6
 
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/R_2.9.0/bin
 dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/R_2.9.0/lib64

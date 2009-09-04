@@ -1,0 +1,17 @@
+#c applications
+#d NCBI Blast (blast-2.2.13)
+#d The Basic Local Alignment Search Tool (BLAST) finds regions 
+#d of local similarity between sequences. The program compares 
+#d nucleotide or protein sequences to sequence databases and 
+#d calculates the statistical significance of matches. BLAST can 
+#d be used to infer functional and evolutionary relationships 
+#d between sequences as well as help identify members of gene 
+#d families.     
+#d http://blast.ncbi.nlm.nih.gov/Blast.cgi
+#rootpath /broad/tools/Linux/x86_64/pkgs/blast_2.2.13
+
+unuse -q `dk_rep '.blast-*'`
+unuse -q `dk_rep '.ncbi-blast-*'`
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/blast_2.2.13/bin
+
