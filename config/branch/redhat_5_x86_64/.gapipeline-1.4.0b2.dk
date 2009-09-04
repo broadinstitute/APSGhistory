@@ -1,6 +1,8 @@
 #c applications
 #d GAPipeline 1.4.0b2
 
+dk_op -q .perl-5.8.9
+
 # Environement for running GAPipeline.
 dk_alter PATH /broad/tools/Linux/redhat_5_x86_64/GAPipeline_1.4.0b2/bin
 dk_alter PERL5LIB /broad/tools/Linux/redhat_5_x86_64/GAPipeline_1.4.0b2/lib/perl

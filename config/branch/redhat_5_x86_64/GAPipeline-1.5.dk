@@ -1,0 +1,10 @@
+#c applications
+#d GAPipeline Version 1.5.0
+#FIXME
+# Improved description needed.
+
+unuse -q `dk_rep "GAPipeline*"`
+
+dk_op -q .gapipeline-1.5.0
+
+

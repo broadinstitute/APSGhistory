@@ -1,0 +1,14 @@
+#c libraries
+#d igraph library
+
+# Clear out any versions lingering around
+unuse -q `dk_rep '*igraph-*'`
+
+# For dynamic linking at runtime
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/igraph_0.5.2/lib
+
+# For gcc
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/igraph_0.5.2/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/igraph_0.5.2/include
+dk_alter PKG_CONFIG_PATH /broad/tools/Linux/x86_64/pkgs/igraph_0.5.2/lib/pkgconfig
+
