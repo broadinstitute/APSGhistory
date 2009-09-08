@@ -4,4 +4,5 @@
 dk_op -q .perl5
 dk_op -q GCC-4.3
 source /broad/tools/Linux/x86_64/pkgs/helisphere/helisphere-1.0.80/helicos.bashrc
+dk_alter PYTHONPATH  /seq/helicosTest/scripts/bin
 
