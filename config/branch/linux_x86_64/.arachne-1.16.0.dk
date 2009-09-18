@@ -11,4 +11,5 @@ dk_op -q .gcc-4.3.3
 
 # Environment
 dk_alter PATH /wga/scr2/ArachneReleases/ReleaseArachne-1-16/bin
+dk_alter PATH /wga/scr2/ArachneReleases/ReleaseArachne-1-16/solexa
 dk_setenv SOLEXA_PIPELINE_DIR /slxa/pipelineOutput/farm

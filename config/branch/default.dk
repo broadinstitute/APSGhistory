@@ -3,10 +3,6 @@
 #d setup. This is meant to *REPLACE* current startup scripts.
 #d Do not use unless you know what you are doing!
 
-# Things which make permanent changes come first.
-# Set up a basic PATH
-dk_op -q .path
-
 # Set LANG
 dk_op -q .lang
 
@@ -19,16 +15,5 @@ dk_op -q .broad
 # Set up local scripts and tools
 dk_op -q .local
 
-# Add X11 to path, this should check for the existance of X11
-# as well as use the correct path for each distro/OS
-dk_op -q .X11
-
-# Source the LSF setup file.
-# LSF related aliases go in this dotkit.
+# LSF
 dk_op -q .lsf-7.0
-
-# Default Applications
-dk_op -q .pdsh-2.17
-dk_op -q .subversion-1.5.5
-
-

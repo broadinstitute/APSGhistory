@@ -4,8 +4,8 @@
 dk_alias finger 'finger -M'
 dk_alias quota 'quota -sQ'
 
-dk_alias ish 'bsub -Is -q interactive bash '
-dk_alias icsh 'bsub -Is -q interactive csh '
-dk_alias isub 'bsub -Is -q interactive '
+#dk_alias ish 'bsub -Is -q interactive bash '
+#dk_alias icsh 'bsub -Is -q interactive csh '
+#dk_alias isub 'bsub -Is -q interactive '
 
 

@@ -11,4 +11,5 @@ dk_op -q .gcc-libs-4.3.3
 
 # Environment
 dk_alter PATH /broad/tools/Linux/redhat_5_x86_64/pkgs/Arachne_20090814/bin
+dk_alter PATH /broad/tools/Linux/redhat_5_x86_64/pkgs/Arachne_20090814/solexa
 dk_setenv SOLEXA_PIPELINE_DIR /slxa/pipelineOutput/farm
