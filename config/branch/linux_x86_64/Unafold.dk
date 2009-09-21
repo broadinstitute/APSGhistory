@@ -1,0 +1,8 @@
+#c applications
+#d unafold - UNAFold is a comprehensive software package for 
+#d nucleic acid folding and hybridization prediction. 
+#rootpath /broad/tools/Linux/x86_64/pkgs/unafold_3.7
+#
+unuse -q `dk_rep ".unafold-*"`
+
+dk_op -q .unafold-3.7
