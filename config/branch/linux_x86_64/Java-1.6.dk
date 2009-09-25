@@ -6,4 +6,4 @@
 unuse -q `dk_rep "Java*"`
 unuse -q `dk_rep ".java-*"`
 
-dk_op -q .java-sun-jdk-1.6.0-12
+dk_op -q .java-sun-jdk-1.6.0-16
