@@ -1,0 +1,16 @@
+#c libraries
+#d Collection of Linear Algebra Libraries
+#d ATLAS, LAPACK, BLAS, XBLAS, ...
+
+# Remove existing linear-algebra kits.
+unuse -q `dk_rep '.linear-algebra-*'`
+
+# Set up environment for using library
+#dk_alter PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1_generic/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1_generic/lib
+
+# Set up build env.
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1_generic/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1_generic/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/linear-algebra_0.1_generic/include
+
