@@ -5,4 +5,4 @@
 
 unuse -q `dk_rep 'Python-*'`
 
-dk_op -q .python-3.1.0
+dk_op -q .python-3.1.1

@@ -1,0 +1,7 @@
+#c libraries
+#d matplotlib
+
+# Clear out any versions lingering around
+unuse -q `dk_rep '*matplotlib-*'`
+
+dk_alter PYTHONPATH /broad/tools/Linux/x86_64/pkgs/matplotlib_0.99.1.1/lib/python2.6/site-packages
