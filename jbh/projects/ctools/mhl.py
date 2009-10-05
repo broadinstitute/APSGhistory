@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import re
 from netaddr import *
 
@@ -8,7 +10,12 @@ class MhlInfo:
         self.aliases = []
 
     def __repr__(self):
-        return "|".join([self.hostname, self.ipaddr, ','.join(self.aliases)])
+        if self.aliases == []:
+            aliasstr = ""
+        else:
+            aliasstr = ','.join(self.aliases)
+
+        return "HOSTNAME=%s; IPADDR=%s; ALIASES=%s" % ( self.hostname, self.ipaddr, aliasstr )
 
     def sethostname(self, hostname):
         if self.hostname is None:
@@ -27,7 +34,7 @@ class MhlInfo:
 
 
 def buildmhldict ():
-    mhlfile = open("//sysman/install/broad/master.host.listing", 'r')
+    mhlfile = open("/sysman/install/broad/master.host.listing", 'r')
     mhlraw = mhlfile.readlines()
     mhlfile.close()
 
@@ -53,9 +60,8 @@ def buildmhldict ():
 
     return mhldict
 
-
 if __name__ == "__main__":
     import sys
     mhldict = buildmhldict()
     for entry in mhldict.keys():
-       print entry, mhldict[entry]
+       print "MAC=%s; %s" % (entry, mhldict[entry])

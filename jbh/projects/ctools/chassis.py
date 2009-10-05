@@ -1,13 +1,43 @@
+#!/usr/bin/env python
+
+import pexpect
+import telnetlib
+import os
+import sys
+import re
+import socket
+
 class Chassis:
     def __init__(self, vendor, model, vendor_uuid ):
         self.vendorid = vendorid
         self.model = model
         self.vendor_uuid = vendor.uuid
 
+def m1000e_run_command (host, username, password, cmd):
+    ssh_newkey = 'Are you sure you want to continue connecting'
+    child = pexpect.spawn('ssh -l %s %s %s'%(username, host, cmd ))
+    i = child.expect([pexpect.TIMEOUT, ssh_newkey, 'password: '])
+    if i == 0: # Timeout
+        print 'ERROR!'
+        print 'SSH could not login. Here is what SSH said:'
+        print child.before, child.after
+        return None
+    if i == 1: # SSH does not have the public key. Just accept it.
+        child.sendline ('yes')
+        child.expect ('password: ')
+        i = child.expect([pexpect.TIMEOUT, 'password: '])
+        if i == 0: # Timeout
+            print 'ERROR!'
+            print 'SSH could not login. Here is what SSH said:'
+            print child.before, child.after
+            return None
+    child.sendline(password)
+    child.expect(pexpect.EOF)
+    output = child.before
+    return output
 
-def ibm_slotinfo (host, username, password):
+def ibm_run_command (host, username, password, cmd):
     prompt = 'system> '
-    macre = re.compile('([0-9a-fA-F]{2}[:|\-]?){6}')
     slots = []
 
     try:
@@ -21,21 +51,14 @@ def ibm_slotinfo (host, username, password):
     brsa.read_until('password: ')
     brsa.write(password + '\r\n')
     brsa.read_until(prompt)
-    for plug in range(1, 15):
-        command = 'info -T blade[' + str(plug) + ']\r\n'
-        brsa.write(command)
-        output = brsa.read_until(prompt)
-        macs = []
-        for line in output.splitlines():
-            mac = macre.search(line)
-            if mac:
-                macs.append(mac.group().rstrip().lower())
-        slot = [ host, plug, macs ]
-        if slot:
-            slots.append(slot)
+    brsa.write(cmd + '\r\n')
+    output = brsa.read_until(prompt)
     brsa.write('exit\r\n')
-    return slots
 
+    return output
 
-        
+if __name__ == "__main__":
+    import sys
+    print m1000e_run_command("brsa63", "root", "U71l9ru8", "getmacaddress")
+    print ibm_run_command("brsa33", "root", "U71l9ru8", "list -l 2")
     

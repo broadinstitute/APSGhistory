@@ -14,29 +14,6 @@ dellchassis = [
     'brsa64',
     'brsa63' ]
 
-def m1000e_run_command (host, username, password, cmd):
-    ssh_newkey = 'Are you sure you want to continue connecting'
-    child = pexpect.spawn('ssh -l %s %s %s'%(username, host, cmd ))
-    i = child.expect([pexpect.TIMEOUT, ssh_newkey, 'password: '])
-    if i == 0: # Timeout
-        print 'ERROR!'
-        print 'SSH could not login. Here is what SSH said:'
-        print child.before, child.after
-        return None
-    if i == 1: # SSH does not have the public key. Just accept it.
-        child.sendline ('yes')
-        child.expect ('password: ')
-        i = child.expect([pexpect.TIMEOUT, 'password: '])
-        if i == 0: # Timeout
-            print 'ERROR!'
-            print 'SSH could not login. Here is what SSH said:'
-            print child.before, child.after
-            return None       
-    child.sendline(password)
-    child.expect(pexpect.EOF)
-    output = child.before
-    return output
-
 def dell_nodeinfo (host, username, password):
 
     global mhldict
