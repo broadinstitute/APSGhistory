@@ -23,6 +23,9 @@ dk_op -q .gcc-libs-4.3.3
 # Oracle
 dk_op -q .oracle-instaclient-11.1
 
+# GraphVIZ
+dk_op -q .graphviz-2.22.2
+
 # Perl 
 dk_alter PATH /broad/tools/Linux/x86_64/pkgs/perl_gcc-4.3.2_5.8.9/bin
 dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/perl_gcc-4.3.2_5.8.9/lib
