@@ -1,0 +1,9 @@
+#c utilities
+#d NetCDF
+#d NetCDF (network Common Data Form) is a set of software libraries 
+#d and machine-independent data formats that support the creation, 
+#d access, and sharing of array-oriented scientific data.
+#rootpath /broad/tools/Linux/x86_64/pkgs/netcdf_4.0.1
+
+dk_op -q  .netcdf-4.0.1
+
