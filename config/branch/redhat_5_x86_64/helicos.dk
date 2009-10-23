@@ -1,0 +1,4 @@
+#c applications
+#d Helicos Pipeline Version for CentOS
+
+dk_op -q .helicos-1.0.389.154
