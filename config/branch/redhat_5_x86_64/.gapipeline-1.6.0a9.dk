@@ -1,0 +1,24 @@
+#c applications/illumina
+#d GAPipeline 1.6.0a9
+#rootpath /broad/software/free/Linux/redhat_5_x86_64/pkgs/gapipeline_1.6.0a9
+
+# Make mutually exclusive with other versions of same package.
+# Make sure this doesn't remove similarly named packages as a side effect
+# for example, apps named blah-finder and blah would both be removed
+# by ".blah-*"
+
+unuse -q `dk_rep ".gapipeline-\d*"`
+
+# Define dotkit dependencies here by calling hidden dotkits for things we depend on:
+# dk_op -q .dependson-1.2.3
+
+# PATH entries.
+dk_alter PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/gapipeline_1.6.0a9/bin
+
+# LD_LIBRARY_PATH entries.
+dk_alter LD_LIBRARY_PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/gapipeline_1.6.0a9/lib
+
+#### DEVELOPMENT ITEMS (these may be optional, delete if not required.
+
+# LIBRARY_PATH entries.
+dk_alter LIBRARY_PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/gapipeline_1.6.0a9/lib

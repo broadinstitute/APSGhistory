@@ -1,0 +1,22 @@
+#c applications
+#d Emacs 23.1
+#rootpath /broad/software/free/Linux/redhat_5_x86_64/pkgs/emacs_23.1
+
+# Make mutually exclusive with other versions of same package.
+# Make sure this doesn't remove similarly named packages as a side effect
+# for example, apps named blah-finder and blah would both be removed
+# by ".blah-*"
+
+unuse -q `dk_rep ".emacs-\d*"`
+
+# Define dotkit dependencies here by calling hidden dotkits for things we depend on:
+# dk_op -q .dependson-1.2.3
+
+
+#### RUNTIME ITEMS
+# PATH entries.
+dk_alter PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/emacs_23.1/bin
+
+
+# MANPATH entries.
+dk_alter MANPATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/emacs_23.1/share/man

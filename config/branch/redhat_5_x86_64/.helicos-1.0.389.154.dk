@@ -1,0 +1,7 @@
+#c applications
+#d Helicos Pipeline Version 1.0.389.154 for CentOS
+
+dk_op -q .samtools-0.1.4
+source /broad/tools/Linux/redhat_5_x86_64/pkgs/helisphere/helisphere-1.0.389.154/helicos.bashrc
+dk_alter PYTHONPATH  /seq/helicosTest/scripts/bin
+
