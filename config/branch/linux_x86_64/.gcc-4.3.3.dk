@@ -3,6 +3,7 @@
 
 
 # Clear out exisitng gcc varsions.
+unuse -q `dk_rep "GCC-*"`
 unuse -q `dk_rep '*gcc-*'`
 
 # Build tools for gcc.

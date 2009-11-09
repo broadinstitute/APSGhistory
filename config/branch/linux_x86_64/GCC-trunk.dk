@@ -1,0 +1,8 @@
+#c devel
+#d GCC, the GNU Compiler Collection
+#d http://gcc.gnu.org/
+#d Trunk. Ask gcc for specific version.
+
+unuse -q `dk_rep "GCC-*"`
+
+dk_op -q .gcc-trunk

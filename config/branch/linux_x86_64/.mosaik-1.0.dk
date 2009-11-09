@@ -1,0 +1,14 @@
+#c applications
+#d MOSAIK is a reference-guided assembler
+#d http://bioinformatics.bc.edu/marthlab/Mosaik
+#rootpath /broad/tools/Linux/x86_64/pkgs/mosaik_1.0
+
+unuse -q `dk_rep "Mosaik*"`
+unuse -q `dk_rep ".mosaik-*"`
+
+# I'm built with GCC-4.3 goodness baked inside!
+dk_op -q .gcc-libs-4.3.3
+
+# Environment
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/mosaik_1.0/bin
+

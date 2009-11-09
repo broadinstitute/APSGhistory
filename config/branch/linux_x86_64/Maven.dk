@@ -1,0 +1,9 @@
+#c applications
+#d Apache Maven is a software project management and comprehension 
+#d tool. Based on the concept of a project object model (POM), 
+#d Maven can manage a project's build, reporting and documentation 
+#d from a central piece of information. 
+
+unuse -q `dk_rep "Maven*"`
+
+dk_op -q .apache-maven-2.2.1

@@ -1,0 +1,6 @@
+#c devel
+#d Sun JDK 1.5
+#d http://java.com/
+#d Latest release of 1.5.
+
+dk_op -q .sun-java-jdk-1.5.0-09-x86-64

@@ -1,0 +1,6 @@
+#c applications
+#d Load Sharing Facility
+
+# Grab the latest.
+use -q .lsf-7.0++
+
