@@ -1,0 +1,37 @@
+#c development/java
+#d Sun JDK 1.5.0_09
+#rootpath /broad/software/free/Linux/redhat_5_x86_64/pkgs/sun-java-jdk_1.5.0-09_x86_64
+
+# Make mutually exclusive with other versions of same package.
+# Make sure this doesn't remove similarly named packages as a side effect
+# for example, apps named blah-finder and blah would both be removed
+# by ".blah-*"
+
+unuse -q `dk_rep ".sun-java-jdk-\d*"`
+
+# Define dotkit dependencies here by calling hidden dotkits for things we depend on:
+# dk_op -q .dependson-1.2.3
+
+
+#### RUNTIME ITEMS
+# PATH entries.
+dk_alter PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/sun-java-jdk_1.5.0-09_x86_64/bin
+
+# LD_LIBRARY_PATH entries.
+dk_alter LD_LIBRARY_PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/sun-java-jdk_1.5.0-09_x86_64/lib
+
+# MANPATH entries.
+dk_alter MANPATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/sun-java-jdk_1.5.0-09_x86_64/man
+
+
+
+#### DEVELOPMENT ITEMS (these may be optional, delete if not required.
+
+# INCLUDE entries.
+dk_alter CPATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/sun-java-jdk_1.5.0-09_x86_64/include
+dk_alter C_INCLUDE_PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/sun-java-jdk_1.5.0-09_x86_64/include
+dk_alter CPLUS_INCLUDE_PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/sun-java-jdk_1.5.0-09_x86_64/include
+dk_alter OBJC_INCLUDE_PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/sun-java-jdk_1.5.0-09_x86_64/include
+
+# LIBRARY_PATH entries.
+dk_alter LIBRARY_PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/sun-java-jdk_1.5.0-09_x86_64/lib
