@@ -1,0 +1,5 @@
+#c bio-tools
+#d Garli 0.96b8
+
+dk_alter PATH /broad/tools/Linux/x86_64/pkgs/garli_0.96b8/bin
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/ncl_2.1.06/lib/ncl

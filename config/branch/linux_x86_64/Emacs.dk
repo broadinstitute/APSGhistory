@@ -4,4 +4,4 @@
 
 unuse -q `dk_rep "Emacs*"`
 
-dk_op -q .emacs-22.3
+dk_op -q .emacs-23.1

@@ -1,0 +1,14 @@
+#c languages
+#d java Sun JDK 1.6.0 
+
+# Clean any old java's lying around
+unuse -q `dk_rep ".java-*"`
+
+# Set JAVA_HOME
+dk_setenv JAVA_HOME /usr/java/java1.6
+
+# Prepend us to the correct places
+dk_alter PATH /usr/java/java1.6/bin
+dk_alter MANPATH /usr/java/java1.6/man
+
+
