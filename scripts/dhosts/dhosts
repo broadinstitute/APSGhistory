@@ -1,0 +1,170 @@
+#
+# $Id: dhosts,v 1.265 2009/11/12 20:09:18 root Exp $
+#
+
+#
+# Please input comments related to the node on the LINE BELOW the node
+# Please also UPDATE RUNAROUND to comment out/uncomment nodes down/up
+# Please update runaround to remove blade-farm for repurposed nodes (prodinfo)
+#
+# DO NOT REMOVE BLADES FROM THIS FILE IF YOU DON'T FIX THEM!!!!!!!!!!!!!!
+# DO NOT REMOVE BLADES FROM THIS FILE IF YOU DON'T FIX THEM!!!!!!!!!!!!!!
+# DO NOT REMOVE BLADES FROM THIS FILE IF YOU DON'T FIX THEM!!!!!!!!!!!!!!
+# DO NOT REMOVE BLADES FROM THIS FILE IF YOU DON'T FIX THEM!!!!!!!!!!!!!!
+# DO NOT REMOVE BLADES FROM THIS FILE IF YOU DON'T FIX THEM!!!!!!!!!!!!!!
+# We use this file to keep track of what blades have what problems/comments!
+#
+node002
+# failed CPU 1
+node003
+# bad HDA
+# Jun 14 23:39:25 node003 kernel: end_request: I/O error, dev 03:07 (hda), sector 379748
+node007
+# hda: dma_intr: status=0x51 { DriveReady SeekComplete Error }
+# hda: dma_intr: error=0x40 { UncorrectableError }, LBAsect=12828064, sector=88448
+# end_request: I/O error, dev 03:08 (hda), sector 88448
+node008
+# hdc: dma_intr: status=0x51 { DriveReady SeekComplete Error }
+# hdc: dma_intr: error=0x40 { UncorrectableError }, LBAsect=4129939, sector=4129872
+# end_request: I/O error, dev 16:01 (hdc), sector 4129872
+node009
+# Dec 30 04:02:07 node009 kernel: end_request: I/O error, dev 16:02 (hdc), sector 8650776
+node020
+# used as a SAS node
+node021
+# Error: only one processor found.
+# used as a build host
+node023
+# Mar 28 18:22:59 node023 kernel: hda: dma_timer_expiry: dma status == 0x61
+node026
+# Dec  3 12:11:45 node026 kernel: end_request: I/O error, dev 16:01 (hdc), sector 164216
+node027
+# Dec 10 11:22:32 node027 kernel: hdc: dma_timer_expiry: dma status == 0x61
+# Jan 24 04:11:04 node027 kernel: end_request: I/O error, dev 16:02 (hdc), sector 26872
+node039
+# Apr 23 15:00:44 node039 kernel: end_request: I/O error, dev 03:05 (hda), sector 0
+node042
+# Jul 27 12:21:51 node042 kernel: end_request: I/O error, dev 16:01 (hdc), sector 3880
+node051
+# hda: dma_intr: status=0x51 { DriveReady SeekComplete Error }
+# hda: dma_intr: error=0x40 { UncorrectableError }, LBAsect=77620264, sector=64880656
+# end_request: I/O error, dev 03:08 (hda), sector 64880656
+# EXT3-fs error (device md(9,0)): ext3_get_inode_loc: unable to read inode block - inode=8110089, block=16220162
+node052
+# nfs: task 35030 can't get a request slot
+# nfs_refresh_inode: inode number mismatch
+# expected (0x2c/0x1d44fa9), got (0x2c/0x1b4922a)
+node061
+# hda: dma_intr: status=0x51 { DriveReady SeekComplete Error }
+# hda: dma_intr: error=0x40 { UncorrectableError }, LBAsect=8623557, sector=132064
+# end_request: I/O error, dev 03:05 (hda), sector 132064
+node062
+#end_request: I/O error, dev 16:02 (hdc), sector 344584
+#EXT3-fs error (device md(9,0)): ext3_readdir: directory #2785281 contains a hole at offset 94208
+node063
+# hdc errors
+node066
+#Feb 28 05:06:33 node066 kernel: end_request: I/O error, dev 03:07 (hda), sector 2
+node067
+# end_request: I/O error, dev 16:02 (hdc), sector 33819896
+# EXT3-fs error (device md(9,0)): ext3_readdir: directory #4227260 contains a hole at offset 0
+node075
+# hda: dma_intr: status=0x51 { DriveReady SeekComplete Error }
+# hda: dma_intr: error=0x40 { UncorrectableError }, LBAsect=67652447, sector=54905200
+# end_request: I/O error, dev 03:08 (hda), sector 54905200
+node078
+# end_request: I/O error, dev 16:01 (hdc), sector 48
+node087
+# Sep 19 22:35:21 node087 kernel: hdc: error waiting for DMA
+# Sep 19 22:35:21 node087 kernel: hdc: dma timeout retry: status=0xd0 { Busy }
+# Sep 19 22:35:21 node087 kernel: hdc: DMA disabled
+# Sep 19 22:35:41 node087 kernel: ide1: reset: success
+# Sep 19 22:40:31 node087 kernel: hdc: dma_timer_expiry: dma status == 0x61
+node091
+# bad hard disk
+node092
+# Mar 31 00:52:44 node092 kernel: end_request: I/O error, dev 03:07 (hda), sector 616324
+node093
+# bad hard disk
+####node099
+####Mar 28 15:10:23 node099 kernel: hda: irq timeout: status=0xd0 { Busy }
+node118
+# needs rebuild
+node119
+# emergency node SuSE9.2 i386
+node129
+# lims
+node130
+# lims
+node132
+# given to thaniel as a pair to node131
+node134
+# closed as per #100366
+node135
+# cpatti started using it on Apr 14th 2008. See 132028
+node136
+# emergency node RH9
+# used as a RH9 build host
+node137
+# for dirseq see #105060
+node138
+# for dirseq see #105060
+node140
+# closed as per 115142
+node169
+# for annotation web
+node170
+node171
+node172
+node173
+# closed to be used as fingap hosts (#106818)
+node174
+node175
+node176
+node177
+# closed as per # 115142
+node178
+# rebuilt as SuSE 9.2 for solexa Flake
+node179
+node180
+# closed for trace and squid (#113166)
+#### SEE tickets tagged 'hardware' for more nodes ####
+node230
+#grep: /var/log/messages: Input/output error
+node243
+# closed as per #115485
+node244
+# closed as per #119190
+node246
+# closed as per #118713 (off-rig SETS for SOLiD) 
+node257
+node258
+# web servers
+node262
+# needs mem check
+node264
+# mempop
+node268
+# bad DIMMs
+node282
+# out for solexa test node (#113979)
+node284
+# out for AMD code analyst (#109143)
+node325
+#amber -- see monia
+################################## node354
+################################## ADMIN ACTION COMMENT: "saw two solexa pipeline errors 7/23 jlc"
+node369
+# memory problems, 2 bad DIMM pairs
+node370
+#amber
+node372
+#amber
+node420
+# Error on DIMM pair 1
+node449
+# missing 2 DIMMs
+node450
+# correctable memory error logging limit reached. 9/4/2009 EHJ
+node451
+# missing 2 DIMMS
