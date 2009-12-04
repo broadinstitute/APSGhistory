@@ -1,0 +1,23 @@
+#!/usr/bin/expect
+
+set host [lindex $argv 0]
+set passw [lindex $argv 1]
+set enpassw [lindex $argv 2]
+set user [lindex $argv 3]
+set date [exec date +%Y%m%d]
+
+spawn ssh "$user@$host"
+expect "password:"
+send "$passw\r"
+expect "$host>"
+send "en\r"
+expect "Password:"
+send "$enpassw\r"
+expect "$host#"
+send "copy nvram:startup-config tftp://69.173.115.212/$date/$host\r"
+expect "start?"
+send "y\r"
+expect "$host#"
+send "logout\r"
+expect "now?"
+exit 0

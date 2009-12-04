@@ -1,0 +1,28 @@
+#!/usr/bin/expect
+
+set host [lindex $argv 0]
+set passw [lindex $argv 1]
+set enpassw [lindex $argv 2]
+set user [lindex $argv 3]
+set date [exec date +%Y%m%d]
+
+spawn ssh "$user@$host"
+expect "password:"
+send "$passw\r"
+expect "$host>"
+send "en\r"
+expect "Password:"
+send "+Tov,tA0d\r"
+expect "$host#"
+send "copy run tftp\r"
+expect "Source filename"
+send "\r"
+expect "remote host"
+send "69.173.115.212\r"
+expect "Destination filename"
+send "$date/$host\r"
+expect "$host#"
+send "logout\r"
+expect EOF
+exit 0
+

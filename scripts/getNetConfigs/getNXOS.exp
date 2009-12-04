@@ -1,0 +1,18 @@
+#!/usr/bin/expect
+
+set host [lindex $argv 0]
+set passw [lindex $argv 1]
+set enpassw [lindex $argv 2]
+set user [lindex $argv 3]
+set date [exec date +%Y%m%d]
+
+spawn ssh "$user@$host"
+expect "Password:"
+send "$passw\r"
+expect "$host#"
+send "copy running-config tftp://69.173.115.212/$date/$host\r"
+expect "vrf"
+send "\r"
+expect "$host#"
+send "exit\r"
+exit 0
