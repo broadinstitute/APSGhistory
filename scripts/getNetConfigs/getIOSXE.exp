@@ -8,12 +8,20 @@ set ip [lindex $argv 4]
 set date [exec date +%Y%m%d]
 
 spawn ssh "$user@$host"
-expect "Password:"
+expect -nocase "password:"
 send "$passw\r"
+expect "$host>"
+send "en\r"
+expect -nocase "password:"
+send "$enpassw\r"
 expect "$host#"
-send "copy running-config tftp://$ip/$date/$host\r"
-expect "vrf"
-send "\r"
+send "copy running-config tftp\r"
+expect "remote host"
+send "$ip\r"
+expect "file name"
+send "$date/$host\r"
 expect "$host#"
 send "exit\r"
+expect eof
 exit 0
+

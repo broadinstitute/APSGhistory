@@ -4,6 +4,7 @@ set host [lindex $argv 0]
 set passw [lindex $argv 1]
 set enpassw [lindex $argv 2]
 set user [lindex $argv 3]
+set ip [lindex $argv 4]
 set date [exec date +%Y%m%d]
 
 spawn ssh "$user@$host"
@@ -16,7 +17,7 @@ send "$enpassw\r"
 expect "$host#"
 send "copy run tftp\r"
 expect "remote host"
-send "69.173.115.212\r"
+send "$ip\r"
 expect "filename"
 send "$date/$host\r"
 expect "$host#"

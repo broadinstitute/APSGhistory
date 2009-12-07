@@ -7,13 +7,17 @@ set user [lindex $argv 3]
 set ip [lindex $argv 4]
 set date [exec date +%Y%m%d]
 
-spawn ssh "$user@$host"
+spawn telnet "$host"
+expect "User:"
+send "$user\r"
 expect "Password:"
 send "$passw\r"
 expect "$host#"
 send "copy running-config tftp://$ip/$date/$host\r"
-expect "vrf"
-send "\r"
+expect "start?"
+send "y\r"
 expect "$host#"
-send "exit\r"
+send "quit\r"
+expect EOF
 exit 0
+
