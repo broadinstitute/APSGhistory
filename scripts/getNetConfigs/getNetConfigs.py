@@ -31,6 +31,20 @@ def get_config(list,cmd,user_pass,en_pass,ip):
 
 		else:
 			logging.warning("%s/%s already exists...skipping" % (smb_rdir,item))
+
+def getDevices(model):
+        infile = open('devicelist.txt','r')
+        result = []
+        for line in infile:
+                if string.find(line,'#') == -1:
+                        fields = line.split(':')
+                        if len(fields) >= 2:
+                                name = fields[0].rstrip("\n")
+                                type = fields[1].rstrip("\n")
+
+                                if type.lower() == model:
+                                        result.append(name)
+        return result
 ###End Functions###
 
 
@@ -80,146 +94,147 @@ sftos_cmd = exp_path + "getSFTOS.exp"
 ##Others##
 ent_cmd = exp_path + "getEnt.exp"
 dell_cmd = exp_path + "getDell.exp"
+dellv2_cmd = exp_path + "getDellv2.exp"
 
 ###Device List By OS###
 ##Cisco##
-ios = ["7cc-1062-3",\
-	"7cc-2062-3a",\
-	"7cc-2062-3b",\
-	"7cc-3062-3a",\
-	"7cc-3062-3b",\
-	"7cc-4062-3a",\
-	"7cc-4062-3b",\
-	"7cc-5062-3a",\
-	"7cc-5062-3b",\
-	"7cc-6062-3a",\
-	"7cc-6062-3b",\
-	"7cc-7062-3a",\
-	"7cc-7062-3b",\
-	"7cc-7091-3",\
-	"7cc-7141-6",\
-	"7cc-7141-a1-4948",\
-	"7cc-7141-d5-4948",\
-	"7cc-7141-e6-4948",\
-	"7cc-7141-e12-4948",\
-	"7cc-7141-f3-4948",\
-	"320c-159-3a",\
-	"320c-159-3b",\
-	"320c-183-3",\
-	"320c-1147-3a",\
-	"320c-1147-3b",\
-	"320c-1147-3c",\
-	"320c-2102-6513",\
-	"5cc-1330-3",\
-	"190f-214-3750"]
-
-fos = ["7cc-7141-5540a"]
-nxos = ["5cc-1330-5010"]
-voip = ["7cc-7141-n1-3a",\
-	"7cc-7141-n1-3b",\
-	"7cc-1062-voip",\
-	"7cc-2062-voip",\
-	"7cc-3062-voip",\
-	"7cc-4062-voip",\
-	"7cc-5062-voip",\
-	"7cc-6062-voip",\
-	"7cc-7062-voip",\
-	"320c-2102-3",\
-	"320c-159-voip",\
-	"320c-183-voip",\
-	"320c-1147-voip",\
-	"5cc-1330-voip"]
-iosxe = ["1sum-asr1006-v2"]
-
-##Force10##
-ftos = ["7cc-7141-c300",\
-	"7cc-7141-a17-s50n",\
-	"7cc-7141-d13-s50n",\
-	"7cc-7141-f6-s50n",\
-	"7cc-7141-f7-s50n",\
-	"7cc-7141-n6-s50n",\
-	"7cc-7141-n8-s50n",\
-	"320c-2102-b2-s50n",\
-	"5cc-1330-a2-s50n",\
-	"5cc-1330-c2-s50n"]
-
-sftos = ["7cc-7141-b3-s50n",\
-	"7cc-7141-c8-s50n",\
-	"7cc-7141-c10-s50n",\
-	"7cc-7141-d4-s50n",\
-	"7cc-7141-d11-s50n",\
-	"7cc-7141-d14-s50n",\
-	"7cc-7141-e13-s50n",\
-	"7cc-7141-f2-s50n",\
-	"7cc-7141-f11-s50n",\
-	"7cc-7141-f13-s50n",\
-	"320c-2102-a5-s50n"]
-
-
-##Others##
-ent = ["7cc-1038t-sw-1",\
-	"7cc-2062t-sw-1",\
-	"7cc-3062t-sw-1",\
-	"7cc-4062t-sw-1",\
-	"7cc-5062t-sw-1",\
-	"7cc-6062t-sw-1",\
-	"7cc-7062t-sw-1",\
-	"320c-169t-sw-1",\
-	"320c-1171t-sw-1"]
-
-dell = ["bswitch50-build",\
-	"bswitch50-main",\
-	"bswitch51-build",\
-	"bswitch51-main",\
-	"bswitch52-build",\
-	"bswitch52-main",\
-	"bswitch53-build",\
-	"bswitch53-main",\
-	"bswitch54-build",\
-	"bswitch54-main",\
-	"bswitch55-build",\
-	"bswitch55-main",\
-	"bswitch56-build",\
-	"bswitch56-main",\
-	"bswitch57-build",\
-	"bswitch57-main",\
-	"bswitch58-build",\
-	"bswitch58-main",\
-	"bswitch59-build",\
-	"bswitch59-main",\
-	"bswitch60-build",\
-	"bswitch60-main",\
-	"bswitch61-build",\
-	"bswitch61-main",\
-	"bswitch62-build",\
-	"bswitch62-main",\
-	"bswitch63-build",\
-	"bswitch63-main",\
-	"bswitch64-build",\
-	"bswitch64-main",\
-	"bswitch65-build",\
-	"bswitch65-main",\
-	"bswitch66-build",\
-	"bswitch66-main",\
-	"bswitch67-build",\
-	"bswitch67-main",\
-	"bswitch68-build",\
-	"bswitch68-main",\
-	"bswitch69-build",\
-	"bswitch69-main",\
-	"bswitch70-build",\
-	"bswitch70-main",\
-	"bswitch71-build",\
-	"bswitch71-main",\
-	"bswitch72-build",\
-	"bswitch72-main",\
-	"bswitch73-build",\
-	"bswitch73-main",\
-	"bswitch74-build",\
-	"bswitch74-main",\
-	"bswitch75-build",\
-	"bswitch75-main"]
-
+#ios = ["7cc-1062-3",\
+#	"7cc-2062-3a",\
+#	"7cc-2062-3b",\
+#	"7cc-3062-3a",\
+#	"7cc-3062-3b",\
+#	"7cc-4062-3a",\
+#	"7cc-4062-3b",\
+#	"7cc-5062-3a",\
+#	"7cc-5062-3b",\
+#	"7cc-6062-3a",\
+#	"7cc-6062-3b",\
+#	"7cc-7062-3a",\
+#	"7cc-7062-3b",\
+#	"7cc-7091-3",\
+#	"7cc-7141-6",\
+#	"7cc-7141-a1-4948",\
+#	"7cc-7141-d5-4948",\
+#	"7cc-7141-e6-4948",\
+#	"7cc-7141-e12-4948",\
+#	"7cc-7141-f3-4948",\
+#	"320c-159-3a",\
+#	"320c-159-3b",\
+#	"320c-183-3",\
+#	"320c-1147-3a",\
+#	"320c-1147-3b",\
+#	"320c-1147-3c",\
+#	"320c-2102-6513",\
+#	"5cc-1330-3",\
+#	"190f-214-3750"]
+#
+#fos = ["7cc-7141-5540a"]
+#nxos = ["5cc-1330-5010"]
+#voip = ["7cc-7141-n1-3a",\
+#	"7cc-7141-n1-3b",\
+#	"7cc-1062-voip",\
+#	"7cc-2062-voip",\
+#	"7cc-3062-voip",\
+#	"7cc-4062-voip",\
+#	"7cc-5062-voip",\
+#	"7cc-6062-voip",\
+#	"7cc-7062-voip",\
+#	"320c-2102-3",\
+#	"320c-159-voip",\
+#	"320c-183-voip",\
+#	"320c-1147-voip",\
+#	"5cc-1330-voip"]
+#iosxe = ["1sum-asr1006-v2"]
+#
+###Force10##
+#ftos = ["7cc-7141-c300",\
+#	"7cc-7141-a17-s50n",\
+#	"7cc-7141-d13-s50n",\
+#	"7cc-7141-f6-s50n",\
+#	"7cc-7141-f7-s50n",\
+#	"7cc-7141-n6-s50n",\
+#	"7cc-7141-n8-s50n",\
+#	"320c-2102-b2-s50n",\
+#	"5cc-1330-a2-s50n",\
+#	"5cc-1330-c2-s50n"]
+#
+#sftos = ["7cc-7141-b3-s50n",\
+#	"7cc-7141-c8-s50n",\
+#	"7cc-7141-c10-s50n",\
+#	"7cc-7141-d4-s50n",\
+#	"7cc-7141-d11-s50n",\
+#	"7cc-7141-d14-s50n",\
+#	"7cc-7141-e13-s50n",\
+#	"7cc-7141-f2-s50n",\
+#	"7cc-7141-f11-s50n",\
+#	"7cc-7141-f13-s50n",\
+#	"320c-2102-a5-s50n"]
+#
+#
+###Others##
+#ent = ["7cc-1038t-sw-1",\
+#	"7cc-2062t-sw-1",\
+#	"7cc-3062t-sw-1",\
+#	"7cc-4062t-sw-1",\
+#	"7cc-5062t-sw-1",\
+#	"7cc-6062t-sw-1",\
+#	"7cc-7062t-sw-1",\
+#	"320c-169t-sw-1",\
+#	"320c-1171t-sw-1"]
+#
+#dell = ["bswitch50-build",\
+#	"bswitch50-main",\
+#	"bswitch51-build",\
+#	"bswitch51-main",\
+#	"bswitch52-build",\
+#	"bswitch52-main",\
+#	"bswitch53-build",\
+#	"bswitch53-main",\
+#	"bswitch54-build",\
+#	"bswitch54-main",\
+#	"bswitch55-build",\
+#	"bswitch55-main",\
+#	"bswitch56-build",\
+#	"bswitch56-main",\
+#	"bswitch57-build",\
+#	"bswitch57-main",\
+#	"bswitch58-build",\
+#	"bswitch58-main",\
+#	"bswitch59-build",\
+#	"bswitch59-main",\
+#	"bswitch60-build",\
+#	"bswitch60-main",\
+#	"bswitch61-build",\
+#	"bswitch61-main",\
+#	"bswitch62-build",\
+#	"bswitch62-main",\
+#	"bswitch63-build",\
+#	"bswitch63-main",\
+#	"bswitch64-build",\
+#	"bswitch64-main",\
+#	"bswitch65-build",\
+#	"bswitch65-main",\
+#	"bswitch66-build",\
+#	"bswitch66-main",\
+#	"bswitch67-build",\
+#	"bswitch67-main",\
+#	"bswitch68-build",\
+#	"bswitch68-main",\
+#	"bswitch69-build",\
+#	"bswitch69-main",\
+#	"bswitch70-build",\
+#	"bswitch70-main",\
+#	"bswitch71-build",\
+#	"bswitch71-main",\
+#	"bswitch72-build",\
+#	"bswitch72-main",\
+#	"bswitch73-build",\
+#	"bswitch73-main",\
+#	"bswitch74-build",\
+#	"bswitch74-main",\
+#	"bswitch75-build",\
+#	"bswitch75-main"]
+#
 ###Create TFTP Path###
 if not path.exists(basedir):
 	Popen(["mkdir", basedir])
@@ -242,5 +257,6 @@ get_config(sftos,sftos_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 ##Others##
 get_config(ent,ent_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 get_config(dell,dell_cmd,util_pass,netdev_en_pass,tftpIP)
+get_config(dellv2,dellv2_cmd,util_pass,netdev_en_pass,tftpIP)
 
 Popen(["umount", "%s" % smb_mount])
