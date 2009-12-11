@@ -2,7 +2,7 @@
 ###Import Block###
 from getpass import getpass,getuser
 from time import sleep
-from os import path
+from os import path,makedirs
 from sys import exit
 from datetime import datetime
 from subprocess import *
@@ -19,10 +19,11 @@ def get_config(list,cmd,user_pass,en_pass,ip):
 			p.wait()
 
 			if path.exists("%s/%s" % (basedir,item)):
-				p=Popen(["mv", "%s/%s" % (basedir,item), "%s" % smb_rdir])
-				p.wait()
+				Popen(["cp", "%s/%s" % (basedir,item), "%s" % smb_rdir]).wait()
+				Popen(["rm","-f", "%s/%s" % (basedir,item)]).wait()
 				if path.exists("%s/%s" % (smb_rdir,item)):
 					logging.info("%s remote transfer complete\n" % item)
+					print("%s remote transfer complete\n" % item)
 				else:
 					logging.error("%s remote transfer failed\n" % item)
 			else:
@@ -59,13 +60,13 @@ tftpdir= "/tftpboot/"
 basedir = tftpdir + date
 
 ###Configure Samba###
-#smb_user = getuser()
-smb_user = "ali"  ##User hard-coded for non-NIS environment.  Useless without password anyway.
+smb_user = getuser()
+#smb_user = "ali"  ##User hard-coded for non-NIS environment.  Useless without password anyway.
 smb_dom = "charles"
 smb_password = getpass("Please enter your Active Directory password:")
 smb_share = "//oxygen/systems/" #share
 smb_mount = "/mnt/oxygen" #mount point
-smb_rdir = smb_mount + "/ResComp/%s" % date # location to place files
+smb_rdir = smb_mount + "/Networking/Switch, Router, & Firewall Configs/%s" % date
 
 ###Mount Share###
 Popen(["sudo","mount", "-t", "cifs", "-o", "username=%s,domain=%s,password=%s" % (smb_user,smb_dom,smb_password), "%s" % smb_share, "%s" % smb_mount])
@@ -120,7 +121,7 @@ if not path.exists(basedir):
 
 ###Create Remote Path###
 if not path.exists(smb_rdir):
-	Popen(["mkdir", smb_rdir])
+	makedirs(smb_rdir)
 
 ###Configure Logging###
 LOG = "%s/runlog.txt" % smb_rdir
