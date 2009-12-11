@@ -1,0 +1,9 @@
+#c applications
+#d use  Molecular Operating Environment version 2009.10
+#FIXME 
+# Description?
+# Hidden versioned dotkit?
+# Install in Linux/x86_64/pkgs
+
+dk_alter PATH /broad/tools/apps/MOE/MOE-2009.10/bin
+dk_setenv MOE /broad/tools/apps/MOE/MOE-2009.10
