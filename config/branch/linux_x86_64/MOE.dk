@@ -1,4 +1,4 @@
 #c languages
-#d use latest MOE (currently 2008.10
+#d use latest MOE (currently 2009.10)
 
-dk_op -q MOE-2008.10
+dk_op -q MOE-2009.10
