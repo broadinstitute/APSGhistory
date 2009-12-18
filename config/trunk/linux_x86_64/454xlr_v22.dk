@@ -1,5 +1,5 @@
 #c applications
-#d set up environment for 454 xlr v2.0.00.20 processing
+#d set up environment for 454 xlr v2.0.00.22 processing
 #FIXME
 # Questions:
 #   Can/should this be supported for exporting in the /broad/tools directory structure?
