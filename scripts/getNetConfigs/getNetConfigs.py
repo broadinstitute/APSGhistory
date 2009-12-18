@@ -35,14 +35,15 @@ def get_config(list,cmd,user_pass,en_pass,ip):
 
 def getDevices(model):
 	FILE = "%s" % smb_mount + "/Networking/Switch, Router, & Firewall Configs/devicelist.txt"
+#	FILE = "%s" % exp_path + "devicelist.txt"
         infile = open("%s" % FILE)
         result = []
         for line in infile:
                 if string.find(line,'#') == -1:
                         fields = line.split(':')
                         if len(fields) >= 2:
-                                name = fields[0].rstrip("\n")
-                                type = fields[1].rstrip("\n")
+                                name = fields[0].rstrip("\r\n")
+                                type = fields[1].rstrip("\r\n")
 
                                 if type.lower() == model:
                                         result.append(name)
