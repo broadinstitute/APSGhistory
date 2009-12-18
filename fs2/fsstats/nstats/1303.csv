@@ -1,0 +1,494 @@
+skipped special files,0
+skipped duplicate hardlinks,0
+skipped snapshot dirs,1
+total capacity used,10.86 TB
+total user data,8.57 TB
+percent overhead,0.211169
+
+histogram,file size
+count,4351520,items
+average,2114.144647,KB
+min,0,KB
+max,458299,KB
+bucket min,bucket max,count,val count
+0,2,7,0.000000
+128,256,1,141.375000
+512,1024,3,2552.000000
+1024,2048,4220181,8289579779.716797
+4096,8192,131327,909701942.857422
+262144,524288,1,458299.948242
+
+histogram,capacity used
+count,4351520,items
+average,2679.934677,KB
+min,1,KB
+max,535137,KB
+bucket min,bucket max,count,val count
+0,2,7,10.500000
+512,1024,2,1515.500000
+1024,2048,2,2347.000000
+2048,4096,4220181,10570636655.500000
+4096,8192,27072,174385664.000000
+8192,16384,104255,916228017.000000
+524288,1048576,1,535137.500000
+
+histogram,directory size (entries)
+count,7324,items
+average,595.145276,ents
+min,0,ents
+max,644,ents
+bucket min,bucket max,count,val count
+0,1,12,6
+4,7,1,7
+64,127,86,7314
+512,1023,7225,4351517
+
+histogram,directory size
+count,7324,items
+average,17.426139,KB
+min,0,KB
+max,18,KB
+bucket min,bucket max,count,val count
+0,2,99,143.195312
+16,32,7225,127485.849609
+
+histogram,filename length
+count,4358845,items
+average,11.983219,chars
+min,2,chars
+max,46,chars
+bucket min,bucket max,count,val count
+0,7,7323,14698
+8,15,4351520,52218233
+16,23,1,16
+40,47,1,46
+
+histogram,mtime (files)
+count,4351520,items
+average,415.079632,days
+min,0,days
+max,634,days
+bucket min,bucket max,count,val count
+0,2,6528,7616.984931
+2,4,2382,8145.484595
+4,8,6066,36392.929861
+8,16,10656,128886.255868
+16,32,21889,534946.707674
+32,64,31104,1441417.792755
+64,128,72768,7441674.690405
+128,256,253285,47633064.716876
+256,512,3650168,1570893532.641214
+512,1024,296674,178101641.611519
+
+histogram,mtime (KB)
+count,9199742715,items
+average,390.202376,days
+min,0,days
+max,634,days
+bucket min,bucket max,count,val count
+0,2,37840967,42343837.594218
+2,4,17261763,59046165.391995
+4,8,34525589,207390061.249149
+8,16,67464083,822548882.053652
+16,32,156561885,3823015102.633007
+32,64,224881623,10427560449.830406
+64,128,357797036,34334205345.339470
+128,256,544358987,102400733901.994553
+256,512,7176109060,3087688050658.384766
+512,1024,582941717,349956575242.228394
+
+histogram,ctime (files)
+count,4351520,items
+average,241.926576,days
+min,0,days
+max,257,days
+bucket min,bucket max,count,val count
+0,2,6528,7616.976481
+2,4,2382,8145.479838
+4,8,6066,36392.913275
+8,16,10656,128886.227535
+16,32,21889,534946.598808
+32,64,31104,1441417.684225
+64,128,72768,7441674.467280
+128,256,3282209,807754596.798429
+256,512,917918,235394658.611349
+
+histogram,ctime (KB)
+count,9199742715,items
+average,229.265353,days
+min,0,days
+max,257,days
+bucket min,bucket max,count,val count
+0,2,37840967,42343787.939678
+2,4,17261763,59046130.890483
+4,8,34525589,207389957.728974
+8,16,67464083,822548694.833558
+16,32,156561885,3823014322.300007
+32,64,224881623,10427559665.129215
+64,128,357797036,34334204137.117195
+128,256,6499792465,1596939143428.812744
+256,512,1803617299,462527008489.919495
+
+histogram,atime (files)
+count,4351520,items
+average,415.079632,days
+min,0,days
+max,634,days
+bucket min,bucket max,count,val count
+0,2,6528,7616.984931
+2,4,2382,8145.484595
+4,8,6066,36392.929861
+8,16,10656,128886.255868
+16,32,21889,534946.707674
+32,64,31104,1441417.792755
+64,128,72768,7441674.690405
+128,256,253285,47633064.716887
+256,512,3650168,1570893532.641294
+512,1024,296674,178101641.611519
+
+histogram,atime (KB)
+count,9199742715,items
+average,390.202376,days
+min,0,days
+max,634,days
+bucket min,bucket max,count,val count
+0,2,37840967,42343837.594218
+2,4,17261763,59046165.391995
+4,8,34525589,207390061.249149
+8,16,67464083,822548882.053652
+16,32,156561885,3823015102.633007
+32,64,224881623,10427560449.830406
+64,128,357797036,34334205345.339470
+128,256,544358987,102400733902.017303
+256,512,7176109060,3087688050658.541992
+512,1024,582941717,349956575242.228394
+
+-------------------------------------------------------
+stats for user 0
+histogram,file size
+count,1,items
+average,458299.948242,KB
+min,458299,KB
+max,458299,KB
+bucket min,bucket max,count,val count
+262144,524288,1,458299.948242
+
+histogram,capacity used
+count,1,items
+average,535137.500000,KB
+min,535137,KB
+max,535137,KB
+bucket min,bucket max,count,val count
+524288,1048576,1,535137.500000
+
+histogram,directory size (entries)
+count,0,items
+average,0.000000,ents
+min,0,ents
+max,0,ents
+bucket min,bucket max,count,val count
+
+histogram,directory size
+count,0,items
+average,0.000000,KB
+min,0,KB
+max,0,KB
+bucket min,bucket max,count,val count
+
+histogram,filename length
+count,2,items
+average,7.500000,chars
+min,6,chars
+max,9,chars
+bucket min,bucket max,count,val count
+0,7,1,6
+8,15,1,9
+
+histogram,mtime (files)
+count,1,items
+average,218.985347,days
+min,218,days
+max,218,days
+bucket min,bucket max,count,val count
+128,256,1,218.985347
+
+histogram,mtime (KB)
+count,458299,items
+average,218.985347,days
+min,218,days
+max,218,days
+bucket min,bucket max,count,val count
+128,256,458299,100360973.297742
+
+histogram,ctime (files)
+count,1,items
+average,218.985347,days
+min,218,days
+max,218,days
+bucket min,bucket max,count,val count
+128,256,1,218.985347
+
+histogram,ctime (KB)
+count,458299,items
+average,218.985347,days
+min,218,days
+max,218,days
+bucket min,bucket max,count,val count
+128,256,458299,100360973.297742
+
+histogram,atime (files)
+count,1,items
+average,218.985347,days
+min,218,days
+max,218,days
+bucket min,bucket max,count,val count
+128,256,1,218.985347
+
+histogram,atime (KB)
+count,458299,items
+average,218.985347,days
+min,218,days
+max,218,days
+bucket min,bucket max,count,val count
+128,256,458299,100360973.297742
+
+-------------------------------------------------------
+stats for user 212
+histogram,file size
+count,4351519,items
+average,2114.039814,KB
+min,0,KB
+max,7760,KB
+bucket min,bucket max,count,val count
+0,2,7,0.000000
+128,256,1,141.375000
+512,1024,3,2552.000000
+1024,2048,4220181,8289579779.716797
+4096,8192,131327,909701942.857422
+
+histogram,capacity used
+count,4351519,items
+average,2679.812316,KB
+min,1,KB
+max,9634,KB
+bucket min,bucket max,count,val count
+0,2,7,10.500000
+512,1024,2,1515.500000
+1024,2048,2,2347.000000
+2048,4096,4220181,10570636655.500000
+4096,8192,27072,174385664.000000
+8192,16384,104255,916228017.000000
+
+histogram,directory size (entries)
+count,7311,items
+average,596.201751,ents
+min,85,ents
+max,644,ents
+bucket min,bucket max,count,val count
+64,127,86,7314
+512,1023,7225,4351517
+
+histogram,directory size
+count,7311,items
+average,17.457084,KB
+min,1,KB
+max,18,KB
+bucket min,bucket max,count,val count
+0,2,86,142.890625
+16,32,7225,127485.849609
+
+histogram,filename length
+count,4358830,items
+average,11.983238,chars
+min,2,chars
+max,46,chars
+bucket min,bucket max,count,val count
+0,7,7310,14620
+8,15,4351518,52218216
+16,23,1,16
+40,47,1,46
+
+histogram,mtime (files)
+count,4351519,items
+average,415.079677,days
+min,0,days
+max,634,days
+bucket min,bucket max,count,val count
+0,2,6528,7616.984931
+2,4,2382,8145.484595
+4,8,6066,36392.929861
+8,16,10656,128886.255868
+16,32,21889,534946.707674
+32,64,31104,1441417.792755
+64,128,72768,7441674.690405
+128,256,253284,47632845.731528
+256,512,3650168,1570893532.641214
+512,1024,296674,178101641.611519
+
+histogram,mtime (KB)
+count,9199284415,items
+average,390.210906,days
+min,0,days
+max,634,days
+bucket min,bucket max,count,val count
+0,2,37840967,42343837.594218
+2,4,17261763,59046165.391995
+4,8,34525589,207390061.249149
+8,16,67464083,822548882.053652
+16,32,156561885,3823015102.633007
+32,64,224881623,10427560449.830406
+64,128,357797036,34334205345.339470
+128,256,543900687,102300372928.696808
+256,512,7176109060,3087688050658.384766
+512,1024,582941717,349956575242.228394
+
+histogram,ctime (files)
+count,4351519,items
+average,241.926582,days
+min,0,days
+max,257,days
+bucket min,bucket max,count,val count
+0,2,6528,7616.976481
+2,4,2382,8145.479838
+4,8,6066,36392.913275
+8,16,10656,128886.227535
+16,32,21889,534946.598808
+32,64,31104,1441417.684225
+64,128,72768,7441674.467280
+128,256,3282208,807754377.813082
+256,512,917918,235394658.611349
+
+histogram,ctime (KB)
+count,9199284415,items
+average,229.265865,days
+min,0,days
+max,257,days
+bucket min,bucket max,count,val count
+0,2,37840967,42343787.939678
+2,4,17261763,59046130.890483
+4,8,34525589,207389957.728974
+8,16,67464083,822548694.833558
+16,32,156561885,3823014322.300007
+32,64,224881623,10427559665.129215
+64,128,357797036,34334204137.117195
+128,256,6499334165,1596838782455.512451
+256,512,1803617299,462527008489.919495
+
+histogram,atime (files)
+count,4351519,items
+average,415.079677,days
+min,0,days
+max,634,days
+bucket min,bucket max,count,val count
+0,2,6528,7616.984931
+2,4,2382,8145.484595
+4,8,6066,36392.929861
+8,16,10656,128886.255868
+16,32,21889,534946.707674
+32,64,31104,1441417.792755
+64,128,72768,7441674.690405
+128,256,253284,47632845.731540
+256,512,3650168,1570893532.641294
+512,1024,296674,178101641.611519
+
+histogram,atime (KB)
+count,9199284415,items
+average,390.210906,days
+min,0,days
+max,634,days
+bucket min,bucket max,count,val count
+0,2,37840967,42343837.594218
+2,4,17261763,59046165.391995
+4,8,34525589,207390061.249149
+8,16,67464083,822548882.053652
+16,32,156561885,3823015102.633007
+32,64,224881623,10427560449.830406
+64,128,357797036,34334205345.339470
+128,256,543900687,102300372928.719543
+256,512,7176109060,3087688050658.541992
+512,1024,582941717,349956575242.228394
+
+-------------------------------------------------------
+stats for user 213
+histogram,file size
+count,0,items
+average,0.000000,KB
+min,0,KB
+max,0,KB
+bucket min,bucket max,count,val count
+
+histogram,capacity used
+count,0,items
+average,0.000000,KB
+min,0,KB
+max,0,KB
+bucket min,bucket max,count,val count
+
+histogram,directory size (entries)
+count,13,items
+average,1.000000,ents
+min,0,ents
+max,7,ents
+bucket min,bucket max,count,val count
+0,1,12,6
+4,7,1,7
+
+histogram,directory size
+count,13,items
+average,0.023438,KB
+min,0,KB
+max,0,KB
+bucket min,bucket max,count,val count
+0,2,13,0.304688
+
+histogram,filename length
+count,13,items
+average,6.153846,chars
+min,6,chars
+max,8,chars
+bucket min,bucket max,count,val count
+0,7,12,72
+8,15,1,8
+
+histogram,mtime (files)
+count,0,items
+average,0.000000,days
+min,0,days
+max,0,days
+bucket min,bucket max,count,val count
+
+histogram,mtime (KB)
+count,0,items
+average,0.000000,days
+min,0,days
+max,0,days
+bucket min,bucket max,count,val count
+
+histogram,ctime (files)
+count,0,items
+average,0.000000,days
+min,0,days
+max,0,days
+bucket min,bucket max,count,val count
+
+histogram,ctime (KB)
+count,0,items
+average,0.000000,days
+min,0,days
+max,0,days
+bucket min,bucket max,count,val count
+
+histogram,atime (files)
+count,0,items
+average,0.000000,days
+min,0,days
+max,0,days
+bucket min,bucket max,count,val count
+
+histogram,atime (KB)
+count,0,items
+average,0.000000,days
+min,0,days
+max,0,days
+bucket min,bucket max,count,val count
+

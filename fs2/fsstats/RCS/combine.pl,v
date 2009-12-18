@@ -1,0 +1,449 @@
+head	1.5;
+access;
+symbols;
+locks
+	matter:1.5; strict;
+comment	@# @;
+
+
+1.5
+date	2009.11.26.18.18.26;	author matter;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2009.08.14.12.24.13;	author matter;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2009.07.05.11.52.47;	author matter;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2009.07.02.12.07.27;	author matter;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.06.30.15.07.59;	author matter;	state Exp;
+branches;
+next	;
+
+
+desc
+@Roll up subdirectory stats into top-level directory or filesystem stats.
+@
+
+
+1.5
+log
+@Added full roll-up.
+@
+text
+@#!/util/bin/perl -w
+
+use DBI;
+use DBD::mysql;
+use Getopt::Std;
+
+use vars qw ($opt_f $opt_d $opt_v);
+
+my $DRYRUN = 0;
+
+##
+## Process command-line options
+##
+getopts('f:d:v');
+unless (defined $opt_f) {
+  warn "usage: $0: -f fsid <-d dirid>";
+  exit 1;
+}
+my $DEBUG = defined $opt_v ? 1 : 0;
+
+##
+## Initiate DB connection
+##
+my $dsn = "DBI:mysql:database=matter;host=mysql;port=3306";
+my $dbh = DBI->connect($dsn, "matter", "tyhjcZ30Y");
+
+my ($sql, $sth, $nr);
+my $cmd;
+##
+## See if we have rollup to do
+##
+unless (defined $opt_d or $opt_f == 0) {
+  $sql = qq{SELECT DISTINCT(parent) FROM subdir WHERE fsid=$opt_f AND parent IS NOT NULL};
+  $sth = $dbh->prepare($sql);
+  $nr  = $sth->execute();
+  if (defined $nr and $nr > 0) {
+    print STDERR "found $nr subdirectories to roll up\n" if $DEBUG;
+    ##
+    ## submit them
+    ##
+    while (my @@row = $sth->fetchrow_array()) {
+      my $dirid = $row[0];
+      $cmd = "$0 -f $opt_f -d $dirid";
+      $cmd .= " -v" if $DEBUG;
+      print STDERR "$cmd\n" if $DEBUG;
+      print `$cmd` unless $DRYRUN;
+    }
+  } else {
+    print STDERR "found $nr subdirectories to roll up\n" if $DEBUG;
+  }
+}
+
+my ($del, $dlh);
+my ($ins, $ish);
+my ($upd, $ush);
+
+##
+## Verify that there is data to work with. There should always be at
+## least '.' (dirid 0). Is this necessary/useful?
+##
+my $dclause = defined $opt_d ? "d.parent=$opt_d" : "d.parent IS NULL";
+if ($opt_f > 0) {
+$sql = <<SQL;
+SELECT MAX(checked) 
+  FROM fsstat f 
+  INNER JOIN subdir d ON f.fsid=d.fsid AND f.dirid=d.dirid
+    WHERE f.fsid=$opt_f 
+    AND f.latest=1 
+    AND f.type=2 
+    AND f.uid IS NULL  
+    AND $dclause
+SQL
+} else {
+$sql = <<SQL;
+SELECT MAX(checked) 
+  FROM fsstat f 
+    WHERE f.dirid IS NULL
+    AND f.latest=1 
+    AND f.type=2 
+    AND f.uid IS NULL  
+SQL
+}
+print STDERR "$sql\n" if $DEBUG;
+$sth = $dbh->prepare($sql);
+$nr = $sth->execute();
+unless ($nr > 0) {
+  warn "unable to query DB.\n";
+  exit 1;
+}
+my $t = ($sth->fetchrow_array())[0];
+unless (defined $t) {
+  warn "found no data to combine.\n";
+  exit 1;
+}
+##
+## Off we go
+##
+if ($opt_f == 0) {		# Global rollup
+  $sql = "SELECT s.uid, s.type, s.histogram FROM fsstat s INNER JOIN filesystem f ON s.fsid=f.id WHERE f.parent IS NULL AND f.deprecated IS FALSE AND s.latest IS TRUE AND s.dirid IS NULL AND s.fsid>0";
+} elsif (defined($opt_d)) {	# Directory rollup
+  $sql = "SELECT s.uid, s.type, s.histogram FROM fsstat s INNER JOIN subdir d ON s.dirid=d.dirid AND s.fsid=d.fsid WHERE s.fsid=$opt_f AND d.parent=$opt_d AND d.deprecated IS FALSE AND s.latest IS TRUE";
+}  else {			# Filesystem rollup
+  $sql = "SELECT s.uid, s.type, s.histogram,d.parent FROM fsstat s INNER JOIN subdir d ON s.dirid=d.dirid AND s.fsid=d.fsid WHERE s.fsid=$opt_f AND d.parent IS NULL AND d.deprecated IS FALSE AND s.latest IS TRUE";
+}
+
+print STDERR "$sql\n" if $DEBUG;
+
+$sth = $dbh->prepare($sql);
+$nr  = $sth->execute();
+unless (defined ($nr) and $nr > 0) {
+  warn "no data returned ($sql)";
+  exit 1;
+}
+my %cdata = ();
+my %csum  = ();
+my %cmax  = ();
+my %vdata = ();
+my %vsum  = ();
+my %vmax  = ();
+while (my $row = $sth->fetchrow_hashref()) {
+  my $uid  = defined $row->{'uid'} ? $row->{'uid'} : 'all';
+  my $type = $row->{'type'};
+  my @@l = split /:/, $row->{'histogram'};
+  for my $line (@@l) {
+    my ($bot, $top, $cnt, $valcnt);
+    ($bot, $top, $cnt, $valcnt) = split /,/, $line;
+    ##
+    ## Count data
+    ##
+    $cdata{$uid}{$type}{$bot} += $cnt;
+    $csum{$uid}{$type}        += $cnt;
+    unless (defined $cmax{$uid}{$type}) {
+      $cmax{$uid}{$type} = 0;
+    }
+    $cmax{$uid}{$type} = $cnt > $cmax{$uid}{$type} ? $cnt : $cmax{$uid}{$type};
+    ##
+    ## Value data
+    ##
+    $vdata{$uid}{$type}{$bot} += $valcnt;
+    $vsum{$uid}{$type}        += $valcnt;
+    unless (defined $vmax{$uid}{$type}) {
+      $vmax{$uid}{$type} = 0;
+    }
+    $vmax{$uid}{$type} = $valcnt > $vmax{$uid}{$type} 
+                       ? $valcnt : $vmax{$uid}{$type};
+  }
+}
+
+##
+## First, rollup for all users
+##
+for my $type (keys %{$csum{'all'}}) {
+  my $hist = "";
+  for my $k (sort {$a<=>$b} keys %{$cdata{'all'}{$type}}) {
+    my $top = $k > 0 ? $k * 2 : 2;
+    my $line =  sprintf  "%d,%d,%d,%.0f", 
+                $k, $top, $cdata{'all'}{$type}{$k}, $vdata{'all'}{$type}{$k};
+    if (length($hist)) {
+      $hist .= ":$line";
+    } else {
+      $hist = "$line";
+    }
+  }
+  if (defined $opt_d) {
+    ##
+    ## Mark previous entries as "old"
+    ##
+    $sql = "UPDATE fsstat SET latest=0 WHERE fsid=$opt_f AND dirid=$opt_d  AND uid IS NULL AND type=$type AND checked < $t";
+    printf STDERR "$sql\n" if $DEBUG;
+    $dbh->do($sql) unless $DRYRUN;
+    ##
+    ##  Delete old rollups, if any
+    ##
+    $sql = "DELETE FROM fsstat WHERE fsid=$opt_f AND dirid=$opt_d AND uid IS NULL AND type=$type AND checked = $t";
+    printf STDERR "$sql\n" if $DEBUG;
+    $dbh->do($sql) unless $DRYRUN;
+    ##
+    ## Insert new data
+    ##
+    $sql = "INSERT INTO fsstat (fsid,dirid,checked,latest,type,sumcnt,sumval,maxcnt,maxval,histogram) VALUES ($opt_f, $opt_d, $t, 1, $type, $csum{'all'}{$type}, $vsum{'all'}{$type}, $cmax{'all'}{$type}, $vmax{'all'}{$type}, '$hist')";
+    printf STDERR "$sql\n" if $DEBUG;
+    $dbh->do($sql) unless $DRYRUN;
+  } else {
+    ##
+    ## Mark previous entries as "old"
+    ##
+    $sql = "UPDATE fsstat SET latest=0 WHERE fsid=$opt_f AND dirid IS NULL  AND uid IS NULL AND type=$type AND checked < $t";
+    printf STDERR "$sql\n" if $DEBUG;
+    $dbh->do($sql) unless $DRYRUN;
+    ##
+    ##  Delete old rollups, if any
+    ##
+    $sql = "DELETE FROM fsstat WHERE fsid=$opt_f AND dirid IS NULL AND uid IS NULL AND type=$type AND checked = $t";
+    printf STDERR "$sql\n" if $DEBUG;
+    $dbh->do($sql) unless $DRYRUN;
+    ##
+    ## Insert new data
+    ##
+    $sql = "INSERT INTO fsstat (fsid,checked,latest,type,sumcnt,sumval,maxcnt,maxval,histogram) VALUES ($opt_f, $t, 1, $type, $csum{'all'}{$type}, $vsum{'all'}{$type}, $cmax{'all'}{$type}, $vmax{'all'}{$type}, '$hist')";
+    printf STDERR "$sql\n" if $DEBUG;
+    $dbh->do($sql) unless $DRYRUN;
+  }
+}
+##
+## Now do per-user stats
+##
+for my $uid (keys %csum) {
+  next if $uid eq 'all';
+  for my $type (keys %{$csum{$uid}}) {
+    my $hist = "";
+      for my $k (sort {$a<=>$b} keys %{$cdata{$uid}{$type}}) {
+      my $top = $k > 0 ? $k * 2 : 2;
+      my $line =  sprintf  "%d,%d,%d,%.0f", 
+                  $k, $top, $cdata{$uid}{$type}{$k}, $vdata{$uid}{$type}{$k};
+      if (length($hist)) {
+        $hist .= ":$line";
+      } else {
+        $hist = "$line";
+      }
+    }
+    if (defined $opt_d) {
+      ##
+      ## Mark previous entries as "old"
+      ##
+      $sql = "UPDATE fsstat SET latest=0 WHERE fsid=$opt_f AND dirid=$opt_d  AND uid=$uid AND type=$type AND checked < $t";
+      printf STDERR "$sql\n" if $DEBUG;
+      $dbh->do($sql) unless $DRYRUN;
+      ##
+      ## Just in case, to avoid duplicate entires
+      ##
+      $sql = "DELETE FROM fsstat WHERE fsid=$opt_f AND dirid=$opt_d AND uid=$uid AND type=$type AND checked = $t";
+      printf STDERR "$sql\n" if $DEBUG;
+      $dbh->do($sql) unless $DRYRUN;
+      ##
+      ## And finally
+      ##
+      $sql = "INSERT INTO fsstat (fsid,dirid,checked,latest,uid,type,sumcnt,sumval,maxcnt,maxval,histogram) VALUES ($opt_f, $opt_d, $t, 1, $uid, $type, $csum{$uid}{$type}, $vsum{$uid}{$type}, $cmax{$uid}{$type}, $vmax{$uid}{$type}, '$hist')";
+      printf STDERR "$sql\n" if $DEBUG;
+      $dbh->do($sql) unless $DRYRUN;
+    } else {
+      ##
+      ## Mark previous entries as "old"
+      ##
+      $sql = "UPDATE fsstat SET latest=0 WHERE fsid=$opt_f AND dirid IS NULL AND uid=$uid AND type=$type AND checked < $t";
+      printf STDERR "$sql\n" if $DEBUG;
+      $dbh->do($sql) unless $DRYRUN;
+      ##
+      ## Just in case, to avoid duplicate entires
+      ##
+      $sql = "DELETE FROM fsstat WHERE fsid=$opt_f AND dirid IS NULL AND uid=$uid AND type=$type AND checked = $t";
+      printf STDERR "$sql\n" if $DEBUG;
+      $dbh->do($sql) unless $DRYRUN;
+      ##
+      ## And finally
+      ##
+      $sql = "INSERT INTO fsstat (fsid,checked,latest,uid,type,sumcnt,sumval,maxcnt,maxval,histogram) VALUES ($opt_f, $t, 1, $uid, $type, $csum{$uid}{$type}, $vsum{$uid}{$type}, $cmax{$uid}{$type}, $vmax{$uid}{$type}, '$hist')";
+      printf STDERR "$sql\n" if $DEBUG;
+      $dbh->do($sql) unless $DRYRUN;
+    }
+  }
+}
+@
+
+
+1.4
+log
+@Prior to fixing global rollup.
+@
+text
+@d9 1
+a9 1
+my $DRYRUN = 1;
+d25 1
+a25 1
+my $dbh = DBI->connect($dsn, "matter", "spamLet1");
+d62 1
+d73 10
+@
+
+
+1.3
+log
+@Before subdir rewrite.
+@
+text
+@d9 1
+a9 1
+my $DRYRUN = 0;
+d28 25
+d59 1
+a59 1
+## least '.' (dirid 0).
+a83 14
+my $parent;
+if (defined $opt_d) {
+  ##
+  ## Determine if we are rolling up to parent directory or top-level
+  ##
+  $sql = "SELECT count(*) FROM subdir WHERE fsid=$opt_f and parent=$opt_d";
+  $sth = $dbh->prepare($sql);
+  $nr  = $sth->execute();
+  unless ($nr > 0) {
+    warn "found no subdirectory data to combine.\n";
+    exit 1;
+  }
+##?  $parent = ($sth->fetchrow_array())[0];
+}
+d85 1
+a85 1
+## If subdirectory, then roll up?
+a88 2
+  $del = "DELETE FROM fsstat WHERE fsid=0 AND checked=?";
+  $ins = "INSERT INTO fsstat(fsid,checked,latest,uid,type,sumcnt,sumval,maxcnt,maxval,histogram) VALUES (0,?,1,?,?,?,?,?,?,?)";
+d90 1
+a90 3
+  $sql = "SELECT s.uid, s.type, s.histogram FROM fsstat s INNER JOIN subdir d ON s.dirid=d.dirid AND s.fsid=d.fsid WHERE s.fsid=$opt_f AND d.parent=$opt_d AND d.deprecated IS FALSE AND s.latest IS TRUE and s.uid IS NOT NULL";
+  $del = "DELETE FROM fsstat WHERE fsid=$opt_f AND dirid=$opt_d AND checked=? AND uid=? AND type=?";
+  $ins = "INSERT INTO fsstat(fsid,dirid,checked,latest,uid,type,sumcnt,sumval,maxcnt,maxval,histogram) VALUES ($opt_f,$opt_d,?,1,?,?,?,?,?,?,?)";
+d92 1
+a92 1
+  $sql = "SELECT s.uid, s.type, s.histogram FROM fsstat s INNER JOIN subdir d ON s.dirid=d.dirid AND s.fsid=d.fsid WHERE s.fsid=$opt_f AND d.deprecated IS FALSE AND s.latest IS TRUE";
+d154 15
+a168 1
+    die "opt_d not yet implemented";
+d170 2
+d173 9
+d185 3
+d211 18
+a228 2
+      die "opt_d not yet implemented";
+      $sql = "INSERT INTO fsstat (fsid,dirid,checked,latest,type,sumcnt,sumval,maxcnt,maxval,histogram) VALUES ($opt_f, $opt_d, $t, 1, $type, $csum{'all'}{$type}, $vsum{'all'}{$type}, $cmax{'all'}{$type}, $vmax{'all'}{$type}, '$hist')";
+d245 1
+a245 1
+      $sql = "INSERT INTO fsstat (fsid,checked,latest,uid,type,sumcnt,sumval,maxcnt,maxval,histogram) VALUES ($opt_f, $t, 1, $uid, $type, $csum{'all'}{$type}, $vsum{'all'}{$type}, $cmax{'all'}{$type}, $vmax{'all'}{$type}, '$hist')";
+@
+
+
+1.2
+log
+@Working for fs-only case.
+@
+text
+@d7 1
+a7 1
+use vars qw ($opt_f $opt_d);
+a8 1
+my $DEBUG  = 1;
+d14 1
+a14 1
+getopt('fd');
+d19 1
+d33 2
+a34 1
+## Verify that there is data to work with
+d71 1
+a71 1
+  $parent = ($sth->fetchrow_array())[0];
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d9 2
+a10 1
+my $DEBUG=1;
+d72 3
+d84 1
+a84 1
+  $sql = "SELECT s.uid, s.type, s.histogram FROM fsstat s INNER JOIN subdir d ON s.dirid=d.dirid AND s.fsid=d.fsid WHERE s.fsid=$opt_f AND d.deprecated IS FALSE AND s.latest IS TRUE AND s.uid IS NOT NULL";
+d87 2
+d102 1
+a102 1
+  my $uid  = $row->{'uid'};
+d108 3
+d117 3
+a119 7
+    $cdata{'all'}{$type}{$bot} += $cnt;
+    $csum{'all'}{$type}        += $cnt;
+    unless (defined $cmax{'all'}{$type}) {
+      $cmax{'all'}{$type} = 0;
+    }
+    $cmax{'all'}{$type} = $cnt > $cmax{'all'}{$type} 
+                        ? $cnt : $cmax{'all'}{$type};
+d121 1
+a121 1
+    $vsum{$uid}{$type}       += $valcnt;
+a126 7
+    $vdata{'all'}{$type}{$bot} += $valcnt;
+    $vsum{'all'}{$type}        += $valcnt;
+    unless (defined $vmax{'all'}{$type}) {
+      $vmax{'all'}{$type} = 0;
+    }
+    $vmax{'all'}{$type} = $valcnt > $vmax{'all'}{$type} 
+                        ? $valcnt : $vmax{'all'}{$type};
+d130 3
+d137 2
+a138 1
+    my $line =  sprintf  "%d,%d,%d,%.1f", $k, $top, $cdata{'all'}{$type}{$k}, $vdata{'all'}{$type}{$k};
+d145 53
+a197 1
+print "Here: $hist\n";
+@

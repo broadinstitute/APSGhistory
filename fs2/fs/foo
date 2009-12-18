@@ -1,0 +1,190 @@
+
+               - 
+IT/Systems ----------
+       default - Collection of default environment setting for basic user setup
+applications ----------
+  GAPipeline-1.3.2 - GAPipeline 1.3.2
+  GAPipeline-1.3rc5 - GAPipeline 1.3rc5
+  ImageMagick-6.4.7-5 - ImageMagick ImageMagick® is a software suite to create, edit, and compose bitmap images.
+       eclipse - Eclipse IDE
+   mafft-6.620 - Multiple alignment program for amino acid or nucleotide sequences
+  mysql-5.1.30 - MySQL 5.1.30
+bio-tools ----------
+        C-Plex - C-Plex 1.1.1 
+           JRI - JRI v0.4 using R-2.6.1 and java 1.5
+     NCBIblast - NCBI blast tools v2.2.16 (default)
+         RECON - RECON v1.05  
+  RepeatMasker - RepeatMasker v3.2.5 and RepBase RELEASE 20080611 
+         adock - use autodock version 3.0 small molecule docking software
+           apt - Affymetrix Power Tools (version 1.10.0 is default)
+       arachne - Broad arachne software v1.13 (default)
+         brood - use brood bioisostere analysis software version 1.1.1
+      cdbfasta - cdbfasta v0.92 
+        consed - consed v15.0, phredphrap, crossmatch and utility scripts 
+      decypher - DeCypher command-line tools for Linux
+     eagleview - eagleview: http://www.joybz.com/research/eagleview/
+    eigentools - EIGENTOOLS-2.0 (pca, pcatoy, eigenstrat, convertf, smartpca, eigenstratQTL, twstats)
+        emboss - emboss suite v5.0 (default)
+           eon - use eon chemical similarity analysis software v2.0.1
+          fred - use fred docking search for ligand binding version 2.2.3
+       gnuplot - gnuplot v4.2.2  
+         hmmer - hmmer suite v2.3.2  
+       iprscan - iprscan v4.3.1; InterPro database v16.0
+         iscan - IScan-1.0.0
+         lagan - lagan toolkit http://lagan.stanford.edu/lagan_web/index.shtml
+         mauve - Mauve v2.1.1  
+     modeltest - Modeltest v3.7  
+        multiz - multiz-tba v022806  
+        muscle - MUSCLE v3.6 
+         omega - use omega conformer generation software version 2.2.1
+     openbabel - openbabel v2.1.1 
+          paml - PAML v4  
+          paup - PAUP v4b10  
+         plink - use plink latest version
+     polyphred - polyphred suite v6.02 (default)
+      polyscan - polyscan v3.0  
+       primer3 - Add primer3
+          rocs - use rocs chemical similarity software v2.3.1
+   schrodinger - Schrodinger chemistry tools
+       signalp - signalp v3.0
+      ssahaSNP - ssahaSNP toolset  
+        staden - staden v1.7.1b (default)
+         starp - Add star*P parallel compute engine for MATLAB and python
+         tmhmm - TMHMM v2.0c 
+          whap - whap v2.09
+deprecated  ----------
+          math - This was a collection point for math related libraries.
+                 Please use linear-algebra dotkit instead.
+devel-tools ----------
+           git - use default git
+       gqlplus - gqlplus v1.12  
+     groovy1.0 - groovy v 1.0 
+   groovy1.5.6 - groovy v 1.5.6 
+     groovy1.5 - groovy v 1.5.0 
+       insight - insight v6.6  
+  subversion-1.5 - Add Subversion 1.5 revision control software to path
+      valgrind - valgrind v3.2.3  
+          wine - 
+development-tools ----------
+  eclipse-3.4.1 - Ecliplse Classis SDK
+graphics ----------
+      graphviz - Graphviz graphics tools v2.16.1
+        netpbm - Netpbm graphics conversion tools (default: 10.33)
+groups ----------
+   build-tools - Current GCC and build tools
+    group-apsg - APSG Specific Dotkits
+languages ----------
+       GCC-4.3 - Python is a dynamic object-oriented programming language.
+                 http://www.python.org/
+                 Latest release in 2.6 series.
+      Java-1.6 - Sun JDK 1.6
+                 http://java.com/
+                 Latest release of 1.6.
+           MOE - use latest MOE (currently 2008.10
+      Perl-5.8 - Perl is a stable, cross platform programming language.
+                 http://www.perl.org/
+                 Latest release in 5.8 series.
+    Python-2.5 - Python is a dynamic object-oriented programming language.
+                 http://www.python.org/
+                 Latest release in 2.5 series.
+    Python-2.6 - Python is a dynamic object-oriented programming language.
+                 http://www.python.org/
+                 Latest release in 2.6 series.
+    Python-3.0 - Python is a dynamic object-oriented programming language.
+                 http://www.python.org/
+                 Latest release in 3.0 series.
+             R - use R v2.4 (default); set /broad/tools R_LIBS 
+      icc-10.0 - use version 10.0 of the Intel C Compiler
+    ifort-10.0 - use version 10.0 of the Intel FORTRAN Compiler
+          java - use python v2.4.2 (default); set /broad/tools PYTHONPATH
+      matlab75 - use version 7.5 of the MATLAB language
+      matlab76 - use version 7.6 of the MATLAB language
+      matlab77 - use version 7.7 of the MATLAB language
+        matlab - use latest version of the MATLAB language
+       openmpi - make the MPI-ified compilers/runtime available
+          perl - use perl v5; set /broad/tools PERL5LIB
+        python - use python v2.4.2 (default); set /broad/tools PYTHONPATH
+libraries ----------
+  boost-1.37.0 - BOOST http://www.boost.org/
+     db-4.7.25 - berkely DB libraries and tools
+  fftw3-3.1.3-single - http://www.fftw.org/index.html (SINGLE PRECISION version)
+  fftw3-3.1.3-x86_64-gcc-3.4.4 - http://www.fftw.org/index.html
+   fftw3-3.1.3 - http://www.fftw.org/index.html 
+         fftw3 - http://www.fftw.org/index.html 
+    gdbm-1.8.3 - gdbm is a GNU implementation of the standard Unix dbm library
+           gsl - Gnu Scientific Library
+                 The GNU Scientific Library (GSL) is a numerical library for C and C++ programmers.
+                 http://www.gnu.org/software/gsl/
+  oracle-instaclient-11.1 - Oracle InstaClient 11.1. Just enough oracle to make it work. 
+shell/dotkit ----------
+        dotkit - The Dotkit package - for man page access.  (Try "man dotkit".)
+testing ----------
+  linear-algebra-0.1 - I am a test dotkit, do not use me. You 
+                 have been warned.
+versioned-bio-tools ----------
+        454xlr - set up environment for 454 xlr processing
+   MOE-2008.10 - use  Molecular Operating Environment version 2008.10
+  NCBIblast-2.2.14 - Add NCBI blast v2.2.14 to path
+  NCBIblast-2.2.16 - Add NCBI blast v2.2.16 to path
+  NCBIblast-2.2.17 - Add NCBI blast v2.2.17 to path
+  NCBIblast-2.2.18+ - Add NCBI blast v2.2.18 to path
+  NCBIblast-2.2.18 - Add NCBI blast v2.2.18 to path
+  RepeatMasker-3.1.8 - RepeatMasker v3.1.8 and RepBase RELEASE 20070924 
+  RepeatMasker-3.1.9 - RepeatMasker v3.1.9 and RepBase RELEASE 20071204 
+  RepeatMasker-3.2.5 - RepeatMasker v3.2.5 and RepBase RELEASE 20080611 
+    apt-1.10.0 - Add Affymetrix Power Tools version 1.10.0 to the PATH
+  arachne-1.12 - Add arachne v1.12 to path
+  arachne-1.13 - Add arachne v1.13 to path
+  arachne-1.14 - Add arachne v1.14 to path
+   arachne-1.1 - Add arachne v1.1 to path
+   arachne-1.3 - Add arachne v1.3 to path
+   arachne-1.6 - Add arachne v1.6 to path
+   arachne-1.7 - Add arachne v1.7 to path
+   arachne-1.9 - Add arachne v1.9 to path
+  bioperl-1.5.2 - prepend path to bioPerl v1.5.2 to default /broad/tools PERL5LIB
+    devArachne - Add latest assembly analysis build of Arachne to path
+  eagleview-2.2 - eagleview: http://www.joybz.com/research/eagleview/
+       emboss4 - Add emboss v4 to path
+       emboss5 - Add emboss v5 to path
+     lagan-2.0 - lagan toolkit: http://lagan.stanford.edu/lagan_web/index.shtml
+    plink-1.00 - Add plink version 1.00 to path
+    plink-1.01 - Add plink version 1.01 to path
+    plink-1.02 - Add plink version 1.02 to path
+  plink-1.03-noweb - Add plink version 1.03, specially compiled not to check whether it's the most recent version, to path
+    plink-1.03 - Add plink version 1.03 to path
+    plink-1.04 - Add plink version 1.04 to path
+    plink-1.05 - Add plink version 1.05 to path
+  polyphred-6.02 - polyphred v6.02 to path
+  polyphred-6.11 - polyphred v6.11 to path
+  polyphred-6.13 - polyphred v6.13a1 debug version to path
+  solidbrowser - SOLiD Alignment Browser v1.0.0
+  staden-1.7.1b - Staden v1.7.1b
+          tamo - TAMO command-line setup
+versioned-graphics ----------
+  graphviz-2.16.1 - Graphviz graphics tools v2.16.1
+  netpbm-10.33 - Netpbm graphics conversion tools v10.33
+versioned-languages ----------
+         R-2.4 - Add R v2.4 to path and /broad/tools R_LIBS
+       R-2.5.1 - Add R v2.5.1 to path and /broad/tools R_LIBS
+       R-2.6.0 - Add R v2.6.0 to path and /broad/tools R_LIBS
+       R-2.6.1 - Add R v2.6.1 to path and /broad/tools R_LIBS 
+       R-2.7.2 - Add R v2.7.2 to path and /broad/tools R_LIBS 
+       R-2.8.1 - R v2.8.1  
+     autotools - Add autoconf, automake, libtool, and m4 to PATH
+     gcc-4.3.0 - Add gcc v4.3.0 to path and LD_LIBRARY_PATH
+     gcc-4.3.2 - Add gcc v4.3.0 to path and LD_LIBRARY_PATH
+     gcc-4.3.3 - Add gcc v4.3.3 to path and LD_LIBRARY_PATH
+                 *****  USE OF THIS DOTKIT DEPRECATED!! *****
+                 'use GCC-4.3' to get the latest version of gcc-4.3.x
+                 or 'use .gcc-4.3.3' to access the hidden minor version
+                 dotkit.
+    perl-5.8.9 - Perl 5.8.9
+  python-2.4-beta - Add python v2.4.2 to path and /broad/tools PYTHONPATH
+                 Add modules that we are beta-testing for Python 2.4 to PYTHONPATH
+  python-2.4.2 - Add python v2.4.2 to path and /broad/tools PYTHONPATH
+  python-2.5.1 - Add python v2.5.1 to path and /broad/tools PYTHONPATH
+  python-2.5.2 - Add python v2.5.2 to path and /broad/tools PYTHONPATH
+  python-2.5.3 - Python 2.5.3
+  python-2.6.1 - Python 2.6.1
+    python-3.0 - Python 3.0
+

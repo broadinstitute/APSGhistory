@@ -1,0 +1,624 @@
+head	1.5;
+access;
+symbols;
+locks
+	matter:1.5; strict;
+comment	@# @;
+
+
+1.5
+date	2009.11.24.14.26.45;	author matter;	state Exp;
+branches;
+next	1.4;
+
+1.4
+date	2009.09.14.20.48.42;	author matter;	state Exp;
+branches;
+next	1.3;
+
+1.3
+date	2009.07.20.12.09.04;	author matter;	state Exp;
+branches;
+next	1.2;
+
+1.2
+date	2009.07.02.12.06.47;	author matter;	state Exp;
+branches;
+next	1.1;
+
+1.1
+date	2009.06.29.14.07.59;	author matter;	state Exp;
+branches;
+next	;
+
+
+desc
+@Walk through directories submitting mystats jobs.
+@
+
+
+1.5
+log
+@Added force-update option.
+@
+text
+@#!/util/bin/perl -w
+
+use DBI;
+use DBD::mysql;
+use Getopt::Long;
+
+
+my $PRG = "/util/bin/perl /sysman/scratch/matter/sandbox/fsstats/mystats";
+my $TMP = "/broad/hptmp/matter";
+my $DRYRUN = 0;
+my $SLEEP = 0;
+my $MAX_SIZE = 1E9;
+
+##
+## Process command-line options
+##
+my ($opt_f,$opt_d,$opt_t,$opt_v,$opt_q);
+$opt_f = $opt_d = $opt_t = $opt_v = $opt_q = undef;
+my $force = '';
+GetOptions(
+           "f=s" => \$opt_f,
+           "d=i" => \$opt_d,
+           "t=i" => \$opt_t,
+           "v" => \$DEBUG,
+           "q=s" => \$opt_q,
+           "force-update" =>\$force
+          );
+unless (defined $opt_f) {
+  warn "usage: $0: -f {filesystem|fsid} <-t timestamp> <-d dirid>";
+  exit 1;
+}
+
+unless (defined $opt_t) {
+  my $t = time();
+  # round to nearest GMT midnight 
+  $opt_t = int($t/86400+0.5) * 86400;
+}
+
+my ($fsid,$dirid);
+
+$dirid = $opt_d if defined $opt_d;
+
+##
+## Initiate DB connection
+##
+my ($dsn,$dbh);
+$dsn = "DBI:mysql:database=matter;host=mysql;port=3306";
+$dbh = DBI->connect($dsn, "matter", "tyhjcZ30Y");
+
+my ($sql, $sth, $nr);
+
+##
+## Look up file system
+##
+if ($opt_f =~ m,^/,) {
+  $sql = qq{SELECT id,mount FROM filesystem WHERE mount='$opt_f' AND deprecated IS FALSE};
+} else {
+  $sql = qq{SELECT id,mount FROM filesystem WHERE id=$opt_f AND deprecated IS FALSE};
+}
+print STDERR "$sql\n" if $DEBUG;
+$sth = $dbh->prepare($sql) or print $dbh->err;
+$nr  = $sth->execute();
+if ($nr > 0) {
+  ($fsid,$mount)  = $sth->fetchrow_array();
+  print "Scanning $mount (fsid $fsid)\n";
+} else {
+  die "No mount found for $opt_f";
+}
+
+##
+## Has file system changed recently?
+##
+$sql  = <<SQL;
+SELECT u.blocks, u.used, u.available, f.id, f.mount, 
+SUBSTRING_INDEX(f.path, ':', 1) server
+  FROM fsusage u INNER JOIN filesystem f ON u.fsid=f.id
+  WHERE u.fsid=?
+  AND u.checked = (SELECT MAX(checked) FROM fsusage)
+SQL
+
+print STDERR "$sql\n" if $DEBUG;
+$sth = $dbh->prepare($sql);
+$nr  = $sth->execute($fsid);
+my ($server,$blks,$used,$avail);
+if ($nr > 0) {
+  my $ref = $sth->fetchrow_hashref();
+  $server = $ref->{'server'};
+  $blks   = $ref->{'blocks'};
+  $used   = $ref->{'used'};
+  $avail  = $ref->{'available'};
+} else {
+  die "could not retreive file system entry";
+}
+  
+$sql = <<SQL;
+SELECT u.blocks, u.used, u.available
+  FROM fsusage u 
+  WHERE fsid = ? 
+  AND checked =
+    (SELECT MAX(checked)
+       FROM fsusage 
+       WHERE fsid=?
+       AND checked < 
+         (SELECT MAX(checked)
+            FROM fsstat
+            WHERE fsid=? 
+            AND dirid IS NULL 
+            AND uid IS NULL 
+            AND type=2 
+            AND latest=1
+         )
+    )
+SQL
+$sth = $dbh->prepare($sql) or die $sql;
+$nr  = $sth->execute($fsid,$fsid,$fsid);
+if ($nr > 0) {
+  my $ref = $sth->fetchrow_hashref();
+  if ($blks  == $ref->{'blocks'} and
+      $used  == $ref->{'used'}   and
+      $avail == $ref->{'available'}) {
+        print STDERR "$mount appears unchanged. ";
+        if ($force) {
+          print STDERR "Update forced.\n\n";
+        } else {
+          print STDERR "Skipping. (Use --force-update to override.)\n";
+          exit;
+        }
+  }
+} else {
+  warn "could not retrieve historical info for $fsid";
+}
+
+##
+## Find directory entry if necessary
+##
+my $dirclause;
+my $level;
+if (defined $opt_d) {
+  $dirclause = "AND parent=$dirid";
+  $sql = qq{SELECT name,level FROM subdir WHERE fsid=$fsid AND dirid=$dirid AND deprecated IS FALSE};
+  print STDERR "$sql\n" if $DEBUG;
+  $sth = $dbh->prepare($sql);
+  $nr = $sth->execute();
+  if ($nr > 0) {
+    ($dir,$level) = $sth->fetchrow_array();
+    $dir = "$mount/" . $dir;
+    unless (-d $dir) {
+      die "Cannot find $dir";
+    }
+  } else {
+    die "No directory entry for $dirid=$opt_d fsid=$fsid";
+  }
+} else {
+  $dirclause = "AND parent IS NULL";
+  $dir = $mount;
+  $level = 0;
+}
+
+##
+## Find all subdirectories in DB
+##
+$sql = qq{SELECT dirid,name FROM subdir WHERE fsid=$fsid AND dirid > 0 AND deprecated IS FALSE $dirclause};
+$sth = $dbh->prepare($sql);
+$nr  = $sth->execute();
+my %dbdir;
+my %olddir;
+if ($nr > 0) {
+  while (my @@row = $sth->fetchrow_array()) {
+    $dbdir{$row[1]}  = $row[0]; 	# Key = name
+    $olddir{$row[0]} = $row[1];		# Key = dirid
+  }
+} else {
+  warn "no subdirectories in DB for fsid=$fsid";
+}
+
+##
+## Find all top-level directories in directory specified
+##
+$cmd = "find $dir -noleaf -maxdepth 1 -mindepth 1 -type d -not -name '.' -not -name '.snapshot'";
+print STDERR "$cmd\n" if $DEBUG;
+open FIND, "$cmd |" or die "could not run find on $mount: $!";
+my (@@newdir, @@olddir);
+while (<FIND>) {
+  chomp;
+  s/^($dir\/)//;
+  if (defined $dbdir{$_}) {
+    delete $olddir{$dbdir{$_}};
+  } else {
+    push @@newdir, $_;
+  }
+}
+##
+## Mark deprecated directories in DB and delete from to-scan list
+##
+for my $d (keys %olddir) {
+  delete $dbdir{$olddir{$d}};
+  $sql = qq{UPDATE subdir SET deprecated=1 WHERE fsid=$fsid AND dirid=$d};
+  print "$sql\n" if $DEBUG;
+  $dbh->do($sql) unless $DRYRUN;
+  ##
+  ## If parent is gone, children should be too
+  ##
+  $sql = qq{UPDATE subdir SET deprecated=1 WHERE fsid=$fsid AND parent=$d};
+  print "$sql\n" if $DEBUG;
+  $dbh->do($sql) unless $DRYRUN;
+}
+##
+## Insert any new directories into DB and add to to-scan list
+##
+my $maxdirid;
+if ($#newdir>=0) {
+  $sql = qq{SELECT MAX(dirid) FROM subdir WHERE fsid=$fsid};
+  $sth = $dbh->prepare($sql);
+  $nr  = $sth->execute();
+  if ($nr > 0) {
+    $maxdirid = ($sth->fetchrow_array())[0];
+  } else {
+    die "something amiss reading subdir table";
+  }
+}
+for my $d (@@newdir) {
+  $maxdirid++;
+  my $newlev = $level + 1;
+  if (defined $opt_d) {
+    $sql = qq{INSERT INTO subdir(fsid,dirid,parent,level,name,deprecated) VALUES ($fsid,$maxdirid,$opt_d,$newlev,} . $dbh->quote($d) . qq{,0)};
+  } else {
+    $sql = qq{INSERT INTO subdir(fsid,dirid,name,deprecated) VALUES ($fsid,$maxdirid,} . $dbh->quote($d). qq{,0)};
+  }
+  print "$sql\n" if $DEBUG;
+  $dbh->do($sql) unless $DRYRUN;
+  $dbdir{$d} = $maxdirid;
+}
+##
+## Now %dbdir contains all directories to be scanned, and all entries
+## in subdir table are up-to-date.
+##
+## If any of these directories have been subscanned before, I guess we
+## have to do so again.
+##
+## If any of these directories were larger than, say, 1TB last time
+## we looked, those should get subscanned as well.
+##
+my $queue = defined $opt_q ? $opt_q : "broad";
+my $cmd;
+my $job;
+my $extdep;
+for my $d (keys %dbdir) {
+  $dirid = $dbdir{$d};
+  $sql = qq{SELECT dirid FROM subdir WHERE fsid=$fsid AND parent=$dirid AND deprecated IS FALSE};
+  print STDERR "$sql\n" if $DEBUG;
+  $sth = $dbh->prepare($sql);
+  $nr  = $sth->execute();
+  if ($nr > 0) {
+    ##
+    ## Yes, we have been subscanned before. Submit me.
+    ##
+    $job = "scanfs_${fsid}_${dirid}";
+    $cmd = "$0 -t $opt_t -f $opt_f -d $dirid";
+    $cmd .= " -v" if $DEBUG;
+#    $cmd = "bsub -q $queue -J $job -o /dev/null $cmd";
+    print STDERR "$cmd\n" if $DEBUG;
+    print `$cmd\n` unless $DRYRUN;
+    delete $dbdir{$d};
+    next; 
+  }
+  $sql = qq{SELECT sumval FROM fsstat WHERE fsid=$fsid AND dirid=$dirid AND type=2 AND uid IS NULL AND latest=1};
+  print STDERR "$sql\n" if $DEBUG;
+  $sth = $dbh->prepare($sql);
+  $nr  = $sth->execute();
+  if ($nr > 0) {
+    my $s = ($sth->fetchrow_array()) [0];
+    if ($s >= $MAX_SIZE) {
+      print STDERR "Directory $d was $s KB when last we checked. Scanning.\n";
+      $job = "scanfs_${fsid}_${dirid}";
+      $cmd = "$0 -t $opt_t -f $opt_f -d $dirid";
+      $cmd .= " -v" if $DEBUG;
+#      $cmd = "bsub -r -q $queue -J $job -o /dev/null $cmd";
+      print STDERR "$cmd\n" if $DEBUG;
+      print `$cmd\n` unless $DRYRUN;
+      $extdep = "done(\"scanfs_${fsid}_*\")";
+      delete $dbdir{$d};
+      next; 
+    }
+  } else {
+    warn "unable to retreive historical size data for directory $d" if $DEBUG;
+  }
+}
+
+my $res = "";
+if (   $server =~ /bromine/ or $server =~ /hydrogen/ 
+    or $server =~ /krypton/  or $server =~ /neon/ 
+    or $server =~ /oxygen/  or $server =~ /radon/ 
+    or $server =~ /xenon/ ) {
+    $res = "-R \"rusage[${server}_io=7]\"";
+} else {
+  $res = "";
+}
+
+unless (-d "$TMP/$opt_t") {
+  mkdir "$TMP/$opt_t", 0755 or die "could not mkdir $TMP/$opt_t: $!";
+}
+unless (-d "$TMP/$opt_t/${fsid}") {
+  mkdir "$TMP/$opt_t/${fsid}", 0755 or die "could not mkdir $TMP/$opt_t/${fsid}: $!";
+}
+my $DIR = "$TMP/$opt_t/${fsid}";
+
+my $dep;
+##
+## Submit scan of top-level contents
+##
+$job = defined $opt_d ? "scan_${fsid}_${opt_d}_0" :
+                        "scan_${fsid}_0";
+$cmd = "$PRG -1 -o $DIR/0.csv \"$dir\"";
+$cmd = "bsub -r -q $queue -o $DIR/0.out -J $job $res " . $cmd;
+print STDERR "$cmd\n" if $DEBUG;
+print `$cmd\n` unless $DRYRUN;
+for my $d (keys %dbdir) {
+  $dirid = $dbdir{$d};
+  $job = defined $opt_d ? "scan_${fsid}_${opt_d}_${dirid}" :
+                          "scan_${fsid}_${dirid}";
+  $cmd = "$PRG -o $DIR/${dirid}.csv \"$dir/$d\"";
+  $cmd = "bsub -r -q $queue -J $job -o  $DIR/${dirid}.out $res " . $cmd;
+  print STDERR "$cmd\n" if $DEBUG;
+  print `$cmd\n` unless $DRYRUN;
+  sleep $SLEEP;
+}
+
+##
+## If we're not top-level, we're done
+##
+exit 0 if defined $opt_d;
+
+if (defined $opt_d) {
+  $job = "upload_${fsid}_${opt_d}";
+  $dep = "done(\"scan_${fsid}_${opt_d}_*\")";
+} else {
+  $job = "upload_${fsid}";
+  $dep = "done(\"scan_${fsid}_*\")";
+}
+$cmd = "/home/radon01/matter/sandbox/fsstats/upload_stats.pl -d $DIR -t $opt_t";
+$cmd .= " -v" if $DEBUG;
+$cmd = "bsub -r -q $queue -w '$dep' -J $job -o $DIR/upload.out " . $cmd;
+print STDERR "$cmd\n" if $DEBUG;
+print `$cmd\n` unless $DRYRUN;
+##
+## Submit rollup only if we're top-level
+##
+$dep = "done(\"$job\")";
+if (defined $opt_d) {
+  $job = "combine_${fsid}_${opt_d}";
+} else {
+  $job = "combine_${fsid}";
+}
+$cmd = "/home/radon01/matter/sandbox/fsstats/combine.pl -f $fsid";
+$cmd .= " -v" if $DEBUG;
+$cmd = "bsub -r -q $queue -w '$dep' -J $job -o $DIR/combine.out " . $cmd;
+print STDERR "$cmd\n" if $DEBUG;
+print `$cmd\n` unless $DRYRUN;
+
+@
+
+
+1.4
+log
+@Cleaned up subdirectory logic.
+@
+text
+@d5 1
+a5 1
+use Getopt::Std;
+a6 1
+use vars qw($opt_f $opt_d $opt_t $opt_v $opt_q);
+d17 11
+a27 1
+getopts('d:f:t:q:v');
+a31 1
+my $DEBUG = defined $opt_v ? 1 : 0;
+d48 1
+a48 1
+$dbh = DBI->connect($dsn, "matter", "spamLet1");
+d121 7
+a127 2
+        warn "$mount appears unchanged. Skipping.\n";
+        exit;
+@
+
+
+1.3
+log
+@Cleaned up rollup logic.
+@
+text
+@d20 1
+a20 1
+  warn "usage: $0: -f fsid <-t timestamp> <-d dirid>";
+a32 1
+$fsid  = $opt_f;
+d47 5
+a51 1
+$sql = qq{SELECT mount FROM filesystem WHERE id=$fsid};
+d56 2
+a57 1
+  $mount = ($sth->fetchrow_array())[0];
+d59 1
+a59 1
+  die "No mount for fsid=$fsid";
+d61 1
+d124 1
+d127 1
+a127 1
+  $sql = qq{SELECT name FROM subdir WHERE fsid=$fsid AND dirid=$dirid AND deprecated IS FALSE};
+d132 2
+a133 1
+    $dir = "$mount/" . ($sth->fetchrow_array())[0];
+d143 1
+d210 1
+d212 1
+a212 1
+    $sql = qq{INSERT INTO subdir(fsid,dirid,parent,name,deprecated) VALUES ($fsid,$maxdirid,$opt_d,} . $dbh->quote($d) . qq{,0)};
+@
+
+
+1.2
+log
+@Manage entire pipeline.
+@
+text
+@d7 1
+a7 1
+use vars qw($opt_f $opt_d $opt_t);
+a10 1
+my $DEBUG = 1;
+d13 1
+d18 3
+a20 3
+getopt('fdt');
+unless (defined $opt_f and defined $opt_t) {
+  warn "usage: $0: -f fsid -t timestamp <-d dirid>";
+d23 8
+d45 3
+d58 59
+a116 1
+## Find directory if necessary
+d139 1
+a139 1
+## Find all directories in DB
+d141 1
+a141 1
+  $sql = qq{SELECT dirid,name FROM subdir WHERE fsid=$fsid AND dirid > 0 AND deprecated IS FALSE $dirclause};
+d176 7
+a182 1
+  $sql = qq{UPDATE subdir SET deprecated=1 WHERE fsid=$fsid AND dirid=$d $dirclause};
+d191 1
+a191 1
+  $sql = qq{SELECT MAX(dirid) FROM subdir WHERE fsid=$fsid $dirclause};
+d215 49
+a263 49
+$sql  = <<SQL;
+SELECT u.blocks, u.used, u.available, f.id, f.mount, 
+SUBSTRING_INDEX(f.path, ':', 1) server
+  FROM fsusage u INNER JOIN filesystem f ON u.fsid=f.id
+  WHERE u.fsid=?
+  AND u.checked = (SELECT MAX(checked) FROM fsusage)
+SQL
+
+$sth = $dbh->prepare($sql);
+$nr  = $sth->execute($fsid);
+my ($server,$blks,$used,$avail);
+if ($nr > 0) {
+  my $ref = $sth->fetchrow_hashref();
+  $server = $ref->{'server'};
+  $blks   = $ref->{'blocks'};
+  $used   = $ref->{'used'};
+  $avail  = $ref->{'available'};
+} else {
+  die "could not retreive file system entry";
+}
+  
+$sql = <<SQL;
+SELECT u.blocks, u.used, u.available
+  FROM fsusage u 
+  WHERE fsid = ? 
+  AND checked =
+    (SELECT MAX(checked)
+       FROM fsusage 
+       WHERE fsid=?
+       AND checked < 
+         (SELECT MAX(checked)
+            FROM fsstat
+            WHERE fsid=? 
+            AND dirid IS NULL 
+            AND uid IS NULL 
+            AND type=2 
+            AND latest=1
+         )
+    )
+SQL
+$sth = $dbh->prepare($sql) or die $sql;
+$nr  = $sth->execute($fsid,$fsid,$fsid);
+if ($nr > 0) {
+  my $ref = $sth->fetchrow_hashref();
+  if ($blks  == $ref->{'blocks'} and
+      $used  == $ref->{'used'}   and
+      $avail == $ref->{'available'}) {
+        warn "$mount appears unchanged. Skipping.\n";
+        exit;
+a264 2
+} else {
+  warn "could not retrieve historical info for $fsid";
+d266 1
+a267 1
+my $queue = "broad";
+d280 3
+a282 1
+my $job;
+d285 1
+a285 5
+unless (-d "$DIR") {
+  mkdir "$DIR", 0755 or die "could not mkdir $DIR: $!";
+}
+
+my $cmd;
+d290 2
+a291 2
+                         "scan_${fsid}_0";
+$cmd = "$PRG -1 -o $DIR/0.csv \"$mount\"";
+d299 1
+a299 1
+  $cmd = "$PRG -o $DIR/${dirid}.csv \"$mount/$d\"";
+d306 12
+a317 2
+$job = defined $opt_d ? "upload_${fsid}_${opt_d}" :
+                        "upload_${fsid}";
+d319 2
+a320 1
+$cmd = "bsub -r -q $queue -w 'done(\"scan_${fsid}_*\")' -J $job -o $DIR/upload.out " . $cmd;
+d323 9
+a331 2
+$cjob = defined $opt_d ? "combine_${fsid}_${opt_d}" :
+			"combine_${fsid}";
+d333 2
+a334 1
+$cmd = "bsub -r -q $queue -w 'done(\"$job\")' -J $cjob -o $DIR/combine.out " . $cmd;
+@
+
+
+1.1
+log
+@Initial revision
+@
+text
+@d38 1
+a38 1
+print "here: $sql\n";
+d52 2
+a53 1
+  $sql = qq{SELECT name FROM subdir WHERE fsid=$fsid AND dirid=$dirid};
+d72 1
+a72 1
+  $sql = qq{SELECT dirid,name FROM subdir WHERE fsid=$fsid AND dirid > 0 $dirclause};
+d90 1
+a90 1
+print "Here: $cmd\n";
+d106 1
+a106 1
+  delete $dbdir{$d};
+d128 1
+a128 1
+    $sql = qq{INSERT INTO subdir(fsid,dirid,parent,name,deprecated) VALUES ($fsid,$maxdirid,$opt_d,$d,0)};
+d130 1
+a130 1
+    $sql = qq{INSERT INTO subdir(fsid,dirid,name,deprecated) VALUES ($fsid,$maxdirid,$d,0)};
+d221 1
+a221 1
+$cmd = "bsub -r -q $queue -o $DIR/0.out $res " . $cmd;
+d235 2
+d238 7
+a244 1
+$cmd = "bsub -q $queue -w 'ended(\"scan_${fsid}*\")' -o $DIR/upload.out " . $cmd;
+@
