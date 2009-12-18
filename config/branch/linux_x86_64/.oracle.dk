@@ -1,0 +1,17 @@
+#c libraries
+#d This is a kludge to support /util/oracle and things that need it.
+#d *NEVER* propogate this to /broad/software. 
+
+unuse `dk_rep ".oracle*"`
+
+# Oracle foo needs libaio
+dk_op -q .libaio-0.3.99
+
+# Path to Oracle Client
+dk_alter PATH /broad/software/nonfree/Linux/redhat_5_x86_64/pkgs/oracle-instaclient_10.1
+dk_alter LD_LIBRARY_PATH /broad/software/nonfree/Linux/redhat_5_x86_64/pkgs/oracle-instaclient_10.1
+
+# Set ORACLE_HOME 
+dk_setenv ORACLE_HOME /broad/software/nonfree/Linux/redhat_5_x86_64/pkgs/oracle-instaclient_10.1
+
+

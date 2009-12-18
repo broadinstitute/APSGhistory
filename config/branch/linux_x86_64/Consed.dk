@@ -4,6 +4,6 @@
 
 unuse -q `dk_rep 'Consed*'`
 
-dk_op -q .phred-phrap-consed-20080410
+dk_op -q .phred-phrap-consed-20091112
 
 

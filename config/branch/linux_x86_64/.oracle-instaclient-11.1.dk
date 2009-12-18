@@ -1,6 +1,8 @@
 #c libraries
 #d Oracle InstaClient 11.1. Just enough oracle to make it work. 
 
+unuse `dk_rep ".oracle*"`
+
 # Oracle foo needs libaio
 dk_op -q .libaio-0.3.99
 

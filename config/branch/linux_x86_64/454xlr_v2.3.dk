@@ -1,0 +1,16 @@
+#c applications
+#d set up environment for 454 xlr v2.3 (aka PhaseC-Software) processing
+#FIXME
+# Questions from v22 dotkit:
+#   Can/should this be supported for exporting in the /broad/tools directory structure?
+#   Should openmpi be a separate dotkit (I'd say an emphatic YES!)
+#   This seems to be semi versioned with no hidden dotkits, why?
+# Answers as they pertain to v2.3:
+#   Insofar as the older dotkits are here, I'm putting this one here. I can move it to /broad/software when we know which version will be running on CentOS
+#   We're hoping to run in single mode which should obviate the need for openmpi (yes, openmpi should be a separate dotkit but that may now be a separate issue from 454xlr
+#   There are no "casual users" of 454xlr and there isn't necessarily a "sensible default". 454users care about the version they are running.
+
+dk_alter PATH /prodinfo/prod3pty/454/XLRoffRig/v2.3/bin:/prodinfo/prod3pty/454/XLRoffRig/v2.3/gsRunProcessor/usr/bin:/prodinfo/prod3pty/454/XLRoffRig/v2.3/gsReporter/usr/bin:/prodinfo/prod3pty/454/XLRoffRig/v2.3/gsRunProcessorManager/usr/bin
+
+dk_setenv GS_CACHEDIR /local/scratch
+
