@@ -1,5 +1,11 @@
 #!/util/bin/perl -w
 
+##
+##  scanfs.pl: Walk a filesystem initiating scans (via mystats) of each
+##  subdirectory of interest, writing output to temporary files in 
+##  $TMP.
+##
+
 use DBI;
 use DBD::mysql;
 use Getopt::Long;
@@ -143,15 +149,16 @@ if (defined $opt_d) {
   $nr = $sth->execute();
   if ($nr > 0) {
     ($dir,$level,$parent) = $sth->fetchrow_array();
+    my $tmplev = $level;
     my @d;
-    while ($level > 0) {
+    while ($tmplev > 0) {
       push @d, $dir;
       $sql = qq{SELECT name,level,parent FROM subdir WHERE fsid=$fsid AND dirid=$parent AND deprecated IS FALSE};
       print STDERR "$sql\n" if $DEBUG;
       $sth = $dbh->prepare($sql);
       $nr = $sth->execute();
       die "recursion problem" unless $nr > 0;
-      ($dir,$level,$parent) = $sth->fetchrow_array();
+      ($dir,$tmplev,$parent) = $sth->fetchrow_array();
     }
     if ($#d >=0 ) {
       $dir = join "/",$mount, reverse @d, $dir;

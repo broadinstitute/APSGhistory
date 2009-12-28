@@ -1,5 +1,10 @@
 #!/util/bin/perl -w
 
+##
+##  active.pl: report last activity (changes in allocation) on all
+##  filesystems.
+##
+
 use DBI;
 use DBD::mysql;
 
