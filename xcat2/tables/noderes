@@ -1,0 +1,2 @@
+#node,servicenode,netboot,tftpserver,nfsserver,monserver,nfsdir,installnic,primarynic,cmdinterface,xcatmaster,current_osimage,next_osimage,nimserver,comments,disable
+"all",,"pxe","192.168.32.2","192.168.32.2",,,"eth0","eth0",,,,,,,

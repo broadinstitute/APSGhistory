@@ -1,0 +1,3 @@
+#node,postscripts,comments,disable
+"xcatdefaults","syslog,remoteshell,otherpkgs,syncfiles",,
+"service","servicenode",,

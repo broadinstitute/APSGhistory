@@ -1,0 +1,7 @@
+#priority,name,host,commands,noderange,parameters,time,rule,comments,disable
+"1","root",,,,,,"allow",,
+"2",,,"getbmcconfig",,,,"allow",,
+"3",,,"nextdestiny",,,,"allow",,
+"4",,,"getdestiny",,,,"allow",,
+"4.4",,,"getpostscript",,,,"allow",,
+"4.5",,,"getcredentials",,,,"allow",,

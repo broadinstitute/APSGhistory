@@ -1,0 +1,5 @@
+#node,os,arch,profile,provmethod,supportedarchs,nodetype,comments,disable
+"farm.raid","centos5.4","x86_64","broad.farm.raid.centos5",,,"osi",,
+"farm","centos5.4","x86_64","broad.farm.centos5",,,"osi",,
+"stateless","centos5.4","x86_64","broad.stateless.centos5",,,"osi",,
+"node1018",,,,"install",,,,
