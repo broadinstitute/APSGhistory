@@ -1,0 +1,79 @@
+      <post-scripts config:type="list">
+        <script>
+          <filename>xcat.sh</filename>
+          <interpreter>shell</interpreter>
+          <source>
+
+<![CDATA[
+#!/bin/sh
+
+cd /etc/sysconfig/network
+rm -f ifcfg-eth-id*
+rm -f ifcfg-myri*
+cat >ifcfg-eth0 <<EOF
+DEVICE=eth0
+BOOTPROTO=dhcp
+STARTMODE=onboot
+EOF
+
+export PRINIC=#TABLE:noderes:$NODE:primarynic#
+if [ -z "$PRINIC" ]; then
+    export PRINIC=eth0
+fi
+if [ "$PRINIC" != "eth0" ]
+then
+	cd /etc/sysconfig/network
+	if [ ! -r ifcfg-$PRINIC ]
+	then
+		cp -f ifcfg-eth0 ifcfg-$PRINIC
+		perl -pi -e "s/eth0/$PRINIC/" ifcfg-$PRINIC
+		echo "DHCLIENT_PRIMARY_DEVICE=yes" >> ifcfg-$PRINIC
+	fi
+fi
+perl -pi -e 's/^FIREWALL="yes"/FIREWALL="no"/' /etc/sysconfig/network/config
+/etc/init.d/network restart
+
+RAND=$(perl -e 'print int(rand(50)). "\n"')
+sleep $RAND
+jsi=0
+while [ $(hostname) == 'linux' ]
+do
+	if [ $jsi -gt 10 ]; then
+		logger "Slept too long!"
+		exit
+	fi
+	let jsi=jsi+1
+	sleep 1
+done
+echo "Slept $jsi seconds before hostname made sense."
+
+HOSTNAME=$(hostname -s)
+echo $HOSTNAME
+
+/sbin/portmap
+
+cat >/etc/init.d/xcatpostinit << 'EOF'
+#INCLUDE:#TABLE:site:key=installdir:value#/postscripts/xcatpostinit#
+EOF
+chmod 755 /etc/init.d/xcatpostinit
+ln -s /etc/init.d/xcatpostinit /etc/init.d/rc3.d/S84xcatpostinit
+ln -s /etc/init.d/xcatpostinit /etc/init.d/rc4.d/S84xcatpostinit
+ln -s /etc/init.d/xcatpostinit /etc/init.d/rc5.d/S84xcatpostinit
+
+mkdir -p /opt/xcat
+cat >/opt/xcat/xcatdsklspost << 'EOF'
+#INCLUDE:#TABLE:site:key=installdir:value#/postscripts/xcatdsklspost#
+chkconfig xcatpostinit off
+EOF
+chmod 755 /opt/xcat/xcatdsklspost
+
+chkconfig --add xcatpostinit
+
+cat >/opt/xcat/xcatinfo << EOF
+XCATSERVER=#XCATVAR:XCATMASTER#
+EOF
+]]>
+
+          </source>
+        </script>
+      </post-scripts>

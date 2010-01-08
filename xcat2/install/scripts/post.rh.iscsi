@@ -1,0 +1,91 @@
+#
+# Setup hostname
+#
+echo "post scripts" >/root/post.log
+export PRINIC=#TABLE:noderes:THISNODE:primarynic#
+if [ -z "$PRINIC" ]
+then
+    export PRINIC=eth0
+fi
+IP=$(ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
+if [ -z $IP ]
+then
+	dhclient eth0
+	IP=$(ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
+fi
+echo "search #TABLE:site:key=domain:value#" >/etc/resolv.conf
+for i in $(echo #TABLE:site:key=nameservers:value# | tr ',' ' ')
+do
+	echo "nameserver $i"
+done >>/etc/resolv.conf
+export HOSTNAME=$(host $IP 2>/dev/null | awk '{print $5}' | awk -F. '{print $1}')
+hostname $HOSTNAME#
+# put xCAT post install in init.d process
+#
+cat >/etc/init.d/xcatpostinit << 'EOF'
+#INCLUDE:#TABLE:site:key=installdir:value#/postscripts/xcatpostinit#
+EOF
+chmod 755 /etc/init.d/xcatpostinit
+ln -s /etc/init.d/xcatpostinit /etc/init.d/rc3.d/S84xcatpostinit
+ln -s /etc/init.d/xcatpostinit /etc/init.d/rc4.d/S84xcatpostinit
+ln -s /etc/init.d/xcatpostinit /etc/init.d/rc5.d/S84xcatpostinit
+
+mkdir -p /opt/xcat
+cat >/opt/xcat/xcatdsklspost << 'EOF'
+#INCLUDE:#TABLE:site:key=installdir:value#/postscripts/xcatdsklspost#
+chkconfig xcatpostinit off
+EOF
+TMP=`sed "/IBM(c)/ a ADDSITEYUM=1" /opt/xcat/xcatdsklspost`
+echo "$TMP" > /opt/xcat/xcatdsklspost
+chmod 755 /opt/xcat/xcatdsklspost
+chkconfig --add xcatpostinit
+
+cat >/opt/xcat/xcatinfo << EOF
+XCATSERVER=#XCATVAR:XCATMASTER#
+EOF
+
+export MASTER_IP="#XCATVAR:XCATMASTER#"
+export MASTER_IPS="#XCATVAR:XCATMASTER#"
+export MASTER="#XCATVAR:XCATMASTER#"
+mkdir -p /tmp/xcatpost
+cd /tmp/xcatpost
+RAND=$(perl -e 'print int(rand(50)). "\n"')
+sleep $RAND
+for i in $(seq 1 20)
+do
+    GOTIT=0
+    for i in $MASTER_IPS
+    do
+	wget -l inf -N --waitretry=10 --random-wait --retry-connrefused  -t 0 -T 60 ftp://$i/postscripts/uploadboot
+	wget -l inf -N --waitretry=10 --random-wait --retry-connrefused  -t 0 -T 60 ftp://$i/postscripts/locktftpdir.awk
+	wget -l inf -N --waitretry=10 --random-wait --retry-connrefused  -t 0 -T 60 ftp://$i/postscripts/unlocktftpdir.awk
+	wget -l inf -N --waitretry=10 --random-wait --retry-connrefused  -t 0 -T 60 ftp://$i/postscripts/setiscsiparms.awk
+	if [ "$?" = "0" ]
+	then
+            if [ ! -x /usr/bin/openssl ]; then #Stop if no openssl to help the next bit
+		exit 1;
+            fi
+            chmod +x /tmp/xcatpost/*
+	    GOTIT=1
+	    break
+	fi
+    done
+    if [ "$GOTIT" = "1" ]
+    then
+	break
+    fi
+    RAND=$(perl -e 'print int(rand(5)). "\n"')
+    sleep $RAND
+done
+export NODE=#TABLE:nodelist:THISNODE:node#
+export OSVER=#TABLE:nodetype:THISNODE:os#
+export ARCH=#TABLE:nodetype:THISNODE:arch#
+iscsiadm -m discovery -t st -p #TABLE:iscsi:$NODE:server#
+sed -i 's/^serial/#serial/' /boot/grub/menu.lst
+sed -i 's/^terminal/#terminal/' /boot/grub/menu.lst
+
+#remove all the repos, later addsiteyum will add the one from the master node.
+rm -f /etc/yum.repos.d/*
+
+uploadboot
+exit 0
