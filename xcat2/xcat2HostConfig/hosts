@@ -1,0 +1,23 @@
+# Do not remove the following line, or various programs
+# that require network functionality will fail.
+127.0.0.1		localhost.localdomain localhost
+::1		localhost6.localdomain6 localhost6
+192.168.33.46 node246 node246.broadinstitute.org 
+192.168.32.246 node1223 node1223.broadinstitute.org 
+192.168.34.55 bariumphys bariumphys.broadinstitute.org 
+192.168.35.69 node1018 node1018.broadinstitute.org 
+192.168.35.70 node1019 node1019.broadinstitute.org 
+192.168.35.71 node1020 node1020.broadinstitute.org 
+192.168.33.150 node350 node350.broadinstitute.org 
+192.168.33.185 node385 node385.broadinstitute.org 
+192.168.35.72 node1021 node1021.broadinstitute.org 
+192.168.35.73 node1022 node1022.broadinstitute.org 
+192.168.35.74 node1023 node1023.broadinstitute.org 
+192.168.35.75 node1024 node1024.broadinstitute.org 
+192.168.35.76 node1025 node1025.broadinstitute.org 
+192.168.35.77 node1026 node1026.broadinstitute.org 
+192.168.35.78 node1027 node1027.broadinstitute.org 
+192.168.35.79 node1028 node1028.broadinstitute.org 
+192.168.35.80 node1029 node1029.broadinstitute.org 
+192.168.35.81 node1030 node1030.broadinstitute.org 
+192.168.35.82 node1031 node1031.broadinstitute.org 
