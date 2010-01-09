@@ -1,5 +1,5 @@
 #!/bin/bash
-
+ 
 if [ $# -eq 1 ]; then
 	echo "Please do not wrap your command in quotation marks."
 	exit 1
