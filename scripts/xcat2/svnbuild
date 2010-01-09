@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [ $# -eq 1 ]; then
+	echo "Please do not wrap your command in quotation marks."
+	exit 1
+elif [ $# -eq 0 ]; then
+	echo "Please provide command to add node.  Otherwise, why are you running me?"
+	exit 1
+fi
+
+if [ $1 != 'nodeadd' ]; then
+	echo "This application is for nodeadd-ing only.  Please refrain from improper use."
+	exit 1
+fi
+
+DIR=/root/svn/xcat2/tables/
+
+exec `$*`
+
+for TABLE in hosts mac nodelist nodehm
+do
+exec `tabdump $TABLE > $DIR/$TABLE`
+done
+
+echo "Please enter desired comments for files you have changed:"
+read COMMENT
+
+exec `cd $DIR; svn ci -m "$COMMENT" *`
