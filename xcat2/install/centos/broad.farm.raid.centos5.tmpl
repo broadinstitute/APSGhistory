@@ -3,8 +3,8 @@
 
 lang en_US
 langsupport en_US
-network --device=eth0 --bootproto dhcp
-network --device=eth1 --bootproto dhcp
+network --device=eth0 --bootproto dhcp --mtu=1500
+network --device=eth1 --bootproto dhcp --mtu=9000
 
 #
 # Where's the source?
@@ -30,24 +30,46 @@ clearpart --all --initlabel
 #
 # Customize to fit your needs
 #
+#Partition Table for non-raided systems
+#part / --size 8192 --fstype ext3
+#part swap --size 8192
+#part /local --size 1024 --grow --fstype ext4
+
+#Partition table for raided systems
+part raid.01 --size 8192 --ondisk sda
+part raid.02 --size 8192 --ondisk sdb
+raid / --fstype ext3 --device md0 --level 0 raid.01 raid.02
+
+part raid.11 --size 8192 --ondisk sda
+part raid.12 --size 8192 --ondisk sdb
+raid swap --fstype swap --device md1 --level 0 raid.11 raid.12
+
+part raid.21 --size 1024 --grow --ondisk sda
+part raid.22 --size 1024 --grow --ondisk sdb
+raid /local --fstype ext4 --device md2 --level 1 raid.21 raid.22
 
 #No RAID
 #/boot really significant for this sort of setup nowadays?
 #part /boot --size 50 --fstype ext3
-#part swap --size 16384
-#part / --size 1 --grow --fstype ext3
+#part / --size 8192 --fstype ext3
+#part /usr --size 8192 --fstype ext3
+#part /var --size 8192 --fstype ext3
+#part swap --size 8192
+#part /tmp --size 8192 --fstype ext3
+#part /local --size 1024 --grow --fstype ext3
+
 
 #RAID 0 /scr for performance
-part /boot --size 50 --fstype ext3
-part / --size 512 --grow --ondisk sda
-part /usr --size 4096 --ondisk sda
-part /var --size 1024 --ondisk sdb
-part swap --size 8192 --ondisk sda
-part /tmp --size 2048 --ondisk sda
-part swap --size 8192 --ondisk sdb
-part raid.01 --size 8192 --grow --ondisk sda
-part raid.02 --size 8192 --grow --ondisk sdb
-raid /local --level 0 --device md0 raid.01 raid.02
+#part /boot --size 50 --fstype ext3
+#part / --size 512 --grow --ondisk sda
+#part /usr --size 4096 --ondisk sda
+#part /var --size 1024 --ondisk sdb
+#part swap --size 8192 --ondisk sda
+#part /tmp --size 2048 --ondisk sda
+#part swap --size 8192 --ondisk sdb
+#part raid.01 --size 8192 --grow --ondisk sda
+#part raid.02 --size 8192 --grow --ondisk sdb
+#raid /local --level 0 --device md0 raid.01 raid.02
 
 #Full RAID 1 Sample
 #part raid.01 --size 50 --ondisk sda
@@ -83,7 +105,7 @@ bootloader
 #
 install
 
-#
+
 # text mode install (default is graphical)
 #
 text
@@ -154,6 +176,10 @@ reboot
 @ System Tools
 @ X Window System
 @ Legacy Software Development
+@ Development Tools
+@ Development Libraries
+ruby
+man
 autofs
 tcsh
 ntp
@@ -179,4 +205,4 @@ compat-libstdc++-33
 %pre
 #INCLUDE:../scripts/pre.rh#
 %post
-#INCLUDE:../scripts/broad.ibm.rh#
+#INCLUDE:../scripts/broad.rh#
