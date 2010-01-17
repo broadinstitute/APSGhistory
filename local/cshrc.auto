@@ -1,13 +1,28 @@
 # System-supplied file - DO NOT EDIT!!
 # Make your changes to $HOME/.my.cshrc instead.
 
-set M_TYPE = (`/broad/tools/dotkit/etc/systype`)
+set M_TYPE = (`/broad/software/dotkit/etc/systype`)
 
 # Select new or classis environment based on host operating system.
 switch ( $M_TYPE )
-  case "redhat*":
+  case "suse*":
+    # Source systemwide configuration
+    if (-f /util/etc/setup_csh) then
+      source /util/etc/setup_csh
+    endif
+
+    # Source group configuration
+    if (! $?group) then
+      set groups=`groups`
+      set group=$groups[1]
+    endif
+
+    if (-f /util/etc/$group.setup_csh) then
+      source /util/etc/$group.setup_csh
+    endif
+  case default:
     # Init Dotkit in every shell
-    setenv DK_ROOT /broad/tools/dotkit
+    setenv DK_ROOT /broad/software/dotkit
     eval `$DK_ROOT/init -c`
 
     # Rather than use .login, test for things to include for logins here.
@@ -25,21 +40,6 @@ switch ( $M_TYPE )
       use -q default++
     endif
     breaksw
-  default:
-    # Source systemwide configuration
-    if (-f /util/etc/setup_csh) then
-      source /util/etc/setup_csh
-    endif
-
-    # Source group configuration
-    if (! $?group) then
-      set groups=`groups`
-      set group=$groups[1]
-    endif
-
-    if (-f /util/etc/$group.setup_csh) then
-      source /util/etc/$group.setup_csh
-    endif
 endsw
 
 # Source user configuration for all systems

@@ -50,7 +50,7 @@ echo "  q - Quit."
 echo 
 
 # Collect response
-read -p " (1,2,3,q): " RESPONSE
+read -p " (1,2,3,4,q): " RESPONSE
 
 case "$RESPONSE" in
   "1" )

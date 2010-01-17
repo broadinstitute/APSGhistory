@@ -1,15 +1,11 @@
 # System-supplied file - DO NOT EDIT!!
 # Make your changes to $HOME/.my.login instead.
 
-set M_TYPE = (`/broad/tools/dotkit/etc/systype`)
+set M_TYPE = (`/broad/software/dotkit/etc/systype`)
 
-# Select new or classis environment based on host operating system.
+# Select new or classic environment based on host operating system.
 switch ( $M_TYPE )
-  case "redhat*":
-    # New style does nothing here.
-    breaksw
-
-  case default:
+  case "suse*":
     # Classic style
     # Source systemwide configuration
     if (-f /util/etc/login_csh) then
@@ -25,6 +21,9 @@ switch ( $M_TYPE )
     if (-f /util/etc/$group.login_csh) then
       source /util/etc/$group.login_csh
     endif
+  case default:
+    # New style does nothing here.
+    breaksw
 endsw
 
 # Source user configuration
