@@ -111,6 +111,8 @@ ln -sin /bin/tcsh /usr/bin/tcsh
 ##tune4fs for tuning.  tune4fs is backwards-compatible, but tune2fs is not; therefore, we are using tune4fs to both ext3 and ext4.
 for x in `fdisk -l | grep -v swap | awk '/Linux/ {print $1}'`; do tune4fs -c 0 -i 0 $x; done
 
+scp $MASTER_IP:/root/.ssh /root/.ssh
+
 #Is this IBM or Dell?  Plan Accordingly
 VENDOR=`dmidecode | awk -F: '/Vendor/ {print $2}' | sed 's/ //' | awk '{print $1}'`
 
