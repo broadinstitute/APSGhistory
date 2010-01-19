@@ -111,7 +111,9 @@ ln -sin /bin/tcsh /usr/bin/tcsh
 ##tune4fs for tuning.  tune4fs is backwards-compatible, but tune2fs is not; therefore, we are using tune4fs to both ext3 and ext4.
 for x in `fdisk -l | grep -v swap | awk '/Linux/ {print $1}'`; do tune4fs -c 0 -i 0 $x; done
 
-scp $MASTER_IP:/root/.ssh /root/.ssh
+#Change this if build server key changes:
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAwVLbQ8Rlt93pgghzzNh7bd8vjKE2oAftYkSy4WwkZBjY8XemVrRm3c3+F2cvYABftnrgbxJn1soTGSJVyoEwHfSZoPtWtOYB4ICt5GdSwHXbgRxBYqFiJA8fPycWeF4qc7GXicVxVpDAcA0Lz+6XVNWQXWSNqAsNyqFXYzf/VavOIkqW4Xr/hxfLsBsDgffo5YlhSQbLJmsz/c3Zo0q3u/PRPB+viMQ2ulwkYdR5dyuP9VNrAMu7NtMK4Lpb+2fskJqVGYJU4PzzV/OE5DsGby95+n90JxfaDgmHlhRIraAADX10dCjmX9iHy4XrhIWDbOjm9H9FNCSnvehHLNPacw== root@hal9000.broadinstitute.org" > /root/.ssh/authorized_keys
+chmod 600 /root/.ssh
 
 #Is this IBM or Dell?  Plan Accordingly
 VENDOR=`dmidecode | awk -F: '/Vendor/ {print $2}' | sed 's/ //' | awk '{print $1}'`
