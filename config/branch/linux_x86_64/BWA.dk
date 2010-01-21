@@ -6,4 +6,4 @@
 
 unuse -q `dk_rep "BWA*"`
 
-dk_op -q .bwa-0.4.9
+dk_op -q .bwa-0.5.5
