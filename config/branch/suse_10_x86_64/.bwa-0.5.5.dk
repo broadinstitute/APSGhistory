@@ -1,0 +1,27 @@
+#c applications
+#d .bwa
+#rootpath /broad/software/free/Linux/suse_10_x86_64/pkgs/bwa_0.5.5
+
+
+# Make mutually exclusive with other versions of same package.
+# Make sure this doesn't remove similarly named packages as a side effect
+# for example, apps named blah-finder and blah would both be removed
+# by ".blah-*" so it's safer to include part of the version number in 
+# the expression, like "blah-[0-9]*". Season to taste.
+setenv _dk_broad_me "`basename $_dk_self`"
+setenv _dk_broad_notme "`dk_rep ".bwa-[0-9]*" | sed "s/$_dk_broad_me//g"`"
+unuse -q $_dk_broad_notme
+unsetenv _dk_broad_notme
+unsetenv _dk_broad_me
+
+
+# Define dotkit dependencies here by calling hidden dotkits for things we depend on:
+# use -q .some-dependency-1.0
+
+#### RUNTIME ITEMS
+# PATH entries.
+dk_alter PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/bwa_0.5.5/bin
+
+# MANPATH entries.
+#dk_alter MANPATH /broad/software/free/Linux/suse_10_x86_64/pkgs/bwa_0.5.5/share/man
+dk_alter MANPATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/bwa_0.5.5/man
