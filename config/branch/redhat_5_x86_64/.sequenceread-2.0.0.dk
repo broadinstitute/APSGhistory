@@ -1,0 +1,20 @@
+#c applications
+#d sequenceread 2.0.0
+#rootpath /broad/software/free/Linux/redhat_5_x86_64/pkgs/sequenceread_2.0.0
+
+# Make mutually exclusive with other versions of same package.
+# Make sure this doesn't remove similarly named packages as a side effect
+# for example, apps named blah-finder and blah would both be removed
+# by ".blah-*"
+
+unuse -q `dk_rep ".sequenceread-[0-9]*"`
+
+dk_op -q .io-lib-1.12.1
+
+#### RUNTIME ITEMS
+# PATH entries.
+dk_alter PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/sequenceread_2.0.0/bin
+
+# MANPATH entries.
+dk_alter MANPATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/sequenceread_2.0.0/share/man
+

@@ -1,0 +1,10 @@
+#c applications
+#d sequenceread
+#FIXME
+# Improved description needed.
+
+unuse -q `dk_rep "Sequenceread*"`
+
+dk_op -q .sequenceread-2.0.0
+
+

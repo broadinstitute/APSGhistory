@@ -1,0 +1,5 @@
+#c bio-tools
+#d SOLAR 
+
+dk_alter PATH /broad/tools/Linux/x86_64/solar/4.0.7/bin:/broad/tools/Linux/x86_64/solar/4.0.7/scripts
+dk_alter SOLAR_LIB /broad/tools/Linux/x86_64/solar/4.0.7/lib

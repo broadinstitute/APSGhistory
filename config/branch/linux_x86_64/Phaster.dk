@@ -1,0 +1,5 @@
+#c applications
+#d Phaster and next_phred tools
+unuse -q `dk_rep "Phaster*"`
+dk_op -q .phaster-1.091022
+

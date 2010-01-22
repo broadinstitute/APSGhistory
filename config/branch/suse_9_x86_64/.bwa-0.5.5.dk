@@ -1,6 +1,6 @@
 #c applications
 #d .bwa
-#rootpath /broad/software/free/Linux/suse_10_x86_64/pkgs/bwa_0.5.5
+#rootpath /broad/software/free/Linux/suse_9_x86_64/pkgs/bwa_0.5.5
 
 
 # Make mutually exclusive with other versions of same package.
@@ -23,5 +23,5 @@ unsetenv _dk_broad_me
 dk_alter PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/bwa_0.5.5/bin
 
 # MANPATH entries.
-#dk_alter MANPATH /broad/software/free/Linux/suse_10_x86_64/pkgs/bwa_0.5.5/share/man
+#dk_alter MANPATH /broad/software/free/Linux/suse_9_x86_64/pkgs/bwa_0.5.5/share/man
 dk_alter MANPATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/bwa_0.5.5/man

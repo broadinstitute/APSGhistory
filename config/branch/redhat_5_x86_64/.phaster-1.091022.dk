@@ -1,0 +1,16 @@
+#c applications
+#d Phaster & next_phred
+#rootpath /broad/software/free/Linux/redhat_5_x86_64/pkgs/phaster_1.091022
+
+# Make mutually exclusive with other versions of same package.
+# Make sure this doesn't remove similarly named packages as a side effect
+# for example, apps named blah-finder and blah would both be removed
+# by ".blah-*"
+
+unuse -q `dk_rep ".phaster-\d*"`
+
+#### RUNTIME ITEMS
+
+# PATH entries.
+dk_alter PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/phaster_1.091022/
+

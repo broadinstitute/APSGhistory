@@ -9,11 +9,11 @@ dk_op -q .db-4.7.25
 dk_op -q .gdbm-1.8.3
 
 # Set up environment for using library
-dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/cyrus-sasl-2.1.22/lib
+dk_alter LD_LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/cyrus-sasl_2.1.22/lib
 
 # Set up build env.
-dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/cyrus-sasl-2.1.22/lib
-dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/cyrus-sasl-2.1.22/include
-dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/cyrus-sasl-2.1.22/include
+dk_alter LIBRARY_PATH /broad/tools/Linux/x86_64/pkgs/cyrus-sasl_2.1.22/lib
+dk_alter C_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/cyrus-sasl_2.1.22/include
+dk_alter CPLUS_INCLUDE_PATH /broad/tools/Linux/x86_64/pkgs/cyrus-sasl_2.1.22/include
 
 

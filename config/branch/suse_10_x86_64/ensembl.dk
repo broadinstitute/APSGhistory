@@ -1,0 +1,11 @@
+#c libraries
+#d ensembl Perl API
+#d http://uswest.ensembl.org/info/docs/api/index.html
+#d Latest release in 5.8 series.
+
+# Unload any loaded Perl super packages.
+unuse -q `dk_rep 'ensembl-*'`
+
+# Get latest perl 5.8
+dk_op -q .ensembl-cvs-56
+
