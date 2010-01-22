@@ -9,7 +9,7 @@
 # by ".blah-*" so it's safer to include part of the version number in 
 # the expression, like "blah-[0-9]*". Season to taste.
 setenv _dk_broad_me "`basename $_dk_self`"
-setenv _dk_broad_notme "`dk_rep ".bwa-[0-9]*" | sed "s/$_dk_broad_me//g"`"
+setenv _dk_broad_notme "`dk_rep ".bwa-[0-9]*" | sed "s/$_dk_broad_me//g"`
 unuse -q $_dk_broad_notme
 unsetenv _dk_broad_notme
 unsetenv _dk_broad_me
