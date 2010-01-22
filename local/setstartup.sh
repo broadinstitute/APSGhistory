@@ -44,7 +44,7 @@ echo "  4 - *NEW* Auto mode. Let the startup scripts do "
 echo "      the Right Thing(tm) based on the host. This "
 echo "      option will run dotkit (new) style startup "
 echo "      on new style hosts (RHEL/centos 4/5) and "
-echo "      classis style startup on older hosts (suse,"
+echo "      classic style startup on older hosts (suse,"
 echo "      solaris and redhat 9."
 echo "  q - Quit."
 echo 
