@@ -102,8 +102,6 @@ chkconfig cups off
 chkconfig gpm off
 ifup eth1
 yum -y groupremove "Dialup Networking Support"
-yum -y groupinstall "Development Tools"
-yum -y install pcre-devel
 echo "Installing cfengine"
 wget -O - http://www.broadinstitute.org/~jbh/centos-setup.sh | bash
 echo "Linking tcsh"
