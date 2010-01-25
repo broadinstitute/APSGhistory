@@ -113,6 +113,9 @@ for x in `fdisk -l | grep -v swap | awk '/Linux/ {print $1}'`; do tune4fs -c 0 -
 echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAwVLbQ8Rlt93pgghzzNh7bd8vjKE2oAftYkSy4WwkZBjY8XemVrRm3c3+F2cvYABftnrgbxJn1soTGSJVyoEwHfSZoPtWtOYB4ICt5GdSwHXbgRxBYqFiJA8fPycWeF4qc7GXicVxVpDAcA0Lz+6XVNWQXWSNqAsNyqFXYzf/VavOIkqW4Xr/hxfLsBsDgffo5YlhSQbLJmsz/c3Zo0q3u/PRPB+viMQ2ulwkYdR5dyuP9VNrAMu7NtMK4Lpb+2fskJqVGYJU4PzzV/OE5DsGby95+n90JxfaDgmHlhRIraAADX10dCjmX9iHy4XrhIWDbOjm9H9FNCSnvehHLNPacw== root@hal9000.broadinstitute.org" > /root/.ssh/authorized_keys
 chmod 600 /root/.ssh
 
+#Change this if trp key changes:
+echo "ssh-dss AAAAB3NzaC1kc3MAAACBAMdPwPbhgProKuYZZLUVRGrVoJYsWoR0Vyd+MGvv7HWngBvNLQ4i3CoixE34wpWhdS/jCX/nYkKWlt+AsENOUrxpmE/uMTp18If6gx8PPxZQkoz7sDQ85ICpeo2HS73jHVdvb2ssLdY3tj5Aqt7lqyMWVFNEF0Ub3S/Zrvx5pD4XAAAAFQDwUVkm5hx0Wc3TwpTfxFKdO40Y6wAAAIB2klA/DaHRZ8UNlcjdu7ie4xd8jaVtc3ZLLdxC4wM98AgCmj9MgwbNpxS8XdTrWgra+Tj+SuN9u6Z9WnC1shHiJYqMG0y3SJDYfgT654GpggeZxiFgmq9baFfr69F3GfXgkzC+nEqaXn5aLwr6QDb+slTKK3Ind7hX/LikzHLNrwAAAIAmRk7ROAMTgGYu7qUNMx1r4z4bJO9dQol/sYPcw5jmd+H1NUC1RQxcY798b0hHVtH04Thzb2EsJtxkz0HeTZkZSa3zptKYSR0XjiOgfcK2EcjNdt2rP9IRVDphUb3Tv7kxkYqEilqihf1LKqaMG4hJaTWCAODalHN9sZcH7TBYqQ== root@tryptophan.broad.mit.edu" >> /root/.ssh/authorized_keys
+
 #Is this IBM or Dell?  Plan Accordingly
 VENDOR=`dmidecode | awk -F: '/Vendor/ {print $2}' | sed 's/ //' | awk '{print $1}'`
 
