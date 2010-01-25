@@ -1,0 +1,14 @@
+#c applications
+#d Glimpse  (which  stands  for  GLobal  IMPlicit SEarch) is a very popular
+#d UNIX indexing and query system that allows you to search through a large
+#d set of files very quickly. Glimpse supports most of agrep's options (agrep
+#d is our powerful version of grep) including approximate matching (e.g., finding
+#d misspelled words), Boolean queries, and even some limited forms of regular
+#d expressions.  It is used in the same way, except that you don't have to specify
+#d file names.  So, if you are looking for a needle anywhere in your file system,
+#d all you have to do is say glimpse needle and all lines containing needle will appear
+#d preceded by the file name.
+
+unuse -q `dk_rep "Glimpse*"`
+
+dk_op -q .glimpse-4.18.6
