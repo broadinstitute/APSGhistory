@@ -11,4 +11,4 @@
 
 unuse -q `dk_rep "Glimpse*"`
 
-dk_op -q .glimpse-4.18.5
+dk_op -q .glimpse-4.18.6
