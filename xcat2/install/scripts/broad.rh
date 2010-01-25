@@ -102,6 +102,8 @@ chkconfig cups off
 chkconfig gpm off
 ifup eth1
 yum -y groupremove "Dialup Networking Support"
+yum -y groupinstall "Yum Utilities"
+yum -y groupinstall "Mono"
 echo "Installing cfengine"
 wget -O - http://www.broadinstitute.org/~jbh/centos-setup.sh | bash
 echo "Linking tcsh"
