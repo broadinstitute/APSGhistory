@@ -20,8 +20,8 @@ unsetenv _dk_broad_me
 
 #### RUNTIME ITEMS
 # PATH entries.
-dk_alter PATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/bwa_0.5.5/bin
+dk_alter PATH /broad/software/free/Linux/suse_10_x86_64/pkgs/bwa_0.5.5
 
 # MANPATH entries.
 #dk_alter MANPATH /broad/software/free/Linux/suse_10_x86_64/pkgs/bwa_0.5.5/share/man
-dk_alter MANPATH /broad/software/free/Linux/redhat_5_x86_64/pkgs/bwa_0.5.5/man
+dk_alter MANPATH /broad/software/free/Linux/suse_10_x86_64/pkgs/bwa_0.5.5/man
