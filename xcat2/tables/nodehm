@@ -1,5 +1,5 @@
 #node,power,mgt,cons,termserver,termport,conserver,serialport,serialspeed,serialflow,getmac,comments,disable
-"node246","blade","blade",,,,,,,,,,
+"node246","ipmi","ipmi",,,,,,,,,,
 "node1223",,"ipmi",,,,,,,,,,
 "bariumphys","ipmi","ipmi",,,,,,,,,,
 "node1018","ipmi","ipmi",,,,,,,,,,
