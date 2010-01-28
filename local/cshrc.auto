@@ -20,6 +20,7 @@ switch ( $M_TYPE )
     if (-f /util/etc/$group.setup_csh) then
       source /util/etc/$group.setup_csh
     endif
+    breaksw
   default:
     # Init Dotkit in every shell
     setenv DK_ROOT /broad/software/dotkit

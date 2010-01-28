@@ -21,6 +21,7 @@ switch ( $M_TYPE )
     if (-f /util/etc/$group.login_csh) then
       source /util/etc/$group.login_csh
     endif
+    breaksw
   case default:
     # New style does nothing here.
     breaksw
