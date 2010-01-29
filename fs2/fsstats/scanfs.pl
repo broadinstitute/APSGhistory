@@ -12,7 +12,7 @@ use Getopt::Long;
 
 
 my $PRG = "/util/bin/perl /sysman/scratch/matter/sandbox/fsstats/mystats";
-my $TMP = "/broad/hptmp/matter";
+my $TMP = "/broad/shptmp/fsstats";
 my $DRYRUN = 0;
 my $SLEEP = 0;
 my $MAX_SIZE = 1E9;
@@ -191,7 +191,7 @@ if ($nr > 0) {
     $olddir{$row[0]} = $row[1];		# Key = dirid
   }
 } else {
-  warn "no subdirectories in DB for fsid=$fsid";
+  warn "no subdirectories in DB for fsid=$fsid $dirclause";
 }
 
 ##
@@ -301,6 +301,7 @@ for my $d (keys %dbdir) {
     $cmd = "$0 -t $opt_t -f $opt_f -d $dirid";
     $cmd .= " -v" if $DEBUG;
     $cmd .= " --force-update" if $force;
+    $cmd .= " -q $queue" if $queue;
 #    $cmd = "bsub -q $queue -J $job -o /dev/null $cmd";
     print STDERR "$cmd\n" if $DEBUG;
     print `$cmd\n` unless $DRYRUN;
@@ -318,8 +319,8 @@ for my $d (keys %dbdir) {
       $job = "scanfs_${fsid}_${dirid}";
       $cmd = "$0 -t $opt_t -f $opt_f -d $dirid";
       $cmd .= " -v" if $DEBUG;
+      $cmd .= " -q $queue" if $queue;
       $cmd .= " --force-update" if $force;
-#      $cmd = "bsub -r -q $queue -J $job -o /dev/null $cmd";
       print STDERR "$cmd\n" if $DEBUG;
       print `$cmd\n` unless $DRYRUN;
       $extdep = "done(\"scanfs_${fsid}_*\")";

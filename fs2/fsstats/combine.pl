@@ -44,7 +44,7 @@ unless (defined $opt_d or $opt_f == 0) {
     warn "No rows returned. Something amiss.\n";
     exit 1;
   }
-  my $level = ($sth->fetchrow_array())[0] - 1;
+  my $level = ($sth->fetchrow_array())[0];
   while ($level > 0) {
     $sql = qq{SELECT DISTINCT(parent) FROM subdir WHERE fsid=$opt_f AND deprecated IS FALSE and level=$level};
     print STDERR "$sql\n" if $DEBUG;
