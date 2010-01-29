@@ -1,5 +1,5 @@
 #node,power,mgt,cons,termserver,termport,conserver,serialport,serialspeed,serialflow,getmac,comments,disable
-"node246","ipmi","ipmi",,,,,,,,,,
+"node246",,"blade",,,,,,,,,,
 "node1223",,"ipmi",,,,,,,,,,
 "bariumphys","ipmi","ipmi",,,,,,,,,,
 "node1018","ipmi","ipmi",,,,,,,,,,
@@ -19,3 +19,4 @@
 "node1030","ipmi","ipmi",,,,,,,,,,
 "node1031","ipmi","ipmi",,,,,,,,,,
 "node328","ipmi","ipmi",,,,,,,,,,
+"jupiter","ipmi","ipmi",,,,,,,,,,
