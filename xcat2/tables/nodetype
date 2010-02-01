@@ -3,3 +3,5 @@
 "farm","centos5.4","x86_64","broad.farm.centos5",,,"osi",,
 "stateless","centos5.4","x86_64","broad.stateless.centos5",,,"osi",,
 "node1018",,,,"install",,,,
+"node328",,,,"install",,,,
+"jupiter",,,,"install",,,,

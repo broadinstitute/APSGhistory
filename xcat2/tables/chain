@@ -20,3 +20,5 @@
 "node1029","boot","boot","runcmd=standby",,,
 "node1030","boot","boot","runcmd=standby",,,
 "node1031","boot","boot","runcmd=standby",,,
+"node328","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
+"jupiter","boot","boot","runcmd=standby",,,

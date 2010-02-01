@@ -1,3 +1,2 @@
 #node,bmc,bmcport,username,password,comments,disable
-"node1223","node1223-rac",,,,,
-"node1019","node1019-rac",,,,,
+"dell","/\z/-rac/",,,,,
