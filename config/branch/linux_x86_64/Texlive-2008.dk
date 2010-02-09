@@ -1,0 +1,9 @@
+#c applications
+#d Add TeXLive 2008 (TeX, LaTeX, etc.) to path
+
+# Remove existing TeX packages
+unuse -q `dk_rep "*texlive-*"`
+unuse -q `dk_rep "TeX*"`
+
+# Set up texlive
+dk_op -q .texlive-2008.dk
