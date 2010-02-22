@@ -2,4 +2,4 @@
 #d use version 7.9 of the MATLAB language
 #rootpath /broad/tools/apps/matlab2009a
 
-dk_alter PATH /broad/tools/apps/matlab2009b/bin
+dk_alter PATH /broad/tools/apps/matlab2009b2/bin
