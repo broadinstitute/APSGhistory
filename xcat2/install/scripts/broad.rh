@@ -166,7 +166,8 @@ mv -f CentOS-Base.new CentOS-Base.repo
 yum -y groupremove "Dialup Networking Support"
 yum -y groupinstall "Yum Utilities"
 yum -y groupinstall "Mono"
-yum -y install nrpe
+yum -y install nagios-nrpe nagios-plugins-nrpe
+chkconfig nrpe on
 ##UPGRADE!
 yum -y upgrade
 
