@@ -174,7 +174,11 @@ for PKG in lapack-devel blas-devel blacs* nagios-nrpe nagios-plugins-nrpe
 do
 	yum -y install $PKG
 done
-chkconfig nrpe on
+#Turn services on
+for SERVICE in nrpe ntpd
+do
+	chkconfig $SERVICE on
+done
 ##UPGRADE!
 yum -y upgrade
 
