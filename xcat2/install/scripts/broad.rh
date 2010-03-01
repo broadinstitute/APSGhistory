@@ -170,7 +170,7 @@ do
 	yum -y install `repoquery -g -l --grouppkgs=all $GROUP`
 done
 #Individuals Next
-for PKG in lapack-devel blas-devel blacs* nagios-nrpe nagios-plugins-nrpe
+for PKG in lapack-devel blas-devel blacs* nagios-nrpe nagios-plugins-nrpe python-imaging.x86_64 python-imaging-devel.x86_64
 do
 	yum -y install $PKG
 done
