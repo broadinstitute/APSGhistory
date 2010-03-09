@@ -404,7 +404,7 @@ if (defined $opt_d) {
 }
 $cmd = "/home/radon01/matter/sandbox/fsstats/combine.pl -f $fsid";
 $cmd .= " -v" if $DEBUG;
-$cmd = "bsub -r -q $queue -P fsstats -w '$dep' -J $job -o $DIR/combine.out " . $cmd;
+$cmd = "bsub -r -q $queue -E \"perl -e 'use DBI'\" -P fsstats -w '$dep' -J $job -o $DIR/combine.out " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
 
