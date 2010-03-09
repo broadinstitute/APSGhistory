@@ -1,4 +1,4 @@
-#!/util/bin/perl -w
+#!/usr/bin/perl
 
 ##
 ##  combine.pl: For a given fsid, roll up all subdirectory stats into

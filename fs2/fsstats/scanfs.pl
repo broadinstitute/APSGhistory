@@ -1,4 +1,4 @@
-#!/util/bin/perl -w
+#!/usr/bin/env perl
 
 ##
 ##  scanfs.pl: Walk a filesystem initiating scans (via mystats) of each
@@ -11,7 +11,7 @@ use DBD::mysql;
 use Getopt::Long;
 
 
-my $PRG = "/util/bin/perl /sysman/scratch/matter/sandbox/fsstats/mystats";
+my $PRG = "perl /sysman/scratch/matter/sandbox/fsstats/mystats";
 my $TMP = "/broad/shptmp/fsstats";
 my $DRYRUN = 0;
 my $SLEEP = 0;
@@ -51,6 +51,7 @@ $dirid = $opt_d if defined $opt_d;
 ##
 my ($dsn,$dbh);
 $dsn = "DBI:mysql:database=matter;host=mysql;port=3306";
+##$dbh = DBI->connect($dsn, "root", "H$Kuz7ei");
 $dbh = DBI->connect($dsn, "matter", "tyhjcZ30Y");
 
 my ($sql, $sth, $nr);
@@ -299,6 +300,8 @@ for my $d (keys %dbdir) {
     ##
     $job = "scanfs_${fsid}_${dirid}";
     $cmd = "$0 -t $opt_t -f $opt_f -d $dirid";
+    $cmd .= " -P \"fsstats\"";
+    $cmd .= " -E \"cd $mount\"";
     $cmd .= " -v" if $DEBUG;
     $cmd .= " --force-update" if $force;
     $cmd .= " -q $queue" if $queue;
@@ -318,6 +321,8 @@ for my $d (keys %dbdir) {
       print STDERR "Directory $d was $s KB when last we checked. Scanning.\n";
       $job = "scanfs_${fsid}_${dirid}";
       $cmd = "$0 -t $opt_t -f $opt_f -d $dirid";
+      $cmd .= " -P \"fsstats\"";
+      $cmd .= " -E \"cd $mount\"";
       $cmd .= " -v" if $DEBUG;
       $cmd .= " -q $queue" if $queue;
       $cmd .= " --force-update" if $force;
@@ -357,7 +362,7 @@ my $dep;
 $job = defined $opt_d ? "scan_${fsid}_${opt_d}_0" :
                         "scan_${fsid}_0";
 $cmd = "$PRG -1 -o $DIR/0.csv \"$dir\"";
-$cmd = "bsub -r -q $queue -o $DIR/0.out -J $job $res " . $cmd;
+$cmd = "bsub -r -q $queue -P fsstats -E \"cd $dir\" -o $DIR/0.out -J $job $res " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
 for my $d (keys %dbdir) {
@@ -365,7 +370,7 @@ for my $d (keys %dbdir) {
   $job = defined $opt_d ? "scan_${fsid}_${opt_d}_${dirid}" :
                           "scan_${fsid}_${dirid}";
   $cmd = "$PRG -o $DIR/${dirid}.csv \"$dir/$d\"";
-  $cmd = "bsub -r -q $queue -J $job -o  $DIR/${dirid}.out $res " . $cmd;
+  $cmd = "bsub -r -q $queue -P fsstats -E \"cd $dir\" -J $job -o  $DIR/${dirid}.out $res " . $cmd;
   print STDERR "$cmd\n" if $DEBUG;
   print `$cmd\n` unless $DRYRUN;
   sleep $SLEEP;
@@ -385,7 +390,7 @@ if (defined $opt_d) {
 }
 $cmd = "/home/radon01/matter/sandbox/fsstats/upload_stats.pl -d $DIR -t $opt_t";
 $cmd .= " -v" if $DEBUG;
-$cmd = "bsub -r -q $queue -w '$dep' -J $job -o $DIR/upload.out " . $cmd;
+$cmd = "bsub -r -q $queue -P fsstats -w '$dep' -J $job -o $DIR/upload.out " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
 ##
@@ -399,7 +404,7 @@ if (defined $opt_d) {
 }
 $cmd = "/home/radon01/matter/sandbox/fsstats/combine.pl -f $fsid";
 $cmd .= " -v" if $DEBUG;
-$cmd = "bsub -r -q $queue -w '$dep' -J $job -o $DIR/combine.out " . $cmd;
+$cmd = "bsub -r -q $queue -P fsstats -w '$dep' -J $job -o $DIR/combine.out " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
 

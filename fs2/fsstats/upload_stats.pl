@@ -1,4 +1,4 @@
-#!/util/bin/perl -w
+#!/usr/bin/env perl
 
 use DBI;
 use DBD::mysql;
