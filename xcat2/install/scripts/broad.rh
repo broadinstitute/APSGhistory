@@ -162,15 +162,70 @@ esac
 ##Convert to home-grown mirror
 sed -e '15,32s/mirrorlist/#mirrorlist/g' -e '15,32s/#baseurl=http:\/\/mirror.centos.org/baseurl=http:\/\/mirror.broadinstitute.org\/linux/g' CentOS-Base.repo > CentOS-Base.new
 mv -f CentOS-Base.new CentOS-Base.repo
-##Alter packages now that we are on the mirror
+##Install packages now that we are on the mirror
 ##Groups first
 yum -y groupremove "Dialup Networking Support"
-for GROUP in "Yum Utilities" Mono "Engineering and Scientific"
+GROUPLIST="
+	network-server
+	yum-utils
+	mono
+	engineering-and-scientific
+	system-tools
+	base-x
+	legacy-software-development
+	development-tools
+	development-libs
+	editors
+	authoring-and-publishing
+	gnome-software-development
+	graphical-internet
+	graphics
+	kde-software-development
+	mail-server
+	mysql
+	openfabrics-enterprise-distribution
+	sql-server
+	printing
+	web-server
+	emacs
+"   
+for GROUP in $GROUPLIST
 do
 	yum -y install `repoquery -g -l --grouppkgs=all $GROUP`
 done
+
 #Individuals Next
-for PKG in lapack-devel blas-devel blacs* nagios-nrpe nagios-plugins-nrpe python-imaging.x86_64 python-imaging-devel.x86_64
+PKGLIST="
+	pcre-devel
+	ruby
+	man
+	autofs
+	ntp
+	tftp
+	xinetd
+	rsh rsh-server
+	psacct
+	nfs-utils
+	net-snmp
+	rsync
+	yp-tools ypserv ypbind
+	m4
+	sendmail-cf
+	gdb
+	bzip2
+	binutils
+	openssh-server
+	util-linux
+	compat-libstdc++-33
+	lapack-devel
+	blas-devel
+	blacs*
+	nagios-nrpe
+	nagios-plugins-nrpe
+	python-imaging.x86_64
+	python-imaging-devel.x86_64
+"
+for PKG in $PKGLIST
 do
 	yum -y install $PKG
 done
