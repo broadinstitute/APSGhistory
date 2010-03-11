@@ -165,29 +165,39 @@ mv -f CentOS-Base.new CentOS-Base.repo
 ##Install packages now that we are on the mirror
 ##Groups first
 yum -y groupremove "Dialup Networking Support"
+yum -y groupinstall yum-utils
 GROUPLIST="
-	network-server
-	yum-utils
-	mono
+	admin-tools
+	authoring-and-publishing
 	engineering-and-scientific
-	system-tools
-	base-x
-	legacy-software-development
 	development-tools
 	development-libs
 	editors
-	authoring-and-publishing
+	emacs
 	gnome-software-development
 	graphical-internet
 	graphics
+	java
+	java-development
 	kde-software-development
+	legacy-network-server
+	legacy-software-development
+	legacy-software-support
 	mail-server
+	mono
 	mysql
+	network-server
 	openfabrics-enterprise-distribution
 	sql-server
 	printing
+	ruby
+	server-cfg
+	system-tools
+	text-internet
 	web-server
-	emacs
+	x-software-development
+	base-x
+	yum-utils
 "   
 for GROUP in $GROUPLIST
 do
@@ -197,7 +207,6 @@ done
 #Individuals Next
 PKGLIST="
 	pcre-devel
-	ruby
 	man
 	autofs
 	ntp
