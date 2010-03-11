@@ -161,7 +161,7 @@ esac
 
 ##Convert to home-grown mirror
 sed -e '15,32s/mirrorlist/#mirrorlist/g' -e '15,32s/#baseurl=http:\/\/mirror.centos.org/baseurl=http:\/\/mirror.broadinstitute.org\/linux/g' CentOS-Base.repo > CentOS-Base.new
-mv -f CentOS-Base.new CentOS-Base.repo
+mv -f CentOS-Base.new /etc/yum.repos.d/CentOS-Base.repo
 ##Install packages now that we are on the mirror
 ##Groups first
 yum -y groupremove "Dialup Networking Support"
