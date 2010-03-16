@@ -1,4 +1,4 @@
-#!/bin/ksh
-#
 unset SYS_TYPE;
-eval `/broad/tools/dotkit/init`
+# We are a tricksie cross-shell hobbit, aren't we.
+DOTKITINIT=`/broad/tools/scripts/useuse.logic` >& /dev/null || set DOTKITINIT=`/broad/tools/scripts/useuse.logic`
+eval `$DOTKITINIT`

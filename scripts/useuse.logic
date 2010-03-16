@@ -1,0 +1,12 @@
+#!/bin/bash
+M_TYPE=`/broad/software/dotkit/etc/systype`
+
+case $M_TYPE in
+  suse*)
+    echo "/broad/tools/dotkit/init"
+    ;;
+  *)
+    echo "/broad/software/dotkit/init"
+    ;;
+esac
+
