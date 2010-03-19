@@ -153,19 +153,37 @@ case $VENDOR in
 	sh PEM605_BIOS_LX_5.3.2_1.BIN -q
 	echo "Removing BIOS FW installer"
 	rm -rf PEM605_BIOS_LX_5.3.2_1.BIN
+
+	#Dell's convoluted way of enabling virtualization settings en masse
+	yum install srvadmin-hapi
+	wget ftp://ftp.us.dell.com/sysman/dtk_2.5_80_Linux.iso
+	mkdir dtk
+	mount -o loop dtk_2.5_80_Linux.iso dtk/
+	cd dtk/isolinux/
+	cp  SA.2 ~/SA.2.gz
+	cd; gunzip SA.2.gz
+	mkdir stage2
+	cd stage2
+	cpio -i < ../SA.2
+	cd lofs
+	mkdir dell
+	mount -o loop dell.cramfs dell/
+	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/
+	/usr/local/sbin/syscfg –virtualization=enable
         ;;
 *)
         echo "Oops.  Fix me."
 esac
 #End IBM/Dell Logic.
 
+###Apparently, yum needs utils before switching to our local mirror
+yum -y groupinstall yum-utils
 ##Convert to home-grown mirror
-sed -e '15,32s/mirrorlist/#mirrorlist/g' -e '15,32s/#baseurl=http:\/\/mirror.centos.org/baseurl=http:\/\/mirror.broadinstitute.org\/linux/g' CentOS-Base.repo > CentOS-Base.new
+sed -e '15,32s/^mirrorlist/#mirrorlist/g' -e '15,32s/#baseurl=http:\/\/mirror.centos.org/baseurl=http:\/\/mirror.broadinstitute.org\/linux/g' /etc/yum.repos.d/CentOS-Base.repo > CentOS-Base.new
 mv -f CentOS-Base.new /etc/yum.repos.d/CentOS-Base.repo
 ##Install packages now that we are on the mirror
 ##Groups first
 yum -y groupremove "Dialup Networking Support"
-yum -y groupinstall yum-utils
 GROUPLIST="
 	admin-tools
 	authoring-and-publishing
