@@ -96,10 +96,6 @@ rm -f /tmp/mypostscript
 rm -f /etc/stunnel/stunnel.conf
 mkdir /local/scratch
 chmod -R 1777 /local/scratch
-chkconfig ip6tables off
-chkconfig bluetooth off
-chkconfig cups off
-chkconfig gpm off
 ifup eth1
 echo "Installing cfengine"
 wget -O - http://www.broadinstitute.org/~jbh/centos-setup.sh | bash
@@ -261,6 +257,13 @@ for SERVICE in nrpe ntpd
 do
 	chkconfig $SERVICE on
 done
+
+#Turn services off
+for SERVICE in iptables bluetooth cups gpm
+do
+	chkconfig $SERVICE off
+done
+
 ##UPGRADE!
 yum -y upgrade
 
