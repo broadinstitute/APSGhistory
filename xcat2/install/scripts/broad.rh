@@ -113,59 +113,65 @@ echo "ssh-dss AAAAB3NzaC1kc3MAAACBAMdPwPbhgProKuYZZLUVRGrVoJYsWoR0Vyd+MGvv7HWngB
 
 #Is this IBM or Dell?  Plan Accordingly
 VENDOR=`dmidecode | awk -F: '/Vendor/ {print $2}' | sed 's/ //' | awk '{print $1}'`
-
+EMAIL="ali@broadinstitute.org"
 case $VENDOR in
 "IBM")
-	echo "Downloading DSA"
-	wget http://download.boulder.ibm.com/ibmdl/pub/systems/support/system_x/ibm_utl_dsa_230i_rhel5_x86-64.rpm
-	echo "Installing DSA"
-	rpm -Uvh ibm_utl_dsa_230i_rhel5_x86-64.rpm
-	echo "Remove Download"
-	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm
+	FILE="ibmInst.log"
+	echo "Downloading DSA" | tee $FILE
+	wget http://download.boulder.ibm.com/ibmdl/pub/systems/support/system_x/ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
+	echo "Installing DSA" | tee -a $FILE
+	rpm -Uvh ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
+	echo "Remove Download" | tee -a $FILE
+	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
+
+	cat $FILE | mail -s "xCAT: Dell Specific Config" $EMAIL
         ;;
 "Dell")
-	echo "Downloading OMSA"
-	wget -O - http://linux.dell.com/repo/hardware/latest/bootstrap.cgi | bash
-	echo "Installing OMSA"
-	yum -y install srvadmin-all
+	FILE="dellInst.log"
+	echo "Downloading OMSA" | tee $FILE
+	wget -O - http://linux.dell.com/repo/hardware/latest/bootstrap.cgi | bash | tee -a $FILE
+	echo "Installing OMSA" | tee -a $FILE
+	yum -y install srvadmin-all | tee -a $FILE
 
-	echo "Copying DSET"
-	wget ftp://ftp.us.dell.com/sysman/delldset_v1.8.1.100.bin
-	echo "Installing DSET"
-	sh delldset_v1.8.1.100.bin -i
-	echo "Removing install file"
-	rm -f delldset_v1.8.1.100.bin
+	echo "Copying DSET" | tee -a $FILE
+	wget ftp://ftp.us.dell.com/sysman/delldset_v1.8.1.100.bin | tee -a $FILE
+	echo "Installing DSET" | tee -a $FILE
+	sh delldset_v1.8.1.100.bin -i | tee -a $FILE
+	echo "Removing install file" | tee -a $FILE
+	rm -f delldset_v1.8.1.100.bin | tee -a $FILE
 
-	echo "Download iDRAC Update"
-	wget ftp://ftp.us.dell.com/esm/PEM605_IDRAC_FRMW_LX_R249272.BIN
-	echo "Installing iDRAC Update"
-	sh PEM605_IDRAC_FRMW_LX_R249272.BIN -q
-	echo "Removing iDRAC Update"
-	rm -rf PEM605_IDRAC_FRMW_LX_R249272.BIN
+	echo "Download iDRAC Update" | tee -a $FILE
+	wget ftp://ftp.us.dell.com/esm/PEM605_IDRAC_FRMW_LX_R249272.BIN | tee -a $FILE
+	echo "Installing iDRAC Update" | tee -a $FILE
+	sh PEM605_IDRAC_FRMW_LX_R249272.BIN -q | tee -a $FILE
+	echo "Removing iDRAC Update" | tee -a $FILE
+	rm -rf PEM605_IDRAC_FRMW_LX_R249272.BIN | tee -a $FILE
 
-	echo "Download BIOS FW Update"
-	wget ftp://ftp.us.dell.com/bios/PEM605_BIOS_LX_5.3.2_1.BIN
-	echo "Install BIOS FW Update"
-	sh PEM605_BIOS_LX_5.3.2_1.BIN -q
-	echo "Removing BIOS FW installer"
-	rm -rf PEM605_BIOS_LX_5.3.2_1.BIN
+	echo "Download BIOS FW Update" | tee -a $FILE
+	wget ftp://ftp.us.dell.com/bios/PEM605_BIOS_LX_5.3.2_1.BIN | tee -a $FILE
+	echo "Install BIOS FW Update" | tee -a $FILE
+	sh PEM605_BIOS_LX_5.3.2_1.BIN -q | tee -a $FILE
+	echo "Removing BIOS FW installer" | tee -a $FILE
+	rm -rf PEM605_BIOS_LX_5.3.2_1.BIN | tee -a $FILE
 
 	#Dell's convoluted way of enabling virtualization settings en masse
-	yum install srvadmin-hapi
-	wget ftp://ftp.us.dell.com/sysman/dtk_2.5_80_Linux.iso
-	mkdir dtk
-	mount -o loop dtk_2.5_80_Linux.iso dtk/
-	cd dtk/isolinux/
-	cp  SA.2 ~/SA.2.gz
-	cd; gunzip SA.2.gz
-	mkdir stage2
-	cd stage2
-	cpio -i < ../SA.2
-	cd lofs
-	mkdir dell
-	mount -o loop dell.cramfs dell/
-	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/
-	/usr/local/sbin/syscfg –virtualization=enable
+	yum install srvadmin-hapi | tee -a $FILE
+	wget ftp://ftp.us.dell.com/sysman/dtk_2.5_80_Linux.iso | tee -a $FILE
+	mkdir dtk | tee -a $FILE
+	mount -o loop dtk_2.5_80_Linux.iso dtk/ | tee -a $FILE
+	cd dtk/isolinux/ | tee -a $FILE
+	cp  SA.2 ~/SA.2.gz | tee -a $FILE
+	cd; gunzip SA.2.gz | tee -a $FILE
+	mkdir stage2 | tee -a $FILE
+	cd stage2 | tee -a $FILE
+	cpio -i < ../SA.2 | tee -a $FILE
+	cd lofs | tee -a $FILE
+	mkdir dell | tee -a $FILE
+	mount -o loop dell.cramfs dell/ | tee -a $FILE
+	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ | tee -a $FILE
+	/usr/local/sbin/syscfg –virtualization=enable | tee -a $FILE
+
+	cat $FILE | mail -s "xCAT: Dell Specific Config" $EMAIL
         ;;
 *)
         echo "Oops.  Fix me."
