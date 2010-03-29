@@ -15,14 +15,15 @@ fi
 
 DIR=/root/svn/xcat2/tables/
 
-exec `$*`
+$*
 
 for TABLE in hosts mac nodelist nodehm
 do
-exec `tabdump $TABLE > $DIR/$TABLE`
+tabdump $TABLE > $DIR/$TABLE
 done
 
 echo "Please enter desired comments for files you have changed:"
 read COMMENT
 
-exec `cd $DIR; svn ci -m "$COMMENT" *`
+cd $DIR
+svn ci -m "$COMMENT" *
