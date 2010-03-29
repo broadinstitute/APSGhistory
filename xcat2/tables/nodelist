@@ -15,6 +15,7 @@
 "node1029","farm,all,dell","booting",,,,
 "node1030","farm,all,dell","booting",,,,
 "node1031","farm,all,dell","booting",,,,
-"node328","farm,all,ibm",,,,,
+"node328","farm,all,ibm","booting",,,,
 "node246","farm.raid,all,ibm",,,,,
 "jupiter","farm,all,dell","booting",,,,
+"oel_test","db,all",,,,,

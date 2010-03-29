@@ -1,3 +1,4 @@
 #node,power,mgt,cons,termserver,termport,conserver,serialport,serialspeed,serialflow,getmac,comments,disable
 "ibm","blade","blade",,,,,,,,,,
 "dell","ipmi","ipmi",,,,,,,,,,
+"oel_test","ipmi","ipmi",,,,,,,,,,
