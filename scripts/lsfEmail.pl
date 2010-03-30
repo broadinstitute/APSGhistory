@@ -7,7 +7,13 @@ use Net::SMTP;
 my ($cmd,$bjobsOutput,$bjobsLongOutput,$machine,@recipients,$count);
 my ($from,$subject,$prefixMessage,$mesg,$mailServer,$smtp,$cc);
 
-$machine = $ARGV[0];
+if ($ARGV[0] eq "-n"){
+	$machine = $ARGV[1];
+} else {
+	$machine = $ARGV[0];
+	`badmin hclose -C "Wedged Node" $machine`;
+}
+
 $cmd = "bjobs -u all -m $machine";
 $bjobsOutput = `$cmd`;
 $cmd = "bjobs -l -u all -m $machine";
@@ -47,5 +53,3 @@ $smtp->datasend("Subject: $subject\n");
 $smtp->datasend($mesg);
 $smtp->dataend();
 $smtp->quit();
-
-`badmin hclose -C "Wedged Node" $machine`;
