@@ -1,19 +1,48 @@
 #!/usr/bin/python
 ###Import Block###
 from getpass import getpass,getuser
-from time import sleep
-from os import path,makedirs
+from time import sleep,time
+from os import path,makedirs,listdir
 from sys import exit
 from datetime import datetime
 from subprocess import *
 
 import logging,string
 
+###clear old download dirs###
+def clear_old_dir(expRate):
+        def get_immediate_subdirectories(dir):
+            return [name for name in listdir(dir)
+                    if path.isdir(path.join(dir, name))]
+
+        basedir = "/tftpboot/"
+        dirs = get_immediate_subdirectories(basedir)
+        for dir in dirs:
+                dir = basedir + dir
+                mtime = path.getmtime(dir)
+                mtime = int(mtime)
+                today = time()
+                delta = (today - mtime)
+                print(dir)
+
+                if delta > expRate:
+                        print "Del Me"
+                else:
+                        print "keep"
+
+
+
 ###Function for Config Import###
 def get_config(list,cmd,user_pass,en_pass,ip):
 	username="admin"
 	for item in list:
 		if not path.exists("%s/%s" % (smb_rdir,item)):
+			#Pre-run that removes SSH host key first
+			p=Popen(["ssh-keygen","-R",item]),stdin=None,stdout=PIPE)
+			sleep(10)
+			p.stdout.close()
+			p.wait()
+
 			p=Popen([cmd, item, user_pass, en_pass, username,ip], stdin=None, stdout=PIPE)
 			sleep(30)
 			p.stdout.close()
@@ -60,6 +89,9 @@ now = datetime.now()
 date = now.strftime("%Y%m%d")
 tftpdir= "/tftpboot/"
 basedir = tftpdir + date
+
+###Before Anything else, remove expired config downloads###
+clear_old_dir(1209600) ##This set the expiration rate @ 2 weeks
 
 ###Configure Samba###
 smb_user = getuser()
