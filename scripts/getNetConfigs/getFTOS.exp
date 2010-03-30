@@ -17,6 +17,7 @@ send "$enpassw\r"
 expect "$host#"
 send "copy run tftp://$ip/$date/$host\r"
 expect "$host#"
-send "logout\r"
+send "\r"
+send "exit\r"
 exit 0
 

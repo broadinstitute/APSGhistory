@@ -15,6 +15,7 @@ def get_config(list,cmd,user_pass,en_pass,ip):
 	for item in list:
 		if not path.exists("%s/%s" % (smb_rdir,item)):
 			p=Popen([cmd, item, user_pass, en_pass, username,ip], stdin=None, stdout=PIPE)
+			sleep(30)
 			p.stdout.close()
 			p.wait()
 
