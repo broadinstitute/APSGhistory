@@ -117,59 +117,59 @@ EMAIL="ali@broadinstitute.org"
 case $VENDOR in
 "IBM")
 	FILE="ibmInst.log"
-	echo "Downloading DSA" | tee $FILE
-	wget http://download.boulder.ibm.com/ibmdl/pub/systems/support/system_x/ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
-	echo "Installing DSA" | tee -a $FILE
-	rpm -Uvh ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
-	echo "Remove Download" | tee -a $FILE
-	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
+	echo "Downloading DSA" > $FILE
+	wget http://download.boulder.ibm.com/ibmdl/pub/systems/support/system_x/ibm_utl_dsa_230i_rhel5_x86-64.rpm >> $FILE
+	echo "Installing DSA" >> $FILE
+	rpm -Uvh ibm_utl_dsa_230i_rhel5_x86-64.rpm >> $FILE
+	echo "Remove Download" >> $FILE
+	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm >> $FILE
 
 	cat $FILE | mail -s "xCAT: Dell Specific Config" $EMAIL
         ;;
 "Dell")
 	FILE="dellInst.log"
-	echo "Downloading OMSA" | tee $FILE
-	wget -O - http://linux.dell.com/repo/hardware/latest/bootstrap.cgi | bash | tee -a $FILE
-	echo "Installing OMSA" | tee -a $FILE
-	yum -y install srvadmin-all | tee -a $FILE
+	echo "Downloading OMSA" > $FILE
+	wget -O - http://linux.dell.com/repo/hardware/latest/bootstrap.cgi | bash >> $FILE
+	echo "Installing OMSA" >> $FILE
+	yum -y install srvadmin-all >> $FILE
 
-	echo "Copying DSET" | tee -a $FILE
-	wget ftp://ftp.us.dell.com/sysman/delldset_v1.8.1.100.bin | tee -a $FILE
-	echo "Installing DSET" | tee -a $FILE
-	sh delldset_v1.8.1.100.bin -i | tee -a $FILE
-	echo "Removing install file" | tee -a $FILE
-	rm -f delldset_v1.8.1.100.bin | tee -a $FILE
+	echo "Copying DSET" >> $FILE
+	wget ftp://ftp.us.dell.com/sysman/delldset_v1.8.1.100.bin >> $FILE
+	echo "Installing DSET" >> $FILE
+	sh delldset_v1.8.1.100.bin -i >> $FILE
+	echo "Removing install file" >> $FILE
+	rm -f delldset_v1.8.1.100.bin >> $FILE
 
-	echo "Download iDRAC Update" | tee -a $FILE
-	wget ftp://ftp.us.dell.com/esm/PEM605_IDRAC_FRMW_LX_R249272.BIN | tee -a $FILE
-	echo "Installing iDRAC Update" | tee -a $FILE
-	sh PEM605_IDRAC_FRMW_LX_R249272.BIN -q | tee -a $FILE
-	echo "Removing iDRAC Update" | tee -a $FILE
-	rm -rf PEM605_IDRAC_FRMW_LX_R249272.BIN | tee -a $FILE
+	echo "Download iDRAC Update" >> $FILE
+	wget ftp://ftp.us.dell.com/esm/PEM605_IDRAC_FRMW_LX_R249272.BIN >> $FILE
+	echo "Installing iDRAC Update" >> $FILE
+	sh PEM605_IDRAC_FRMW_LX_R249272.BIN -q >> $FILE
+	echo "Removing iDRAC Update" >> $FILE
+	rm -rf PEM605_IDRAC_FRMW_LX_R249272.BIN >> $FILE
 
-	echo "Download BIOS FW Update" | tee -a $FILE
-	wget ftp://ftp.us.dell.com/bios/PEM605_BIOS_LX_5.3.2_1.BIN | tee -a $FILE
-	echo "Install BIOS FW Update" | tee -a $FILE
-	sh PEM605_BIOS_LX_5.3.2_1.BIN -q | tee -a $FILE
-	echo "Removing BIOS FW installer" | tee -a $FILE
-	rm -rf PEM605_BIOS_LX_5.3.2_1.BIN | tee -a $FILE
+	echo "Download BIOS FW Update" >> $FILE
+	wget ftp://ftp.us.dell.com/bios/PEM605_BIOS_LX_5.3.2_1.BIN >> $FILE
+	echo "Install BIOS FW Update" >> $FILE
+	sh PEM605_BIOS_LX_5.3.2_1.BIN -q >> $FILE
+	echo "Removing BIOS FW installer" >> $FILE
+	rm -rf PEM605_BIOS_LX_5.3.2_1.BIN >> $FILE
 
 	#Dell's convoluted way of enabling virtualization settings en masse
-	yum install srvadmin-hapi | tee -a $FILE
-	wget ftp://ftp.us.dell.com/sysman/dtk_2.5_80_Linux.iso | tee -a $FILE
-	mkdir dtk | tee -a $FILE
-	mount -o loop dtk_2.5_80_Linux.iso dtk/ | tee -a $FILE
-	cd dtk/isolinux/ | tee -a $FILE
-	cp  SA.2 ~/SA.2.gz | tee -a $FILE
-	cd; gunzip SA.2.gz | tee -a $FILE
-	mkdir stage2 | tee -a $FILE
-	cd stage2 | tee -a $FILE
-	cpio -i < ../SA.2 | tee -a $FILE
-	cd lofs | tee -a $FILE
-	mkdir dell | tee -a $FILE
-	mount -o loop dell.cramfs dell/ | tee -a $FILE
-	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ | tee -a $FILE
-	/usr/local/sbin/syscfg –virtualization=enable | tee -a $FILE
+	yum install srvadmin-hapi >> $FILE
+	wget ftp://ftp.us.dell.com/sysman/dtk_2.5_80_Linux.iso >> $FILE
+	mkdir dtk >> $FILE
+	mount -o loop dtk_2.5_80_Linux.iso dtk/ >> $FILE
+	cd dtk/isolinux/ >> $FILE
+	cp  SA.2 ~/SA.2.gz >> $FILE
+	cd; gunzip SA.2.gz >> $FILE
+	mkdir stage2 >> $FILE
+	cd stage2 >> $FILE
+	cpio -i < ../SA.2 >> $FILE
+	cd lofs >> $FILE
+	mkdir dell >> $FILE
+	mount -o loop dell.cramfs dell/ >> $FILE
+	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ >> $FILE
+	/usr/local/sbin/syscfg –virtualization=enable >> $FILE
 
 	cat $FILE | mail -s "xCAT: Dell Specific Config" $EMAIL
         ;;
@@ -180,9 +180,11 @@ esac
 
 ###Apparently, yum needs utils before switching to our local mirror
 yum -y groupinstall yum-utils
-##Convert to home-grown mirror
+##Convert to home-grown mirror and clean
 sed -e '15,32s/^mirrorlist/#mirrorlist/g' -e '15,32s/#baseurl=http:\/\/mirror.centos.org/baseurl=http:\/\/mirror.broadinstitute.org\/linux/g' /etc/yum.repos.d/CentOS-Base.repo > CentOS-Base.new
 mv -f CentOS-Base.new /etc/yum.repos.d/CentOS-Base.repo
+
+yum clean all
 ##Install packages now that we are on the mirror
 ##Groups first
 yum -y groupremove "Dialup Networking Support"
@@ -271,6 +273,7 @@ do
 done
 
 ##UPGRADE!
+yum clean all
 yum -y upgrade
 
 
