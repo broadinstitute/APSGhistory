@@ -101,8 +101,6 @@ for SERVICE in ypbind autofs nfs
 do
 	/etc/init.d/$SERVICE restart
 done
-echo "Installing cfengine"
-wget -O - http://www.broadinstitute.org/~jbh/centos-setup.sh | bash
 echo "Linking tcsh"
 ln -sin /bin/tcsh /usr/bin/tcsh
 ##tune4fs for tuning.  tune4fs is backwards-compatible, but tune2fs is not; therefore, we are using tune4fs to both ext3 and ext4.
@@ -195,6 +193,7 @@ yum -y groupremove "Dialup Networking Support"
 GROUPLIST="
 	admin-tools
 	authoring-and-publishing
+	Broad-Base
 	engineering-and-scientific
 	development-tools
 	development-libs
@@ -203,7 +202,6 @@ GROUPLIST="
 	gnome-software-development
 	graphical-internet
 	graphics
-	java
 	java-development
 	kde-software-development
 	legacy-network-server
@@ -230,40 +228,6 @@ do
 	yum -y install `repoquery -g -l --grouppkgs=all $GROUP`
 done
 
-#Individuals Next
-PKGLIST="
-	pcre-devel
-	man
-	autofs
-	ntp
-	tftp
-	xinetd
-	rsh rsh-server
-	psacct
-	nfs-utils
-	net-snmp
-	rsync
-	yp-tools ypserv ypbind
-	m4
-	sendmail-cf
-	gdb
-	bzip2
-	binutils
-	openssh-server
-	util-linux
-	compat-libstdc++-33
-	lapack-devel
-	blas-devel
-	blacs*
-	nagios-nrpe
-	nagios-plugins-nrpe
-	python-imaging.x86_64
-	python-imaging-devel.x86_64
-"
-for PKG in $PKGLIST
-do
-	yum -y install $PKG
-done
 #Turn services on
 for SERVICE in nrpe ntpd
 do
