@@ -143,14 +143,12 @@ case $VENDOR in
 	echo "Installing DSET" | tee -a $FILE
 	sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i | tee -a $FILE
 
-	echo "Installing iDRAC Update" | tee -a $FILE
-	sh /broad/mirror/linux/dell/hardware/PEM605_IDRAC_FRMW_LX_R249272.BIN -q | tee -a $FILE
-
-	echo "Install BIOS FW Update" | tee -a $FILE
-	sh /broad/mirror/linux/dell/hardware/BIOS/PEM605_BIOS_LX_5.3.2_1.BIN -q | tee -a $FILE
+	yum -y install dell_ft_install
+	yum -y install $(bootstrap_firmware)
+	update_firmware --yes
 
 	#Dell's convoluted way of enabling virtualization settings en masse
-	yum install srvadmin-hapi | tee -a $FILE
+	yum -y install srvadmin-hapi | tee -a $FILE
 	mkdir dtk | tee -a $FILE
 	mount -o loop /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso dtk/ | tee -a $FILE
 	cd dtk/isolinux/ | tee -a $FILE
