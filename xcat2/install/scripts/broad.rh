@@ -205,5 +205,7 @@ do
 	chkconfig $SERVICE off
 done
 
+sed "s/$(hostname)//g" /etc/hosts > /tmp/hosts.tmp
+mv /tmp/hosts.tmp /etc/hosts
 
 exit 0
