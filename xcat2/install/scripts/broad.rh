@@ -97,9 +97,13 @@ rm -f /etc/stunnel/stunnel.conf
 mkdir /local/scratch
 chmod -R 1777 /local/scratch
 ifup eth1
-for SERVICE in ypbind autofs nfs
+
+# modprobe seems necessary for reasons unknown.
+/sbin/modprobe nfs 
+for SERVICE in portmap ypbind autofs nfs
 do
 	/etc/init.d/$SERVICE restart
+	sleep 1
 done
 echo "Linking tcsh"
 ln -sin /bin/tcsh /usr/bin/tcsh
@@ -128,39 +132,27 @@ case $VENDOR in
 
 	cat $FILE | mail -s "xCAT: Dell Specific Config" $EMAIL
         ;;
+# REMEMBER YOU DID THIS
 "Dell")
 	FILE="dellInst.log"
 	echo "Downloading OMSA" | tee $FILE
-	wget -O - http://linux.dell.com/repo/hardware/latest/bootstrap.cgi | bash | tee -a $FILE
+	wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash | tee -a $FILE
 	echo "Installing OMSA" | tee -a $FILE
 	yum -y install srvadmin-all | tee -a $FILE
 
-	echo "Copying DSET" | tee -a $FILE
-	wget ftp://ftp.us.dell.com/sysman/delldset_v1.8.1.100.bin | tee -a $FILE
 	echo "Installing DSET" | tee -a $FILE
-	sh delldset_v1.8.1.100.bin -i | tee -a $FILE
-	echo "Removing install file" | tee -a $FILE
-	rm -f delldset_v1.8.1.100.bin | tee -a $FILE
+	sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i | tee -a $FILE
 
-	echo "Download iDRAC Update" | tee -a $FILE
-	wget ftp://ftp.us.dell.com/esm/PEM605_IDRAC_FRMW_LX_R249272.BIN | tee -a $FILE
 	echo "Installing iDRAC Update" | tee -a $FILE
-	sh PEM605_IDRAC_FRMW_LX_R249272.BIN -q | tee -a $FILE
-	echo "Removing iDRAC Update" | tee -a $FILE
-	rm -rf PEM605_IDRAC_FRMW_LX_R249272.BIN | tee -a $FILE
+	sh /broad/mirror/linux/dell/hardware/PEM605_IDRAC_FRMW_LX_R249272.BIN -q | tee -a $FILE
 
-	echo "Download BIOS FW Update" | tee -a $FILE
-	wget ftp://ftp.us.dell.com/bios/PEM605_BIOS_LX_5.3.2_1.BIN | tee -a $FILE
 	echo "Install BIOS FW Update" | tee -a $FILE
-	sh PEM605_BIOS_LX_5.3.2_1.BIN -q | tee -a $FILE
-	echo "Removing BIOS FW installer" | tee -a $FILE
-	rm -rf PEM605_BIOS_LX_5.3.2_1.BIN | tee -a $FILE
+	sh /broad/mirror/linux/dell/hardware/BIOS/PEM605_BIOS_LX_5.3.2_1.BIN -q | tee -a $FILE
 
 	#Dell's convoluted way of enabling virtualization settings en masse
 	yum install srvadmin-hapi | tee -a $FILE
-	wget ftp://ftp.us.dell.com/sysman/dtk_2.5_80_Linux.iso | tee -a $FILE
 	mkdir dtk | tee -a $FILE
-	mount -o loop dtk_2.5_80_Linux.iso dtk/ | tee -a $FILE
+	mount -o loop /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso dtk/ | tee -a $FILE
 	cd dtk/isolinux/ | tee -a $FILE
 	cp  SA.2 ~/SA.2.gz | tee -a $FILE
 	cd; gunzip SA.2.gz | tee -a $FILE
@@ -183,55 +175,28 @@ esac
 ###Apparently, yum needs utils before switching to our local mirror
 yum -y groupinstall yum-utils
 ##Convert to home-grown mirror and clean
+echo Changing to Broad-hosted CentOS mirror..
 wget http://www/~apsg/software/yumConfig/CentOS-Base.repo
 mv -f CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 
-yum clean all
-##Install packages now that we are on the mirror
-##Groups first
+##Yum customization and package foo
+echo Updating installed packages..
+wget http://www/~apsg/software/yumConfig/yum.conf
+rm -f /etc/yum.conf
+mv yum.conf /etc
 yum -y groupremove "Dialup Networking Support"
-GROUPLIST="
-	admin-tools
-	authoring-and-publishing
-	Broad-Base
-	engineering-and-scientific
-	development-tools
-	development-libs
-	editors
-	emacs
-	gnome-software-development
-	graphical-internet
-	graphics
-	java-development
-	kde-software-development
-	legacy-network-server
-	legacy-software-development
-	legacy-software-support
-	mail-server
-	mono
-	mysql
-	network-server
-	openfabrics-enterprise-distribution
-	sql-server
-	printing
-	ruby
-	server-cfg
-	system-tools
-	text-internet
-	web-server
-	x-software-development
-	base-x
-	yum-utils
-"   
-for GROUP in $GROUPLIST
-do
-	yum -y install `repoquery -g -l --grouppkgs=all $GROUP`
-done
+yum clean all
+yum -y upgrade
+echo Installing Broad package group "Broad Base"
+yum -y groupinstall "Broad Base"
+
 
 #Turn services on
 for SERVICE in nrpe ntpd
 do
-	chkconfig $SERVICE on
+	/sbin/chkconfig $SERVICE on
+	# Sure set the clock
+	ntpdate ns1.broadinstitute.org
 done
 
 #Turn services off
@@ -239,13 +204,6 @@ for SERVICE in iptables bluetooth cups gpm
 do
 	chkconfig $SERVICE off
 done
-
-##UPGRADE!
-wget http://www/~apsg/software/yumConfig/yum.conf
-mv yum.conf /etc
-
-yum clean all
-yum -y upgrade
 
 
 exit 0
