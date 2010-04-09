@@ -18,4 +18,6 @@
 "node328","farm,all,ibm","booting",,,,
 "node246","farm.raid,all,ibm",,,,,
 "jupiter","farm,all,dell","booting",,,,
-"oel_test","db,all",,,,,
+"node1150","dell,farm,all",,,,,
+"voeltest","db,all","booting",,,,
+"wga7","farm,all",,,,,
