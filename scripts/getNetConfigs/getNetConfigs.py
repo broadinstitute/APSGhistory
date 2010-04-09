@@ -38,10 +38,8 @@ def get_config(list,cmd,user_pass,en_pass,ip):
 	for item in list:
 		if not path.exists("%s/%s" % (smb_rdir,item)):
 			#Pre-run that removes SSH host key first
-			p=Popen(["ssh-keygen","-R",item]),stdin=None,stdout=PIPE)
+			p=Popen(["ssh-keygen","-R",item],stdin=None,stdout=None)
 			sleep(10)
-			p.stdout.close()
-			p.wait()
 
 			p=Popen([cmd, item, user_pass, en_pass, username,ip], stdin=None, stdout=PIPE)
 			sleep(30)
