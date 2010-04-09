@@ -204,6 +204,15 @@ do
 done
 
 sed "s/$(hostname)//g" /etc/hosts > /tmp/hosts.tmp
-mv /tmp/hosts.tmp /etc/hosts
+mv -f /tmp/hosts.tmp /etc/hosts
+
+# Start CFENGINE3 installation
+wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-3.0.4-1.centos5.x86_64.rpm
+wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
+rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
+tar xvfP /tmp/base_promises.tar
+cf-key
+cf-agent -f /var/cfengine/inputs/failsafe.cf
+
 
 exit 0
