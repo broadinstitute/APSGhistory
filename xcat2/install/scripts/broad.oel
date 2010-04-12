@@ -2,6 +2,7 @@
 # Setup hostname
 #
 echo "post scripts" >/root/post.log
+echo "GATEWAYDEV=eth1" >> /etc/sysconfig/network-scripts/ifcfg-eth0
 export PRINIC=#TABLE:noderes:THISNODE:primarynic#
 if [ -z "$PRINIC" ]
 then
@@ -21,65 +22,197 @@ done >>/etc/resolv.conf
 export HOSTNAME=$(host $IP 2>/dev/null | awk '{print $5}' | awk -F. '{print $1}')
 hostname $HOSTNAME
 #
-# put xCAT post install in init.d process
+# Run xCAT post install
 #
-cat >/etc/init.d/xcatpostinit << 'EOF'
-#INCLUDE:#TABLE:site:key=installdir:value#/postscripts/xcatpostinit#
-EOF
-chmod 755 /etc/init.d/xcatpostinit
-ln -s /etc/init.d/xcatpostinit /etc/init.d/rc3.d/S84xcatpostinit
-ln -s /etc/init.d/xcatpostinit /etc/init.d/rc4.d/S84xcatpostinit
-ln -s /etc/init.d/xcatpostinit /etc/init.d/rc5.d/S84xcatpostinit
+export MASTER_IP="#XCATVAR:XCATMASTER#"
+export MASTER_IPS="#XCATVAR:XCATMASTER#"
+export MASTER="#XCATVAR:XCATMASTER#"
+cd /tmp
+RAND=$(perl -e 'print int(rand(50)). "\n"')
+sleep $RAND
+for i in $(seq 1 20)
+do
+	GOTIT=0
+	for i in $MASTER_IPS
+	do
+      wget -l inf -N -r --waitretry=10 --random-wait --retry-connrefused  -t 0 -T 60 ftp://$i/postscripts
+		#wget --wait=10 --random-wait --waitretry=10 --retry-connrefused -t 0 -T 60 http://$i/install/autoinst/xcatpost.tar.gz
+		if [ "$?" = "0" ]
+		then
+         if [ -x /usr/sbin/stunnel -o -x /usr/bin/stunnel ]; then #Stop if no stunnel to help the next bit
+            echo client=yes > /etc/stunnel/stunnel.conf
+            echo foreground=yes >> /etc/stunnel/stunnel.conf
+            echo output=/dev/null >> /etc/stunnel/stunnel.conf
+            echo verify=0 >> /etc/stunnel/stunnel.conf
+            echo '[xcatd]' >> /etc/stunnel/stunnel.conf
+            echo accept=400 >> /etc/stunnel/stunnel.conf
+            echo connect=$i:3001 >> /etc/stunnel/stunnel.conf
 
-mkdir -p /opt/xcat
-cat >/opt/xcat/xcatdsklspost << 'EOF'
-#INCLUDE:#TABLE:site:key=installdir:value#/postscripts/xcatdsklspost#
-chkconfig xcatpostinit off
-EOF
-TMP=`sed "/IBM(c)/ a ADDSITEYUM=1" /opt/xcat/xcatdsklspost`
-echo "$TMP" > /opt/xcat/xcatdsklspost
-chmod 755 /opt/xcat/xcatdsklspost
-chkconfig --add xcatpostinit
+            stunnel &
+            STUN_PID=$!
+            sleep 1
+         fi
+         mv $i/postscripts /xcatpost
+         rm -rf $i
+         chmod +x /xcatpost/*
+         /xcatpost/getpostscript.awk |sed -e 's/<[^>]*>//g'|egrep -v '^ *$'|sed -e 's/^ *//' > /tmp/mypostscript
+         MYCONT=`cat /tmp/mypostscript`
+         while [ -z "$MYCONT" ]; do
+            let SLI=$RANDOM%10+10
+            sleep $SLI
+            /xcatpost/getpostscript.awk |sed -e 's/<[^>]*>//g'|egrep -v '^ *$'|sed -e 's/^ *//' > /tmp/mypostscript
+            MYCONT=`cat /tmp/mypostscript`
+         done
 
-cat >/opt/xcat/xcatinfo << EOF
-XCATSERVER=#XCATVAR:XCATMASTER#
-EOF
-
-#something Jarrod knows
+            
+         chmod +x /tmp/mypostscript
+			GOTIT=1
+			break
+		fi
+	done
+	if [ "$GOTIT" = "1" ]
+	then
+		break
+	fi
+	RAND=$(perl -e 'print int(rand(5)). "\n"')
+	sleep $RAND
+done
+cd /xcatpost
+#gunzip xcatpost.tar.gz
+#tar -xvf xcatpost.tar
+#/xcatpost/#TABLE:nodelist:THISNODE:node#
+export PATH=/xcatpost:$PATH
+/tmp/mypostscript
+export NODE=#TABLE:nodelist:THISNODE:node#
+export OSVER=#TABLE:nodetype:THISNODE:os#
+export ARCH=#TABLE:nodetype:THISNODE:arch#
+addsiteyum
 sed -i 's/^serial/#serial/' /boot/grub/menu.lst
 sed -i 's/^terminal/#terminal/' /boot/grub/menu.lst
+updateflag.awk $MASTER 3002
+cd /
+rm -Rf /xcatpost
+rm -f /tmp/mypostscript
+rm -f /etc/stunnel/stunnel.conf
+mkdir /local/scratch
+chmod -R 1777 /local/scratch
+ifup eth1
 
-#change the chain from install to boot
-cat >/tmp/updateflag.awk <<EOF
-#!/usr/bin/awk -f
+# modprobe seems necessary for reasons unknown.
+/sbin/modprobe nfs 
+for SERVICE in portmap ypbind autofs nfs
+do
+	/etc/init.d/$SERVICE restart
+	sleep 1
+done
+echo "Linking tcsh"
+ln -sin /bin/tcsh /usr/bin/tcsh
+##tune4fs for tuning.  tune4fs is backwards-compatible, but tune2fs is not; therefore, we are using tune4fs to both ext3 and ext4.
+for x in `fdisk -l | grep -v swap | awk '/Linux/ {print $1}'`; do tune4fs -c 0 -i 0 $x; done
 
-BEGIN {
-	xcatdport = #TABLE:site:key=xcatiport:value#
-	xcatdhost = "#XCATVAR:XCATMASTER#"
+#Change this if build server key changes:
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAwVLbQ8Rlt93pgghzzNh7bd8vjKE2oAftYkSy4WwkZBjY8XemVrRm3c3+F2cvYABftnrgbxJn1soTGSJVyoEwHfSZoPtWtOYB4ICt5GdSwHXbgRxBYqFiJA8fPycWeF4qc7GXicVxVpDAcA0Lz+6XVNWQXWSNqAsNyqFXYzf/VavOIkqW4Xr/hxfLsBsDgffo5YlhSQbLJmsz/c3Zo0q3u/PRPB+viMQ2ulwkYdR5dyuP9VNrAMu7NtMK4Lpb+2fskJqVGYJU4PzzV/OE5DsGby95+n90JxfaDgmHlhRIraAADX10dCjmX9iHy4XrhIWDbOjm9H9FNCSnvehHLNPacw== root@hal9000.broadinstitute.org" > /root/.ssh/authorized_keys
+chmod 600 /root/.ssh
 
-	ns = "/inet/tcp/0/" xcatdhost "/" xcatdport
+#Change this if trp key changes:
+echo "ssh-dss AAAAB3NzaC1kc3MAAACBAMdPwPbhgProKuYZZLUVRGrVoJYsWoR0Vyd+MGvv7HWngBvNLQ4i3CoixE34wpWhdS/jCX/nYkKWlt+AsENOUrxpmE/uMTp18If6gx8PPxZQkoz7sDQ85ICpeo2HS73jHVdvb2ssLdY3tj5Aqt7lqyMWVFNEF0Ub3S/Zrvx5pD4XAAAAFQDwUVkm5hx0Wc3TwpTfxFKdO40Y6wAAAIB2klA/DaHRZ8UNlcjdu7ie4xd8jaVtc3ZLLdxC4wM98AgCmj9MgwbNpxS8XdTrWgra+Tj+SuN9u6Z9WnC1shHiJYqMG0y3SJDYfgT654GpggeZxiFgmq9baFfr69F3GfXgkzC+nEqaXn5aLwr6QDb+slTKK3Ind7hX/LikzHLNrwAAAIAmRk7ROAMTgGYu7qUNMx1r4z4bJO9dQol/sYPcw5jmd+H1NUC1RQxcY798b0hHVtH04Thzb2EsJtxkz0HeTZkZSa3zptKYSR0XjiOgfcK2EcjNdt2rP9IRVDphUb3Tv7kxkYqEilqihf1LKqaMG4hJaTWCAODalHN9sZcH7TBYqQ== root@tryptophan.broad.mit.edu" >> /root/.ssh/authorized_keys
 
-	while(1) {
-		if((ns |& getline) > 0)
-			print \$0
-        else {
-            print "Retrying update"
-            close(ns)
-            system("sleep 5")
-        }
+#Is this IBM or Dell?  Plan Accordingly
+VENDOR=`dmidecode | awk -F: '/Vendor/ {print $2}' | sed 's/ //' | awk '{print $1}'`
+EMAIL="ali@broadinstitute.org"
+case $VENDOR in
+"IBM")
+	FILE="ibmInst.log"
+	echo "Downloading DSA" | tee $FILE
+	wget http://download.boulder.ibm.com/ibmdl/pub/systems/support/system_x/ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
+	echo "Installing DSA" | tee -a $FILE
+	rpm -Uvh ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
+	echo "Remove Download" | tee -a $FILE
+	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
 
-		if(\$0 == "ready")
-			print "next" |& ns
-		if(\$0 == "done")
-			break
-	}
+	cat $FILE | mail -s "xCAT: Dell Specific Config" $EMAIL
+        ;;
+# REMEMBER YOU DID THIS
+"Dell")
+	FILE="dellInst.log"
+	echo "Downloading OMSA" | tee $FILE
+	wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash | tee -a $FILE
+	echo "Installing OMSA" | tee -a $FILE
+	yum -y install srvadmin-all | tee -a $FILE
 
-	close(ns)
+	echo "Installing DSET" | tee -a $FILE
+	sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i | tee -a $FILE
 
-	exit 0
-}
-EOF
-chmod 755 /tmp/updateflag.awk
-/tmp/updateflag.awk
+	yum -y install dell_ft_install
+	yum -y install $(bootstrap_firmware)
+	update_firmware --yes
+
+	#Dell's convoluted way of enabling virtualization settings en masse
+	yum -y install srvadmin-hapi | tee -a $FILE
+	mkdir dtk | tee -a $FILE
+	mount -o loop /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso dtk/ | tee -a $FILE
+	cd dtk/isolinux/ | tee -a $FILE
+	cp  SA.2 ~/SA.2.gz | tee -a $FILE
+	cd; gunzip SA.2.gz | tee -a $FILE
+	mkdir stage2 | tee -a $FILE
+	cd stage2 | tee -a $FILE
+	cpio -i < ../SA.2 | tee -a $FILE
+	cd lofs | tee -a $FILE
+	mkdir dell | tee -a $FILE
+	mount -o loop dell.cramfs dell/ | tee -a $FILE
+	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ | tee -a $FILE
+	/usr/local/sbin/syscfg –virtualization=enable | tee -a $FILE
+
+	cat $FILE | mail -s "xCAT: Dell Specific Config" $EMAIL
+        ;;
+*)
+        echo "Oops.  Fix me."
+esac
+#End IBM/Dell Logic.
+
+###Apparently, yum needs utils before switching to our local mirror
+yum -y groupinstall yum-utils
+##Convert to home-grown mirror and clean
+echo Changing to Broad-hosted CentOS mirror..
+wget http://www/~apsg/software/yumConfig/CentOS-Base.repo
+mv -f CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
+
+##Yum customization and package foo
+echo Updating installed packages..
+wget http://www/~apsg/software/yumConfig/yum.conf
+rm -f /etc/yum.conf
+mv yum.conf /etc
+yum -y groupremove "Dialup Networking Support"
+yum clean all
+yum -y upgrade
+echo Installing Broad package group "Broad Base"
+yum -y groupinstall "Broad Base"
+
+
+#Turn services on
+for SERVICE in nrpe ntpd
+do
+	/sbin/chkconfig $SERVICE on
+	# Sure set the clock
+	ntpdate ns1.broadinstitute.org
+done
+
+#Turn services off
+for SERVICE in iptables bluetooth cups gpm
+do
+	chkconfig $SERVICE off
+done
+
+sed "s/$(hostname)//g" /etc/hosts > /tmp/hosts.tmp
+mv -f /tmp/hosts.tmp /etc/hosts
+
+# Start CFENGINE3 installation
+wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-3.0.4-1.centos5.x86_64.rpm
+wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
+rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
+tar xvfP /tmp/base_promises.tar
+cf-key
+cf-agent -f /var/cfengine/inputs/failsafe.cf
+
 
 exit 0
