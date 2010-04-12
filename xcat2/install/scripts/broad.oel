@@ -82,7 +82,4 @@ EOF
 chmod 755 /tmp/updateflag.awk
 /tmp/updateflag.awk
 
-#remove all the repos, later addsiteyum will add the one from the master node.
-rm -f /etc/yum.repos.d/*
-
 exit 0
