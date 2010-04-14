@@ -1,5 +1,5 @@
 #node,power,mgt,cons,termserver,termport,conserver,serialport,serialspeed,serialflow,getmac,comments,disable
 "ibm","blade","blade",,,,,,,,,,
 "dell","ipmi","ipmi",,,,,,,,,,
-"crd1","ipmi","ipmi",,,,,,,,,,
 "crd2","ipmi","ipmi",,,,,,,,,,
+"crd3","ipmi","ipmi",,,,,,,,,,
