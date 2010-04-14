@@ -22,7 +22,7 @@ do
 tabdump $TABLE > $DIR/$TABLE
 done
 
-COMMENT="Added $1"
+COMMENT="Added $2"
 
 cd $DIR
 svn ci -m "$COMMENT" *
