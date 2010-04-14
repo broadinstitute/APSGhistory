@@ -22,4 +22,6 @@
 "voeltest","db,all","booting",,,,
 "wga7","dell,farm,all","booting",,,,
 "wga8","dell,farm,all",,,,,
-"wga9","all",,,,,
+"wga9","farm,dell,all",,,,,
+"crd1","all",,,,,
+"crd2","dell,farm,all",,,,,
