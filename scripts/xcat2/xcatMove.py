@@ -4,13 +4,11 @@ import sys
 from subprocess import Popen, PIPE
 
 def info(file,awkParam):
-	p1=Popen(["ssh", "%s@%s" % (sshUser,sshHost), "grep", "%s" % node, "%s" % file],stdout=PIPE).wait()
+	p1=Popen(["ssh", "%s@%s" % (sshUser,sshHost), "grep", "%s" % node, "%s" % file],stdout=PIPE)
+	p1.wait()
 	p2 = Popen("awk " + awkParam, stdin=p1.stdout, stdout=PIPE, shell=True, universal_newlines=True)
 	return p2.stdout.readlines()[0].rstrip('\n')
 
-def migrateDHCP(makeCmd):
-	Popen=(["%s" % makeCmd, "%s" % node]).wait()
-	Popen=(["ssh","%s@%s" % (sshUser,sshHost), "%s" % clearCmd, "-d", "%s" % node])
 
 #Set Variables
 sshUser = "root"
@@ -31,7 +29,13 @@ else:
 	model = "all"
 
 Popen(["svnbuild", "nodeadd","%s" % node,"groups=%s" % model ,"mac.interface=eth0","hosts.ip=%s" % ip ,"mac.mac=%s" % mac\
-	,"nodehm.mgt=ipmi","nodehm.power=ipmi"]).wait()
+	,"nodehm.mgt=ipmi","nodehm.power=ipmi"])
+sleep(30)
 
-migrateDHCP("makehosts")
-migrateDHCP("makedhcp")
+p1=Popen(["makehosts","%s" % node],stdout=PIPE)
+p1.wait()
+
+p1=Popen(["makedhcp", "%s" % node])
+p1.wait()
+p2=Popen(["ssh","%s@%s" % (sshUser,sshHost), "makedhcp", "-d", "%s" % node])
+p2.wait()

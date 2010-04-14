@@ -22,8 +22,7 @@ do
 tabdump $TABLE > $DIR/$TABLE
 done
 
-echo "Please enter desired comments for files you have changed:"
-read COMMENT
+COMMENT="Added $1"
 
 cd $DIR
 svn ci -m "$COMMENT" *
