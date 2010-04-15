@@ -30,3 +30,4 @@
 "crd3","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/crd3 ksdevice=eth0 noipv6",,,,,
 "ibmdemo","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/ibmdemo ksdevice=eth0 noipv6",,,,,
 "crd7","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/crd7 ksdevice=eth0 noipv6",,,,,
+"crd5","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/crd5 ksdevice=eth0 noipv6",,,,,

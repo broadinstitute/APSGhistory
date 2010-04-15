@@ -23,7 +23,7 @@
 "node328","boot","boot","runcmd=standby",,,
 "oel_test","boot","boot","runcmd=standby",,,
 "node1150","boot","boot",,,,
-"voeltest","install rhels5.4.oel-x86_64-db.test.oel5","boot","runcmd=standby",,,
+"voeltest","boot","boot","runcmd=standby",,,
 "wga7","boot","boot","runcmd=standby",,,
 "wga8","boot","boot","runcmd=standby",,,
 "wga9","boot","boot","runcmd=standby",,,
@@ -31,3 +31,4 @@
 "crd3","boot","boot","runcmd=standby",,,
 "ibmdemo","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
 "crd7","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
+"crd5","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
