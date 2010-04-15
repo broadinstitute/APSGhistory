@@ -1,1 +1,7 @@
 #imagename,profile,imagetype,provmethod,osname,osvers,osdistro,osarch,synclists,comments,disable
+"rhels5.4-x86_64-install-compute","compute","linux","install","Linux","rhels5.4",,"x86_64",,,
+"rhels5.4-x86_64-install-xen","xen","linux","install","Linux","rhels5.4",,"x86_64",,,
+"rhels5.4-x86_64-install-kvm","kvm","linux","install","Linux","rhels5.4",,"x86_64",,,
+"rhels5.4-x86_64-install-storage","storage","linux","install","Linux","rhels5.4",,"x86_64",,,
+"rhels5.4-x86_64-install-service","service","linux","install","Linux","rhels5.4",,"x86_64",,,
+"rhels5.4-x86_64-install-iscsi","iscsi","linux","install","Linux","rhels5.4",,"x86_64",,,

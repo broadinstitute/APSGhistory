@@ -1,1 +1,7 @@
 #imagename,template,pkglist,pkgdir,otherpkglist,otherpkgdir,exlist,postinstall,rootimgdir,comments,disable
+"rhels5.4-x86_64-install-compute","/opt/xcat/share/xcat/install/rh/compute.tmpl",,"/install/rhels5.4/x86_64",,"/install/post/otherpkgs/rhels5.4/x86_64",,,,,
+"rhels5.4-x86_64-install-xen","/opt/xcat/share/xcat/install/rh/xen.tmpl",,"/install/rhels5.4/x86_64",,"/install/post/otherpkgs/rhels5.4/x86_64",,,,,
+"rhels5.4-x86_64-install-kvm","/opt/xcat/share/xcat/install/rh/kvm.tmpl",,"/install/rhels5.4/x86_64",,"/install/post/otherpkgs/rhels5.4/x86_64",,,,,
+"rhels5.4-x86_64-install-storage","/opt/xcat/share/xcat/install/rh/storage.tmpl",,"/install/rhels5.4/x86_64",,"/install/post/otherpkgs/rhels5.4/x86_64",,,,,
+"rhels5.4-x86_64-install-service","/opt/xcat/share/xcat/install/rh/service.tmpl",,"/install/rhels5.4/x86_64",,"/install/post/otherpkgs/rhels5.4/x86_64",,,,,
+"rhels5.4-x86_64-install-iscsi","/opt/xcat/share/xcat/install/rh/iscsi.tmpl",,"/install/rhels5.4/x86_64",,"/install/post/otherpkgs/rhels5.4/x86_64",,,,,
