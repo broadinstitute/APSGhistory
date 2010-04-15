@@ -122,7 +122,7 @@ VENDOR=`dmidecode | awk -F: '/Vendor/ {print $2}' | sed 's/ //' | awk '{print $1
 EMAIL="ali@broadinstitute.org"
 case $VENDOR in
 "IBM")
-	FILE="ibmInst.log"
+	FILE="/tmp/ibmInst.log"
 	echo "Downloading DSA" | tee $FILE
 	wget http://download.boulder.ibm.com/ibmdl/pub/systems/support/system_x/ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
 	echo "Installing DSA" | tee -a $FILE
@@ -130,7 +130,7 @@ case $VENDOR in
 	echo "Remove Download" | tee -a $FILE
 	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
 
-	cat $FILE | mail -s "xCAT: Dell Specific Config" $EMAIL
+	nail -s "IBM Install Info" -a $FILE $EMAIL < /dev/null
         ;;
 # REMEMBER YOU DID THIS
 "Dell")
@@ -163,7 +163,7 @@ case $VENDOR in
 	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ | tee -a $FILE
 	/usr/local/sbin/syscfg –virtualization=enable | tee -a $FILE
 
-	cat $FILE | mail -s "xCAT: Dell Specific Config" $EMAIL
+	nail -s "Dell Install Info" -a $FILE $EMAIL < /dev/null
         ;;
 *)
         echo "Oops.  Fix me."
@@ -211,8 +211,10 @@ wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-comm
 wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
 rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
 tar xvfP /tmp/base_promises.tar
+/sbin/chkconfig --add cfengine3
 cf-key
 cf-agent -f /var/cfengine/inputs/failsafe.cf
+cf-agent
 
 
 exit 0

@@ -172,22 +172,11 @@ esac
 
 ###Apparently, yum needs utils before switching to our local mirror
 yum -y groupinstall yum-utils
-##Convert to home-grown mirror and clean
-echo Changing to Broad-hosted CentOS mirror..
-wget http://www/~apsg/software/yumConfig/CentOS-Base.repo
-mv -f CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
+yum -y install oracle*
 
 ##Yum customization and package foo
-echo Updating installed packages..
-wget http://www/~apsg/software/yumConfig/yum.conf
-rm -f /etc/yum.conf
-mv yum.conf /etc
 yum -y groupremove "Dialup Networking Support"
 yum clean all
-yum -y upgrade
-echo Installing Broad package group "Broad Base"
-yum -y groupinstall "Broad Base"
-
 
 #Turn services on
 for SERVICE in nrpe ntpd
@@ -205,14 +194,5 @@ done
 
 sed "s/$(hostname)//g" /etc/hosts > /tmp/hosts.tmp
 mv -f /tmp/hosts.tmp /etc/hosts
-
-# Start CFENGINE3 installation
-wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-3.0.4-1.centos5.x86_64.rpm
-wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
-rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
-tar xvfP /tmp/base_promises.tar
-cf-key
-cf-agent -f /var/cfengine/inputs/failsafe.cf
-
 
 exit 0
