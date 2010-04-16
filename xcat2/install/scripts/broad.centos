@@ -194,7 +194,7 @@ for SERVICE in nrpe ntpd
 do
 	/sbin/chkconfig $SERVICE on
 	# Sure set the clock
-	ntpdate ns1.broadinstitute.org
+	ntpdate ntp1.broadinstitute.org
 done
 
 #Turn services off

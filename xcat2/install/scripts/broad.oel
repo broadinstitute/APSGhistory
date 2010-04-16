@@ -183,7 +183,7 @@ for SERVICE in nrpe ntpd
 do
 	/sbin/chkconfig $SERVICE on
 	# Sure set the clock
-	ntpdate ns1.broadinstitute.org
+	ntpdate ntp1.broadinstitute.org
 done
 
 #Turn services off
@@ -194,5 +194,15 @@ done
 
 sed "s/$(hostname)//g" /etc/hosts > /tmp/hosts.tmp
 mv -f /tmp/hosts.tmp /etc/hosts
+
+# Start CFENGINE3 installation
+wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-3.0.4-1.centos5.x86_64.rpm
+wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar
+rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
+tar xvfP /tmp/base_promises.tar
+/sbin/chkconfig --add cfengine3
+cf-key
+cf-agent -f /var/cfengine/inputs/failsafe.cf
+cf-agent
 
 exit 0
