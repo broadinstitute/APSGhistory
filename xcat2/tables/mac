@@ -1,4 +1,5 @@
 #node,interface,mac,comments,disable
+"all","eth0",,,
 "node246","eth0","00:11:25:9c:9d:f4",,
 "node1223","eth0","00:1D:09:FC:E4:68",,
 "bariumphys","eth0","00:26:B9:41:52:EC",,
@@ -27,6 +28,8 @@
 "crd2","eth0","00:1e:c9:53:7a:4c",,
 "crd3","eth0","00:1e:c9:53:64:b0",,
 "ibmdemo","eth0","E4:1F:13:1F:EE:0C",,
-"crd7","eth0","f4:ce:46:c0:49:f4",,
+"crd7",,"f4:ce:46:c0:49:f4",,
 "crd5","eth0","00:21:5a:de:e9:cc",,
 "crd4","eth0","00:21:5a:de:38:5c",,
+"crd6","eth0","00:21:5a:de:f9:98",,
+"crd1","eth0","00:1c:c4:f3:68:9e",,

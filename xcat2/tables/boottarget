@@ -1,1 +1,3 @@
 #bprofile,kernel,initrd,kcmdline,comments,disable
+"10g.crd7","xcat/centos5.4/x86_64/vmlinuz",,"initrd=xcat/centos5.4/x86_64/initrd.img nofb utf8 ks=http://192.168.32.2/install/autoinst/crd7  noipv6",,
+"ExtraNic.crd5","xcat/centos5.4/x86_64/vmlinuz",,"initrd=xcat/centos5.4/x86_64/initrd.img nofb utf8 ks=http://192.168.32.2/install/autoinst/crd5  noipv6",,
