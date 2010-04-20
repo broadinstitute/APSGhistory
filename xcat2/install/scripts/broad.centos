@@ -2,7 +2,31 @@
 # Setup hostname
 #
 echo "post scripts" >/root/post.log
-echo "GATEWAYDEV=eth1" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+#echo "GATEWAYDEV=eth1" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+
+echo Trying to determine the right interface in the build network
+for i in {0..5}
+do 
+ifconfig eth$i up 
+dhclient eth$i
+ if ifconfig eth$i | grep -q '192.168'
+   then 
+   export PRINIC=eth$i
+ fi
+ if ifconfig eth$i | grep -q '69.173' && [ -n "$PRINIC" ]
+   then 
+   echo "GATEWAYDEV=eth$i" > /etc/sysconfig/network-scripts/ifcfg-$PRINIC
+   	if ifconfig eth$i | grep -q '69.173'
+	   then
+   	   ifconfig eth$i mtu 9000
+   	   echo "MTU=9000" >> /etc/sysconfig/network-scripts/ifcfg-eth$i
+	fi
+ fi
+done
+
+echo GATEWAYDEV=$GATEWAYNIC
+
+
 export PRINIC=#TABLE:noderes:THISNODE:primarynic#
 if [ -z "$PRINIC" ]
 then
