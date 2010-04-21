@@ -31,6 +31,6 @@
 "crd3","boot","boot","runcmd=standby",,,
 "ibmdemo","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
 "crd7","boot","boot","runcmd=standby",,,
-"crd5","install boottarget-x86_64-ExtraNic.crd5","boot","runcmd=standby",,,
-"crd6","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
 "crd4","boot","boot","runcmd=standby",,,
+"crd1","boot","boot","runcmd=standby",,,
+"crd5","boot","boot","runcmd=standby",,,
