@@ -5,21 +5,26 @@ echo "post scripts" >/root/post.log
 #echo "GATEWAYDEV=eth1" >> /etc/sysconfig/network-scripts/ifcfg-eth0
 
 echo Trying to determine the right interface in the build network
-for i in {0..5}
+for dev in $(ifconfig -a | awk '/^eth/ { print $1 }')
 do 
-ifconfig eth$i up 
-dhclient eth$i
- if ifconfig eth$i | grep -q '192.168'
+/sbin/ifconfig $dev up 
+/sbin/dhclient -pf /tmp/$dev $dev
+ if /sbin/ifconfig $dev | grep -q '192.168'
    then 
-   export PRINIC=eth$i
+   export PRINIC=$dev
  fi
- if ifconfig eth$i | grep -q '69.173' && [ -n "$PRINIC" ]
+ if /sbin/ifconfig $dev  | grep -q '69.173' && [ -n "$PRINIC" ]
    then 
-   echo "GATEWAYDEV=eth$i" > /etc/sysconfig/network-scripts/ifcfg-$PRINIC
-   	if ifconfig eth$i | grep -q '69.173'
+   export GATEWAYNIC=$dev
+   echo "GATEWAYDEV=$dev" >> /etc/sysconfig/network-scripts/ifcfg-$PRINIC
+   cp /etc/sysconfig/network-scripts/ifcfg-$dev /tmp/ifcfg-$dev
+   sed 's/ONBOOT=no/ONBOOT=yes/g' /tmp/ifcfg-$dev
+   mv -f /tmp/ifcfg-$dev /etc/sysconfig/network-scripts/ifcfg-$dev
+   echo Found interface in VLAN32
+   	if /sbin/ifconfig $dev | grep -q '69.173'
 	   then
-   	   ifconfig eth$i mtu 9000
-   	   echo "MTU=9000" >> /etc/sysconfig/network-scripts/ifcfg-eth$i
+   	   /sbin/ifconfig $dev mtu 9000
+   	   echo "MTU=9000" >> /etc/sysconfig/network-scripts/ifcfg-$dev
 	fi
  fi
 done
@@ -27,16 +32,16 @@ done
 echo GATEWAYDEV=$GATEWAYNIC
 
 
-export PRINIC=#TABLE:noderes:THISNODE:primarynic#
+#export PRINIC=#TABLE:noderes:THISNODE:primarynic#
 if [ -z "$PRINIC" ]
 then
     export PRINIC=eth0
 fi
-IP=$(ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
+IP=$(/sbin/ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
 if [ -z $IP ]
 then
 	dhclient eth0
-	IP=$(ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
+	IP=$(/sbin/ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
 fi
 echo "search #TABLE:site:key=domain:value#" >/etc/resolv.conf
 for i in $(echo #TABLE:site:key=nameservers:value# | tr ',' ' ')
@@ -236,9 +241,10 @@ wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises
 rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
 tar xvfP /tmp/base_promises.tar
 /sbin/chkconfig --add cfengine3
-cf-key
-cf-agent -f /var/cfengine/inputs/failsafe.cf
-cf-agent
+/usr/local/sbin/cf-key
+/usr/local/sbin/cf-agent -f /var/cfengine/inputs/failsafe.cf
+/usr/local/sbin/cf-agent -K
+/usr/local/sbin/cf-agent -K
 
 
 exit 0
