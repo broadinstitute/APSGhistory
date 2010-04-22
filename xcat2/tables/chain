@@ -35,3 +35,4 @@
 "crd1","boot","boot","runcmd=standby",,,
 "crd5","boot","boot","runcmd=standby",,,
 "crd6","boot","boot","runcmd=standby",,,
+"node1384","boot","boot","runcmd=standby",,,
