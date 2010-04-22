@@ -18,7 +18,7 @@ do
    export GATEWAYNIC=$dev
    echo "GATEWAYDEV=$dev" >> /etc/sysconfig/network-scripts/ifcfg-$PRINIC
    cp /etc/sysconfig/network-scripts/ifcfg-$dev /tmp/ifcfg-$dev
-   echo "$(sed 's/ONBOOT=no/ONBOOT=yes/g' /tmp/ifcfg-$dev)" > /etc/sysconfig/network-scripts/ifcfg-$dev
+   echo "$(sed 's/ONBOOT=no/ONBOOT=yes/g;/ONBOOT/ i\BOOTPROTO=dhcp' /tmp/ifcfg-$dev)" > /etc/sysconfig/network-scripts/ifcfg-$dev
    echo Found interface in VLAN32
    	if /sbin/ifconfig $dev | grep -q '69.173'
 	   then
