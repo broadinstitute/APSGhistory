@@ -3,8 +3,9 @@
 
 lang en_US
 langsupport en_US
-network --device=eth0 --bootproto dhcp --mtu=1500
-network --device=eth1 --bootproto dhcp --mtu=9000
+
+network --bootproto dhcp 
+#network --device=eth1 --bootproto dhcp --mtu=9000
 
 #
 # Where's the source?
@@ -24,16 +25,17 @@ zerombr yes
 #
 # Wipe out the disk
 #
-clearpart --all --initlabel
+#clearpart --all --initlabel
 #clearpart --linux
 
+%include /tmp/part-include
 #
 # Customize to fit your needs
 #
 #Partition Table for non-raided systems
-part / --size 12288 --fstype ext3
-part swap --size 8192
-part /local --size 1024 --grow --fstype ext4
+#part / --size 12288 --fstype ext3
+#part swap --size 8192
+#part /local --size 1024 --grow --fstype ext4
 
 #No RAID
 #/boot really significant for this sort of setup nowadays?
@@ -163,7 +165,8 @@ reboot
 tcsh
 sed
 mailx
-%pre
+%pre --log=/root/my-pre-log
+#INCLUDE:../scripts/broad.partTable#
 #INCLUDE:../scripts/pre.rh#
-%post
+%post --log=/root/my-post-log
 #INCLUDE:../scripts/broad.centos#
