@@ -35,3 +35,4 @@
 "crd1","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/crd1 ksdevice=bootif noipv6",,,,,
 "crd6","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/crd6 ksdevice=bootif noipv6",,,,,
 "node1384","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1384 ksdevice=bootif noipv6",,,,,
+"node1386","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1386 ksdevice=bootif noipv6",,,,,
