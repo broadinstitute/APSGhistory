@@ -2,6 +2,27 @@
 # Setup hostname
 #
 echo "post scripts" >/root/post.log
+
+
+#export PRINIC=#TABLE:noderes:THISNODE:primarynic#
+if [ -z "$PRINIC" ]
+then
+    export PRINIC=eth0
+fi
+IP=$(/sbin/ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
+if [ -z $IP ]
+then
+	dhclient eth0
+	IP=$(/sbin/ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
+fi
+echo "search #TABLE:site:key=domain:value#" >/etc/resolv.conf
+for i in $(echo #TABLE:site:key=nameservers:value# | tr ',' ' ')
+do
+	echo "nameserver $i"
+done >>/etc/resolv.conf
+export HOSTNAME=$(host $IP 2>/dev/null | awk '{print $5}' | awk -F. '{print $1}')
+hostname $HOSTNAME
+
 #echo "GATEWAYDEV=eth1" >> /etc/sysconfig/network-scripts/ifcfg-eth0
 
 echo Trying to determine the right interface in the build network
@@ -29,26 +50,6 @@ do
 done
 
 echo GATEWAYDEV=$GATEWAYNIC
-
-
-#export PRINIC=#TABLE:noderes:THISNODE:primarynic#
-if [ -z "$PRINIC" ]
-then
-    export PRINIC=eth0
-fi
-IP=$(/sbin/ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
-if [ -z $IP ]
-then
-	dhclient eth0
-	IP=$(/sbin/ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
-fi
-echo "search #TABLE:site:key=domain:value#" >/etc/resolv.conf
-for i in $(echo #TABLE:site:key=nameservers:value# | tr ',' ' ')
-do
-	echo "nameserver $i"
-done >>/etc/resolv.conf
-export HOSTNAME=$(host $IP 2>/dev/null | awk '{print $5}' | awk -F. '{print $1}')
-hostname $HOSTNAME
 #
 # Run xCAT post install
 #
