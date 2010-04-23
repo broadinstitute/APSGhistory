@@ -172,7 +172,7 @@ case $VENDOR in
 
 	yum -y install dell_ft_install
 	yum -y install $(/usr/sbin/bootstrap_firmware)
-	/usr/sbin/update_firmware --yes
+	/usr/sbin/update_firmware -yv
 
 	#Dell's convoluted way of enabling virtualization settings en masse
 	yum -y install srvadmin-hapi | tee -a $FILE
