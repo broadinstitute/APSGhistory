@@ -165,8 +165,8 @@ reboot
 tcsh
 sed
 mailx
-%pre --log=/root/my-pre-log
+%pre --log=/mnt/sysimage/tmp/my-pre-log
 #INCLUDE:../scripts/broad.partTable#
 #INCLUDE:../scripts/pre.rh#
-%post --log=/root/my-post-log
+%post --log=/tmp/my-post-log
 #INCLUDE:../scripts/broad.centos#
