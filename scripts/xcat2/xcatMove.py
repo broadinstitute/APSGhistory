@@ -22,12 +22,12 @@ model = info("/opt/xcat/etc/nodemodel.tab",r"'{print $2}'")
 
 if (model == "DELL"):
 	model = "dell,farm,all"
-elif (model == "LS21") | (model == "LS20"):
+elif (model == "LS21") | (model == "LS20") | (model == "HS20"):
 	model = "ibm,farm,all"
-elif model == "HS20":
-	model = "ibm,farm.raid,all"
+elif (model == "HP"):
+	model = "hp,farm,all"
 else:
-	model = "all"
+	model = "farm,all"
 
 Popen(["svnbuild", "nodeadd","%s" % node,"groups=%s" % model ,"mac.interface=eth0","hosts.ip=%s" % ip ,"mac.mac=%s" % mac\
 	,"nodehm.mgt=ipmi","nodehm.power=ipmi"])

@@ -17,10 +17,12 @@ DIR=/root/svn/xcat2/tables/
 
 $*
 
-for TABLE in hosts mac nodelist nodehm
+for TABLE in `tabdump`
 do
 tabdump $TABLE > $DIR/$TABLE
 done
+
+rm $DIR/passwd
 
 COMMENT="Added $2"
 
