@@ -158,7 +158,6 @@ case $VENDOR in
 	echo "Remove Download" | tee -a $FILE
 	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
 
-	nail -s "IBM Install Info" -a $FILE $EMAIL < /dev/null
         ;;
 # REMEMBER YOU DID THIS
 "Dell")
@@ -172,8 +171,8 @@ case $VENDOR in
 	sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i | tee -a $FILE
 
 	yum -y install dell_ft_install
-	yum -y install $(bootstrap_firmware)
-	update_firmware --yes
+	yum -y install $(/usr/sbin/bootstrap_firmware)
+	/usr/sbin/update_firmware --yes
 
 	#Dell's convoluted way of enabling virtualization settings en masse
 	yum -y install srvadmin-hapi | tee -a $FILE
@@ -191,7 +190,6 @@ case $VENDOR in
 	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ | tee -a $FILE
 	/usr/local/sbin/syscfg –virtualization=enable | tee -a $FILE
 
-	nail -s "Dell Install Info" -a $FILE $EMAIL < /dev/null
         ;;
 *)
         echo "Oops.  Fix me."
