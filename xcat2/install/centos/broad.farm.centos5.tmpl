@@ -3,6 +3,7 @@
 
 lang en_US
 langsupport en_US
+logger --syslog=gln
 
 network --bootproto dhcp 
 #network --device=eth1 --bootproto dhcp --mtu=9000
@@ -155,7 +156,7 @@ selinux --disabled
 #
 # Reboot after installation
 #
-reboot
+#reboot
 
 #
 #end of section
@@ -165,8 +166,8 @@ reboot
 tcsh
 sed
 mailx
-%pre --log=/mnt/sysimage/tmp/my-pre-log
+%pre --syslog=gln
 #INCLUDE:../scripts/broad.partTable#
 #INCLUDE:../scripts/pre.rh#
-%post --log=/tmp/my-post-log
+%post --syslog=gln
 #INCLUDE:../scripts/broad.centos#
