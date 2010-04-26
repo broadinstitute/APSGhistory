@@ -20,8 +20,8 @@ for i in $(echo #TABLE:site:key=nameservers:value# | tr ',' ' ')
 do
 	echo "nameserver $i"
 done >>/etc/resolv.conf
-export HOSTNAME=$(host $IP 2>/dev/null | awk '{print $5}' | awk -F. '{print $1}')
-hostname $HOSTNAME
+#export HOSTNAME=$(host $IP 2>/dev/null | awk '{print $5}' | awk -F. '{print $1}')
+#hostname $HOSTNAME
 
 #echo "GATEWAYDEV=eth1" >> /etc/sysconfig/network-scripts/ifcfg-eth0
 
@@ -48,6 +48,8 @@ do
 	fi
  fi
 done
+
+ifup $GATEWAYNIC 
 
 echo GATEWAYDEV=$GATEWAYNIC
 #
@@ -125,7 +127,6 @@ rm -f /tmp/mypostscript
 rm -f /etc/stunnel/stunnel.conf
 mkdir /local/scratch
 chmod -R 1777 /local/scratch
-ifup eth1
 
 # modprobe seems necessary for reasons unknown.
 /sbin/modprobe nfs 
@@ -162,6 +163,8 @@ case $VENDOR in
         ;;
 # REMEMBER YOU DID THIS
 "Dell")
+	# Set the firmware to auto-install
+	sed -i 's/rpm_mode=manual/rpm_mode=auto/g' /etc/firmware/firmware.conf	
 	FILE="dellInst.log"
 	echo "Downloading OMSA" | tee $FILE
 	wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash | tee -a $FILE

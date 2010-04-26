@@ -2,25 +2,56 @@
 # Setup hostname
 #
 echo "post scripts" >/root/post.log
-echo "GATEWAYDEV=eth1" >> /etc/sysconfig/network-scripts/ifcfg-eth0
-export PRINIC=#TABLE:noderes:THISNODE:primarynic#
+
+
+#export PRINIC=#TABLE:noderes:THISNODE:primarynic#
 if [ -z "$PRINIC" ]
 then
     export PRINIC=eth0
 fi
-IP=$(ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
+IP=$(/sbin/ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
 if [ -z $IP ]
 then
-	dhclient eth0
-	IP=$(ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
+        dhclient eth0
+        IP=$(/sbin/ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
 fi
 echo "search #TABLE:site:key=domain:value#" >/etc/resolv.conf
 for i in $(echo #TABLE:site:key=nameservers:value# | tr ',' ' ')
 do
-	echo "nameserver $i"
+        echo "nameserver $i"
 done >>/etc/resolv.conf
-export HOSTNAME=$(host $IP 2>/dev/null | awk '{print $5}' | awk -F. '{print $1}')
-hostname $HOSTNAME
+#export HOSTNAME=$(host $IP 2>/dev/null | awk '{print $5}' | awk -F. '{print $1}')
+#hostname $HOSTNAME
+
+#echo "GATEWAYDEV=eth1" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+
+echo Trying to determine the right interface in the build network
+for dev in $(ifconfig -a | awk '/^eth/ { print $1 }')
+do
+/sbin/ifconfig $dev up
+/sbin/dhclient -pf /tmp/$dev $dev
+ if /sbin/ifconfig $dev | grep -q '192.168'
+   then
+   export PRINIC=$dev
+ fi
+ if /sbin/ifconfig $dev  | grep -q '69.173' && [ -n "$PRINIC" ]
+   then
+   export GATEWAYNIC=$dev
+   echo "GATEWAYDEV=$dev" >> /etc/sysconfig/network-scripts/ifcfg-$PRINIC
+   cp /etc/sysconfig/network-scripts/ifcfg-$dev /tmp/ifcfg-$dev
+   echo "$(sed 's/ONBOOT=no/ONBOOT=yes/g;/ONBOOT/ i\BOOTPROTO=dhcp' /tmp/ifcfg-$dev)" > /etc/sysconfig/network-scripts/ifcfg-$dev
+   echo Found interface in VLAN32
+        if /sbin/ifconfig $dev | grep -q '69.173'
+           then
+           /sbin/ifconfig $dev mtu 9000
+           echo "MTU=9000" >> /etc/sysconfig/network-scripts/ifcfg-$dev
+        fi
+ fi
+done
+
+ifup $GATEWAYNIC
+
+echo GATEWAYDEV=$GATEWAYNIC
 #
 # Run xCAT post install
 #
@@ -96,7 +127,6 @@ rm -f /tmp/mypostscript
 rm -f /etc/stunnel/stunnel.conf
 mkdir /local/scratch
 chmod -R 1777 /local/scratch
-ifup eth1
 
 # modprobe seems necessary for reasons unknown.
 /sbin/modprobe nfs 
@@ -122,7 +152,7 @@ VENDOR=`dmidecode | awk -F: '/Vendor/ {print $2}' | sed 's/ //' | awk '{print $1
 EMAIL="ali@broadinstitute.org"
 case $VENDOR in
 "IBM")
-	FILE="ibmInst.log"
+	FILE="/tmp/ibmInst.log"
 	echo "Downloading DSA" | tee $FILE
 	wget http://download.boulder.ibm.com/ibmdl/pub/systems/support/system_x/ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
 	echo "Installing DSA" | tee -a $FILE
@@ -130,7 +160,6 @@ case $VENDOR in
 	echo "Remove Download" | tee -a $FILE
 	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
 
-	cat $FILE | mail -s "xCAT: Dell Specific Config" $EMAIL
         ;;
 # REMEMBER YOU DID THIS
 "Dell")
@@ -144,8 +173,8 @@ case $VENDOR in
 	sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i | tee -a $FILE
 
 	yum -y install dell_ft_install
-	yum -y install $(bootstrap_firmware)
-	update_firmware --yes
+	yum -y install $(/usr/sbin/bootstrap_firmware)
+	/usr/sbin/update_firmware -yv
 
 	#Dell's convoluted way of enabling virtualization settings en masse
 	yum -y install srvadmin-hapi | tee -a $FILE
@@ -163,7 +192,6 @@ case $VENDOR in
 	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ | tee -a $FILE
 	/usr/local/sbin/syscfg –virtualization=enable | tee -a $FILE
 
-	cat $FILE | mail -s "xCAT: Dell Specific Config" $EMAIL
         ;;
 *)
         echo "Oops.  Fix me."
@@ -201,8 +229,9 @@ wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises
 rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
 tar xvfP /tmp/base_promises.tar
 /sbin/chkconfig --add cfengine3
-cf-key
-cf-agent -f /var/cfengine/inputs/failsafe.cf
-cf-agent
+/usr/local/sbin/cf-key
+/usr/local/sbin/cf-agent -f /var/cfengine/inputs/failsafe.cf
+/usr/local/sbin/cf-agent -K
+/usr/local/sbin/cf-agent -K
 
 exit 0
