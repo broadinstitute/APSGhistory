@@ -47,3 +47,4 @@
 "node1398","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1398 ksdevice=bootif noipv6",,,,,
 "node1385","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1385 ksdevice=bootif noipv6",,,,,
 "crd8","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/crd8 ksdevice=bootif noipv6",,,,,
+"thorium","xcat/rhels5.4.oel/x86_64/vmlinuz","xcat/rhels5.4.oel/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/thorium ksdevice=bootif noipv6",,,,,
