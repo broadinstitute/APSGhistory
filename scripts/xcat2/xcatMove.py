@@ -1,3 +1,7 @@
+if [ $(tabgrep $1 2> /dev/null | wc -l) -gt 0 ]; then
+	echo "$1 exists.  Exiting..."
+	exit 0
+fi
 #!/usr/bin/python
 # Import Block
 import sys
