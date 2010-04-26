@@ -47,3 +47,4 @@
 "node1389","boot","boot","runcmd=standby",,,
 "node1398","boot","boot","runcmd=standby",,,
 "node1385","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
+"crd8","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
