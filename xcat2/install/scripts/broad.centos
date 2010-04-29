@@ -163,8 +163,6 @@ case $VENDOR in
         ;;
 # REMEMBER YOU DID THIS
 "Dell")
-	# Set the firmware to auto-install
-	sed -i 's/rpm_mode=manual/rpm_mode=auto/g' /etc/firmware/firmware.conf	
 	FILE="dellInst.log"
 	echo "Downloading OMSA" | tee $FILE
 	wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash | tee -a $FILE
@@ -174,9 +172,6 @@ case $VENDOR in
 	echo "Installing DSET" | tee -a $FILE
 	sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i | tee -a $FILE
 
-	yum -y install dell_ft_install
-	yum -y install $(/usr/sbin/bootstrap_firmware)
-	/usr/sbin/update_firmware -yv
 
 	#Dell's convoluted way of enabling virtualization settings en masse
 	yum -y install srvadmin-hapi | tee -a $FILE
@@ -194,6 +189,15 @@ case $VENDOR in
 	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ | tee -a $FILE
 	/usr/local/sbin/syscfg –virtualization=enable | tee -a $FILE
 
+	#Start firmware update block
+	/sbin/start_udev
+	/etc/init.d/ipmi restart
+	/etc/init.d/instsvcdrv restart
+	yum -y install dell_ft_install
+	# Set the firmware to auto-install
+	sed -i 's/rpm_mode=manual/rpm_mode=auto/g' /etc/firmware/firmware.conf	
+	yum -y install $(/usr/sbin/bootstrap_firmware)
+	/usr/sbin/update_firmware -yv
         ;;
 *)
         echo "Oops.  Fix me."
