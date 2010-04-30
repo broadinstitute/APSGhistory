@@ -2,10 +2,11 @@
 ###Import Block###
 from getpass import getpass,getuser
 from time import sleep,time
-from os import path,makedirs,listdir,remove
+from os import path,makedirs,listdir,remove,rmdir
 from sys import exit
 from datetime import datetime
 from subprocess import *
+import shutil
 
 import logging,string
 
@@ -26,7 +27,7 @@ def clear_old_dir(expRate):
                 print(dir)
 
                 if delta > expRate:
-                       remove(dir) 
+			shutil.rmtree(dir)
 
 ###Function for Config Import###
 def get_config(list,cmd,user_pass,en_pass,ip):
