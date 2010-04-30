@@ -2,7 +2,7 @@
 ###Import Block###
 from getpass import getpass,getuser
 from time import sleep,time
-from os import path,makedirs,listdir
+from os import path,makedirs,listdir,remove
 from sys import exit
 from datetime import datetime
 from subprocess import *
@@ -26,11 +26,7 @@ def clear_old_dir(expRate):
                 print(dir)
 
                 if delta > expRate:
-                        print "Del Me"
-                else:
-                        print "keep"
-
-
+                       remove(dir) 
 
 ###Function for Config Import###
 def get_config(list,cmd,user_pass,en_pass,ip):
