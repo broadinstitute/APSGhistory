@@ -19,7 +19,7 @@ $*
 
 for TABLE in `tabdump`
 do
-tabdump $TABLE > $DIR/$TABLE
+tabdump $TABLE > $DIR/$TABLE.csv
 done
 
 rm $DIR/passwd
