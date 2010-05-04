@@ -1,0 +1,11 @@
+#!/bin/sh
+
+OIFS=$IFS
+IFS=','
+NODE_LIST=$NODES
+for NODE in $NODE_LIST
+do
+    sed -i '/LABEL/ a\IPAPPEND 2' /tftpboot/pxelinux.cfg/$NODE
+done
+
+IFS=$OIFS
