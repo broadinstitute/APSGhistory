@@ -161,31 +161,30 @@ case $VENDOR in
         ;;
 # REMEMBER YOU DID THIS
 "Dell")
-	FILE="/tmp/dellInst.log"
-	echo "Downloading OMSA" | tee $FILE
-	wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash | tee -a $FILE
-	echo "Installing OMSA" | tee -a $FILE
-	yum -y install srvadmin-all | tee -a $FILE
+	echo "Downloading OMSA"
+	wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash
+	echo "Installing OMSA"
+	yum -y install srvadmin-all
 
-	echo "Installing DSET" | tee -a $FILE
-	sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i | tee -a $FILE
+	echo "Installing DSET"
+	sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i
 
 
 	#Dell's convoluted way of enabling virtualization settings en masse
-	yum -y install srvadmin-hapi | tee -a $FILE
-	mkdir /tmp/dtk | tee -a $FILE
-	mount -o loop /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso /tmp/dtk/ | tee -a $FILE
-	cd /tmp/dtk/isolinux/ | tee -a $FILE
-	cp  SA.2 ~/SA.2.gz | tee -a $FILE
-	cd; gunzip SA.2.gz | tee -a $FILE
-	mkdir stage2 | tee -a $FILE
-	cd stage2 | tee -a $FILE
-	cpio -i < ../SA.2 | tee -a $FILE
-	cd lofs | tee -a $FILE
-	mkdir dell | tee -a $FILE
-	mount -o loop dell.cramfs dell/ | tee -a $FILE
-	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ | tee -a $FILE
-	/usr/local/sbin/syscfg –virtualization=enable | tee -a $FILE
+	yum -y install srvadmin-hapi
+	mkdir /tmp/dtk
+	mount -o loop -o ro /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso /tmp/dtk/
+	cd /tmp/dtk/isolinux/
+	cp  SA.2 ~/SA.2.gz
+	cd; gunzip SA.2.gz
+	mkdir stage2
+	cd stage2
+	cpio -i < ../SA.2
+	cd lofs
+	mkdir dell
+	mount -o loop dell.cramfs dell/
+	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/
+	/usr/local/sbin/syscfg --virtualization=enable
 
 	#Start firmware update block
 	/sbin/start_udev
@@ -193,7 +192,7 @@ case $VENDOR in
 	/etc/init.d/instsvcdrv restart
 	yum -y install dell_ft_install
 	yum -y install $(/usr/sbin/bootstrap_firmware)
-	/usr/sbin/update_firmware -yv
+	#/usr/sbin/update_firmware -yv
         ;;
 *)
         echo "Oops.  Fix me."
