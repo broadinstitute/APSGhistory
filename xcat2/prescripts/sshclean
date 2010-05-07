@@ -1,0 +1,11 @@
+#!/bin/sh
+
+OIFS=$IFS
+IFS=','
+NODE_LIST=$NODES
+for NODE in $NODE_LIST
+do
+    ssh-keygen -R $NODE
+done
+
+IFS=$OIFS
