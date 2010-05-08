@@ -159,7 +159,8 @@ def hpInfo():
 			if datetimeStr(line) < currentDate:
 				startDate = datetimeStr(line)
 			if datetimeStr(line) > currentDate:
-				print("|%s|%s|%s|%s|" % (serial,sku,startDate.strftime("%Y-%m-%d"),maxDate.strftime("%Y-%m-%d")))
+			#	print("|%s|%s|%s|%s|" % (serial,sku,startDate.strftime("%Y-%m-%d"),maxDate.strftime("%Y-%m-%d")))
+				return maxDate
 				break
 vendor = getVendor()
 if vendor == "Dell":
