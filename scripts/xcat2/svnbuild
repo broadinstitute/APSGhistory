@@ -22,7 +22,7 @@ do
 tabdump $TABLE > $DIR/$TABLE.csv
 done
 
-rm $DIR/passwd
+rm $DIR/passwd.csv
 
 COMMENT="Added $2"
 
