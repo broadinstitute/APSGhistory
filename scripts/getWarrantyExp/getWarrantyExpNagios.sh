@@ -12,6 +12,11 @@ while getopts "w:" flag; do
 	WARNING_LEVEL=$OPTARG
 done
 
+if [ -z $WARNING_LEVEL ]; then
+	echo "UNKNOWN -- argument required"
+	exit $UNKNOWN
+fi
+
 die_unknown()
 {
 	local MESSAGE=$1
@@ -77,23 +82,22 @@ isDate()
 				return 1
 			fi
 			;;
+		HP)
+			if [ "${#STRING}" -eq 11 ] && [ "$(expr index "$STRING" "-")" -eq 3 ] && [ "$(expr index "${STRING:4:7}" "-")" -eq 3 ]; then
+				return 0
+			else
+				return 1
+			fi
+			;;
 	esac
-}
-splitString()
-{
-	OIFS=$IFS
-	IFS=';' read -ra ADDR <<< "$1"
-
-	IFS=$OIFS
-	echo ${STRING[1]}
 }
 IBMInfo()
 {
 	local TYPE=$(getIBMType)
 	local SERIAL=$SYS_SERIAL
-
 	local URL="http://www-307.ibm.com/pc/support/site.wss/warrantyLookup.do?type=$TYPE&serial=$SERIAL&country=897&iws=off&sitestyle=lenovo"
 	local PAGE="$(curl -o - --silent "$URL" | tr '>' '\n' | tr '<' '\n')"
+
 	for LINE in $PAGE; do
 		isDate "$LINE"
 
@@ -105,24 +109,42 @@ IBMInfo()
 DellInfo()
 {
 	local SERIAL=$SYS_SERIAL
-
 	local EXP_DATE=0
-
 	local URL="http://support.dell.com/support/topics/global.aspx/support/my_systems_info/details?c=us&cs=RC956904&l=en&s=hied&servicetag=$SERIAL"
 	local PAGE="$(curl -o - --silent "$URL" | tr '>' '\n' | tr '<' '\n')"
+
 	for LINE in $PAGE; do
 		isDate "$LINE"
 
 		if [ "$?" -eq 0 ]; then 
-			EXP_DATE="$(dateToDays "$LINE")"
-			if [ $EXP_DATE -gt $(dateToDays "$LINE") ]; then
-				$EXP_DATE=$LINE
+			if [ $EXP_DATE -lt $(dateToDays "$LINE") ]; then
+				EXP_DATE="$(dateToDays "$LINE")"
 			fi
 		fi
 	done
 
 	echo "$EXP_DATE"
 		
+}
+HPInfo()
+{
+	local SERIAL=$SYS_SERIAL
+	local SKU="$(dmidecode | awk -F: '/SKU/ {print $2}' | cut -f2 -d' ')"
+	local EXP_DATE=0
+	local URL="http://h20000.www2.hp.com/bizsupport/TechSupport/WarrantyResults.jsp?lang=en&cc=us&prodSeriesId=454811&prodTypeId=12454&sn=$SERIAL&pn=$SKU&country=US&nickname=&find=Display+Warranty+Information+%C2%BB"
+	local PAGE="$(curl -o - --silent "$URL" | tr '>' '\n' | tr '<' '\n' | tr ' ' '-' | tr -d '\r')"
+	
+	for LINE in $PAGE; do
+		isDate "$LINE"
+
+		if [ "$?" -eq 0 ]; then
+			if [ $EXP_DATE -lt $(dateToDays "$LINE") ]; then
+				EXP_DATE="$(dateToDays "$LINE")"
+			fi
+		fi
+	done
+
+	echo "$EXP_DATE"
 }
 SYS_SERIAL=$(getSerial)
 SYS_VENDOR=$(getVendor)
@@ -133,6 +155,12 @@ case "$SYS_VENDOR" in
 	"Dell Inc.")
 		EXPIRE_DATE="$(DellInfo)"
 		;;
+	HP)
+		EXPIRE_DATE="$(HPInfo)"
+		;;
+	*)
+		echo "UNKNOWN vendor"
+		exit $UKNOWN
 esac
 
 DELTA_DAYS=$(($EXPIRE_DATE - $CURRENT_DATE))
