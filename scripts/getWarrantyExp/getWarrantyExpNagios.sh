@@ -42,17 +42,17 @@ dateToDays()
 }
 getSerial()
 {
-	local SERIAL=$(dmidecode -s system-serial-number)
+	local SERIAL=$(sudo /usr/sbin/dmidecode -s system-serial-number)
 	[ "$?" -ne 0 ] && die_unknown systemid || echo $SERIAL
 }
 getVendor()
 {
-	local VENDOR=$(dmidecode -s system-manufacturer)
+	local VENDOR=$(sudo /usr/sbin/dmidecode -s system-manufacturer)
 	[ "$?" -ne 0 ] && die_unknown vendor || echo $VENDOR
 }
 getIBMType()
 {
-	local TYPE=$(dmidecode -s system-product-name | cut -f2 -d[)
+	local TYPE=$(sudo /usr/sbin/dmidecode -s system-product-name | cut -f2 -d[)
 	[ "$?" -ne 0 ] && die_unknown IBMtype || echo "${TYPE:0:4}"
 }
 isDate()
@@ -129,7 +129,7 @@ DellInfo()
 HPInfo()
 {
 	local SERIAL=$SYS_SERIAL
-	local SKU="$(dmidecode | awk -F: '/SKU/ {print $2}' | cut -f2 -d' ')"
+	local SKU="$(sudo /usr/sbin/dmidecode | awk -F: '/SKU/ {print $2}' | cut -f2 -d' ')"
 	local EXP_DATE=0
 	local URL="http://h20000.www2.hp.com/bizsupport/TechSupport/WarrantyResults.jsp?lang=en&cc=us&prodSeriesId=454811&prodTypeId=12454&sn=$SERIAL&pn=$SKU&country=US&nickname=&find=Display+Warranty+Information+%C2%BB"
 	local PAGE="$(curl -o - --silent "$URL" | tr '>' '\n' | tr '<' '\n' | tr ' ' '-' | tr -d '\r')"
@@ -159,8 +159,9 @@ case "$SYS_VENDOR" in
 		EXPIRE_DATE="$(HPInfo)"
 		;;
 	*)
-		echo "UNKNOWN vendor"
-		exit $UKNOWN
+		echo "$SYS_VENDOR"
+		exit $UNKNOWN
+		;;
 esac
 
 DELTA_DAYS=$(($EXPIRE_DATE - $CURRENT_DATE))
