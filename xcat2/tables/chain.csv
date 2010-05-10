@@ -70,3 +70,5 @@
 "node1393","boot","boot","runcmd=standby",,,
 "proteus","boot","boot","runcmd=standby",,,
 "node1372","boot","boot","runcmd=standby",,,
+"node1016","boot","boot","runcmd=standby",,,
+"node1017","boot","boot","runcmd=standby",,,
