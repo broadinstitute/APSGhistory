@@ -7,21 +7,27 @@
 
 use DBI;
 use DBD::mysql;
-use Getopt::Std;
+use Getopt::Long;
 
-use vars qw ($opt_f $opt_d $opt_v);
 
 my $DRYRUN = 0;
 
 ##
 ## Process command-line options
 ##
-getopts('f:d:v');
+my ($opt_f, $opt_d, $opt_v);
+my $norollup = '';
+my $DEBUG;
+GetOptions(
+           "f=s" => \$opt_f,
+           "d=i" => \$opt_d,
+           "v" => \$DEBUG,
+           "norollup" =>\$norollup
+          );
 unless (defined $opt_f) {
   warn "usage: $0: -f fsid <-d dirid>";
   exit 1;
 }
-my $DEBUG = defined $opt_v ? 1 : 0;
 
 ##
 ## Initiate DB connection
@@ -34,7 +40,7 @@ my $cmd;
 ##
 ## See if we have rollup to do
 ##
-unless (defined $opt_d or $opt_f == 0) {
+unless (defined $opt_d or $opt_f == 0 or $norollup) {
   $sql = qq{SELECT DISTINCT(parent) FROM subdir WHERE fsid=$opt_f AND parent IS NOT NULL AND deprecated IS FALSE};
   $sql = qq{SELECT MAX(level) FROM subdir WHERE fsid=$opt_f AND deprecated IS FALSE};
   print STDERR "$sql\n" if $DEBUG;
@@ -111,7 +117,7 @@ if ($opt_f == 0) {		# Global rollup
 } elsif (defined($opt_d)) {	# Directory rollup
   $sql = "SELECT s.uid, s.type, s.histogram FROM fsstat s INNER JOIN subdir d ON s.dirid=d.dirid AND s.fsid=d.fsid WHERE s.fsid=$opt_f AND d.parent=$opt_d AND d.deprecated IS FALSE AND s.latest IS TRUE";
 }  else {			# Filesystem rollup
-  $sql = "SELECT s.uid, s.type, s.histogram,d.parent FROM fsstat s INNER JOIN subdir d ON s.dirid=d.dirid AND s.fsid=d.fsid WHERE s.fsid=$opt_f AND d.parent IS NULL AND d.deprecated IS FALSE AND s.latest IS TRUE";
+  $sql = "SELECT s.uid, s.type, s.histogram, s.dirid FROM fsstat s INNER JOIN subdir d ON s.dirid=d.dirid AND s.fsid=d.fsid WHERE s.fsid=$opt_f AND d.parent IS NULL AND d.deprecated IS FALSE AND s.latest IS TRUE";
 }
 
 print STDERR "$sql\n" if $DEBUG;

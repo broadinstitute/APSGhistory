@@ -39,8 +39,9 @@ SELECT s.uid,s.type,s.histogram
   AND s.dirid IS NULL
   AND s.uid IS NULL
   AND f.id NOT IN (1384,1178,1131,1286,1270)
-  AND f.gid IN (11)
-  AND s.type=15
+  AND f.gid IN (2,5,9,10,12,19,21)
+  AND f.gid IS NOT NULL
+  AND s.type=1
 SQL
 
 print STDERR "$sql\n" if $DEBUG;

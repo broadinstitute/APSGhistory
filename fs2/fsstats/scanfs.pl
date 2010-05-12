@@ -300,8 +300,8 @@ for my $d (keys %dbdir) {
     ##
     $job = "scanfs_${fsid}_${dirid}";
     $cmd = "$0 -t $opt_t -f $opt_f -d $dirid";
-    $cmd .= " -P \"fsstats\"";
-    $cmd .= " -E \"cd $mount\"";
+#    $cmd .= " -P \"fsstats\"";
+#    $cmd .= " -E \"cd $mount\"";
     $cmd .= " -v" if $DEBUG;
     $cmd .= " --force-update" if $force;
     $cmd .= " -q $queue" if $queue;
@@ -321,8 +321,8 @@ for my $d (keys %dbdir) {
       print STDERR "Directory $d was $s KB when last we checked. Scanning.\n";
       $job = "scanfs_${fsid}_${dirid}";
       $cmd = "$0 -t $opt_t -f $opt_f -d $dirid";
-      $cmd .= " -P \"fsstats\"";
-      $cmd .= " -E \"cd $mount\"";
+#      $cmd .= " -P \"fsstats\"";
+#      $cmd .= " -E \"cd $mount\"";
       $cmd .= " -v" if $DEBUG;
       $cmd .= " -q $queue" if $queue;
       $cmd .= " --force-update" if $force;
@@ -333,7 +333,7 @@ for my $d (keys %dbdir) {
       next; 
     }
   } else {
-    warn "unable to retreive historical size data for directory $d" if $DEBUG;
+    warn "unable to retrieve historical size data for directory $d" if $DEBUG;
   }
 }
 
@@ -390,7 +390,7 @@ if (defined $opt_d) {
 }
 $cmd = "/home/radon01/matter/sandbox/fsstats/upload_stats.pl -d $DIR -t $opt_t";
 $cmd .= " -v" if $DEBUG;
-$cmd = "bsub -r -q $queue -P fsstats -w '$dep' -J $job -o $DIR/upload.out " . $cmd;
+$cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -J $job -o $DIR/upload.out " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
 ##
@@ -404,7 +404,7 @@ if (defined $opt_d) {
 }
 $cmd = "/home/radon01/matter/sandbox/fsstats/combine.pl -f $fsid";
 $cmd .= " -v" if $DEBUG;
-$cmd = "bsub -r -q $queue -E \"perl -e 'use DBI'\" -P fsstats -w '$dep' -J $job -o $DIR/combine.out " . $cmd;
+$cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -J $job -o $DIR/combine.out " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
 
