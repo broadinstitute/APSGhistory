@@ -19,7 +19,7 @@
 "node1029","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1029 ksdevice=bootif noipv6",,,,,
 "node1030","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1030 ksdevice=bootif noipv6",,,,,
 "node1031","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1031 ksdevice=bootif noipv6",,,,,
-"node328","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node328 ksdevice=eth0 noipv6",,,,,
+"node328","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node328 ksdevice=bootif noipv6",,,,,
 "oel_test","xcat/rhels5.4/x86_64/vmlinuz","xcat/rhels5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/oel_test ksdevice=eth0 noipv6",,,,,
 "node1150","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1150 ksdevice=eth0 noipv6",,,,,
 "voeltest","xcat/rhels5.4.oel/x86_64/vmlinuz","xcat/rhels5.4.oel/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/voeltest ksdevice=eth0 noipv6",,,,,
@@ -71,3 +71,4 @@
 "node1372","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1372 ksdevice=bootif noipv6",,,,,
 "node1016","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1016 ksdevice=bootif noipv6",,,,,
 "node1017","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1017 ksdevice=bootif noipv6",,,,,
+"germanium","xcat/rhels5.4.oel/x86_64/vmlinuz","xcat/rhels5.4.oel/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/germanium ksdevice=bootif noipv6",,,,,

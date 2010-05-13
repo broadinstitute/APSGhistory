@@ -1,2 +1,2 @@
 #node,begin,end,comments,disable
-"all",,"install:ipappend,install:sshclean",,
+"all",,"install:ipappend,sshclean",,
