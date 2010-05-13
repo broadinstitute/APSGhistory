@@ -230,6 +230,17 @@ else
 	echo Installing Broad package group "Broad Base"
 	yum -y groupinstall "Broad Base"
 
+	# Start CFENGINE3 installation
+	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-3.0.4-1.centos5.x86_64.rpm
+	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
+	rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
+	tar xvfP /tmp/base_promises.tar
+	/sbin/chkconfig --add cfengine3
+	/usr/local/sbin/cf-key
+	/usr/local/sbin/cf-agent -f /var/cfengine/inputs/failsafe.cf
+	/usr/local/sbin/cf-agent -K
+	/usr/local/sbin/cf-agent -K
+
 fi
 
 #Turn services on
@@ -247,16 +258,5 @@ do
 done
 
 sed -i "s/$(hostname)//g" /etc/hosts
-
-# Start CFENGINE3 installation
-wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-3.0.4-1.centos5.x86_64.rpm
-wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
-rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
-tar xvfP /tmp/base_promises.tar
-/sbin/chkconfig --add cfengine3
-/usr/local/sbin/cf-key
-/usr/local/sbin/cf-agent -f /var/cfengine/inputs/failsafe.cf
-/usr/local/sbin/cf-agent -K
-/usr/local/sbin/cf-agent -K
 
 exit 0
