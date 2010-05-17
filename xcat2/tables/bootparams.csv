@@ -31,7 +31,7 @@
 "ibmdemo","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/ibmdemo ksdevice=bootif noipv6",,,,,
 "crd7","xcat/centos5.4/x86_64/vmlinuz",,"initrd=xcat/centos5.4/x86_64/initrd.img nofb utf8 ks=http://192.168.32.2/install/autoinst/crd7 ksdevice=eth2 noipv6",,,,,
 "crd4","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/crd4 ksdevice=eth0 noipv6",,,,,
-"crd5","xcat/centos5.4/x86_64/vmlinuz",,"initrd=xcat/centos5.4/x86_64/initrd.img nofb utf8 ks=http://192.168.32.2/install/autoinst/crd5  noipv6",,,,,
+"crd5","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/crd5 ksdevice=bootif noipv6",,,,,
 "crd1","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/crd1 ksdevice=bootif noipv6",,,,,
 "crd6","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/crd6 ksdevice=bootif noipv6",,,,,
 "node1384","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1384 ksdevice=bootif noipv6",,,,,
@@ -72,3 +72,4 @@
 "node1016","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1016 ksdevice=bootif noipv6",,,,,
 "node1017","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1017 ksdevice=bootif noipv6",,,,,
 "germanium","xcat/rhels5.4.oel/x86_64/vmlinuz","xcat/rhels5.4.oel/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/germanium ksdevice=bootif noipv6",,,,,
+"scandium","xcat/rhels5.4.oel/x86_64/vmlinuz","xcat/rhels5.4.oel/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/scandium ksdevice=bootif noipv6",,,,,
