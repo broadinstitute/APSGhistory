@@ -146,6 +146,54 @@ chmod 600 /root/.ssh
 #Change this if trp key changes:
 echo "ssh-dss AAAAB3NzaC1kc3MAAACBAMdPwPbhgProKuYZZLUVRGrVoJYsWoR0Vyd+MGvv7HWngBvNLQ4i3CoixE34wpWhdS/jCX/nYkKWlt+AsENOUrxpmE/uMTp18If6gx8PPxZQkoz7sDQ85ICpeo2HS73jHVdvb2ssLdY3tj5Aqt7lqyMWVFNEF0Ub3S/Zrvx5pD4XAAAAFQDwUVkm5hx0Wc3TwpTfxFKdO40Y6wAAAIB2klA/DaHRZ8UNlcjdu7ie4xd8jaVtc3ZLLdxC4wM98AgCmj9MgwbNpxS8XdTrWgra+Tj+SuN9u6Z9WnC1shHiJYqMG0y3SJDYfgT654GpggeZxiFgmq9baFfr69F3GfXgkzC+nEqaXn5aLwr6QDb+slTKK3Ind7hX/LikzHLNrwAAAIAmRk7ROAMTgGYu7qUNMx1r4z4bJO9dQol/sYPcw5jmd+H1NUC1RQxcY798b0hHVtH04Thzb2EsJtxkz0HeTZkZSa3zptKYSR0XjiOgfcK2EcjNdt2rP9IRVDphUb3Tv7kxkYqEilqihf1LKqaMG4hJaTWCAODalHN9sZcH7TBYqQ== root@tryptophan.broad.mit.edu" >> /root/.ssh/authorized_keys
 
+# The following MUST go above the Dell OMSA tools otherwise we end up getting packages from upstream RHEL release that is probable
+# a version or more ahead of what we are using 5.4.
+if [ -e /etc/enterprise-release ]; then
+	yum -y groupinstall yum-utils
+	for PACKAGE in autofs ksh tcsh ntp tftp xinetd rsh rsh-server psacct\
+	 nfs-utils net-snmp rsync yp-tools ypserv ypbind m4 sendmail-cf gdb\
+	 bzip2 binutils openssh-server util-linux compat-libstdc++-33 oracle*\
+	sg3_utils
+	do
+		yum -y install $PACKAGE
+	done
+
+	##Yum customization and package foo
+	yum -y groupremove "Dialup Networking Support"
+	yum clean all
+else
+	###Apparently, yum needs utils before switching to our local mirror
+	yum -y groupinstall yum-utils
+	##Convert to home-grown mirror and clean
+	echo Changing to Broad-hosted CentOS mirror..
+	wget http://www/~apsg/software/yumConfig/CentOS-Base.repo
+	mv -f CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
+
+	##Yum customization and package foo
+	echo Updating installed packages..
+	wget http://www/~apsg/software/yumConfig/yum.conf
+	rm -f /etc/yum.conf
+	mv yum.conf /etc
+	yum -y groupremove "Dialup Networking Support"
+	yum clean all
+	yum -y upgrade
+	echo Installing Broad package group "Broad Base"
+	yum -y groupinstall "Broad Base"
+
+	# Start CFENGINE3 installation
+	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-3.0.4-1.centos5.x86_64.rpm
+	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
+	rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
+	tar xvfP /tmp/base_promises.tar
+	/sbin/chkconfig --add cfengine3
+	/usr/local/sbin/cf-key
+	/usr/local/sbin/cf-agent -f /var/cfengine/inputs/failsafe.cf
+	/usr/local/sbin/cf-agent -K
+	/usr/local/sbin/cf-agent -K
+
+fi
+
+
 #Is this IBM or Dell?  Plan Accordingly
 VENDOR=$(dmidecode -s system-manufacturer | cut -f1 -d' ')
 case $VENDOR in
@@ -198,51 +246,6 @@ case $VENDOR in
         echo "Oops.  Fix me."
 esac
 #End IBM/Dell Logic.
-
-if [ -e /etc/enterprise-release ]; then
-	yum -y groupinstall yum-utils
-	for PACKAGE in autofs ksh tcsh ntp tftp xinetd rsh rsh-server psacct\
-	 nfs-utils net-snmp rsync yp-tools ypserv ypbind m4 sendmail-cf gdb\
-	 bzip2 binutils openssh-server util-linux compat-libstdc++-33 oracle*\
-	sg3_utils
-	do
-		yum -y install $PACKAGE
-	done
-
-	##Yum customization and package foo
-	yum -y groupremove "Dialup Networking Support"
-	yum clean all
-else
-	###Apparently, yum needs utils before switching to our local mirror
-	yum -y groupinstall yum-utils
-	##Convert to home-grown mirror and clean
-	echo Changing to Broad-hosted CentOS mirror..
-	wget http://www/~apsg/software/yumConfig/CentOS-Base.repo
-	mv -f CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
-
-	##Yum customization and package foo
-	echo Updating installed packages..
-	wget http://www/~apsg/software/yumConfig/yum.conf
-	rm -f /etc/yum.conf
-	mv yum.conf /etc
-	yum -y groupremove "Dialup Networking Support"
-	yum clean all
-	yum -y upgrade
-	echo Installing Broad package group "Broad Base"
-	yum -y groupinstall "Broad Base"
-
-	# Start CFENGINE3 installation
-	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-3.0.4-1.centos5.x86_64.rpm
-	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
-	rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
-	tar xvfP /tmp/base_promises.tar
-	/sbin/chkconfig --add cfengine3
-	/usr/local/sbin/cf-key
-	/usr/local/sbin/cf-agent -f /var/cfengine/inputs/failsafe.cf
-	/usr/local/sbin/cf-agent -K
-	/usr/local/sbin/cf-agent -K
-
-fi
 
 #Turn services on
 for SERVICE in nrpe ntpd
