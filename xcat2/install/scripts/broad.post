@@ -153,7 +153,7 @@ if [ -e /etc/enterprise-release ]; then
 	for PACKAGE in autofs ksh tcsh ntp tftp xinetd rsh rsh-server psacct\
 	 nfs-utils net-snmp rsync yp-tools ypserv ypbind m4 sendmail-cf gdb\
 	 bzip2 binutils openssh-server util-linux compat-libstdc++-33 oracle*\
-	sg3_utils
+	sg3_utils xterm
 	do
 		yum -y install $PACKAGE
 	done
