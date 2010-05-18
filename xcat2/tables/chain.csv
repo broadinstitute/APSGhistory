@@ -74,3 +74,4 @@
 "node1017","boot","boot","runcmd=standby",,,
 "germanium","boot","boot","runcmd=standby",,,
 "scandium","boot","boot","runcmd=standby",,,
+"roquefort","boot","boot","runcmd=standby",,,
