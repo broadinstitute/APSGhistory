@@ -6,6 +6,7 @@ NODE_LIST=$NODES
 for NODE in $NODE_LIST
 do
     ssh-keygen -R $NODE
+    ssh root@trp ssh-keygen -R $NODE.broadinstitute.org
 done
 
 IFS=$OIFS
