@@ -2,7 +2,7 @@
 
 function info () 
 {
-	echo $(ssh $USER@$HOST grep $NODE $1 | cut -f$2 -d' ')
+	echo $(ssh $USER@$HOST grep $NODE | cut -f2 -d' ')
 }
 
 
