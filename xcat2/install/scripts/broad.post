@@ -220,26 +220,26 @@ case $VENDOR in
 
 	#Dell's convoluted way of enabling virtualization settings en masse
 	yum -y install srvadmin-hapi
-	mkdir /tmp/dtk
-	mount -o loop -o ro /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso /tmp/dtk/
-	cd /tmp/dtk/isolinux/
-	cp  SA.2 ~/SA.2.gz
-	cd; gunzip SA.2.gz
-	mkdir stage2
-	cd stage2
-	cpio -i < ../SA.2
-	cd lofs
-	mkdir dell
-	mount -o loop dell.cramfs dell/
-	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/
-	/usr/local/sbin/syscfg --virtualization=enable
+	echo "mkdir /tmp/dtk" > /etc/rc.local
+	echo "mount -o loop -o ro /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso /tmp/dtk/" >> /etc/rc.local
+	echo "cd /tmp/dtk/isolinux/" >> /etc/rc.local
+	echo "cp  SA.2 ~/SA.2.gz" >> /etc/rc.local
+	echo "cd; gunzip SA.2.gz" >> /etc/rc.local
+	echo "mkdir stage2" >> /etc/rc.local
+	echo "cd stage2" >> /etc/rc.local
+	echo "cpio -i < ../SA.2" >> /etc/rc.local
+	echo "cd lofs" >> /etc/rc.local
+	echo "mkdir dell" >> /etc/rc.local
+	echo "mount -o loop dell.cramfs dell/" >> /etc/rc.local
+	echo "mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/" >> /etc/rc.local
+	eaacho "/usr/local/sbin/syscfg --virtualization=enable" >> /etc/rc.local
 
 	#Start firmware update block
 	/sbin/start_udev
 	/etc/init.d/ipmi restart
 	/etc/init.d/instsvcdrv restart
 	yum -y install dell_ft_install
-	yum -y install $(/usr/sbin/bootstrap_firmware)
+	echo "yum -y install \$(/usr/sbin/bootstrap_firmware)" >> /etc/rc.local
         echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt ; reboot" > /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
