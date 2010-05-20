@@ -240,7 +240,9 @@ case $VENDOR in
 	/etc/init.d/instsvcdrv restart
 	yum -y install dell_ft_install
 	yum -y install $(/usr/sbin/bootstrap_firmware)
-	#/usr/sbin/update_firmware -yv
+        echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt ; reboot" > /etc/rc.local
+        echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
+
         ;;
 *)
         echo "Oops.  Fix me."
