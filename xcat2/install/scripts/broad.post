@@ -209,18 +209,15 @@ case $VENDOR in
         ;;
 # REMEMBER YOU DID THIS
 "Dell")
-	echo "Downloading OMSA"
-	wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash
-	echo "Installing OMSA"
-	yum -y install srvadmin-all
+	scp $MASTER:/etc/snmp/snmpd.conf /etc/snmp
+	echo "wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash" > /etc/rc.local
+	echo "yum -y install srvadmin-all" >> /etc/rc.local
 
-	echo "Installing DSET"
-	sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i
-
+	echo "sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i" >> /etc/rc.local
 
 	#Dell's convoluted way of enabling virtualization settings en masse
-	yum -y install srvadmin-hapi
-	echo "mkdir /tmp/dtk" > /etc/rc.local
+	echo "yum -y install srvadmin-hapi" >> /etc/rc.local
+	echo "mkdir /tmp/dtk" >> /etc/rc.local
 	echo "mount -o loop -o ro /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso /tmp/dtk/" >> /etc/rc.local
 	echo "cd /tmp/dtk/isolinux/" >> /etc/rc.local
 	echo "cp  SA.2 ~/SA.2.gz" >> /etc/rc.local
@@ -235,10 +232,7 @@ case $VENDOR in
 	eaacho "/usr/local/sbin/syscfg --virtualization=enable" >> /etc/rc.local
 
 	#Start firmware update block
-	/sbin/start_udev
-	/etc/init.d/ipmi restart
-	/etc/init.d/instsvcdrv restart
-	yum -y install dell_ft_install
+	echo "yum -y install dell_ft_install" >> /etc/rc.local
 	echo "yum -y install \$(/usr/sbin/bootstrap_firmware)" >> /etc/rc.local
         echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt ; reboot" > /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
