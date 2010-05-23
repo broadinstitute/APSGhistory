@@ -209,7 +209,7 @@ case $VENDOR in
         ;;
 # REMEMBER YOU DID THIS
 "Dell")
-	scp $MASTER:/etc/snmp/snmpd.conf /etc/snmp
+	wget http://$MASTER/snmp/snmpd.conf -O /etc/snmp/snmpd.conf
 	echo "wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash" > /etc/rc.local
 	echo "yum -y install srvadmin-all" >> /etc/rc.local
 
@@ -234,7 +234,7 @@ case $VENDOR in
 	#Start firmware update block
 	echo "yum -y install dell_ft_install" >> /etc/rc.local
 	echo "yum -y install \$(/usr/sbin/bootstrap_firmware)" >> /etc/rc.local
-        echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt ; reboot" > /etc/rc.local
+        echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt ; reboot" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
         ;;
