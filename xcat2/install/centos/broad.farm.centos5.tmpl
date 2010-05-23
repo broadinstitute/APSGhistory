@@ -168,5 +168,5 @@ mailx
 %pre
 #INCLUDE:../scripts/broad.partTable#
 #INCLUDE:../scripts/pre.rh#
-%post
-#INCLUDE:../scripts/broad.post# --log=/tmp/my-post-log
+%post --log=/tmp/my-post-log
+#INCLUDE:../scripts/broad.post# 
