@@ -87,5 +87,5 @@
 "node1158","boot","boot","runcmd=standby",,,
 "node1146","boot","boot","runcmd=standby",,,
 "node1154","boot","boot","runcmd=standby",,,
-"node1156","install centos5.4-x86_64-broad.farm.centos5","boot","runcmd=standby",,,
+"node1156","boot","boot","runcmd=standby",,,
 "node1159","boot","boot","runcmd=standby",,,
