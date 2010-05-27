@@ -23,7 +23,6 @@
 "node328","boot","boot","runcmd=standby",,,
 "oel_test","boot","boot","runcmd=standby",,,
 "node1150","boot","boot","runcmd=standby",,,
-"voeltest","boot","boot","runcmd=standby",,,
 "wga7","boot","boot","runcmd=standby",,,
 "wga8","boot","boot","runcmd=standby",,,
 "wga9","boot","boot","runcmd=standby",,,
@@ -105,3 +104,4 @@
 "node1141","boot","boot","runcmd=standby",,,
 "node1142","boot","boot","runcmd=standby",,,
 "node1143","boot","boot","runcmd=standby",,,
+"node144","boot","boot","runcmd=standby",,,

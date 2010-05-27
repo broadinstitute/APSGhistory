@@ -22,7 +22,6 @@
 "node328","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node328 ksdevice=bootif noipv6",,,,,
 "oel_test","xcat/rhels5.4/x86_64/vmlinuz","xcat/rhels5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/oel_test ksdevice=eth0 noipv6",,,,,
 "node1150","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1150 ksdevice=bootif noipv6",,,,,
-"voeltest","xcat/rhels5.4.oel/x86_64/vmlinuz","xcat/rhels5.4.oel/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/voeltest ksdevice=eth0 noipv6",,,,,
 "wga7","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/wga7 ksdevice=eth0 noipv6",,,,,
 "wga8","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/wga8 ksdevice=eth0 noipv6",,,,,
 "wga9","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/wga9 ksdevice=eth0 noipv6",,,,,
@@ -104,3 +103,4 @@
 "node1141","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1141 ksdevice=bootif noipv6",,,,,
 "node1142","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1142 ksdevice=bootif noipv6",,,,,
 "node1143","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1143 ksdevice=bootif noipv6",,,,,
+"node144","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node144 ksdevice=bootif noipv6",,,,,
