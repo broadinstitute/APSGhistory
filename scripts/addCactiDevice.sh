@@ -10,7 +10,7 @@ cd /var/lib/cacti/cli
 HOST_TEMPLATE_ID=$(php -q add_device.php --list-host-templates | grep "$HOST_TEMPLATE" | awk '{print $1}')
 php -q add_device.php --description=$HOST --ip=$(host $HOST | cut -f1 -d' ') --template=$HOST_TEMPLATE_ID --community=$CSTRING --ping_method=udp
 HOST_ID=$(php -q add_tree.php --list-hosts | grep "$HOST" | awk '{print $1}')
-TREE_ID=$(php -q add_tree.php --list-trees | grep "$TREE" | awk '{print $1}')
+TREE_ID=$(php -q add_tree.php --list-trees | grep -i "$TREE" | awk '{print $1}')
 php -q add_tree.php --type=node --node-type=host --host-id=$HOST_ID --tree-id=$TREE_ID
 
 #Add Graphs
