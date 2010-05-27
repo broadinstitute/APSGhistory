@@ -1,11 +1,5 @@
 #!/bin/bash
 
-function info () 
-{
-	echo $(ssh $USER@$HOST grep $NODE $1| cut -f2 -d' ')
-}
-
-
 #Set Variables
 USER="root"
 HOST="pm"
@@ -16,9 +10,9 @@ if [ $(tabgrep $1 2> /dev/null | wc -l) -gt 0 ]; then
 	exit 0
 fi
 
-MAC=$(info /opt/xcat/etc/mac.tab 2)
-IP=$(info /opt/xcat/etc/hosts 1)
-MODEL=$(info /opt/xcat/etc/nodemodel.tab 2)
+MAC=$(ssh $USER@$HOST grep "$NODE-" /opt/xcat/etc/mac.tab | cut -f2 -d' ')
+IP=$(ssh $USER@$HOST grep $NODE /opt/xcat/etc/hosts | cut -f1 -d' ')
+MODEL=$(ssh $USER@$HOST grep $NODE /opt/xcat/etc/nodemodel.tab | cut -f2 -d' ')
 
 case $MODEL in
 	"DELL") 			GROUP="dell,farm,all";;
