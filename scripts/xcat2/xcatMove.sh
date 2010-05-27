@@ -10,7 +10,7 @@ if [ $(tabgrep $1 2> /dev/null | wc -l) -gt 0 ]; then
 	exit 0
 fi
 
-MAC=$(ssh $USER@$HOST grep "$NODE-" /opt/xcat/etc/mac.tab | cut -f2 -d' ')
+MAC=$(ssh $USER@$HOST grep "$NODE-eth0" /opt/xcat/etc/mac.tab | cut -f2 -d' ')
 IP=$(ssh $USER@$HOST grep $NODE /opt/xcat/etc/hosts | cut -f1 -d' ')
 MODEL=$(ssh $USER@$HOST grep $NODE /opt/xcat/etc/nodemodel.tab | cut -f2 -d' ')
 
