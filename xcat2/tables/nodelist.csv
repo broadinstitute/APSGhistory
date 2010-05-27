@@ -102,5 +102,6 @@
 "node144","ibm,farm,all","booting","05-26-2010 23:23:16",,,,,
 "node142","ibm,farm,all","booting","05-26-2010 23:44:00",,,,,
 "node143","ibm,farm,all","booting","05-26-2010 23:43:29",,,,,
-"node145","ibm,farm,all",,,,,,,
-"node146","ibm,farm,all",,,,,,,
+"node145","ibm,farm,all","installing","05-26-2010 23:55:16",,,,,
+"node146","ibm,farm,all","installing","05-26-2010 23:55:16",,,,,
+"node147","ibm,farm,all",,,,,,,
