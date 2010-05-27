@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# -*- shell-script -*-
+
+FILE=`basename $1`
+export EDITOR=${EDITOR:-vi}
+export VISUAL=${VISUAL:-$EDITOR}
+
+DIR=`dirname $1`
+DIR=${DIR:-.}
+
+source /broad/tools/scripts/useuse
+reuse -q Subversion-1.6
+# no git dotkit right now
+#reuse -q Git
+
+##
+## Version-control logic
+##
+
+# Use git or svn if possible, and fall back to rcs.
+
+# Check out file if
+# it's present, or add it if not.  Doesn't currently handle update,
+# merge, push or pull at all.
+
+if [[ -n "$1" ]]
+then
+    if git status $DIR >/dev/null 2>&1
+    then
+	git status $FILE >/dev/null 2>&1 || ADD='git add'
+	DIFF='git diff'
+	COMMIT='git commit'
+    elif svn info $DIR >/dev/null 2>&1
+    then
+	svn info $FILE >/dev/null 2>&1 || ADD='svn add'
+	DIFF='svn diff'
+	COMMIT='svn commit'
+    else
+	[[ -e $FILE ]] && CO='co -l'
+	COMMIT="ci -w$USER -u"
+    fi
+fi
+
+##
+## Actual VC & editing
+##
+
+set -e
+
+cd $DIR
+
+[[ -n $CO ]]     && $CO     $FILE
+                    $VISUAL $FILE
+[[ -n $ADD ]]    && $ADD    $FILE
+[[ -n $DIFF ]]   && $DIFF   $FILE
+[[ -n $COMMIT ]] && $COMMIT $FILE
