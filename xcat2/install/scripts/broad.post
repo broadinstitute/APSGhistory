@@ -39,11 +39,14 @@ do
    export GATEWAYNIC=$dev
    echo "GATEWAYDEV=$dev" >> /etc/sysconfig/network-scripts/ifcfg-$PRINIC
    sed -i 's/ONBOOT=no/ONBOOT=yes/g;/ONBOOT/ i\BOOTPROTO=dhcp' /etc/sysconfig/network-scripts/ifcfg-$dev
-   echo Found interface in VLAN32
-   	if /sbin/ifconfig $dev | grep -q '69.173'
-	   then
-   	   /sbin/ifconfig $dev mtu 9000
-   	   echo "MTU=9000" >> /etc/sysconfig/network-scripts/ifcfg-$dev
+	if [ /sbin/ifconfig | egrep -q 'addr:69.173.(6[4-9]|7[0-9])' ]; then
+		echo "Found interface in VLAN32"
+		/sbin/ifconfig $dev mtu 9000
+		echo "MTU=9000" >> /etc/sysconfig/network-scripts/ifcfg-$dev
+	elif [ /sbin/ifconfig | egrep -q 'addr:69.173.(8[0-7])' ]; then
+		echo "Found interface in VLAN18"
+		/sbin/ifconfig $dev mtu 1500
+		echo "MTU=1500" >> /etc/sysconfig/network-scripts/ifcfg-$dev
 	fi
  fi
 done
@@ -206,11 +209,17 @@ case $VENDOR in
 	echo "Remove Download" | tee -a $FILE
 	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
 
+	wget http://$MASTER/snmp/snmpd.conf -O /etc/snmp/snmpd.conf
+	echo "chkconfig snmpd on" > /etc/rc.local
+	echo "service snmpd restart" >> /etc/rc.local
+
         ;;
 # REMEMBER YOU DID THIS
 "Dell")
 	wget http://$MASTER/snmp/snmpd.conf -O /etc/snmp/snmpd.conf
-	echo "wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash" > /etc/rc.local
+	echo "chkconfig snmpd on" > /etc/rc.local
+	echo "service snmpd restart" >> /etc/rc.local
+	echo "wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash" >> /etc/rc.local
 	echo "yum -y install srvadmin-all" >> /etc/rc.local
 
 	echo "sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i" >> /etc/rc.local
