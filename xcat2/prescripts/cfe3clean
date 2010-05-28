@@ -1,0 +1,12 @@
+
+#!/bin/sh
+
+OIFS=$IFS
+IFS=','
+NODE_LIST=$NODES
+for NODE in $NODE_LIST
+do
+	ssh cfengine3 "ls /var/cfengine/ppkeys/*$NODE.* | xargs rm -f"
+done
+
+IFS=$OIFS
