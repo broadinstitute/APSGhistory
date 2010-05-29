@@ -144,3 +144,7 @@
 "node165","boot","boot","runcmd=standby",,,
 "node148","boot","boot","runcmd=standby",,,
 "node150","boot","boot","runcmd=standby",,,
+"node185","boot","boot","runcmd=standby",,,
+"node187","boot","boot","runcmd=standby",,,
+"node192","boot","boot","runcmd=standby",,,
+"node194","boot","boot","runcmd=standby",,,
