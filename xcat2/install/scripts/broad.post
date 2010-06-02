@@ -39,11 +39,11 @@ do
    export GATEWAYNIC=$dev
    echo "GATEWAYDEV=$dev" >> /etc/sysconfig/network-scripts/ifcfg-$PRINIC
    sed -i 's/ONBOOT=no/ONBOOT=yes/g;/ONBOOT/ i\BOOTPROTO=dhcp' /etc/sysconfig/network-scripts/ifcfg-$dev
-	if [ /sbin/ifconfig | egrep -q 'addr:69.173.(6[4-9]|7[0-9])' ]; then
+	if /sbin/ifconfig $dev | egrep -q '69.173.(6[4-9]|7[0-9])'; then
 		echo "Found interface in VLAN32"
 		/sbin/ifconfig $dev mtu 9000
 		echo "MTU=9000" >> /etc/sysconfig/network-scripts/ifcfg-$dev
-	elif [ /sbin/ifconfig | egrep -q 'addr:69.173.(8[0-7])' ]; then
+	elif /sbin/ifconfig $dev | egrep -q '69.173.(8[0-7])'; then
 		echo "Found interface in VLAN18"
 		/sbin/ifconfig $dev mtu 1500
 		echo "MTU=1500" >> /etc/sysconfig/network-scripts/ifcfg-$dev
@@ -54,7 +54,11 @@ done
 ifup $GATEWAYNIC 
 
 echo GATEWAYDEV=$GATEWAYNIC
-#
+echo "
+	xCAT build from xcat2
+	 $(hostname) postbuild 
+	at $(date)" | mail -s "xCAT build from xCAT2  -- $(hostname) postbuild ($(date +%F | tr -d '-'))" xcat@broadinstitute.org
+
 # Run xCAT post install
 #
 export MASTER_IP="#XCATVAR:XCATMASTER#"
@@ -189,10 +193,10 @@ else
 	rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
 	tar xvfP /tmp/base_promises.tar
 	/sbin/chkconfig --add cfengine3
-	/usr/local/sbin/cf-key
-	/usr/local/sbin/cf-agent -f /var/cfengine/inputs/failsafe.cf
-	/usr/local/sbin/cf-agent -K
-	/usr/local/sbin/cf-agent -K
+	/var/cfengine/bin/cf-key
+	/var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
+	/var/cfengine/bin/cf-agent -K
+	/var/cfengine/bin/cf-agent -K
 
 fi
 
