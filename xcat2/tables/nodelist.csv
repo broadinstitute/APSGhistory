@@ -147,7 +147,7 @@
 "node204","ibm,farm,all","booting","06-01-2010 18:39:03",,,,,
 "node209","ibm,farm,all","booting","06-01-2010 18:39:28",,,,,
 "node1337","dell,farm,all","booting","05-29-2010 15:13:55",,,,,
-"node231","ibm,farm,all","booting","05-29-2010 18:06:27",,,,,
+"node231","ibm,farm,all","booting","06-02-2010 16:05:24",,,,,
 "node229","ibm,farm,all","booting","06-01-2010 12:12:08",,,,,
 "node232","ibm,farm,all","booting","06-01-2010 12:12:13",,,,,
 "node233","ibm,farm,all","booting","06-01-2010 12:11:40",,,,,
@@ -180,3 +180,4 @@
 "node353","ibm,farm,all","booting","06-02-2010 12:35:13",,,,,
 "node354","ibm,farm,all","booting","06-02-2010 12:34:50",,,,,
 "node397","ibm,farm,all",,,,,,,
+"node398","ibm,farm,all",,,,,,,
