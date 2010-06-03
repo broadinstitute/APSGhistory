@@ -199,3 +199,6 @@
 "node449","boot","boot","runcmd=standby",,,
 "node450","boot","boot","runcmd=standby",,,
 "node451","boot","boot","runcmd=standby",,,
+"node439","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
+"node440","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
+"node441","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
