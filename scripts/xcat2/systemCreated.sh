@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ -z $(which bhosts 2> /dev/null) ]; then
+	. /broad/tools/scripts/useuse
+	reuse LSF
+fi
+
 HOST_LIST=$(nodels)
 echo "{| class="wikitable sortable"
 |+Nodes Moved to Centos (Date is last Rebuild)
