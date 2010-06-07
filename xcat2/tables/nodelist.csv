@@ -208,7 +208,7 @@
 "node426","ibm,farm,all","booting","06-03-2010 10:48:22",,,,,
 "node431","ibm,farm,all","booting","06-03-2010 10:48:12",,,,,
 "node438","ibm,farm,all","booting","06-03-2010 10:47:26",,,,,
-"hardac","dell,farm,all","installing","06-05-2010 05:53:24",,,,,
+"hardac","dell,farm,all","installing","06-05-2010 05:59:07",,,,,
 "node432","ibm,farm,all",,,,,,,
 "node446","ibm,farm,all",,,,,,,
 "node448","ibm,farm,all",,,,,,,
@@ -222,3 +222,4 @@
 "node462","ibm,farm,all",,,,,,,
 "node463","ibm,farm,all",,,,,,,
 "node464","ibm,farm,all",,,,,,,
+"node465","ibm,farm,all",,,,,,,
