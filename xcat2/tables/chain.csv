@@ -213,3 +213,4 @@
 "node426","boot","boot","runcmd=standby",,,
 "node431","boot","boot","runcmd=standby",,,
 "node438","boot","boot","runcmd=standby",,,
+"hardac","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
