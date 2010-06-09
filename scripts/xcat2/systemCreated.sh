@@ -16,13 +16,27 @@ for HOST in $HOST_LIST; do
 	if [ $(bhosts $HOST 2>/dev/null | wc -l) -lt 1 ]; then
 		continue
 	fi
-	FS=$(ssh $HOST df -P / 2> /dev/null | awk 'END{print $1}')
-	FS_DATE=$(ssh $HOST tune2fs -l $FS 2> /dev/null | grep 'Filesystem created:')
-	FS_DATE=$(echo $FS_DATE | awk -F'created: ' '{print $2}')
-	FS_DATE=$(date +%F -s "$FS_DATE") 
+
+	IP=$(host $HOST 2>/dev/null | awk '{print $NF}')
+	if [ -z $IP ]; then
+		continue
+	fi
+
+	FS_DATE=$(snmpget -v2c -c pzCuQMLd $IP HOST-RESOURCES-MIB::hrSWInstalledDate.1 2>/dev/null | awk -F'STRING:' '{print $2}' 2>/dev/null | cut -f1 -d',')
+	if [ -z $FS_DATE ]; then
+		continue
+	fi
+	
+	FS_DATE=$(date +%F -d "$FS_DATE")
 	echo "| $FS_DATE || $HOST" >> /root/bin/hostList.tmp
 
-	NODE=$(cat /root/bin/hostList.tmp | sort | grep $FS_DATE | awk -F'| ' '{print $4}')
+	#FS=$(ssh $HOST df -P / 2> /dev/null | awk 'END{print $1}')
+	#FS_DATE=$(ssh $HOST tune2fs -l $FS 2> /dev/null | grep 'Filesystem created:')
+	#FS_DATE=$(echo $FS_DATE | awk -F'created: ' '{print $2}')
+	#FS_DATE=$(date +%F -s "$FS_DATE") 
+
+#	NODE=$(cat /root/bin/hostList.tmp | sort | grep $FS_DATE | awk -F'| ' '{print $4}')
+	NODE=$(cat /root/bin/hostList.tmp | grep $FS_DATE | awk -F'| ' '{print $4}')
 	OUTPUT="|-"
 	OUTPUT="$OUTPUT $(echo "| $FS_DATE || $NODE" | tr '\n' ',' | sed 's/,$//g')"
 	echo "$OUTPUT" >> /root/bin/hostList
