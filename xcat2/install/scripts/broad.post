@@ -54,10 +54,6 @@ done
 ifup $GATEWAYNIC 
 
 echo GATEWAYDEV=$GATEWAYNIC
-echo "
-	xCAT build from xcat2
-	 $(hostname) postbuild 
-	at $(date)" | mail -s "xCAT build from xCAT2  -- $(hostname) postbuild ($(date +%F | tr -d '-'))" xcat@broadinstitute.org
 
 # Run xCAT post install
 #
@@ -216,6 +212,8 @@ case $VENDOR in
 	wget http://$MASTER/snmp/snmpd.conf -O /etc/snmp/snmpd.conf
 	echo "chkconfig snmpd on" > /etc/rc.local
 	echo "service snmpd restart" >> /etc/rc.local
+	echo "ssh leyte /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
+        echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
         ;;
 # REMEMBER YOU DID THIS
@@ -242,12 +240,13 @@ case $VENDOR in
 	echo "mkdir dell" >> /etc/rc.local
 	echo "mount -o loop dell.cramfs dell/" >> /etc/rc.local
 	echo "mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/" >> /etc/rc.local
-	eaacho "/usr/local/sbin/syscfg --virtualization=enable" >> /etc/rc.local
+	echo "/usr/local/sbin/syscfg --virtualization=enable" >> /etc/rc.local
 
 	#Start firmware update block
 	echo "yum -y install dell_ft_install" >> /etc/rc.local
 	echo "yum -y install \$(/usr/sbin/bootstrap_firmware)" >> /etc/rc.local
         echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt ; reboot" >> /etc/rc.local
+	echo "ssh leyte /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
         ;;
@@ -271,5 +270,10 @@ do
 done
 
 sed -i "s/$(hostname)//g" /etc/hosts
+
+echo "
+	xCAT build from xcat2
+	 $(hostname) boot 
+	at $(date)" | mail -s "xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))" xcat@broadinstitute.org
 
 exit 0
