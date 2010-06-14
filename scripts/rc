@@ -37,6 +37,7 @@ then
 	COMMIT='svn commit'
     else
 	[[ -e $FILE ]] && CO='co -l'
+	DIFF="rcsdiff"
 	COMMIT="ci -w$USER -u"
     fi
 fi
