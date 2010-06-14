@@ -290,4 +290,4 @@
 "node1338","boot","boot","runcmd=standby",,,
 "node1341","boot","boot","runcmd=standby",,,
 "node1345","boot","boot","runcmd=standby",,,
-"gsa2","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
+"gsa2","boot","boot","runcmd=standby",,,
