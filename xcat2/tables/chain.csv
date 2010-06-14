@@ -284,3 +284,4 @@
 "node1108","boot","boot","runcmd=standby",,,
 "node1109","boot","boot","runcmd=standby",,,
 "node1110","boot","boot","runcmd=standby",,,
+"gsa1","boot","boot","runcmd=standby",,,
