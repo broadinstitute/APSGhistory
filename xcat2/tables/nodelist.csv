@@ -54,7 +54,7 @@
 "node1375","dell,farm,all","booting",,,,,,
 "node1376","dell,farm,all","booting",,,,,,
 "node1377","dell,farm,all","booting",,,,,,
-"node1378","dell,farm,all","booting",,,,,,
+"node1378","dell,farm,all","booting","06-16-2010 11:00:06",,,,,
 "node1379","dell,farm,all","booting",,,,,,
 "node1380","dell,farm,all","booting",,,,,,
 "node1381","dell,farm,all","booting",,,,,,
@@ -319,3 +319,4 @@
 "node1364","dell,farm,all",,,,,,,
 "node1366","dell,farm,all",,,,,,,
 "node1367","dell,farm,all",,,,,,,
+"node1401","dell,farm,all",,,,,,,
