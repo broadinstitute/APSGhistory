@@ -314,3 +314,4 @@
 "node247","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node247 ksdevice=bootif noipv6",,,,,
 "node248","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node248 ksdevice=bootif noipv6",,,,,
 "node249","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node249 ksdevice=bootif noipv6",,,,,
+"gapdev01","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/gapdev01 ksdevice=bootif noipv6",,,,,

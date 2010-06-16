@@ -315,3 +315,4 @@
 "node247","boot","boot","runcmd=standby",,,
 "node248","boot","boot","runcmd=standby",,,
 "node249","boot","boot","runcmd=standby",,,
+"gapdev01","boot","boot","runcmd=standby",,,

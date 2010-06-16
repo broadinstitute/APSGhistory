@@ -310,4 +310,6 @@
 "node247","ibm,farm,all","booting","06-15-2010 18:28:50",,,,,
 "node248","ibm,farm,all","booting","06-15-2010 18:29:08",,,,,
 "node249","ibm,farm,all","booting","06-15-2010 18:29:02",,,,,
-"gapdev01","farm,all",,,,,,,
+"gapdev01","dell,farm,all","booting","06-16-2010 09:57:23",,,,,
+"node162","ibm,farm,all",,,,,,,
+"node375","ibm,farm,all",,,,,,,
