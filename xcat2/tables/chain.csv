@@ -312,3 +312,6 @@
 "node1232","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
 "gsa3","boot","boot","runcmd=standby",,,
 "node1353","boot","boot","runcmd=standby",,,
+"node247","boot","boot","runcmd=standby",,,
+"node248","boot","boot","runcmd=standby",,,
+"node249","boot","boot","runcmd=standby",,,
