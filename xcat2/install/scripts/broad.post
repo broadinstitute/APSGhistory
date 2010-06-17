@@ -51,6 +51,8 @@ do
  fi
 done
 
+if [ -z $GATEWAYNIC ]; do
+	echo -e "xCAT postbuild failed on $PRINIC. \$GATEWAYNIC not found." | mail -s "xCAT build failure" xcat@broadinstitute.org
 ifup $GATEWAYNIC 
 
 echo GATEWAYDEV=$GATEWAYNIC
