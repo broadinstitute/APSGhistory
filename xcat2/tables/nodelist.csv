@@ -333,7 +333,7 @@
 "node1365","dell,farm,all","booting","06-18-2010 14:06:13",,,,,
 "node1400","dell,farm,all","booting","06-18-2010 14:05:56",,,,,
 "node369","ibm,farm,all","installing","06-18-2010 13:58:27",,,,,
-"node1105","dell,farm,all","booting","06-18-2010 17:58:14",,,,,
+"node1105","dell,farm,all","booting","06-18-2010 18:01:08",,,,,
 "berkelium","dell,farm,all","booting","06-18-2010 14:10:42",,,,,
 "node1227","dell,farm,all","booting","06-18-2010 14:07:55",,,,,
 "node1414","dell,farm,all","booting","06-18-2010 14:06:25",,,,,
@@ -352,3 +352,4 @@
 "node1429","dell,farm,all","booting","06-18-2010 14:07:07",,,,,
 "node1430","dell,farm,all","booting","06-18-2010 14:06:19",,,,,
 "node1408","dell,farm,all",,,,,,,
+"node1411","dell,farm,all",,,,,,,
