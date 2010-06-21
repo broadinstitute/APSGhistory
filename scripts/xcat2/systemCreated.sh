@@ -21,11 +21,16 @@ for HOST in $HOST_LIST; do
 	if [ -z $IP ]; then
 		continue
 	fi
-
-	FS_DATE=$(snmpget -v2c -c pzCuQMLd $IP HOST-RESOURCES-MIB::hrSWInstalledDate.1 2>/dev/null | awk -F'STRING:' '{print $2}' 2>/dev/null | cut -f1 -d',')
-	if [ -z $FS_DATE ]; then
+	FS_DATE=$(snmpget -v2c -c pzCuQMLd $IP HOST-RESOURCES-MIB::hrSWInstalledDate.1 2>/dev/null | awk -F'STRING:' '{print $2}' 2>/dev/null | awk -F',' '{print $1" " $2}' | cut -f1 -d'.')
+	if [ -z "$FS_DATE" ]; then
 		continue
 	fi
+	OFFSET=$(snmpget -v2c -c pzCuQMLd $IP HOST-RESOURCES-MIB::hrSWInstalledDate.1 2>/dev/null | awk -F'STRING:' '{print $2}' 2>/dev/null | awk -F, '{print $NF}' | cut -f1 -d:)
+	if [ -z "$OFFSET" ]; then
+		continue
+	fi
+
+	FS_DATE=$(date -d @$(~ali/bashcalc.sh $(date +%s -d "$FS_DATE")+$(($OFFSET*$((60*60)))))) # Convert from UTC
 	
 	FS_DATE=$(date +%F -d "$FS_DATE")
 	echo "| $FS_DATE || $HOST" >> /root/bin/hostList.tmp

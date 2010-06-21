@@ -41,4 +41,5 @@ do
 	makedhcp $NODE
 
 	ssh $USER@$HOST makedhcp -d $NODE
+	ssh $USER@$HOST service dhcpd stop
 done
