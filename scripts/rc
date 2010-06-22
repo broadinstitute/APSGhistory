@@ -53,5 +53,5 @@ cd $DIR
 [[ -n $CO ]]     && $CO     $FILE
                     $VISUAL $FILE
 [[ -n $ADD ]]    && $ADD    $FILE
-[[ -n $DIFF ]]   && $DIFF   $FILE
+[[ -n $DIFF ]]   && $DIFF   $FILE || true
 [[ -n $COMMIT ]] && $COMMIT $FILE
