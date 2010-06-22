@@ -2,7 +2,7 @@
 
 #Functions
 startDate(){
-	local START_DATE=$(date -d @$(($(date +%s) + 60)) "+%x %H:%M:%S" | sed -e 's/\//-/g')
+	local START_DATE=$(date -d @$(date +%s)  "+%x %H:%M:%S" | sed -e 's/\//-/g')
 	echo $START_DATE
 }
 
