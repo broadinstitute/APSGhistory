@@ -394,3 +394,4 @@
 "node1004","boot","boot","runcmd=standby",,,
 "node1005","boot","boot","runcmd=standby",,,
 "node1006","boot","boot","runcmd=standby",,,
+"hyacinth","boot","boot","runcmd=standby",,,
