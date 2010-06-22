@@ -19,9 +19,14 @@ reuse -q Subversion-1.6
 
 # Use git or svn if possible, and fall back to rcs.
 
-# Check out file if
-# it's present, or add it if not.  Doesn't currently handle update,
-# merge, push or pull at all.
+# Check out file if it's present, or add it if not.  Doesn't currently
+# handle update, merge, push or pull at all.
+
+# VC operations that follow may depend on being in the working
+# directory, so ensure we are there.
+set -e
+cd $DIR
+set +e
 
 if [[ -n "$1" ]]
 then
@@ -41,14 +46,11 @@ then
 	COMMIT="ci -w$USER -u"
     fi
 fi
+set -e -x
 
 ##
 ## Actual VC & editing
 ##
-
-set -e
-
-cd $DIR
 
 [[ -n $CO ]]     && $CO     $FILE
                     $VISUAL $FILE
