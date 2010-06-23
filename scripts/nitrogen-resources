@@ -21,7 +21,10 @@ ARGF.each { |line|
 }
 
 dupes.each { |dup, target|
-  table[dup] = table[target] if table[target]
+  until target.empty? or table[target]
+    target = target.split('/')[0..-2].join('/')
+  end
+  table[dup] = table[target] unless target.empty?
 }
 
 table.each { |volume, resources|
