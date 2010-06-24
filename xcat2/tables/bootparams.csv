@@ -412,3 +412,4 @@
 "node1446","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1446 ksdevice=bootif noipv6",,,,,
 "node1447","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1447 ksdevice=bootif noipv6",,,,,
 "node1409","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1409 ksdevice=bootif noipv6",,,,,
+"gapqa02","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/gapqa02 ksdevice=bootif noipv6",,,,,
