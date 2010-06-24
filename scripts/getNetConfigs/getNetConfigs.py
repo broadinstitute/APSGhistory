@@ -113,6 +113,7 @@ exp_path = "/usr/local/bin/"
 ios_cmd = exp_path + "getIOS.exp"
 fos_cmd = exp_path + "getFOS.exp"
 nxos_cmd = exp_path + "getNXOS.exp"
+nxos_san_cmd = exp_path + "getNXOS-SAN.exp"
 iosxe_cmd = exp_path + "getIOSXE.exp"
 
 ##Force10##
@@ -130,6 +131,7 @@ ios = getDevices("ios")
 iosxe = getDevices("iosxe")
 fos = getDevices("fos")
 nxos = getDevices("nxos")
+nxos_san = getDevices("ciscosan")
 voip = getDevices("voip")
 
 ##Force10
@@ -161,6 +163,7 @@ logging.basicConfig(filename=LOG,level=logging.INFO,filemode='w',format="%(ascti
 get_config(ios,ios_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 get_config(fos,fos_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 get_config(nxos,nxos_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
+get_config(nxos_san,nxos_san_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 get_config(voip,ios_cmd,netdev_user_pass,voipdev_en_pass,tftpIP)
 get_config(iosxe,iosxe_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 ##Force10##
