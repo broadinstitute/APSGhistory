@@ -1,0 +1,19 @@
+#!/usr/bin/expect
+
+set host [lindex $argv 0]
+set passw [lindex $argv 1]
+set enpassw [lindex $argv 2]
+set user [lindex $argv 3]
+set ip [lindex $argv 4]
+set date [exec date +%Y%m%d]
+
+spawn telnet -l $user $host
+expect "Password:"
+send "$passw\r"
+expect "#"
+send "copy running-config tftp://$ip/$date/$host\r"
+expect "#"
+send "\r"
+expect "#"
+send "exit\r"
+exit 0
