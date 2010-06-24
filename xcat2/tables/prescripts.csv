@@ -1,2 +1,2 @@
 #node,begin,end,comments,disable
-"all",,"install:ipappend,sshclean,cfe3clean,emailXCAT,nagiosquiet",,
+"all",,"install:ipappend,sshclean,cfe3clean,emailXCAT",,
