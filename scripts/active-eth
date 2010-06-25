@@ -1,0 +1,2 @@
+#!/bin/sh
+/sbin/ifconfig | grep -B 1 addr:69 | head -1 | cut -d" " -f 1

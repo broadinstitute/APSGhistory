@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+DOTKIT_LIST="$1"
+shift
+
+. /broad/tools/scripts/useuse
+for dk in $DOTKIT_LIST; do reuse -q $dk; done
+
+exec -- "$@"

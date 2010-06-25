@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+
+failed = false
+
+files = ARGV
+
+files.each { |file|
+    source = `/bin/df #{file}`.split("\n")[1].split[0]
+    host, path = source.split(":")
+
+    unless host and path
+       $stderr.puts "#{source} (for #{file}) is not a network path;  no resource available"
+       failed = true
+       next
+    end
+
+    windows_path = "\\\\#{host.sub('.broadinstitute.org','')}#{file.sub('/','\\\\').sub('/','_').gsub('/','\\\\')}"
+    windows_path.sub!('home_radon', 'home')
+
+    puts windows_path
+}
+
+exit (failed ? 17 : 0)
