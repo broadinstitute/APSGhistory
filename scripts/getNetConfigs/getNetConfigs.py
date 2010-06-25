@@ -6,6 +6,7 @@ from os import path,makedirs,listdir,remove,rmdir
 from sys import exit
 from datetime import datetime
 from subprocess import *
+from socket import gethostbyname,gethostname
 import shutil
 
 import logging,string
@@ -77,7 +78,7 @@ def getDevices(model):
 
 
 ###Set TFTP IP###
-tftpIP="69.173.67.37"
+tftpIP="%s" % gethostbyname(gethostname())
 
 ###Get YYYYMMDD date and establish local basedir###
 now = datetime.now()
