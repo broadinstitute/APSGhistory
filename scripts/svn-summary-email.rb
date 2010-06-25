@@ -25,7 +25,7 @@ exit 0 if changed.map { |line| line.sub(/^.\s+/,'') }.grep($pattern).empty?
 
 # translate author into email address
 
-hostname = `hostname -d`.chomp
+hostname = `hostname -d`.chomp.sub('broad.mit.edu','broadinstitute.org')
 fullname = Etc.getpwnam(author).gecos
 author   = "\"#{fullname}\" <#{author}@#{hostname}>"
 
@@ -33,7 +33,7 @@ author   = "\"#{fullname}\" <#{author}@#{hostname}>"
 
 datestamp = Time.local(* ParseDate.parsedate(datestamp)).strftime('%a, %d %b %Y %H:%M:%S %z')
 
-sendmail = IO.popen('/usr/sbin/sendmail -t -f svnadmin@broad.mit.edu', 'w')
+sendmail = IO.popen('/usr/sbin/sendmail -t -f svnadmin@broadinstitute.org', 'w')
 
 sendmail.puts <<END_HEADER
 From:    #{author}
