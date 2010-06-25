@@ -10,7 +10,7 @@ prog=${0##*/}
 ## Log application access
 ##
 applog () {
-  echo $(date "+%b %e %H:%M:%S %Z %Y") $HOSTNAME\($UID\): $@ >> $LOG
+  : echo $(date "+%b %e %H:%M:%S %Z %Y") $HOSTNAME\($UID\): $@ >> $LOG
 }
 
 case $(arch) in
