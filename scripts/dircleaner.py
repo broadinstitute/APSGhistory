@@ -71,8 +71,9 @@ def main():
             if not options.dry_run:
                 try:
                     os.remove(path)
-                except OSError:
-                    status = 'failed '
+                except OSError, e:
+                    if errno.errorcode[e.errno] != 'ENOENT':
+                        status = 'failed '
             if options.verbose:
                 print status + 'rm:',path
         for path in dirlist:
@@ -80,8 +81,9 @@ def main():
             if not options.dry_run:
                 try:
                     os.rmdir(path)
-                except OSError:
-                    status = 'failed '
+                except OSError, e:
+                    if errno.errorcode[e.errno] != 'ENOENT':
+                        status = 'failed '
             if options.verbose:
                 print status + 'rmdir:',path
 
