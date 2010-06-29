@@ -415,3 +415,4 @@
 "node1409","boot","boot","runcmd=standby",,,
 "gapqa02","boot","boot","runcmd=standby",,,
 "cga1","boot","boot","runcmd=standby",,,
+"node1444","boot","boot","runcmd=standby",,,
