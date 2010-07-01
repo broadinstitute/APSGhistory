@@ -415,5 +415,6 @@
 "node1083","dell,farm,all","booting","06-29-2010 13:26:14",,,,,
 "node1326","dell,farm,all","booting","06-29-2010 13:26:47",,,,,
 "node329","ibm,farm,all","booting","06-29-2010 15:02:13",,,,,
-"gapqa01","dell,farm,all","booting","07-01-2010 07:48:02",,,,,
-"erbium","dell,db,all",,,,,,,
+"gapqa01","dell,farm,all","booting","07-01-2010 08:50:06",,,,,
+"erbium","dell,db,all","booting","07-01-2010 09:14:24",,,,,
+"node355","ibm,farm,all",,,,,,,
