@@ -20,9 +20,9 @@ echo "
 " > $FILE
 
 for HOST in $(nodels); do
-	IP=$(tabdump hosts | grep $HOST | awk -F, '{print $2}' | tr -d '"')
-	MAC=$(tabdump mac | grep $HOST | awk -F, '{print $3}' | tr -d '"')
-	TAGS=$(tabdump nodelist | grep $HOST | awk -F\" '{print $4}')
+	IP=$(tabdump hosts | grep -w $HOST | awk -F, '{print $2}' | tr -d '"')
+	MAC=$(tabdump mac | grep -w $HOST | awk -F, '{print $3}' | tr -d '"')
+	TAGS=$(tabdump nodelist | grep -w $HOST | awk -F\" '{print $4}')
 
 	echo "|$IP|||$MAC|||$HOST|||$TAGS||" >> $TMP_FILE
 done
