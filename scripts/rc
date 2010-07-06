@@ -8,6 +8,8 @@ export VISUAL=${VISUAL:-$EDITOR}
 DIR=`dirname $1`
 DIR=${DIR:-.}
 
+COMMIT_USER=${SUDO_USER:-$USER}
+
 source /broad/tools/scripts/useuse
 reuse -q Subversion-1.6
 # no git dotkit right now
@@ -39,11 +41,11 @@ then
     then
 	svn info $FILE >/dev/null 2>&1 || ADD='svn add'
 	DIFF='svn diff'
-	COMMIT='svn commit'
+	COMMIT='svn --username $COMMIT_USER commit'
     else
 	[[ -e $FILE ]] && CO='co -l'
 	DIFF="rcsdiff"
-	COMMIT="ci -w$USER -u"
+	COMMIT="ci -w$COMMIT_USER -u"
     fi
 fi
 set -e -x
