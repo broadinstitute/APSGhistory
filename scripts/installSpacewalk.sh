@@ -10,7 +10,7 @@ rpm -Uvh http://spacewalk.redhat.com/yum/1.0/RHEL/5/$BASEARCH/spacewalk-client-r
 rpm -Uvh http://download.fedora.redhat.com/pub/epel/5/$BASEARCH/epel-release-5-3.noarch.rpm
 
 #install the good stuff
-yum install rhn-client-tools rhn-check rhn-setup rhnsd m2crypto yum-rhn-plugin osad
+yum -y install rhn-client-tools rhn-check rhn-setup rhnsd m2crypto yum-rhn-plugin osad
 
 #register system on spacewalk
 rhnreg_ks --serverUrl=http://vspacewalk.broadinstitute.org/XMLRPC --activationkey=1-CentOSBroad
