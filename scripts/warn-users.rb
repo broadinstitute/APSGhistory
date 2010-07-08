@@ -14,8 +14,7 @@ def start_email(uid)
   pwent = Etc.getpwuid(uid)
   username, fullname = pwent.name, pwent.gecos
 
-#  sendmail = IO.popen("/usr/sbin/sendmail -f apsg@broadinstitute.org #{username}@broadinstitute.org", 'w')
-  sendmail = IO.popen("/usr/sbin/sendmail -f adb@broadinstitute.org adb@broadinstitute.org", 'w')
+  sendmail = IO.popen("/usr/sbin/sendmail -f apsg@broadinstitute.org #{username}@broadinstitute.org", 'w')
 
   sendmail.puts header = <<HEADER
 From: Research Computing resource usage alerts <help@broadinstitute.org>
