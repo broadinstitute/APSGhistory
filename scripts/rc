@@ -41,7 +41,7 @@ then
     then
 	svn info $FILE >/dev/null 2>&1 || ADD='svn add'
 	DIFF='svn diff'
-	COMMIT='svn --username $COMMIT_USER commit'
+	COMMIT="svn --username $COMMIT_USER commit"
     else
 	[[ -e $FILE ]] && CO='co -l'
 	DIFF="rcsdiff"
