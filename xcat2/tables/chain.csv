@@ -436,3 +436,4 @@
 "node366","boot","boot","runcmd=standby",,,
 "node367","boot","boot","runcmd=standby",,,
 "node368","boot","boot","runcmd=standby",,,
+"medpopdev02","boot","boot","runcmd=standby",,,
