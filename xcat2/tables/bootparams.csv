@@ -437,3 +437,4 @@
 "node368","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node368 ksdevice=bootif noipv6",,,,,
 "medpopdev02","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/medpopdev02 ksdevice=bootif noipv6",,,,,
 "astatine","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/astatine ksdevice=bootif noipv6",,,,,
+"ytterbium","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/ytterbium ksdevice=bootif noipv6",,,,,
