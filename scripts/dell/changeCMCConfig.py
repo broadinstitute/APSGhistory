@@ -5,9 +5,9 @@ from sys import argv,exit
 from getpass import getpass
 
 hosts = argv[1].split(',')
-group = argv[2]
-object = argv[3]
-value = argv[4]
+config = ""
+for args in range(2,len(argv)):
+	config += "%s " % argv[args]
 password = getpass("Password:")
 debugMode = True
 
@@ -19,7 +19,7 @@ for host in hosts:
 	child.sendline("%s" % password)
 	child.expect('Welcome')
 	child.expect('$')
-	child.sendline("racadm config -g %s -o %s %s" % (group,object,value))
+	child.sendline("racadm config %s" % config)
 	child.expect('$')
 	child.sendline("exit")
 	child.expect(pexpect.EOF)
