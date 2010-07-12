@@ -6,8 +6,8 @@ require 'etc'
 $email = {}
 
 # Limits how much filename content we send per email; well short of
-# our current 50 MB message size limit.
-EMAIL_SIZE_LIMIT = 24000000
+# our current 10 MB message size limit.
+EMAIL_SIZE_LIMIT = 9876543
 $email_size = {}
 
 def start_email(uid)
