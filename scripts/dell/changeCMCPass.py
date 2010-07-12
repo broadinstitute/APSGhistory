@@ -8,7 +8,7 @@ hosts = argv[1].split(',')
 opass = getpass("Current Password:")
 npass = getpass("New Password:")
 npassConfirm = getpass("Confirm New Password:")
-debugMode = False
+debugMode = True
 
 if npass == npassConfirm:
 	for host in hosts:
@@ -20,6 +20,8 @@ if npass == npassConfirm:
 		child.expect('Welcome')
 		child.expect('$')
 		child.sendline("racadm config -g cfgUserAdmin -o cfgUserAdminPassword -i 1 \'%s\'" % npass)
+		child.expect('$')
+		child.sendline("racadm deploy -a -u root -p %s" % npass)
 		child.expect('$')
 		child.sendline("racreset")
 		child.expect('$')
