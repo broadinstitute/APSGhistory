@@ -25,7 +25,7 @@ do
 done  
 
 #Write out partition scheme based on whether there are 1 or 2 hard drives  
-if [ $numhd -eq 2 ] ; then   
+if [ $numhd -ge 2 ] ; then   
 	#2 drives   
 	echo "#partitioning scheme generated in %pre for 2 drives" > /tmp/part-include   
 	echo "clearpart --all --initlabel" >> /tmp/part-include   
@@ -50,7 +50,7 @@ elif [ $numhd -eq 1 ] ; then
 	echo "part swap --size 8192" >> /tmp/part-include   
 	echo "part /local --fstype ext4 --size 1024 --grow" >> /tmp/part-include 
 else
-	echo "more code needed"
+	echo "error"
 fi
 
 
