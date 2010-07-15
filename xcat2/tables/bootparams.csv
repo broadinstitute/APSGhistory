@@ -439,3 +439,4 @@
 "astatine","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/astatine ksdevice=bootif noipv6",,,,,
 "ytterbium","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/ytterbium ksdevice=bootif noipv6",,,,,
 "yttrium","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/yttrium ksdevice=bootif noipv6",,,,,
+"gapprod02","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/gapprod02 ksdevice=bootif noipv6",,,,,
