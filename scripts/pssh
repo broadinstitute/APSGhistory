@@ -3,8 +3,22 @@
 OIFS=$IFS
 IFS=','
 HOSTS=$1
+CMD=$2
+
+#meh.  The next eight lines (not including WS) are a standard construct in MoniaScript, it seems worthwhile to keep around.
+USAGE="Usage: $(basename $0) \$HOSTS \$CMD"
+ARG_NO=2
+E_OK=0       # successful termination
+E_USAGE=64      # command line usage error
+
+if [ $# -ne "$ARG_NO" ]; then
+        echo 1>&2 $USAGE
+        exit $E_USAGE
+fi
 
 for HOST in $HOSTS; do 
 	ssh -n $HOST $CMD > /tmp/$HOST.log & done
 wait
 IFS=$OIFS
+
+exit $E_OK
