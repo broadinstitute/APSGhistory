@@ -1,0 +1,10 @@
+#!/bin/bash
+
+OIFS=$IFS
+IFS=','
+HOSTS=$1
+
+for HOST in $HOSTS; do 
+	ssh -n $HOST $CMD > /tmp/$HOST.log & done
+wait
+IFS=$OIFS
