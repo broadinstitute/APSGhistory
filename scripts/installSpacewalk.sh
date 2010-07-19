@@ -15,3 +15,6 @@ yum -y install rhn-client-tools rhn-check rhn-setup rhnsd m2crypto yum-rhn-plugi
 #register system on spacewalk
 rhnreg_ks --serverUrl=http://vspacewalk.broadinstitute.org/XMLRPC --activationkey=1-CentOSBroad
 
+yum clean all
+yum -y upgrade
+yum clean all
