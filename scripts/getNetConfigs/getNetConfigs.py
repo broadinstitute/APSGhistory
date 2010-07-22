@@ -172,5 +172,5 @@ get_config(ftos,ftos_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 get_config(sftos,sftos_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 ##Others##
 get_config(ent,ent_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
-get_config(dell,dell_cmd,util_pass,netdev_en_pass,tftpIP)
-get_config(dellv2,dellv2_cmd,util_pass,netdev_en_pass,tftpIP)
+get_config(dell,dell_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
+get_config(dellv2,dellv2_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
