@@ -164,7 +164,7 @@ logging.basicConfig(filename=LOG,level=logging.INFO,filemode='w',format="%(ascti
 get_config(ios,ios_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 get_config(fos,fos_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 get_config(nxos,nxos_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
-get_config(nxos_san,nxos_san_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
+get_config(nxos_san,nxos_san_cmd,util_pass,netdev_en_pass,tftpIP)
 get_config(voip,ios_cmd,netdev_user_pass,voipdev_en_pass,tftpIP)
 get_config(iosxe,iosxe_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 ##Force10##
