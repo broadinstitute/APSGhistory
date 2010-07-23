@@ -1,3 +1,6 @@
 #!/bin/bash
 
-/broad/tools/scripts/svn-summary-email.rb "$@" '' tribble_svn_list@broad.mit.edu
+REPOS="$1"
+REV="$2"
+
+/broad/svn/svn/tools/hook-scripts/commit-email.pl "$REPOS" "$REV" --from svn@broadinstitute.org -s "SVN: " tribble_svn_list@broadinstitute.org
