@@ -451,3 +451,4 @@
 "node1456","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1456 ksdevice=bootif noipv6",,,,,
 "node1457","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1457 ksdevice=bootif noipv6",,,,,
 "vitalstatistix","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/vitalstatistix ksdevice=bootif noipv6",,,,,
+"gold","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/gold ksdevice=bootif noipv6",,,,,
