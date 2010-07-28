@@ -51,8 +51,6 @@ do
  fi
 done
 
-if [ -z $GATEWAYNIC ]; do
-	echo -e "xCAT postbuild failed on $PRINIC. \$GATEWAYNIC not found." | mail -s "xCAT build failure" xcat@broadinstitute.org
 ifup $GATEWAYNIC 
 
 echo GATEWAYDEV=$GATEWAYNIC
@@ -215,6 +213,7 @@ case $VENDOR in
 	echo "chkconfig snmpd on" > /etc/rc.local
 	echo "service snmpd restart" >> /etc/rc.local
 	echo "ssh leyte /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
+	echo -e "xCAT build from xcat2\n$(hostname) postinstall\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) postbuild ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
         ;;
@@ -234,7 +233,7 @@ case $VENDOR in
 	echo "mount -o loop -o ro /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso /tmp/dtk/" >> /etc/rc.local
 	echo "cd /tmp/dtk/isolinux/" >> /etc/rc.local
 	echo "cp  SA.2 ~/SA.2.gz" >> /etc/rc.local
-	echo "cd; gunzip SA.2.gz" >> /etc/rc.local
+	echo "cd; gunzip -f SA.2.gz" >> /etc/rc.local
 	echo "mkdir stage2" >> /etc/rc.local
 	echo "cd stage2" >> /etc/rc.local
 	echo "cpio -i < ../SA.2" >> /etc/rc.local
@@ -249,6 +248,7 @@ case $VENDOR in
 	echo "yum -y install \$(/usr/sbin/bootstrap_firmware)" >> /etc/rc.local
         echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt ; reboot" >> /etc/rc.local
 	echo "ssh leyte /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
+	echo -e "xCAT build from xcat2\n$(hostname) postinstall\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) postbuild ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
         ;;
@@ -275,7 +275,7 @@ sed -i "s/$(hostname)//g" /etc/hosts
 
 echo "
 	xCAT build from xcat2
-	 $(hostname) boot 
-	at $(date)" | mail -s "xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))" xcat@broadinstitute.org
+	 $(hostname) postinstall
+	at $(date)" | mail -s "xCAT build from xCAT2  -- $(hostname) postbuild ($(date +%F | tr -d '-'))" xcat@broadinstitute.org
 
 exit 0
