@@ -209,9 +209,6 @@ case $VENDOR in
 	echo "Remove Download" | tee -a $FILE
 	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
 
-	wget http://$MASTER/snmp/snmpd.conf -O /etc/snmp/snmpd.conf
-	echo "chkconfig snmpd on" > /etc/rc.local
-	echo "service snmpd restart" >> /etc/rc.local
 	echo "ssh leyte /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
 	echo -e "xCAT build from xcat2\n$(hostname) postinstall\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) postbuild ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
@@ -219,9 +216,6 @@ case $VENDOR in
         ;;
 # REMEMBER YOU DID THIS
 "Dell")
-	wget http://$MASTER/snmp/snmpd.conf -O /etc/snmp/snmpd.conf
-	echo "chkconfig snmpd on" > /etc/rc.local
-	echo "service snmpd restart" >> /etc/rc.local
 	echo "wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash" >> /etc/rc.local
 	echo "yum -y install srvadmin-all" >> /etc/rc.local
 
