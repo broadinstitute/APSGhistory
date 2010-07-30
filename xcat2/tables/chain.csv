@@ -452,7 +452,7 @@
 "node1456","boot","boot","runcmd=standby",,,
 "node1457","boot","boot","runcmd=standby",,,
 "vitalstatistix","boot","boot","runcmd=standby",,,
-"gold","boot","boot","runcmd=standby",,,
+"gold","install centos5.4-x86_64-broad.farm.centos5","boot","runcmd=standby",,,
 "americium","boot","boot","runcmd=standby",,,
 "node1512","boot","boot","runcmd=standby",,,
 "node1513","boot","boot","runcmd=standby",,,
@@ -486,3 +486,4 @@
 "node1509","boot","boot","runcmd=standby",,,
 "node1510","boot","boot","runcmd=standby",,,
 "node1511","boot","boot","runcmd=standby",,,
+"getafix","boot","boot","runcmd=standby",,,
