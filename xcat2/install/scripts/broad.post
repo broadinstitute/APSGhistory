@@ -164,6 +164,9 @@ if [ -e /etc/enterprise-release ]; then
 	##Yum customization and package foo
 	yum -y groupremove "Dialup Networking Support"
 	yum clean all
+
+	mv /etc/group > /etc/group.default
+	cat /etc/group.default | awk '/games/{gsub(/20/, "40")};/dip/{gsub(/40/, "20")};{print}' | sort -n -k3 -t: > /etc/group
 else
 	###Apparently, yum needs utils before switching to our local mirror
 	yum -y groupinstall yum-utils
