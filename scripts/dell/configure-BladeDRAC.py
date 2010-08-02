@@ -15,13 +15,51 @@ def setDHCP():
 	optionList.append("%s oemdell_domainnamefromdhcp=1 oemdell_serversfromdhcp=1" % path)
 	for optionItem in optionList:
 		configList.append("set %s" % optionItem)
-#	configList.append("config -g %s -o cfgDNSServersFromDHCP 1" % groupName)
-#	configList.append("config -g %s -o cfgDNSDomainNameFromDHCP 1" % groupName)
+
+	for host in hosts:
+		for configItem in configList:
+			child = pexpect.spawn("ssh %s" % host)
+			if debugMode:
+				child.logfile = sys.stdout
+			child.expect("root@%s's password:" % host)
+			child.sendline("%s" % password)
+			child.expect('->')
+			child.sendline("%s" % configItem)
+			child.expect("Connection to %s closed" % host) 
 	
 	return configList
 
-def fixAD():
-	return ["config -g cfgActiveDirectory -o cfgADCertValidationEnable 0"]
+def configAD():
+	optionList = []
+	configList = []
+	
+	path = "/system1/sp1/oemdell_adservice1"
+	domain = "broad.mit.edu"
+	domainController = "dracdc.broadinstitute.org"
+
+	optionList.append("%s enablestate=1 oemdell_adrootdomain=%s oemdell_schematype=2 oemdell_adspecifyserverenable=1" % (path,domain))
+	optionList.append("%s oemdell_addomaincontroller=%s oemdell_adglobalcatalog=%s" % (path,domainController,domainController))
+
+	path = "/system1/sp1/group1"
+	optionList.append("%s oemdell_groupname=DRACAdmin oemdell_groupdomain=%s oemdell_groupprivilege=0x1ff" % (path,domain))
+
+	for optionItem in optionList:
+		configList.append("set %s" % optionItem)
+	
+	for host in hosts:
+		child = pexpect.spawn("ssh %s" % host)
+		if debugMode:
+			child.logfile = sys.stdout
+		child.expect("root@%s's password:" % host)
+		child.sendline("%s" % password)
+		child.expect('->')
+		for configItem in configList:
+			child.sendline("%s" % configItem)
+			child.expect('->')
+		child.sendline("exit")
+		child.expect(pexpect.EOF)
+
+	return configList
 
 def deploy():
 	return ["deploy -a -u root -p %s -d" % password]
@@ -52,21 +90,10 @@ password = getpass("Password:")
 debugMode = True
 
 configDict = {
-	"setDHCP": setDHCP}
-	#"fixAD": fixAD,
+	"setDHCP": setDHCP,
+	"configAD": configAD}
+
 	#"deploy": deploy,
 	#"setNetSvcs": setNetSvcs}
 
 configList = configDict.get(configArg)()
-for host in hosts:
-	for configItem in configList:
-		child = pexpect.spawn("ssh %s" % host)
-		if debugMode:
-			child.logfile = sys.stdout
-		child.expect("root@%s's password:" % host)
-		child.sendline("%s" % password)
-		child.expect('->')
-		child.sendline("%s" % configItem)
-		child.expect("Connection to %s closed" % host) 
-		#child.sendline("exit")
-		#child.expect(pexpect.EOF)

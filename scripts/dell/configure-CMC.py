@@ -58,7 +58,6 @@ for host in hosts:
 		child.logfile = sys.stdout
 	child.expect("root@%s's password:" % host)
 	child.sendline("%s" % password)
-	child.expect('Welcome')
 	child.expect('$')
 	for configItem in configList:
 		child.sendline("racadm %s" % configItem)
