@@ -3,6 +3,7 @@
 #Set Variables
 USER="root"
 HOST="pm"
+DIR=/root/svn/xcat2/tables/
 
 NODE_LIST=$(echo "$1" | tr ',' ' ')
 
@@ -30,9 +31,9 @@ do
 	esac
 
 	if [ $GROUP = "ibm,farm,all" ]; then
-		svnbuild nodeadd $NODE groups=$GROUP mac.interface=eth0 hosts.ip=$IP mac.mac=$MAC mp.mpa=$IBM_CHASSIS mp.id=$IBM_SLOT
+		nodeadd $NODE groups=$GROUP mac.interface=eth0 hosts.ip=$IP mac.mac=$MAC mp.mpa=$IBM_CHASSIS mp.id=$IBM_SLOT
 	else
-		svnbuild nodeadd $NODE groups=$GROUP mac.interface=eth0 hosts.ip=$IP mac.mac=$MAC
+		nodeadd $NODE groups=$GROUP mac.interface=eth0 hosts.ip=$IP mac.mac=$MAC
 	fi
 
 	sleep 30
@@ -43,3 +44,16 @@ do
 	ssh $USER@$HOST makedhcp -d $NODE
 	ssh $USER@$HOST service dhcpd stop
 done
+
+
+for TABLE in $(tabdump)
+do
+tabdump $TABLE > $DIR/$TABLE.csv
+done
+
+rm $DIR/passwd.csv
+
+COMMENT="Added $NODE_LIST"
+
+cd $DIR
+svn ci -m "$COMMENT" *
