@@ -504,3 +504,5 @@
 "node1061","boot","boot","runcmd=standby",,,
 "node1062","boot","boot","runcmd=standby",,,
 "node1063","boot","boot","runcmd=standby",,,
+"lutetium","boot","boot",,,,
+"tantalum","boot","boot","runcmd=standby",,,
