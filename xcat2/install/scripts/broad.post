@@ -165,8 +165,11 @@ if [ -e /etc/enterprise-release ]; then
 	yum -y groupremove "Dialup Networking Support"
 	yum clean all
 
-	mv /etc/group > /etc/group.default
+	mv /etc/group /etc/group.BAK
 	cat /etc/group.default | awk '/games/{gsub(/20/, "40")};/dip/{gsub(/40/, "20")};{print}' | sort -n -k3 -t: > /etc/group
+
+	mv /etc/multipath.conf /etc/multipath.BAK
+	echo -e "defaults {\n\tuser_friendly_names yes\n}" > /etc/multipath.conf
 else
 	###Apparently, yum needs utils before switching to our local mirror
 	yum -y groupinstall yum-utils
@@ -213,6 +216,7 @@ case $VENDOR in
 	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
 
 	echo "ssh leyte /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
+	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
@@ -245,6 +249,7 @@ case $VENDOR in
 	echo "yum -y install \$(/usr/sbin/bootstrap_firmware)" >> /etc/rc.local
         echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt ; reboot" >> /etc/rc.local
 	echo "ssh leyte /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
+	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
