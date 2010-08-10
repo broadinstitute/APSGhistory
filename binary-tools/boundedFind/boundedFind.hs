@@ -16,11 +16,19 @@ import System.Posix.Files
 -- function starts with a task list, performs the first task, reports
 -- the results and the new task list, and continues.
 
-steps step tasks = takeUntil (null . snd) $ process tasks where
-           process (task:tasks) = let (r, t) = step task
-                                  in ((r, t ++ tasks) : process (t ++ tasks))
+-- for the task queue
+import Prelude hiding (null, mapM)
+import Data.Sequence hiding (zipWith, take)
+import Data.Traversable
 
--- Like takeWhile (not . f), but reports the 
+steps step = takeUntil (null . snd) . process . fromList where
+    process tasks | null tasks = []
+                  | otherwise  =
+                      let (task :< rest) = viewl tasks
+                          (result, more) = step task
+                          tasks' = rest >< fromList more
+                      in ((result, tasks') : process tasks')
+
 takeUntil test [] = []
 takeUntil test (a:as) | test a    = [a]
                       | otherwise = (a : takeUntil test as)
@@ -43,14 +51,13 @@ processPath p = do info <- getFileInfo p
                            else return []
                    return (info, map (combine p) $ kids \\ [".", ".."])
 
-promoteMaybe (Nothing, t) = Nothing
-promoteMaybe (Just r, t)  = Just (r,t)
-
 showResults h [] = []
-showResults h [(r,t)]    = (print r : map (hPutStrLn h) t)
+showResults h [(r,t)]    = [print r, (mapM (hPutStrLn h) t >> return ())]
 showResults h ((r,t):xs) = (print r : showResults h xs)
 
-deMaybe = concatMap (maybeToList.promoteMaybe)
+deMaybe = concatMap (maybeToList.promoteMaybe) where
+    promoteMaybe (Nothing, t) = Nothing
+    promoteMaybe (Just r, t)  = Just (r,t)
 
 main = do (checkpointPath : count : paths) <- getArgs
        	  withFile checkpointPath WriteMode $ \h ->
