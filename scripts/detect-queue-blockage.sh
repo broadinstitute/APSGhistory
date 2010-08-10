@@ -5,7 +5,7 @@ alias ish=true
 alias isub=true
 
 . /broad/tools/scripts/useuse
-reuse -q LSF-7.0
+reuse -q LSF
 
 # usage:
 #
