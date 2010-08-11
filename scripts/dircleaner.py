@@ -1,4 +1,4 @@
-#!/util/bin/python
+#!/usr/bin/env python
 
 import os,stat,time
 from optparse import OptionParser
