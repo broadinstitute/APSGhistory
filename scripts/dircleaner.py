@@ -2,6 +2,7 @@
 
 import os,stat,time
 from optparse import OptionParser
+import errno
 
 # allow an hour for files even with no procs running
 # to avoid race conditions or the like
