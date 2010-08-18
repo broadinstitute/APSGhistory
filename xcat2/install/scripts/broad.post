@@ -166,7 +166,7 @@ if [ -e /etc/enterprise-release ]; then
 	yum clean all
 
 	mv /etc/group /etc/group.BAK
-	cat /etc/group.default | awk '/games/{gsub(/20/, "40")};/dip/{gsub(/40/, "20")};{print}' | sort -n -k3 -t: > /etc/group
+	cat /etc/group.BAK | awk '/games/{gsub(/20/, "40")};/dip/{gsub(/40/, "20")};{print}' | sort -n -k3 -t: > /etc/group
 
 	mv /etc/multipath.conf /etc/multipath.BAK
 	echo -e "defaults {\n\tuser_friendly_names yes\n}" > /etc/multipath.conf
@@ -178,6 +178,18 @@ else
 	wget http://www/~apsg/software/yumConfig/CentOS-Base.repo
 	mv -f CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 
+
+	# Start CFENGINE3 installation
+	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-latest.centos5.x86_64.rpm
+	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
+	rpm -ivh /tmp/cfengine-community-latest.centos5.x86_64.rpm
+	tar xvfP /tmp/base_promises.tar
+	/sbin/chkconfig --add cfengine3
+	/var/cfengine/bin/cf-key
+	/var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
+	/var/cfengine/bin/cf-agent -K
+	/var/cfengine/bin/cf-agent -K
+
 	##Yum customization and package foo
 	echo Updating installed packages..
 	wget http://www/~apsg/software/yumConfig/yum.conf
@@ -188,17 +200,6 @@ else
 	yum -y upgrade || echo "Yum Upgrade Failed" >> /etc/motd
 	echo Installing Broad package group "Broad Base"
 	yum -y groupinstall "Broad Base" || echo "Yum Broad Base Group Install Failed" >> /etc/motd
-
-	# Start CFENGINE3 installation
-	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-3.0.4-1.centos5.x86_64.rpm
-	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
-	rpm -ivh /tmp/cfengine-community-3.0.4-1.centos5.x86_64.rpm
-	tar xvfP /tmp/base_promises.tar
-	/sbin/chkconfig --add cfengine3
-	/var/cfengine/bin/cf-key
-	/var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
-	/var/cfengine/bin/cf-agent -K
-	/var/cfengine/bin/cf-agent -K
 
 fi
 
@@ -217,6 +218,7 @@ case $VENDOR in
 
 	echo "ssh leyte /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
+	echo "rm /etc/ssh/ssh_host*" >> /etc/local
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
@@ -250,6 +252,7 @@ case $VENDOR in
         echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt ; reboot" >> /etc/rc.local
 	echo "ssh leyte /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
+	echo "rm /etc/ssh/ssh_host*" >> /etc/local
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
