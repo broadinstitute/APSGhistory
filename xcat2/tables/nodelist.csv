@@ -61,7 +61,7 @@
 "node1396","dell,farm,all","booting",,,,,,
 "node1382","dell,farm,all","booting",,,,,,
 "node1393","dell,farm,all","booting","07-29-2010 17:30:26",,,,,
-"proteus","dell,farm,all","booting","06-05-2010 05:02:53",,,,,
+"proteus","dell,farm,all","booting","08-30-2010 10:14:30",,,,,
 "node1372","dell,farm,all","booting","07-06-2010 16:27:26",,,,,
 "node1016","dell,farm,all","booting","05-04-2010 17:48:57",,,,,
 "node1017","dell,farm,all","booting","05-04-2010 17:11:44",,,,,
@@ -676,3 +676,4 @@
 "node1206","dell,farm,all","booting","08-25-2010 17:30:37",,,,,
 "node1207","dell,farm,all","booting","08-25-2010 17:29:51",,,,,
 "pilsner","dell,farm,all","booting","08-26-2010 14:16:48",,,,,
+"stout","dell,farm,all",,,,,,,
