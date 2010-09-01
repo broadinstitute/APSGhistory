@@ -685,3 +685,4 @@
 "terbium","boot","boot","runcmd=standby",,,
 "node1240","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
 "node1241","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
+"node1242","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
