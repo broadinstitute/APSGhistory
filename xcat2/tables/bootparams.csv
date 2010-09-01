@@ -682,3 +682,4 @@
 "pilsner","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/pilsner ksdevice=bootif noipv6",,,,,
 "stout","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/stout ksdevice=bootif noipv6",,,,,
 "mead","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/mead ksdevice=bootif noipv6",,,,,
+"terbium","xcat/rhels5.4.oel/x86_64/vmlinuz","xcat/rhels5.4.oel/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/terbium ksdevice=bootif noipv6",,,,,
