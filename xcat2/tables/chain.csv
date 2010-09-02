@@ -681,7 +681,7 @@
 "bock","boot","boot","runcmd=standby",,,
 "pilsner","boot","boot","runcmd=standby",,,
 "stout","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
-"mead","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
+"mead","boot","boot","runcmd=standby",,,
 "terbium","boot","boot","runcmd=standby",,,
 "node1240","boot","boot","runcmd=standby",,,
 "node1241","boot","boot","runcmd=standby",,,
