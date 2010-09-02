@@ -676,7 +676,7 @@
 "node1206","dell,farm,all","booting","08-25-2010 17:30:37",,,,,
 "node1207","dell,farm,all","booting","08-25-2010 17:29:51",,,,,
 "pilsner","dell,farm,all","booting","08-26-2010 14:16:48",,,,,
-"stout","dell,farm,all","installing","09-02-2010 13:05:09",,,,,
+"stout","dell,farm,all","booting","09-02-2010 15:18:50",,,,,
 "mead","dell,farm,all","booting","09-02-2010 13:48:22",,,,,
 "terbium","dell,db,all","booting","08-31-2010 16:45:03",,,,,
 "node1240","dell,farm,all","booting","09-01-2010 11:06:13",,,,,
@@ -734,3 +734,4 @@
 "node1290","dell,farm,all",,,,,,,
 "node1291","dell,farm,all",,,,,,,
 "node1292","dell,farm,all",,,,,,,
+"node1293","dell,farm,all",,,,,,,

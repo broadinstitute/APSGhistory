@@ -680,7 +680,7 @@
 "node1207","boot","boot","runcmd=standby",,,
 "bock","boot","boot","runcmd=standby",,,
 "pilsner","boot","boot","runcmd=standby",,,
-"stout","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
+"stout","boot","boot","runcmd=standby",,,
 "mead","boot","boot","runcmd=standby",,,
 "terbium","boot","boot","runcmd=standby",,,
 "node1240","boot","boot","runcmd=standby",,,
@@ -736,3 +736,4 @@
 "node1289","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
 "node1290","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
 "node1291","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
+"node1292","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
