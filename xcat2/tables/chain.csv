@@ -749,3 +749,4 @@
 "picard02","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
 "node1301","boot","boot","runcmd=standby",,,
 "node1302","boot","boot","runcmd=standby",,,
+"node1220","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
