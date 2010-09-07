@@ -579,7 +579,7 @@
 "node1551","boot","boot","runcmd=standby",,,
 "node1552","boot","boot","runcmd=standby",,,
 "node1553","boot","boot","runcmd=standby",,,
-"node1554","boot","boot","runcmd=standby",,,
+"node1554","install centos5.4-x86_64-broad.farm.centos5","boot","runcmd=standby",,,
 "node1555","boot","boot","runcmd=standby",,,
 "node1556","boot","boot","runcmd=standby",,,
 "node1557","boot","boot","runcmd=standby",,,
@@ -745,3 +745,4 @@
 "node1298","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
 "node1299","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
 "node1300","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
+"picard01","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
