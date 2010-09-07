@@ -1,6 +1,6 @@
 #node,ip,hostnames,otherinterfaces,comments,disable
 "node246","192.168.33.46",,,,
-"node1223","192.168.32.246",,,,
+"node1223","192.168.39.36",,,,
 "bariumphys","192.168.34.55",,,,
 "node1018","192.168.35.69",,,,
 "node1019","192.168.35.70",,,,
