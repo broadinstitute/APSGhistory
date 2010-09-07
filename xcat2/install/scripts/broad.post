@@ -188,7 +188,6 @@ else
 	/var/cfengine/bin/cf-key
 	/var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
 	/var/cfengine/bin/cf-agent -K
-	/var/cfengine/bin/cf-agent -K
 
 	##Yum customization and package foo
 	echo Updating installed packages..
