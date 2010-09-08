@@ -1,6 +1,6 @@
 #node,kernel,initrd,kcmdline,addkcmdline,dhcpstatements,adddhcpstatements,comments,disable
 "node246","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node246 ksdevice=eth0 noipv6",,,,,
-"node1223","xcat/centos5.3/x86_64/vmlinuz","xcat/centos5.3/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1223 ksdevice=eth0 noipv6",,,,,
+"node1223","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1223 ksdevice=bootif noipv6",,,,,
 "barium","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/barium ksdevice=eth0 noipv6",,,,,
 "bariumphys","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/bariumphys ksdevice=eth0 noipv6",,,,,
 "node1018","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1018 ksdevice=bootif noipv6",,,,,
