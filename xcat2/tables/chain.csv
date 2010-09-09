@@ -752,3 +752,4 @@
 "node1220","boot","boot","runcmd=standby",,,
 "node1221","boot","boot","runcmd=standby",,,
 "node1222","boot","boot","runcmd=standby",,,
+"crd9","boot","boot","runcmd=standby",,,

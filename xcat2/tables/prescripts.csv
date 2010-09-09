@@ -1,4 +1,2 @@
 #node,begin,end,comments,disable
 "all",,"install:ipappend,sshclean,emailXCAT",,
-"node1301",,,,
-"node1302",,,,
