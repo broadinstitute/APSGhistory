@@ -19,10 +19,10 @@ echo "
 </tr>
 " > $FILE
 
-for HOST in $(nodels); do
-	IP=$(tabdump hosts | grep -w $HOST | awk -F, '{print $2}' | tr -d '"')
-	MAC=$(tabdump mac | grep -w $HOST | awk -F, '{print $3}' | tr -d '"')
-	TAGS=$(tabdump nodelist | grep -w $HOST | awk -F\" '{print $4}')
+for HOST in $(/opt/xcat/bin/nodels); do
+	IP=$(/opt/xcat/sbin/tabdump hosts | grep -w $HOST | awk -F, '{print $2}' | tr -d '"')
+	MAC=$(/opt/xcat/sbin/tabdump mac | grep -w $HOST | awk -F, '{print $3}' | tr -d '"')
+	TAGS=$(/opt/xcat/sbin/tabdump nodelist | grep -w $HOST | awk -F\" '{print $4}')
 
 	echo "|$IP|||$MAC|||$HOST|||$TAGS||" >> $TMP_FILE
 done
@@ -36,7 +36,3 @@ echo "
 " >> $FILE
 
 rm -f $TMP_FILE
-rm -f /tmp/dhcpd.conf.pm
-rm -f /tmp/hosts.pm
-rm -f /tmp/mac.tab.pm
-rm -f /tmp/nodetype.tab.pm

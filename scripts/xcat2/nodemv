@@ -7,4 +7,5 @@ TABLES=$(tabgrep $OLDNAME)
 for TABLE in $TABLES; do
 	echo "$TABLE"
 	nodech $OLDNAME $TABLE.node=$NEWNAME 2> /dev/null
+	noderm $OLDNAME 2> /dev/null
 done
