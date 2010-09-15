@@ -19,6 +19,12 @@ echo "
 </tr>
 " > $FILE
 
+IP=$(/sbin/ifconfig eth1 | awk -F: '/inet addr/ {print $2}' | cut -f1 -d' ')
+MAC=$(/sbin/ifconfig eth1 | awk '/HWaddr/ {print $5}')
+HOST=$(hostname | cut -f1 -d.)
+
+echo "|$IP|||$MAC|||$HOST|||||" >> $TMP_FILE
+
 for HOST in $(/opt/xcat/bin/nodels); do
 	IP=$(/opt/xcat/sbin/tabdump hosts | grep -w $HOST | awk -F, '{print $2}' | tr -d '"')
 	MAC=$(/opt/xcat/sbin/tabdump mac | grep -w $HOST | awk -F, '{print $3}' | tr -d '"')
