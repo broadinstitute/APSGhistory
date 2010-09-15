@@ -5,7 +5,7 @@ IFS=','
 NODE_LIST=$NODES
 for NODE in $NODE_LIST
 do
-	ssh trp /broad/tools/scripts/hush.sh $NODE 3600
+	/broad/tools/scripts/hush.sh $NODE $USER downtime 120
 done
 
 IFS=$OIFS
