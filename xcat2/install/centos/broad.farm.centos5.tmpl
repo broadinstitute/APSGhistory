@@ -145,7 +145,7 @@ rootpw --iscrypted #CRYPT:passwd:key=system,username=root:password#
 #
 # OR
 #auth --useshadow --enablemd5
-auth --enablenis --nisdomain gcnisdom --nisserver nis1 --enablemd5
+auth --useshadow --enablenis --nisdomain gcnisdom --nisserver nis1 --enablemd5
 
 #
 # SE Linux
@@ -170,3 +170,5 @@ mailx
 #INCLUDE:../scripts/pre.rh#
 %post --log=/tmp/my-post-log
 #INCLUDE:../scripts/broad.post# 
+%post --nochroot
+mv -f /tmp/my-post-log /mnt/sysimage/tmp/
