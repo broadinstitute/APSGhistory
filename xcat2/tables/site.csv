@@ -4,7 +4,7 @@
 "tftpdir","/tftpboot",,
 "master","192.168.32.2",,
 "domain","broadinstitute.org",,
-"installdir","/install",,
+"installdir","/opt/xcat/install",,
 "timezone","America/New_York",,
 "nameservers","192.168.32.2",,
 "forwarders","69.173.64.11,69.173.64.12",,
