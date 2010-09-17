@@ -6,6 +6,8 @@ PATH="$1"
 USER="$2"
 CAPS="$3"
 
+echo $PATH $USER $CAPS >> /tmp/seq-hook-log
+
 if [[ $CAPS == *mergeinfo* ]]
 then
     exit 0
