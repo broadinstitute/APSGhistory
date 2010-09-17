@@ -10,3 +10,8 @@
 "centos5-x86_64-install-storage","storage","linux","install","Linux","centos5",,"x86_64",,,
 "centos5-x86_64-install-all","all","linux","install","Linux","centos5",,"x86_64",,,
 "centos5-x86_64-install-iscsi","iscsi","linux","install","Linux","centos5",,"x86_64",,,
+"centos5.4-x86_64-install-compute","compute","linux","install","Linux","centos5.4",,"x86_64",,,
+"centos5.4-x86_64-install-xen","xen","linux","install","Linux","centos5.4",,"x86_64",,,
+"centos5.4-x86_64-install-storage","storage","linux","install","Linux","centos5.4",,"x86_64",,,
+"centos5.4-x86_64-install-all","all","linux","install","Linux","centos5.4",,"x86_64",,,
+"centos5.4-x86_64-install-iscsi","iscsi","linux","install","Linux","centos5.4",,"x86_64",,,
