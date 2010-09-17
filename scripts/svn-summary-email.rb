@@ -1,5 +1,4 @@
-#!/util/bin/ruby
-# /usr/bin/env can't find ruby with the default paths
+#!/usr/bin/env ruby
 
 require 'etc'
 require 'parsedate'
