@@ -1,0 +1,20 @@
+#!/bin/bash
+
+exec 1>&2
+
+PATH="$1"
+USER="$2"
+CAPS="$3"
+
+if [[ $CAPS == *mergeinfo* ]]
+then
+    exit 0
+else
+    echo
+    echo Your client is too old to commit to this repository:  the mergeinfo capability is required.
+    echo Please use Subversion-1.6 or newer.
+    echo
+    echo Capabilities:  $CAPS
+
+    exit 1
+fi
