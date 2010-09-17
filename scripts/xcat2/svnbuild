@@ -1,5 +1,9 @@
 #!/bin/bash
  
+. /broad/tools/scripts/useuse
+
+reuse -q Subversion-1.6
+
 if [ $# -eq 1 ]; then
 	echo "Please do not wrap your command in quotation marks."
 	exit 1
@@ -13,7 +17,7 @@ if [ $1 != 'nodeadd' ]; then
 	exit 1
 fi
 
-DIR=/root/svn/xcat2/tables/
+DIR=/root/subversion/xcat2/tables
 
 $*
 

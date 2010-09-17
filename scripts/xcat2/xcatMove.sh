@@ -1,9 +1,12 @@
 #!/bin/bash
 
+. /broad/tools/scripts/useuse
+reuse -q Subversion-1.6
+
 #Set Variables
 USER="root"
 HOST="pm"
-DIR=/root/svn/xcat2/tables/
+DIR=/root/subversion/xcat2/tables/
 
 NODE_LIST=$(echo "$1" | tr ',' ' ')
 
