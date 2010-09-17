@@ -770,3 +770,4 @@
 "salt","boot",,,,,
 "node269","boot","boot","runcmd=standby",,,
 "node270","boot","boot","runcmd=standby",,,
+"node340","boot","boot","runcmd=standby",,,
