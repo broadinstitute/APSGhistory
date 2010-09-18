@@ -253,7 +253,7 @@ case $VENDOR in
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
-	echo "cf-agent" >> /etc/rc.local
+	echo "service lsf restart" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
         ;;
