@@ -776,7 +776,7 @@
 "node333","boot","boot","runcmd=standby",,,
 "node334","boot","boot","runcmd=standby",,,
 "node335","boot","boot","runcmd=standby",,,
-"node336","install centos5.4-x86_64-broad.farm.centos5","boot","runcmd=standby",,,
+"node336","boot","boot","runcmd=standby",,,
 "node337","boot","boot","runcmd=standby",,,
 "node338","boot","boot","runcmd=standby",,,
 "node339","boot","boot","runcmd=standby",,,
