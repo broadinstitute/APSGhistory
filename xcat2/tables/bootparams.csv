@@ -780,3 +780,4 @@
 "node1431","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1431 ksdevice=bootif noipv6",,,,,
 "node1419","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1419 ksdevice=bootif noipv6",,,,,
 "node1032","xcat/centos5.4/x86_64/vmlinuz","xcat/centos5.4/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/node1032 ksdevice=bootif noipv6",,,,,
+"curium","xcat/rhel5.4.oel/x86_64/vmlinuz","xcat/rhel5.4.oel/x86_64/initrd.img","nofb utf8 ks=http://192.168.32.2/install/autoinst/curium ksdevice=bootif noipv6",,,,,
