@@ -1,6 +1,6 @@
 #node,os,arch,profile,provmethod,supportedarchs,nodetype,comments,disable
 "farm","centos5.4","x86_64","broad.farm.centos5",,,"osi",,
-"db","rhels5.4.oel","x86_64","db.test.oel5",,,"osi",,
+"db","rhel5.4.oel","x86_64","db.test.oel5",,,"osi",,
 "crd7","boottarget","x86_64","10g.crd7","install",,,,
 "stateless","centos5.4","x86_64","broad.stateless.centos5",,,"osi",,
 "node328","centos5.4","x86_64","broad.farm.centos5","install",,,,
@@ -46,3 +46,4 @@
 "node334",,,,"install",,,,
 "node337",,,,"install",,,,
 "node1419",,,,"install",,,,
+"node1032",,,,"install",,,,
