@@ -170,6 +170,17 @@ if [ -e /etc/enterprise-release ]; then
 
 	mv /etc/multipath.conf /etc/multipath.BAK
 	echo -e "defaults {\n\tuser_friendly_names yes\n}" > /etc/multipath.conf
+
+	# Start CFENGINE3 installation
+        wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-latest.centos5.x86_64.rpm
+        wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar
+        rpm -ivh /tmp/cfengine-community-latest.centos5.x86_64.rpm
+        tar xvfP /tmp/base_promises.tar
+        /sbin/chkconfig --add cfengine3
+        /var/cfengine/bin/cf-key
+        /var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
+        /var/cfengine/bin/cf-agent -Kv >> /tmp/cf-agent.log
+
 else
 	###Apparently, yum needs utils before switching to our local mirror
 	yum -y groupinstall yum-utils
@@ -187,7 +198,7 @@ else
 	/sbin/chkconfig --add cfengine3
 	/var/cfengine/bin/cf-key
 	/var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
-	/var/cfengine/bin/cf-agent -K
+	/var/cfengine/bin/cf-agent -Kv >> /tmp/cf-agent.log
 
 	##Yum customization and package foo
 	echo Updating installed packages..
@@ -253,7 +264,7 @@ case $VENDOR in
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
-	echo "service lsf restart" >> /etc/rc.local
+	echo "[ -f /etc/init.d/lsf ] && service lsf restart" >> /etc/rc.local #If exists, restart LSF services
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
         ;;
