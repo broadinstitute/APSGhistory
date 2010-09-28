@@ -176,7 +176,7 @@ if [ -e /etc/enterprise-release ]; then
         /sbin/chkconfig --add cfengine3
         /var/cfengine/bin/cf-key
         /var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
-        /var/cfengine/bin/cf-agent -Kv >> /tmp/cf-agent.log
+        /var/cfengine/bin/cf-agent -Kv >> /var/log/cfBuild.log
 
 else
 	###Apparently, yum needs utils before switching to our local mirror
@@ -186,7 +186,7 @@ else
 	wget http://www/~apsg/software/yumConfig/CentOS-Base.repo
 	mv -f CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 
-
+	cp /etc/security/limits.conf /tmp/limits.conf.orig
 	# Start CFENGINE3 installation
 	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-latest.centos5.x86_64.rpm
 	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
@@ -195,7 +195,8 @@ else
 	/sbin/chkconfig --add cfengine3
 	/var/cfengine/bin/cf-key
 	/var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
-	/var/cfengine/bin/cf-agent -Kv >> /tmp/cf-agent.log
+	/var/cfengine/bin/cf-agent -Kv >> /var/log/cfBuild.log
+	cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)
 
 	##Yum customization and package foo
 	echo Updating installed packages..
@@ -215,7 +216,7 @@ fi
 VENDOR=$(dmidecode -s system-manufacturer | cut -f1 -d' ')
 case $VENDOR in
 "IBM")
-	FILE="/tmp/ibmInst.log"
+	FILE="/var/log/ibmInst.log"
 	echo "Downloading DSA" | tee $FILE
 	wget http://download.boulder.ibm.com/ibmdl/pub/systems/support/system_x/ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
 	echo "Installing DSA" | tee -a $FILE
@@ -227,8 +228,10 @@ case $VENDOR in
 	echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/local
-	echo "cf-agent -Kv >> /tmp/cf-agent.log" >> /etc/rc.local
-	echo "cf-agent -Kv >> /tmp/cf-agent.log" >> /etc/rc.local
+	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
+	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
+	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
+	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
@@ -264,8 +267,10 @@ case $VENDOR in
 	echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
-	echo "cf-agent -Kv >> /tmp/cf-agent.log" >> /etc/rc.local
-	echo "cf-agent -Kv >> /tmp/cf-agent.log" >> /etc/rc.local
+	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
+	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
+	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
+	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
 	echo "[ -f /etc/init.d/lsf ] && service lsf restart" >> /etc/rc.local #If exists, restart LSF services
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
