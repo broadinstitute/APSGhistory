@@ -233,6 +233,7 @@ case $VENDOR in
 	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
 	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
+	echo " [ $(/broad/tools/scripts/limitschk.sh  | awk '{print $4}') -eq 131072 ] || echo \"Setting Limits Failed\"" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
         ;;
@@ -273,6 +274,7 @@ case $VENDOR in
 	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
 	echo "[ -f /etc/init.d/lsf ] && service lsf restart" >> /etc/rc.local #If exists, restart LSF services
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
+	echo " [ $(/broad/tools/scripts/limitschk.sh  | awk '{print $4}') -eq 131072 ] || echo \"Setting Limits Failed\" >> /etc/motd" >> /etc/rc.local
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
 
         ;;
