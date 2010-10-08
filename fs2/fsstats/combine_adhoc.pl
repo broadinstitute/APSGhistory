@@ -38,9 +38,7 @@ SELECT s.uid,s.type,s.histogram
   AND s.latest IS TRUE
   AND s.dirid IS NULL
   AND s.uid IS NULL
-  AND f.id NOT IN (1384,1178,1131,1286,1270)
-  AND f.gid IN (2,5,9,10,12,19,21)
-  AND f.gid IS NOT NULL
+  AND f.path like 'nitrogen%'
   AND s.type=1
 SQL
 

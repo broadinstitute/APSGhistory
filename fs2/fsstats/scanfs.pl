@@ -51,7 +51,6 @@ $dirid = $opt_d if defined $opt_d;
 ##
 my ($dsn,$dbh);
 $dsn = "DBI:mysql:database=matter;host=mysql;port=3306";
-##$dbh = DBI->connect($dsn, "root", "H$Kuz7ei");
 $dbh = DBI->connect($dsn, "matter", "tyhjcZ30Y");
 
 my ($sql, $sth, $nr);
@@ -60,15 +59,16 @@ my ($sql, $sth, $nr);
 ## Look up file system
 ##
 if ($opt_f =~ m,^/,) {
-  $sql = qq{SELECT id,mount FROM filesystem WHERE mount='$opt_f' AND deprecated IS FALSE};
+  $sql = qq{SELECT id, mount, maxdepth FROM filesystem WHERE mount='$opt_f' AND deprecated IS FALSE};
 } else {
-  $sql = qq{SELECT id,mount FROM filesystem WHERE id=$opt_f AND deprecated IS FALSE};
+  $sql = qq{SELECT id, mount,maxdepth FROM filesystem WHERE id=$opt_f AND deprecated IS FALSE};
 }
 print STDERR "$sql\n" if $DEBUG;
 $sth = $dbh->prepare($sql) or print $dbh->err;
 $nr  = $sth->execute();
+my ($mount, $maxdepth);
 if ($nr > 0) {
-  ($fsid,$mount)  = $sth->fetchrow_array();
+  ($fsid,$mount,$maxdepth)  = $sth->fetchrow_array();
   print "Scanning $mount (fsid $fsid)\n";
 } else {
   die "No mount found for $opt_f";
@@ -150,6 +150,9 @@ if (defined $opt_d) {
   $nr = $sth->execute();
   if ($nr > 0) {
     ($dir,$level,$parent) = $sth->fetchrow_array();
+    if (defined $maxdepth and $level >= $maxdepth) {
+      die "ERROR: directory $dir has level >= maxdepth ($level >= $maxdepth) for filesystem (fsid=$fsid)";
+    }
     my $tmplev = $level;
     my @d;
     while ($tmplev > 0) {
@@ -284,11 +287,16 @@ for my $d (@newdir) {
 ## If any of these directories were larger than, say, 1TB last time
 ## we looked, those should get subscanned as well.
 ##
-my $queue = defined $opt_q ? $opt_q : "broad";
+my $queue = defined $opt_q ? $opt_q : "week";
 my $cmd;
 my $job;
 my $extdep;
+my $nodescend = 0;
+if (defined $maxdepth and $level + 1 >= $maxdepth) {
+  $nodescend = 1;
+}
 for my $d (keys %dbdir) {
+  next if $nodescend;
   $dirid = $dbdir{$d};
   $sql = qq{SELECT dirid FROM subdir WHERE fsid=$fsid AND parent=$dirid AND deprecated IS FALSE};
   print STDERR "$sql\n" if $DEBUG;
@@ -298,14 +306,20 @@ for my $d (keys %dbdir) {
     ##
     ## Yes, we have been subscanned before. Submit me.
     ##
+    ##
+    ## First ensure there exists a "." entry for me.
+    ##
+    $sql = qq{SELECT dirid FROM subdir WHERE fsid=$fsid AND parent=$dirid AND name='.'};
+    print STDERR "$sql\n" if $DEBUG;
+    $sth = $dbh->prepare($sql);
+    $nr  = $sth->execute();
+    unless ($nr > 0) {	# Nope. Create entry.
+    }
     $job = "scanfs_${fsid}_${dirid}";
     $cmd = "$0 -t $opt_t -f $opt_f -d $dirid";
-#    $cmd .= " -P \"fsstats\"";
-#    $cmd .= " -E \"cd $mount\"";
     $cmd .= " -v" if $DEBUG;
     $cmd .= " --force-update" if $force;
     $cmd .= " -q $queue" if $queue;
-#    $cmd = "bsub -q $queue -J $job -o /dev/null $cmd";
     print STDERR "$cmd\n" if $DEBUG;
     print `$cmd\n` unless $DRYRUN;
     delete $dbdir{$d};
@@ -359,10 +373,36 @@ my $dep;
 ##
 ## Submit scan of top-level contents
 ##
-$job = defined $opt_d ? "scan_${fsid}_${opt_d}_0" :
-                        "scan_${fsid}_0";
-$cmd = "$PRG -1 -o $DIR/0.csv \"$dir\"";
-$cmd = "bsub -r -q $queue -P fsstats -E \"cd $dir\" -o $DIR/0.out -J $job $res " . $cmd;
+if (defined $opt_d) {
+  $sql = qq{SELECT dirid FROM subdir WHERE fsid=$fsid AND parent=$dirid AND name='.'};
+  $sth = $dbh->prepare($sql);
+  $nr  = $sth->execute();
+  my $dotdir;
+  if ($nr > 0) {
+    $dotdir = ($sth->fetchrow_array())[0];
+  } else { # Insert entry
+    $sql = qq{SELECT MAX(dirid) FROM subdir WHERE fsid=$fsid};
+    $sth = $dbh->prepare($sql);
+    $nr  = $sth->execute();
+    if ($nr > 0) {
+      $maxdirid = ($sth->fetchrow_array())[0];
+    } else {
+      die "something amiss reading subdir table";
+    }
+    $dotdir = $maxdirid + 1;
+    $newlev = $level + 1;
+    $sql = qq{INSERT INTO subdir(fsid,dirid,parent,level,name,deprecated) VALUES ($fsid,$dotdir,$opt_d,$newlev,'.',0)};
+    print "$sql\n" if $DEBUG;
+    $dbh->do($sql) unless $DRYRUN;
+  }
+  $job = "scan_${fsid}_$dotdir";
+  $cmd = "$PRG -1 -o $DIR/${dotdir}.csv \"$dir\"";
+  $cmd = "bsub -r -q $queue -P fsstats -R centos -E \"cd $dir\" -o $DIR/${dotdir}.out -J $job $res " . $cmd;
+} else {
+  $job = "scan_${fsid}_0";
+  $cmd = "$PRG -1 -o $DIR/0.csv \"$dir\"";
+  $cmd = "bsub -r -q $queue -P fsstats -R centos -E \"cd $dir\" -o $DIR/0.out -J $job $res " . $cmd;
+}
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
 for my $d (keys %dbdir) {
@@ -370,7 +410,7 @@ for my $d (keys %dbdir) {
   $job = defined $opt_d ? "scan_${fsid}_${opt_d}_${dirid}" :
                           "scan_${fsid}_${dirid}";
   $cmd = "$PRG -o $DIR/${dirid}.csv \"$dir/$d\"";
-  $cmd = "bsub -r -q $queue -P fsstats -E \"cd $dir\" -J $job -o  $DIR/${dirid}.out $res " . $cmd;
+  $cmd = "bsub -r -q $queue -P fsstats -R centos -E \"cd $dir\" -J $job -o  $DIR/${dirid}.out $res " . $cmd;
   print STDERR "$cmd\n" if $DEBUG;
   print `$cmd\n` unless $DRYRUN;
   sleep $SLEEP;
@@ -390,7 +430,7 @@ if (defined $opt_d) {
 }
 $cmd = "/home/radon01/matter/sandbox/fsstats/upload_stats.pl -d $DIR -t $opt_t";
 $cmd .= " -v" if $DEBUG;
-$cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -J $job -o $DIR/upload.out " . $cmd;
+$cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -R centos -J $job -o $DIR/upload.out " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
 ##
@@ -404,7 +444,7 @@ if (defined $opt_d) {
 }
 $cmd = "/home/radon01/matter/sandbox/fsstats/combine.pl -f $fsid";
 $cmd .= " -v" if $DEBUG;
-$cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -J $job -o $DIR/combine.out " . $cmd;
+$cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -R centos -J $job -o $DIR/combine.out " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
 
