@@ -788,3 +788,4 @@
 "bcbdb06","boot","boot","runcmd=standby",,,
 "node431","boot","boot","runcmd=standby",,,
 "node325","boot","boot","runcmd=standby",,,
+"node1217","install centos5.4-x86_64-broad.farm.centos5","boot",,,,
