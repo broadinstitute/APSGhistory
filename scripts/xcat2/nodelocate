@@ -1,31 +1,19 @@
 #!/bin/sh
 
-#
-# $Id$
-#
-
-# Uncomment the next line for testing
-#set -x
-
-#########################################################
-#
-# locate a node
-# for example: nodelocate node1000
-# 
-#########################################################
-
-PATH=/opt/xcat/bin:/opt/xcat/sbin:/bin:/usr/bin:/sbin:/usr/sbin:/util/bin:/util/sbin:/usr/local/bin
-
 # Here we define Usage -- define once, print many
 USAGE="Usage: `basename $0` $NODE"
+
+#HOST is the only ARG
+HOST=$1
 
 # Here we define how many arguments we should accept
 ARG_NO=1
 
 # error codes as defined in /usr/include/sysexits.h
-E_OK=0       # successful termination
-E_USAGE=64      # command line usage error 
-E_NOINPUT=66      # cannot open input
+E_OK=0       		# successful termination
+E_USAGE=64      	# command line usage error 
+E_NOINPUT=66      	# cannot open input
+E_UNAVAILABLE=69 	#service unavailable
 
 # Here we test the number of arguments
 if [ $# -ne "$ARG_NO" ]; then
@@ -33,16 +21,24 @@ if [ $# -ne "$ARG_NO" ]; then
         exit $E_USAGE
 fi
 
-# switches
-NODENUM=$1
+function IBM {
+	tabdump mp | tr -d '"' | grep -w $HOST | awk -F, '{print "node: "$1 "\nchassis: "$2 "\nslot: "$3}'
+}
 
-#ok, we assume nobody futzed around with the files and won't check for existence
+function Dell {
+	for CMC in brsa{50..87}; do
+		ssh service@$CMC getslotname | awk -v cmc=$CMC -v host=$HOST '$2 ~ host {print "node: " $2 "\nchassis: " cmc "\nslot: " $1}'
+	done
+}
 
-case $NODENUM in
-        -help|--help|-h) echo 1>&2 $USAGE;;
-        *) tabdump mp | tr -d '"' | grep -w $NODENUM | awk -F, '{print "node: "$1 "\nchassis: "$2 "\nslot: "$3}';;
-esac
+VENDOR=$(tabdump nodelist | awk -F\" -v host=$HOST '$2 ~ host {print $4}')
 
-
+if [[ $VENDOR == *ibm* ]]; then
+	IBM
+elif [[ $VENDOR == *dell* ]]; then
+	Dell
+else
+	echo "Vendor not configured" && exit $E_UNAVALABLE
+fi
 
 exit $E_OK

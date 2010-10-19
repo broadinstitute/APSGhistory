@@ -1,13 +1,15 @@
 #!/bin/bash
 
+makehosts -n
+
+service named stop
+rm -f /etc/named.conf
+makedns
+service named start
+
+service dhcpd stop
+rm -f /etc/dhcpd.conf
+/opt/xcat/sbin/makedhcp -a -d
 /opt/xcat/sbin/makedhcp -n
-service dhcpd restart
-
-for NODE in $(nodels); do
-	makedhcp -d $NODE
-	makehosts -d $NODE
-	makehosts $NODE
-	makedhcp $NODE
-done
-
+/opt/xcat/sbin/makedhcp -a
 service dhcpd restart
