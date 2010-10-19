@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Here we define Usage -- define once, print many
-USAGE="Usage: `basename $0` $NODE"
+USAGE="Usage: `basename $0` \$NODE"
 
 #HOST is the only ARG
 HOST=$1
@@ -13,7 +13,8 @@ ARG_NO=1
 E_OK=0       		# successful termination
 E_USAGE=64      	# command line usage error 
 E_NOINPUT=66      	# cannot open input
-E_UNAVAILABLE=69 	#service unavailable
+E_NOHOST=68		# host not found
+E_UNAVAILABLE=69 	# service unavailable
 
 # Here we test the number of arguments
 if [ $# -ne "$ARG_NO" ]; then
@@ -26,9 +27,10 @@ function IBM {
 }
 
 function Dell {
-	for CMC in brsa{50..87}; do
-		ssh service@$CMC getslotname | awk -v cmc=$CMC -v host=$HOST '$2 ~ host {print "node: " $2 "\nchassis: " cmc "\nslot: " $1}'
-	done
+	RESULT=$(tabdump nodepos | tr -d '"' | grep -w $HOST | awk -F, '{print "node: "$1 "\nchassis: "$3 "\nslot: "$4}')
+	if [ -z "$RESULT" ] ; then
+		echo "Host not found: Perhaps missing OMSA or really sick?" && exit $E_NOHOST
+	fi
 }
 
 VENDOR=$(tabdump nodelist | awk -F\" -v host=$HOST '$2 ~ host {print $4}')
