@@ -1,10 +1,10 @@
 #!/bin/bash
 
-makehosts -n
+/opt/xcat/sbin/makehosts -n
 
 service named stop
 rm -f /etc/named.conf
-makedns
+/opt/xcat/sbin/makedns
 service named start
 
 service dhcpd stop
