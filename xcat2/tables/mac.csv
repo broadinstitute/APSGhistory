@@ -1,6 +1,6 @@
 #node,interface,mac,comments,disable
 "all","eth0",,,
-"node246","eth0","00:11:25:9c:9d:f4",,
+"node246",,"00:11:25:9c:9d:f4",,
 "node1223","eth0","00:1D:09:FC:E4:68",,
 "bariumphys","eth0","00:26:B9:41:52:EC",,
 "node1018","eth0","00:1D:09:FC:D1:3C",,
@@ -790,4 +790,6 @@
 "node1218","eth0","00:1D:09:FC:E0:DC",,
 "node1219","eth0","00:1D:09:FC:E4:84",,
 "xcatDev","eth0","00:50:56:bb:00:30",,
-"node1226","eth0","BC:30:5B:10:B1:A5",,
+"node1226","eth0","BC:30:5B:10:B1:A6",,
+"xcatdev","eth1","00:50:56:BB:00:36",,
+"node1560","eth0","84:2b:2b:22:7c:2c",,
