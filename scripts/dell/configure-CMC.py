@@ -28,8 +28,6 @@ def setNetSvcs():
 	ntpAddr2="ntp2"
 	ntpAddr3="ntp0"
 	syslogAddr="glutamine"
-	
-
 	configList.append("config -g %s -o cfgRhostsSmtpServerIpAddr %s" % (groupName,smtpAddr))
 	configList.append("config -g %s -o cfgRhostsNtpEnable 1" % groupName)
 	configList.append("config -g %s -o cfgRhostsNtpServer1 %s" % (groupName,ntpAddr1))
@@ -42,7 +40,6 @@ def setNetSvcs():
 
 hosts = argv[1].split(',')
 configArg = argv[2]
-password = getpass("Password:")
 debugMode = True
 
 configDict = {
@@ -53,11 +50,9 @@ configDict = {
 
 configList = configDict.get(configArg)()
 for host in hosts:
-	child = pexpect.spawn("ssh %s" % host)
+	child = pexpect.spawn("ssh service@%s" % host)
 	if debugMode:
 		child.logfile = sys.stdout
-	child.expect("root@%s's password:" % host)
-	child.sendline("%s" % password)
 	child.expect('$')
 	for configItem in configList:
 		child.sendline("racadm %s" % configItem)
