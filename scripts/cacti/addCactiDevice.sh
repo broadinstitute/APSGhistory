@@ -1,5 +1,20 @@
 #!/bin/bash
 
+# Here we define Usage -- define once, print many
+USAGE="Usage: $(basename $0) HOST TREE_NAME COMMUNITY TEMPLATE"
+
+# Here we define how many arguments we should accept
+ARG_NO=4
+
+# error codes as defined in /usr/include/sysexits.h
+E_OK=0       # successful termination
+E_USAGE=64      # command line usage error 
+
+if [ $# -ne "$ARG_NO" ]; then
+        echo 1>&2 $USAGE
+        exit $E_USAGE
+fi
+
 HOST=$1
 TREE=$2
 CSTRING=$3
