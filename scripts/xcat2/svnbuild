@@ -26,7 +26,8 @@ do
 tabdump $TABLE > $DIR/$TABLE.csv
 done
 
-rm $DIR/passwd.csv
+rm -f $DIR/passwd.csv
+rm -f $DIR/auditlog.csv
 
 COMMENT="Added $2"
 
