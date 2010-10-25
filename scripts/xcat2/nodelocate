@@ -30,7 +30,9 @@ function Dell {
 	RESULT=$(tabdump nodepos | tr -d '"' | grep -w $HOST | awk -F, '{print "node: "$1 "\nchassis: "$3 "\nslot: "$4}')
 	if [ -z "$RESULT" ] ; then
 		echo "Host not found: Perhaps missing OMSA or really sick?" && exit $E_NOHOST
-	fi
+	else
+		echo "$RESULT"
+	fi	
 }
 
 VENDOR=$(tabdump nodelist | awk -F\" -v host=$HOST '$2 ~ host {print $4}')
