@@ -12,11 +12,9 @@ debugMode = True
 
 if npass == npassConfirm:
 	for host in hosts:
-		child = pexpect.spawn("ssh %s" % host)
+		child = pexpect.spawn("ssh service@%s" % host)
 		if debugMode:
 			child.logfile = sys.stdout
-		child.expect("root@%s's password:" % host)
-		child.sendline("%s" % opass)
 		child.expect('Welcome')
 		child.expect('$')
 		child.sendline("racadm config -g cfgUserAdmin -o cfgUserAdminPassword -i 1 \'%s\'" % npass)
