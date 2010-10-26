@@ -4,7 +4,6 @@ import sys
 from sys import argv,exit
 from getpass import getpass
 
-hosts = argv[1].split(',')
 password = getpass("Password:")
 debugMode = True
 
@@ -16,7 +15,7 @@ configList.append('sshpkauth -i svcacct -k 1 -p0xfff -t "ssh-dss AAAAB3NzaC1kc3M
 #xcat2 key - Index 2, full auth
 configList.append('sshpkauth -i svcacct -k 2 -p0xfff -t "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAlTS7D6TAyIa4tw00LjBsQ7s6hYGWPW4OD9SQCHhlN95ISSPtXRCjcInY8m238fIrhNEm/3agFiqEFnbbCp9mwr6WDB3WhPCjBIgO6lpDDOVZyMH9bkUUus3suwCBcXWGwrUUaSzz2i/N4T9NRdjvOpE1NQZ3LSbMtpgDlEoSEp9Fm+SRb1j8iMdmBVkrOmr7wbE2QopUeM63KvZxSaO2qF4gK/ko9BAB79LIzQTqGItOTABN8qyT3ROEvKrOG1HqEATPFgjlY9LHg8HgUKNmO54A4DL0IMu4I0VRhqks0IfhaBVzmhd4lzTzpgipTP4XoGFLxB4UvdR6gwsb53FK4Q== root@xcat2.broadinstitute.org"')
 
-for host in hosts:
+for host in argv.pop(1):
 	child = pexpect.spawn("ssh %s" % host)
 	if debugMode:
 		child.logfile = sys.stdout

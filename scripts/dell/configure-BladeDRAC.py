@@ -61,9 +61,6 @@ def configAD():
 
 	return configList
 
-def deploy():
-	return ["deploy -a -u root -p %s -d" % password]
-
 def setNetSvcs():
 	configList = []
 	groupName="cfgRemoteHosts"
@@ -84,8 +81,8 @@ def setNetSvcs():
 	
 	return configList
 
+configArg = argv.pop(1)
 hosts = argv[1].split(',')
-configArg = argv[2]
 password = getpass("Password:")
 debugMode = True
 

@@ -2,7 +2,6 @@
 import pexpect
 import sys
 from sys import argv,exit
-from getpass import getpass
 
 def setDHCP():
 	configList = []
@@ -13,9 +12,6 @@ def setDHCP():
 	configList.append("config -g %s -o cfgDNSDomainNameFromDHCP 1" % groupName)
 	
 	return configList
-
-def fixAD():
-	return ["config -g cfgActiveDirectory -o cfgADCertValidationEnable 0"]
 
 def deploy():
 	return ["deploy -a -u root -p %s -d" % password]
@@ -38,19 +34,16 @@ def setNetSvcs():
 	
 	return configList
 
-#hosts = argv[1].split(',')
-command=argv.pop(0) #Unused, but don't want to lose it
-configArg = argv.pop(0)
+configArg = argv.pop(1)
 debugMode = True
 
 configDict = {
 	"setDHCP": setDHCP,
-	"fixAD": fixAD,
 	"deploy": deploy,
 	"setNetSvcs": setNetSvcs}
 
 configList = configDict.get(configArg)()
-for host in argv:
+for host in argv[1:]:
 	child = pexpect.spawn("ssh service@%s" % host)
 	if debugMode:
 		child.logfile = sys.stdout
@@ -60,4 +53,4 @@ for host in argv:
 	child.expect('$')
 	child.sendline("exit")
 	child.expect(pexpect.EOF)
-	argv.pop(0)
+	argv.pop(1)

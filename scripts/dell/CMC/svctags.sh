@@ -1,8 +1,5 @@
 #!/bin/bash
 
-
-
-
 USER=service
 
 while [ $# -ge 1 ]; do
