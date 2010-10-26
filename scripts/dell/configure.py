@@ -38,8 +38,9 @@ def setNetSvcs():
 	
 	return configList
 
-hosts = argv[1].split(',')
-configArg = argv[2]
+#hosts = argv[1].split(',')
+command=argv.pop(0) #Unused, but don't want to lose it
+configArg = argv.pop(0)
 debugMode = True
 
 configDict = {
@@ -49,7 +50,7 @@ configDict = {
 	"setNetSvcs": setNetSvcs}
 
 configList = configDict.get(configArg)()
-for host in hosts:
+for host in argv:
 	child = pexpect.spawn("ssh service@%s" % host)
 	if debugMode:
 		child.logfile = sys.stdout
@@ -59,3 +60,4 @@ for host in hosts:
 	child.expect('$')
 	child.sendline("exit")
 	child.expect(pexpect.EOF)
+	argv.pop(0)
