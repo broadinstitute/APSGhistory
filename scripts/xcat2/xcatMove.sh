@@ -55,6 +55,7 @@ tabdump $TABLE > $DIR/$TABLE.csv
 done
 
 rm $DIR/passwd.csv
+rm $DIR/auditlog.csv
 
 COMMENT="Added $NODE_LIST"
 
