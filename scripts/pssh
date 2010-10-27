@@ -2,11 +2,18 @@
 
 OIFS=$IFS
 IFS=','
+
+if [ $# -lt "$ARG_NO" ]; then
+        echo 1>&2 $USAGE
+        exit $E_USAGE
+fi
+
 HOSTS=$1
+shift
 CMD=""
 
 while [ $# -ge 1 ]; do
-        CMD="$CMD $2"
+        CMD="$CMD $1"
         shift
 done
 
@@ -16,13 +23,9 @@ ARG_NO=2
 E_OK=0       # successful termination
 E_USAGE=64      # command line usage error
 
-if [ $# -lt "$ARG_NO" ]; then
-        echo 1>&2 $USAGE
-        exit $E_USAGE
-fi
 
 for HOST in $HOSTS; do 
-	ssh -n $HOST $CMD > /tmp/$HOST.log & done
+	ssh -n $HOST $CMD &> /tmp/$HOST.log & done
 wait
 IFS=$OIFS
 
