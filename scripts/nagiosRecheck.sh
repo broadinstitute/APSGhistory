@@ -6,10 +6,6 @@ startDate(){
         echo $START_DATE
 }
 
-#HOST_LIST is only required argument
-HOST_LIST=$(echo "$1" | tr ',' ' ')
-
-
 # Here we define Usage -- define once, print many
 USAGE="Usage: `basename $0` \$HOSTS \$USER"
 
@@ -20,21 +16,13 @@ E_NOINPUT=66            # cannot open input
 E_NOHOST=68             # host not found
 E_UNAVAILABLE=69        # service unavailable
 
-case $# in
-        1)
-		USER=$(printenv USER)
-                ;;
-        2)
-                USER=$2
-                ;;
-        *)
-		echo 1>&2 $USAGE
-		exit $E_USAGE
-                ;;
-esac
-
-echo $USER
-exit 0
+if [ "x$1" = "x-u" ]; then
+        USER=$2
+        shift
+        shift
+else
+        USER=$(printenv USER)
+fi
 
 #Password Input
 stty -echo
@@ -44,7 +32,8 @@ stty echo
 #App Variables
 NAGIOS_URL="https://systems.broadinstitute.org/nagios/cgi-bin/cmd.cgi"
 
-for HOST in $HOST_LIST; do
+while [ $# -ge 1 ]; do
 	curl -u $USER:$PASSW -d "cmd_typ=96&cmd_mod=2&host=$HOST&start_time=$(startDate)&force_check&&btnSubmit=Commit" "$NAGIOS_URL"
 	curl -u $USER:$PASSW -d "cmd_typ=17&cmd_mod=2&host=$HOST&start_time=$(startDate)&force_check&&btnSubmit=Commit" "$NAGIOS_URL"
+        shift
 done
