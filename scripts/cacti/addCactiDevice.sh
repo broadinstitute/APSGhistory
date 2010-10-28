@@ -33,7 +33,7 @@ if [ -n $TREE_ID ]; then
 		echo "Skipping add_tree for $HOST.  Already exists in tree, and Cacti is stupid."
 	fi
 else
-	echo "Something is wrong with tree.  Does not compute." && exit 1
+	echo "Something is wrong with tree.  Does not compute."
 fi
 
 #Add Graphs
