@@ -22,10 +22,17 @@ ORDER BY HostName;"
 SQL_CMD="$MYSQL_BIN -e \"${SQL_CODE}\" -u${USER} -p${PASSWORD} -h ${DB_SERVER} ${DATABASE}"
 SQL_OUT=$(echo "$SQL_CMD" | bash)
 
-for HOST in $(echo "$SQL_OUT" | awk '{print $1}' | uniq);do
-	echo "$HOST has entries in:"
+COUNT=0
+for HOST in $(echo "$SQL_OUT" | awk '$1 !~ /HostName/ {print $1}' | uniq);do
+	COUNT=$(($COUNT+1))
+done
+
+echo "$COUNT with duplicates:"
+
+for HOST in $(echo "$SQL_OUT" | awk '$1 !~ /HostName/ {print $1}' | uniq);do
+	echo -e "\t$HOST has entries in:"
 
 	for TABLE in $(echo "$SQL_OUT" | grep -w $HOST | awk '{print $2}'); do
-		echo -e "\t$TABLE"
+		echo -e "\t\t$TABLE"
 	done
 done
