@@ -1,5 +1,6 @@
 #/bin/bash
 
+MYSQL_BIN="/usr/bin/mysql"
 USER="cacti_dev"
 PASSWORD="ELnSrYXr"
 DB_SERVER="itdb"
@@ -18,7 +19,7 @@ JOIN graph_tree_items ON host.id=graph_tree_items.host_id
 JOIN graph_tree ON graph_tree_items.graph_tree_id=graph_tree.id
 ORDER BY HostName;"
 
-SQL_CMD="mysql -e $(echo \"${SQL_CODE}\") -u${USER} -p${PASSWORD} -h ${DB_SERVER} ${DATABASE}"
+SQL_CMD="$MYSQL_BIN -e \"${SQL_CODE}\" -u${USER} -p${PASSWORD} -h ${DB_SERVER} ${DATABASE}"
 SQL_OUT=$(echo "$SQL_CMD" | bash)
 
 for HOST in $(echo "$SQL_OUT" | awk '{print $1}' | uniq);do
