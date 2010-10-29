@@ -1,0 +1,44 @@
+#!/bin/bash
+
+noderm all
+MHL_ENTRIES=$(awk '$1 ~ /#xCAT#/ {print $2}' /sysman/install/broad/master.host.listing)
+HOSTS=$(echo "$MHL_ENTRIES" | awk -F\| '{print $3}')
+FILE_DIR=/root/subversion/xcat2/tables/
+HOST_FILE=$FILE_DIR/hosts.csv
+MAC_FILE=$FILE_DIR/mac.csv
+NODELIST_FILE=$FILE_DIR/nodelist.csv
+IPMI_FILE=$FILE_DIR/ipmi.csv
+MP_FILE=$FILE_DIR/mp.csv
+
+##Write Required Lines##
+echo "#node,ip,hostnames,otherinterfaces,comments,disable" > $HOST_FILE
+echo "#node,interface,mac,comments,disable
+\"all\",\"eth0\",,," > $MAC_FILE
+echo "#node,groups,status,statustime,appstatus,appstatustime,primarysn,comments,disable" > $NODELIST_FILE
+echo "#node,bmc,bmcport,username,password,comments,disable
+\"dell\",\"/\z/-rac/\",,,,," > $IPMI_FILE
+echo "#node,mpa,id,comments,disable" > $MP_FILE
+
+for HOST in $HOSTS; do
+	GROUP=$(echo "$MHL_ENTRIES" | grep -w $HOST | awk -v host=$HOST -F\| '$3 ~ host {print $4}')
+	MAC=$(echo "$MHL_ENTRIES" | grep -w $HOST | awk -v host=$HOST -F\| '$3 ~ host {print $2}' | tr '[:upper:]' '[:lower:]')
+	IP=$(echo "$MHL_ENTRIES" | grep -w $HOST | awk -v host=$HOST -F\| '$3 ~ host {print $1}')
+	CHASSIS=$(echo "$MHL_ENTRIES" | grep -w $HOST | awk -v host=$HOST -F\| '$3 ~ host {print $5}')
+	SLOT=$(echo "$MHL_ENTRIES" | grep -w $HOST | awk -v host=$HOST -F\| '$3 ~ host {print $6}')
+
+	if [[ -z $CHASSIS ]]; then
+		echo "$HOST,$IP,,,," >> $HOST_FILE
+		echo "$HOST,,$MAC,," >> $MAC_FILE
+		echo "$HOST,\"$GROUP\"" >> $NODELIST_FILE
+	else
+		echo "$HOST,$IP,,,," >> $HOST_FILE
+		echo "$HOST,,$MAC,," >> $MAC_FILE
+		echo "$HOST,\"$GROUP\"" >> $NODELIST_FILE
+		echo "$HOST,$CHASSIS,$SLOT,," >> $MP_FILE
+	fi
+done
+
+for FILE in $(ls $FILE_DIR); do
+	tabrestore $FILE_DIR/$FILE
+done
+/broad/tools/scripts/xcat2/scrubDHCP.sh
