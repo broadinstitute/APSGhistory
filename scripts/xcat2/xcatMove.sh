@@ -33,31 +33,6 @@ do
 		*) 				GROUP="farm,all";;
 	esac
 
-	if [ $GROUP = "ibm,farm,all" ]; then
-		nodeadd $NODE groups=$GROUP mac.interface=eth0 hosts.ip=$IP mac.mac=$MAC mp.mpa=$IBM_CHASSIS mp.id=$IBM_SLOT
-	else
-		nodeadd $NODE groups=$GROUP mac.interface=eth0 hosts.ip=$IP mac.mac=$MAC
-	fi
+	echo "#xCAT# $IP|$MAC|$NODE|$GROUP|$IBM_CHASSIS|$IBM_SLOT|"
 
-	sleep 30
-
-	makehosts $NODE
-	makedhcp $NODE
-
-	ssh $USER@$HOST makedhcp -d $NODE
-	ssh $USER@$HOST service dhcpd stop
 done
-
-
-for TABLE in $(tabdump)
-do
-tabdump $TABLE > $DIR/$TABLE.csv
-done
-
-rm $DIR/passwd.csv
-rm $DIR/auditlog.csv
-
-COMMENT="Added $NODE_LIST"
-
-cd $DIR
-svn ci -m "$COMMENT" *
