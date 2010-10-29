@@ -1,6 +1,7 @@
 #/bin/bash
 
 MYSQL_BIN="/usr/bin/mysql"
+MAIL_LIST="ali@broadinstitute.org"
 USER="cacti_dev"
 PASSWORD="ELnSrYXr"
 DB_SERVER="itdb"
@@ -27,12 +28,15 @@ for HOST in $(echo "$SQL_OUT" | awk '$1 !~ /HostName/ {print $1}' | uniq);do
 	COUNT=$(($COUNT+1))
 done
 
-echo "$COUNT with duplicates:"
+OUTPUT=$(echo "$COUNT with duplicates:")
 
-for HOST in $(echo "$SQL_OUT" | awk '$1 !~ /HostName/ {print $1}' | uniq);do
+OUTPUT="${OUTPUT}
+$(for HOST in $(echo "$SQL_OUT" | awk '$1 !~ /HostName/ {print $1}' | uniq);do
 	echo -e "\t$HOST has entries in:"
 
 	for TABLE in $(echo "$SQL_OUT" | grep -w $HOST | awk '{print $2}'); do
 		echo -e "\t\t$TABLE"
 	done
-done
+done)"
+
+echo "$OUTPUT" | mail -s "Test Cacti stuff" ${MAIL_LIST}
