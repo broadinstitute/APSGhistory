@@ -1,11 +1,11 @@
 #/bin/bash
 
 MYSQL_BIN="/usr/bin/mysql"
-MAIL_LIST="ali@broadinstitute.org"
-USER="cacti_dev"
-PASSWORD="ELnSrYXr"
+MAIL_LIST="ali@broadinstitute.org frans@broadinstitute.org teixeira@broadinstitute.org"
+USER="cacti"
+PASSWORD="S9Ph6w7p"
 DB_SERVER="itdb"
-DATABASE="cacti_dev"
+DATABASE="cacti"
 SQL_CODE="
 SELECT host.hostname AS HostName,graph_tree.name FROM
 (
@@ -28,7 +28,7 @@ for HOST in $(echo "$SQL_OUT" | awk '$1 !~ /HostName/ {print $1}' | uniq);do
 	COUNT=$(($COUNT+1))
 done
 
-OUTPUT=$(echo "$COUNT with duplicates:")
+OUTPUT=$(echo "$COUNT host(s) in DB ${DATABASE} with duplicates:")
 
 OUTPUT="${OUTPUT}
 $(for HOST in $(echo "$SQL_OUT" | awk '$1 !~ /HostName/ {print $1}' | uniq);do
@@ -39,4 +39,4 @@ $(for HOST in $(echo "$SQL_OUT" | awk '$1 !~ /HostName/ {print $1}' | uniq);do
 	done
 done)"
 
-echo "$OUTPUT" | mail -s "Test Cacti stuff" ${MAIL_LIST}
+echo "$OUTPUT" | mail -s "Cacti Duplicate Check" ${MAIL_LIST}
