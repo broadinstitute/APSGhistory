@@ -4,10 +4,13 @@
 
 MYSQL_BIN="/usr/bin/mysql"
 CLI_DIR="/var/lib/cacti/cli"
-USER="cacti_dev"
-PASSWORD="ELnSrYXr"
-DB_SERVER="itdb"
-DATABASE="cacti_dev"
+for VAR in $(grep '^\$' /etc/cacti/db.php | tr -d '$ ;'| tr "\'" '"');do
+        eval $VAR
+done
+USER=$database_username
+PASSWORD=$database_password
+DB_SERVER=$database_hostname
+DATABASE=$database_default
 SRC_TREE_NAME=$1
 DEST_TREE_NAME=$2
 HOSTNAME=$3

@@ -1,11 +1,16 @@
 #/bin/bash
 
+# $Id$:
+
 MYSQL_BIN="/usr/bin/mysql"
 MAIL_LIST="ali@broadinstitute.org frans@broadinstitute.org teixeira@broadinstitute.org"
-USER="cacti"
-PASSWORD="S9Ph6w7p"
-DB_SERVER="itdb"
-DATABASE="cacti"
+for VAR in $(grep '^\$' /etc/cacti/db.php | tr -d '$ ;'| tr "\'" '"');do
+        eval $VAR
+done
+USER=$database_username
+PASSWORD=$database_password
+DB_SERVER=$database_hostname
+DATABASE=$database_default
 SQL_CODE="
 SELECT host.hostname AS HostName,graph_tree.name FROM
 (
