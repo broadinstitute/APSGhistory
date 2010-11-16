@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# $Id$:
+# $Id$
 # Here we define Usage -- define once, print many
 USAGE="Usage: $(basename $0) HOST TREE_NAME COMMUNITY TEMPLATE"
 

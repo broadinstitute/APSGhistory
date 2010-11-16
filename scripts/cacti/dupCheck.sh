@@ -1,6 +1,6 @@
 #/bin/bash
 
-# $Id$:
+# $Id$
 
 MYSQL_BIN="/usr/bin/mysql"
 MAIL_LIST="ali@broadinstitute.org frans@broadinstitute.org teixeira@broadinstitute.org"
