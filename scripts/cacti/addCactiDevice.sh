@@ -27,7 +27,7 @@ HOST_TEMPLATE_ID=$(php -q add_device.php --list-host-templates | grep "$HOST_TEM
 php -q add_device.php --description=$HOST --ip=$(host $HOST | cut -f1 -d' ') --template=$HOST_TEMPLATE_ID --community=$CSTRING --ping_method=udp
 HOST_ID=$(php -q add_tree.php --list-hosts | grep "$HOST" | awk '{print $1}')
 TREE_ID=$(php -q add_tree.php --list-trees | grep -i "$TREE" | awk '{print $1}')
-if [ -n $TREE_ID ]; then
+if [ -n "${TREE_ID:+x}" ]; then
 	if [[ $(php -q add_tree.php --list-nodes --tree-id=$TREE_ID | grep -wc "$HOST") -eq 0 ]]; then
 		php -q add_tree.php --type=node --node-type=host --host-id=$HOST_ID --tree-id=$TREE_ID
 	else
