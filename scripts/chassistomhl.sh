@@ -2,6 +2,8 @@
 # Script to convert output of CMC 'getmacaddress' command to MHL format
 # Frans Lawaetz 8-17-2010
 
+# $Id$
+
 RAND=$RANDOM
 IFS=$'\n'
 
@@ -65,7 +67,7 @@ do
  IFS=\.
  echo "$prodIP|-|${prodmac}|node${nodenumber}|-|unix_svr|g|runaround,linux,centos,centos-5,x86_64,7cc,nfshosts,$chassis_name|dell blade" >> /tmp/${RAND}.prod
  echo "$RACIP|-|$racmac|node${nodenumber}-rac|-|dhcpdevice|g|-|dell remote access controller" >> /tmp/${RAND}.rac
- echo "svnbuild nodeadd node${nodenumber} groups=dell,farm,all mac.interface=eth0 hosts.ip=$buildIP mac.mac=$buildmac" >> /tmp/${RAND}.build
+ echo "#xCAT# $buildIP|${buildmac}|node${nodenumber}|dell,farm,all|||" >> /tmp/${RAND}.build
 
  echo "racadm serveraction -m $racslot powercycle"
  ((racslot++))
