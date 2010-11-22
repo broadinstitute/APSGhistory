@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# $Id
+
+function Reap
+{
+	local PID=$1
+	local TIMEOUT=$2
+
+	if [ -n "${TIMEOUT:-x}" ]; then
+		sleep $TIMEOUT
+	else
+		sleep 10
+	fi
+
+	if [ $(ps -p $PID | awk '$1 !~ /PID/ {print $0}' | wc -l) -gt 0 ]; then
+		kill $PID
+	fi
+}
