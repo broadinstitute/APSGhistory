@@ -33,6 +33,10 @@ for HOST in $(echo "$SQL_OUT" | awk '$1 !~ /HostName/ {print $1}' | uniq);do
 	COUNT=$(($COUNT+1))
 done
 
+if [ $COUNT -eq 0 ]; then
+	exit 0
+fi
+
 OUTPUT=$(echo "$COUNT host(s) in DB ${DATABASE} with duplicates:")
 
 OUTPUT="${OUTPUT}
