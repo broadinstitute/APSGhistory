@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # $Id$
-import sys,subprocess,string,os,shutil,glob
+import sys,string,os,shutil,glob
+from subprocess import *
 
 ssh_lib_path = '/broad/tools/scripts'
 sys.path.append(ssh_lib_path)
@@ -34,11 +35,17 @@ for cmcNum in range(50,90):
 
 os.remove('%s/ssh.pyc' % ssh_lib_path)
 
+#ConCat here
 destination = open('%s/nodepos.csv' % ofile_path, 'w')
 for filename in glob.glob(os.path.join(ofile_path, 'brsa*')):
-    shutil.copyfileobj(open(filename, 'r'), destination)
+	shutil.copyfileobj(open(filename, 'r'), destination)
 destination.close()
 
+#Clean up here
+for filename in glob.glob(os.path.join(ofile_path, 'brsa*')):
+	os.remove(filename)
+
+#Sort Here
 file = open('%s/nodepos.csv' % ofile_path, 'r')
 lines = file.readlines()
 file.close()
@@ -47,3 +54,5 @@ ofile.write("#node,rack,u,chassis,slot,room,comments,disable\n")
 for line in sorted(lines, key = str.lower):
         ofile.write(line)
 ofile.close()
+
+Popen(["tabrestore",'%s/nodepos.csv' % ofile_path],stdin=None,stdout=open('/dev/null','w'),stderr=open('/dev/null','w'))
