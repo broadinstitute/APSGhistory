@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# $Id$
+
 # Here we define Usage -- define once, print many
 USAGE="Usage: `basename $0` \$NODE"
 
@@ -27,7 +29,7 @@ function IBM {
 }
 
 function Dell {
-	RESULT=$(tabdump nodepos | tr -d '"' | grep -w $HOST | awk -F, '{print "node: "$1 "\nchassis: "$3 "\nslot: "$4}')
+	RESULT=$(tabdump nodepos | tr -d '"' | grep -w $HOST | awk -F, '{print "node: "$1 "\nchassis: "$4 "\nslot: "$5}')
 	if [ -z "$RESULT" ] ; then
 		echo "Host not found: Perhaps missing OMSA or really sick?" && exit $E_NOHOST
 	else
