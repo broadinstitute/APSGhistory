@@ -7,7 +7,7 @@ ssh_lib_path = '/broad/tools/scripts'
 sys.path.append(ssh_lib_path)
 import ssh
 
-ofile_path = '/tmp/nodepos'
+ofile_path = '/tmp/'
 
 for cmcNum in range(50,90):
 	cmc = "brsa%s" % cmcNum
@@ -56,3 +56,5 @@ for line in sorted(lines, key = str.lower):
 ofile.close()
 
 Popen(["tabrestore",'%s/nodepos.csv' % ofile_path],stdin=None,stdout=open('/dev/null','w'),stderr=open('/dev/null','w'))
+
+os.remove('%s/nodepos.csv' % ofile_path)
