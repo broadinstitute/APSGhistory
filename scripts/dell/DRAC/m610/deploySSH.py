@@ -1,4 +1,6 @@
 #!/usr/local/bin/python
+# $Id$
+
 import pexpect
 import sys
 from sys import argv,exit
@@ -17,6 +19,7 @@ configList.append('sshpkauth -i %d -k 1 -t "ssh-dss AAAAB3NzaC1kc3MAAACBAMdPwPbh
 configList.append('sshpkauth -i %d -k 2 -t "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAlTS7D6TAyIa4tw00LjBsQ7s6hYGWPW4OD9SQCHhlN95ISSPtXRCjcInY8m238fIrhNEm/3agFiqEFnbbCp9mwr6WDB3WhPCjBIgO6lpDDOVZyMH9bkUUus3suwCBcXWGwrUUaSzz2i/N4T9NRdjvOpE1NQZ3LSbMtpgDlEoSEp9Fm+SRb1j8iMdmBVkrOmr7wbE2QopUeM63KvZxSaO2qF4gK/ko9BAB79LIzQTqGItOTABN8qyT3ROEvKrOG1HqEATPFgjlY9LHg8HgUKNmO54A4DL0IMu4I0VRhqks0IfhaBVzmhd4lzTzpgipTP4XoGFLxB4UvdR6gwsb53FK4Q== root@xcat2.broadinstitute.org"' % userIndex)
 
 for host in argv[1:]:
+	host = "%s-rac" % host
 	child = pexpect.spawn("ssh %s" % host)
 	if debugMode:
 		child.logfile = sys.stdout
