@@ -4,6 +4,11 @@ import sys
 from sys import argv,exit
 from getpass import getpass
 
+if len(argv) < 2:
+	print "Feed me a chassis to work with"
+	print "USAGE: %s $CHASSIS" % argv[0]
+	exit (1)
+
 npass = getpass("New Password:")
 npassConfirm = getpass("Confirm New Password:")
 debugMode = True
