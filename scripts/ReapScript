@@ -7,7 +7,7 @@ function Reap
 	local PID=$1
 	local TIMEOUT=$2
 
-	if [ -n "${TIMEOUT:-x}" ]; then
+	if [ -n "${TIMEOUT:+x}" ]; then
 		sleep $TIMEOUT
 	else
 		sleep 10
