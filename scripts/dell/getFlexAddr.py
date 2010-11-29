@@ -22,3 +22,5 @@ for cmcNum in range(50,90):
 				print item
 	except Exception:
 		continue
+
+os.remove('%s/ssh.pyc' % ssh_lib_path)
