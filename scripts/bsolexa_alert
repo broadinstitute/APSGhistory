@@ -1,0 +1,79 @@
+#!/bin/sh
+
+#########################################################
+# 
+# This will be run from cron and will check solexa
+# jobs in pending for more than x time AND not depending
+# on another job to finish.
+# Please report bugs to monia@mit.edu 
+#
+#########################################################
+
+PATH=/broad/lsf/7.0/linux2.4-glibc2.3-x86/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+. /broad/lsf/conf/profile.lsf
+
+USAGE="Usage: `basename $0`"
+ARG_NO=0
+EMAIL_LIST="lsfadmin@broad.mit.edu"
+SOLEXA_PEND_FILE=/root/solexapend.jobid
+CHECK_INTERVAL="4 hours"
+
+
+E_OK=0       # successful termination
+E_USAGE=64      # command line usage error 
+E_NOINPUT=66      # cannot open input
+
+
+if [ $# -lt "$ARG_NO" ]; then
+        echo 1>&2 $USAGE
+        exit $E_USAGE
+fi
+
+PEND_JOBS=`bjobs -u all -q solexa|grep -v sleep|grep PEND|cut -d" " -f1|xargs -n1 -i bjobs -l {} |egrep "^Job|Dependency condition invalid or never satisfied|dependency condition not satisfied|requirement for exclusive execution not satisfied"|cut -d"," -f1,2|sed -e :a -e '$!N;s/\n Job//;ta' -e '$!N;s/\n Dependency condition invalid or never satisfied/ condition invalid or never satisfied/;ta' -e 'P;D' |egrep -v "dependency condition not satisfied|condition invalid or never satisfied" |grep "^Job" `
+if [ $? = 0 ]; then
+      PEND_FOUND_JOBIDS=`echo "$PEND_JOBS" |cut -d"<" -f2|cut -d">" -f1 |sort `
+      echo $PEND_FOUND_JOBIDS
+      # if SOLEXA_PEND_FILE exists, it means we had jobs last time we ran
+      if [ ! -r $SOLEXA_PEND_FILE ]; then
+            # there were no jobs last time we ran (or we are not root, but we won't be testing for 
+            # now since this should be run from root's cron)
+            echo "$PEND_FOUND_JOBIDS" > $SOLEXA_PEND_FILE
+            exit $E_NOINPUT
+      else
+            # jobs last time we ran, possible long pend
+            STUCK_JOBIDS=`echo "$PEND_FOUND_JOBIDS" |comm -1 -2 $SOLEXA_PEND_FILE - `
+            if [ "$STUCK_JOBIDS" ]; then
+                        echo "Stuck jobids: $STUCK_JOBIDS"
+                        echo "
+WARNING: The following jobs have been pending for more than $CHECK_INTERVAL: 
+
+$STUCK_JOBIDS
+
+OUTPUT:
+
+JOBID   USER    STAT  QUEUE      FROM_HOST   EXEC_HOST   JOB_NAME   SUBMIT_TIME
+`for soljobid in $STUCK_JOBIDS; do bjobs $soljobid|grep -v SUBMIT_TIME;done`
+
+Please check the solexa queue balance.
+
+$PEND_JOBS
+
+Thank you.
+
+Kind regards,
+Monia " |Mail -s "ALERT: Solexa jobs pending for more than $CHECK_INTERVAL (`date +%Y%m%d%H%M`)" $EMAIL_LIST
+                        echo "$PEND_FOUND_JOBIDS" > $SOLEXA_PEND_FILE
+                        exit $E_OK
+            fi
+            # whew! Just some normal new pends
+            echo "$PEND_FOUND_JOBIDS" > $SOLEXA_PEND_FILE
+            exit $E_OK
+      fi
+else
+      # all clear, clean up
+      rm -f $SOLEXA_PEND_FILE
+fi
+
+
+exit $E_OK
