@@ -1,1 +1,1 @@
-#node,host,migrationdest,storage,cfgstore,memory,cpus,nics,bootorder,clockoffset,virtflags,vncport,textconsole,powerstate,beacon,comments,disable
+#node,host,migrationdest,storage,storagemodel,cfgstore,memory,cpus,nics,nicmodel,bootorder,clockoffset,virtflags,master,vncport,textconsole,powerstate,beacon,datacenter,comments,disable
