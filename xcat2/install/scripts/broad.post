@@ -165,9 +165,6 @@ if [ -e /etc/enterprise-release ]; then
 	yum -y groupremove "Dialup Networking Support"
 	yum clean all
 
-	mv /etc/multipath.conf /etc/multipath.BAK
-	echo -e "defaults {\n\tuser_friendly_names yes\n}" > /etc/multipath.conf
-
 	# Start CFENGINE3 installation
         wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-latest.centos5.x86_64.rpm
         wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar
