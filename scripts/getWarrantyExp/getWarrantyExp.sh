@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#CURRENT_DATE="$(echo "$(date +%s)/86400" | bc)"
+#$Id:$
 
 #Nagios Status
 UNKNOWN=-1
