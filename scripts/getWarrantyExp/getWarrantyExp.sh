@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#$Id$
+# $Id$
 
 #Nagios Status
 UNKNOWN=-1
