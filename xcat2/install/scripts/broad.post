@@ -142,8 +142,6 @@ ln -sin /bin/tcsh /usr/bin/tcsh
 ##tune4fs for tuning.  tune4fs is backwards-compatible, but tune2fs is not; therefore, we are using tune4fs to both ext3 and ext4.
 for x in `fdisk -l | grep -v swap | awk '/Linux/ {print $1}'`; do tune4fs -c 0 -i 0 $x; done
 
-#Change this if build server key changes:
-echo "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAwVLbQ8Rlt93pgghzzNh7bd8vjKE2oAftYkSy4WwkZBjY8XemVrRm3c3+F2cvYABftnrgbxJn1soTGSJVyoEwHfSZoPtWtOYB4ICt5GdSwHXbgRxBYqFiJA8fPycWeF4qc7GXicVxVpDAcA0Lz+6XVNWQXWSNqAsNyqFXYzf/VavOIkqW4Xr/hxfLsBsDgffo5YlhSQbLJmsz/c3Zo0q3u/PRPB+viMQ2ulwkYdR5dyuP9VNrAMu7NtMK4Lpb+2fskJqVGYJU4PzzV/OE5DsGby95+n90JxfaDgmHlhRIraAADX10dCjmX9iHy4XrhIWDbOjm9H9FNCSnvehHLNPacw== root@hal9000.broadinstitute.org" > /root/.ssh/authorized_keys
 chmod 600 /root/.ssh
 
 #Change this if trp key changes:
@@ -166,14 +164,16 @@ if [ -e /etc/enterprise-release ]; then
 	yum clean all
 
 	# Start CFENGINE3 installation
-        wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-latest.centos5.x86_64.rpm
-        wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar
-        rpm -ivh /tmp/cfengine-community-latest.centos5.x86_64.rpm
-        tar xvfP /tmp/base_promises.tar
-        /sbin/chkconfig --add cfengine3
-        /var/cfengine/bin/cf-key
-        /var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
-        /var/cfengine/bin/cf-agent -Kv >> /var/log/cfBuild.log
+        wget -P /tmp http://mirror/linux/cfengine3/install.sh
+        sh /tmp/install.sh
+        #wget -P /tmp http://mirror/linux/cfengine3/cfengine-community-latest.centos5.x86_64.rpm
+        #wget -P /tmp http://mirror/linux/cfengine3/base_promises.tar
+        #rpm -ivh /tmp/cfengine-community-latest.centos5.x86_64.rpm
+        #tar xvfP /tmp/base_promises.tar
+        #/sbin/chkconfig --add cfengine3
+        #/var/cfengine/bin/cf-key
+        #/var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
+        #/var/cfengine/bin/cf-agent -Kv >> /var/log/cfBuild.log
 
 else
 	###Apparently, yum needs utils before switching to our local mirror
@@ -183,17 +183,19 @@ else
 	wget http://www/~apsg/software/yumConfig/CentOS-Base.repo
 	mv -f CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 
-	cp /etc/security/limits.conf /tmp/limits.conf.orig
+	cp /etc/security/limits.conf{,.orig}
 	# Start CFENGINE3 installation
-	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/cfengine-community-latest.centos5.x86_64.rpm
-	wget -P /tmp http://www.broadinstitute.org/~apsg/software/cfengine/base_promises.tar 
-	rpm -ivh /tmp/cfengine-community-latest.centos5.x86_64.rpm
-	tar xvfP /tmp/base_promises.tar
-	/sbin/chkconfig --add cfengine3
-	/var/cfengine/bin/cf-key
-	/var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
-	/var/cfengine/bin/cf-agent -Kv >> /var/log/cfBuild.log
-	cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)
+        wget -P /tmp http://mirror/linux/cfengine3/install.sh
+        sh /tmp/install.sh
+        #wget -P /tmp http://mirror/linux/cfengine3/cfengine-community-latest.centos5.x86_64.rpm
+        #wget -P /tmp http://mirror/linux/cfengine3/base_promises.tar
+	#rpm -ivh /tmp/cfengine-community-latest.centos5.x86_64.rpm
+	#tar xvfP /tmp/base_promises.tar
+	#/sbin/chkconfig --add cfengine3
+	#/var/cfengine/bin/cf-key
+	#/var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
+	#/var/cfengine/bin/cf-agent -Kv >> /var/log/cfBuild.log
+	#cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)
 
 	##Yum customization and package foo
 	echo Updating installed packages..
@@ -243,29 +245,41 @@ case $VENDOR in
 	echo "wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash" >> /etc/rc.local
 	echo "yum -y install srvadmin-all" >> /etc/rc.local
 
-	echo "sh /broad/mirror/linux/dell/hardware/delldset_v1.8.1.100.bin -i" >> /etc/rc.local
+        echo "sh /broad/mirror/linux/dell/hardware/delldset_v2.1.0.112_A00.bin -i" >> /etc/rc.local
+
+        if [ ! -f /usr/bin/serviceTag ]; then
+		echo "wget -P /usr/bin http://mirror.broadinstitute.org/linux/dell/hardware/serviceTag" >> /etc/rc.local
+        fi
 
 	#Dell's convoluted way of enabling virtualization settings en masse
-	echo "service cfengine3 stop" >> /rc.local
-	echo "yum -y install srvadmin-hapi" >> /etc/rc.local
-	echo "mkdir /tmp/dtk" >> /etc/rc.local
-	echo "mount -o loop -o ro /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso /tmp/dtk/" >> /etc/rc.local
-	echo "cd /tmp/dtk/isolinux/" >> /etc/rc.local
-	echo "cp  SA.2 ~/SA.2.gz" >> /etc/rc.local
-	echo "cd; gunzip -f SA.2.gz" >> /etc/rc.local
-	echo "mkdir stage2" >> /etc/rc.local
-	echo "cd stage2" >> /etc/rc.local
-	echo "cpio -i < ../SA.2" >> /etc/rc.local
-	echo "cd lofs" >> /etc/rc.local
-	echo "mkdir dell" >> /etc/rc.local
-	echo "mount -o loop dell.cramfs dell/" >> /etc/rc.local
-	echo "mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/" >> /etc/rc.local
-	echo "/usr/local/sbin/syscfg --virtualization=enable" >> /etc/rc.local
+	if [ ! -f /usr/local/sbin/syscfg ]; then
+		echo "
+		#Dell's convoluted way of enabling virtualization settings en masse
+		service cfengine3 stop
+		mkdir /tmp/dtk 
+		mount -o loop -o ro /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso /tmp/dtk/ 
+		cd /tmp/dtk/isolinux/ 
+		cp  SA.2 ~/SA.2.gz 
+		cd; gunzip -f SA.2.gz 
+		mkdir stage2 
+		cd stage2 
+		cpio -i < ../SA.2 
+		cd lofs 
+		mkdir dell 
+		mount -o loop dell.cramfs dell/ 
+		mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ 
+		usr/local/sbin/syscfg --virtualization=enable 
+
+		#Cleanup of DTK
+		umount /tmp/dtk && rm -rf /tmp/dtk 
+		umount ~/stage2/lofs/dell && rm -rf ~/stage2" | tr -d '\t' >> /etc/rc.local
+        fi
+
 
 	#Start firmware update block
 	echo "yum -y install dell_ft_install" >> /etc/rc.local
 	echo "yum -y install \$(/usr/sbin/bootstrap_firmware)" >> /etc/rc.local
-        echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt ; reboot" >> /etc/rc.local
+        echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt" >> /etc/rc.local
 	if [ -e /etc/enterprise-release ]; then
 		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
 	else
@@ -273,14 +287,14 @@ case $VENDOR in
 	fi
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
-	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
-	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
-	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
-	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
-	echo "[ -f /etc/init.d/lsf ] && service lsf restart" >> /etc/rc.local #If exists, restart LSF services
+
+        for i in {0..1}; do
+		echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
+        done
+
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
-	echo " [ $(/broad/tools/scripts/limitschk.sh  | awk '{print $4}') -eq 131072 ] && echo \"LSF Limits Set Correctly\" || echo \"Setting Limits Failed\"" >> /etc/rc.local
-        echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
+        
+        echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local && shutdown -rf 1" >> /etc/rc.local
 
         ;;
 *)
