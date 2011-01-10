@@ -28,7 +28,7 @@ done
 if [ $numhd -ge 2 ] ; then   
 	#2 drives   
 	echo "#partitioning scheme generated in %pre for 2 drives" > /tmp/part-include   
-	echo "clearpart --all --initlabel" >> /tmp/part-include   
+	echo "clearpart --all --drives sda,sdb --initlabel" >> /tmp/part-include   
 
 	echo "part raid.01 --size ${part1[1]} --ondisk sda" >> /tmp/part-include
 	echo "part raid.02 --size ${part1[2]} --ondisk sdb" >> /tmp/part-include
@@ -45,10 +45,10 @@ if [ $numhd -ge 2 ] ; then
 elif [ $numhd -eq 1 ] ; then   
 	#1 drive   
 	echo "#partitioning scheme generated in %pre for 1 drive" > /tmp/part-include   
-	echo "clearpart --all --initlabel" >> /tmp/part-include   
-	echo "part / --fstype ext3 --size ${part1[1]}" >> /tmp/part-include   
-	echo "part swap --size 8192" >> /tmp/part-include   
-	echo "part /local --fstype ext4 --size 1024 --grow" >> /tmp/part-include 
+	echo "clearpart --all --drives sda --initlabel" >> /tmp/part-include   
+	echo "part / --fstype ext3 --size ${part1[1]} --ondisk sda" >> /tmp/part-include   
+	echo "part swap --size 8192 --ondisk sda" >> /tmp/part-include   
+	echo "part /local --fstype ext4 --size 1024 --grow --ondisk sda" >> /tmp/part-include 
 else
 	echo "error"
 fi
