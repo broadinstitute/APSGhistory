@@ -2,14 +2,14 @@
 
 /opt/xcat/sbin/makehosts -n
 
-service named stop
-rm -f /etc/named.conf
+sudo /sbin/service named stop
+sudo rm -f /etc/named.conf
 /opt/xcat/sbin/makedns
-service named start
+sudo /sbin/service named start
 
-service dhcpd stop
-rm -f /etc/dhcpd.conf
+sudo /sbin/service dhcpd stop
+sudo rm -f /etc/dhcpd.conf
 /opt/xcat/sbin/makedhcp -a -d
 /opt/xcat/sbin/makedhcp -n
 /opt/xcat/sbin/makedhcp -a
-service dhcpd restart
+sudo /sbin/service dhcpd restart

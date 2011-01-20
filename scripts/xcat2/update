@@ -3,12 +3,14 @@
 noderm all
 MHL_ENTRIES=$(awk '$1 ~ /#xCAT#/ {print $2}' /sysman/install/broad/master.host.listing)
 HOSTS=$(echo "$MHL_ENTRIES" | awk -F\| '{print $3}')
-FILE_DIR=/root/subversion/xcat2/tables/
+FILE_DIR=/tmp/updateTables
 HOST_FILE=$FILE_DIR/hosts.csv
 MAC_FILE=$FILE_DIR/mac.csv
 NODELIST_FILE=$FILE_DIR/nodelist.csv
 IPMI_FILE=$FILE_DIR/ipmi.csv
 MP_FILE=$FILE_DIR/mp.csv
+
+mkdir $FILE_DIR
 
 ##Write Required Lines##
 echo "#node,ip,hostnames,otherinterfaces,comments,disable" > $HOST_FILE
@@ -42,3 +44,4 @@ for FILE in $(ls $FILE_DIR); do
 	tabrestore $FILE_DIR/$FILE
 done
 /broad/tools/scripts/xcat2/scrubDHCP.sh
+rm -rf $FILE_DIR

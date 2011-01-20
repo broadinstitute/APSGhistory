@@ -82,8 +82,13 @@ DellInfo()
 	local EXP_DATE=0
 	local URL="http://support.dell.com/support/topics/global.aspx/support/my_systems_info/details?c=us&cs=RC956904&l=en&s=hea&servicetag=$SERIAL"
 	 #Remove Tags and Grep Dates
-	local PAGE="$(curl -o - --silent "$URL" | sed -e "s/<[^>]*>/\n/g" | egrep "^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](20[0-9][0-9])$")"
+	local PAGE="$(curl -o - --silent "$URL" | sed -e "s/<[^>]*>/\n/g" |  egrep '^(0?[1-9]|1[012])[- /.](0?[1-9]|[12][0-9]|3[01])[- /.](20[0-9][0-9])$')"
 
+	if [ -z "$PAGE" ]; then
+		local URL="http://support.dell.com/support/topics/global.aspx/support/my_systems_info/details?c=us&cs=RC956904&l=en&s=hied&servicetag=$SERIAL"
+		local PAGE="$(curl -o - --silent "$URL" | sed -e "s/<[^>]*>/\n/g" |  egrep '^(0?[1-9]|1[012])[- /.](0?[1-9]|[12][0-9]|3[01])[- /.](20[0-9][0-9])$')"
+	fi
+	
 	for LINE in $PAGE; do
 		isDate "$LINE"
 
@@ -104,7 +109,7 @@ HPInfo()
 	local EXP_DATE=0
 	local URL="http://h20000.www2.hp.com/bizsupport/TechSupport/WarrantyResults.jsp?lang=en&cc=us&prodSeriesId=454811&prodTypeId=12454&sn=$SERIAL&pn=$SKU&country=US&nickname=&find=Display+Warranty+Information+%C2%BB"
 	local PAGE="$(curl -o - --silent "$URL" | sed -e "s/<[^>]*>/\n/g" | egrep "^(0[1-9]|[12][0-9]|3[01])[- /.]([A-Za-z]++)[- /.](19|20)[0-9][0-9]" | tr ' ' '-')"
-	
+
 	for LINE in $PAGE; do
 		isDate "$LINE"
 
@@ -123,7 +128,7 @@ case "$SYS_VENDOR" in
 	IBM)
 		echo "$(IBMInfo)"
 		;;
-	"Dell Inc.")
+	Dell*)
 		echo "$(DellInfo)"
 		;;
 	HP)

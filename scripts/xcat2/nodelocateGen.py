@@ -55,6 +55,7 @@ for line in sorted(lines, key = str.lower):
         ofile.write(line)
 ofile.close()
 
-Popen(["tabrestore",'%s/nodepos.csv' % ofile_path],stdin=None,stdout=open('/dev/null','w'),stderr=open('/dev/null','w'))
+#Popen(["tabrestore",'%s/nodepos.csv' % ofile_path],stdin=None,stdout=open('/dev/null','w'),stderr=open('/dev/null','w'))
+Popen(["tabrestore",'%s/nodepos.csv' % ofile_path])
 
-os.remove('%s/nodepos.csv' % ofile_path)
+#os.remove('%s/nodepos.csv' % ofile_path)

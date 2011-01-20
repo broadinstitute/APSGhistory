@@ -9,15 +9,14 @@ IFS=$'\n'
 
 if [ -z $1 ]
 then
-echo 'Usage: chassistomhl.sh <filename>'
+echo 'Usage: chassistomhl.sh <chassis_name>'
 exit 1
 fi
-echo What is the chassis name?  Example: ufarm83 
 
-until [[ $chassis_name == ufarm[0-9][0-9] ]]
-do
- read chassis_name
-done
+chassis_name=$(echo $1 | sed 's/brsa/ufarm/g')
+if [[ $chassis_name != ufarm[0-9][0-9] ]]; then
+	echo 'Invalid Chassis' && exit 1
+fi
 
 echo "What is the starting IP address for the PRODUCTION / VLAN32 interfaces? Example: 69.173.45.2"
  
@@ -49,9 +48,6 @@ do
  read nodenumber
 done
 
-echo "Should I generate makehosts and makedhcp statements as well?  y/n"
-read q
-
 #echo "Should I generate nagios entries as well? y/n"
 #read nagios 
  
@@ -69,15 +65,8 @@ do
  echo "$RACIP|-|$racmac|node${nodenumber}-rac|-|dhcpdevice|g|-|dell remote access controller" >> /tmp/${RAND}.rac
  echo "#xCAT# $buildIP|${buildmac}|node${nodenumber}|dell,farm,all|||" >> /tmp/${RAND}.build
 
- echo "racadm serveraction -m $racslot powercycle"
  ((racslot++))
   
-if [ $q = "y" ]
- then
-  echo makehosts node${nodenumber} >> /tmp/${RAND}.build
-  echo makedhcp node${nodenumber} >> /tmp/${RAND}.build
-  echo nodeset node${nodenumber} install >> /tmp/${RAND}.build
-fi
 #echo -e "define host{\nuse\t\tnonprod-blade\n\thost_name\t\tnode${nodeumber}\n\taddress\t\tnode${nodenumber}.broadinstitute.org\n\talias\t\t${prodIP}\n\tparents\t\t
 
 
