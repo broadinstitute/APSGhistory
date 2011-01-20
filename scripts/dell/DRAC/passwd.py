@@ -1,6 +1,5 @@
 #!/usr/bin/python
-import pexpect
-import sys
+import pexpect,sys,time
 from sys import argv,exit
 from getpass import getpass
 
@@ -14,13 +13,15 @@ if npass == npassConfirm:
 		child = pexpect.spawn("ssh %s" % host)
 		if debugMode:
 			child.logfile = sys.stdout
-		child.expect("root@%s's password:" % host)
+		child.expect("root@%s.*'s password:" % host)
 		child.sendline("%s" % opass)
-		child.expect('$')
+		time.sleep(2)
+		#child.expect('$')
+		child.expect(['$', '>'])
 		child.sendline("racadm config -g cfgUserAdmin -o cfgUserAdminPassword -i 2 \'%s\'" % npass)
-		child.expect('$')
+		child.expect(['$', '>'])
 		child.sendline("racadm racreset")
-		child.expect('$')
+		child.expect(['$', '>'])
 		child.sendline("exit")
 		child.expect(pexpect.EOF)
 		argv.pop(1)

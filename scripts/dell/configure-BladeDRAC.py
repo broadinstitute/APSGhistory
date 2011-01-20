@@ -83,14 +83,27 @@ def setNetSvcs():
 
 configArg = argv.pop(1)
 hosts = argv[1].split(',')
-password = getpass("Password:")
+password = getpass("Current Password:")
 debugMode = True
 
 configDict = {
 	"setDHCP": setDHCP,
-	"configAD": configAD}
-
-	#"deploy": deploy,
-	#"setNetSvcs": setNetSvcs}
+	"configAD": configAD,
+#	"deploy": deploy,
+	"setNetSvcs": setNetSvcs}
 
 configList = configDict.get(configArg)()
+
+for host in argv[1:]:
+        child = pexpect.spawn("ssh %s" % host)
+        if debugMode:
+                child.logfile = sys.stdout
+	child.expect("password:")
+	child.sendline("%s" % password)
+        child.expect('$')
+        for configItem in configList:
+                child.sendline("racadm %s" % configItem)
+        child.expect('$')
+        child.sendline("exit")
+        child.expect(pexpect.EOF)
+        argv.pop(1)
