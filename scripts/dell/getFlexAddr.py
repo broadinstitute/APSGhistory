@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # $Id$
-import sys
+import sys,os
 
 ssh_lib_path = '/broad/tools/scripts'
 sys.path.append(ssh_lib_path)
 import ssh
 
-for cmcNum in range(50,90):
+for cmcNum in range(50,92):
 	cmc = "brsa%s" % cmcNum
 	print "\n"
 	print cmc
