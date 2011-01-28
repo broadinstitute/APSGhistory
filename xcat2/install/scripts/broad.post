@@ -215,85 +215,85 @@ fi
 VENDOR=$(dmidecode -s system-manufacturer | cut -f1 -d' ')
 case $VENDOR in
 "IBM")
-	FILE="/var/log/ibmInst.log"
-	echo "Downloading DSA" | tee $FILE
-	wget http://download.boulder.ibm.com/ibmdl/pub/systems/support/system_x/ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
-	echo "Installing DSA" | tee -a $FILE
-	rpm -Uvh ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
-	echo "Remove Download" | tee -a $FILE
-	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
 
-	echo "service cfengine3 stop" >> /etc/rc.local
-	if [ -e /etc/enterprise-release ]; then
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
-	else
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
-	fi
-	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
-	echo "rm /etc/ssh/ssh_host*" >> /etc/local
-	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
-	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
-	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
-	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
-	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
-	echo " [ $(/broad/tools/scripts/limitschk.sh  | awk '{print $4}') -eq 131072 ] || echo \"Setting Limits Failed\"" >> /etc/rc.local
-        echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
+FILE="/var/log/ibmInst.log"
+echo "Downloading DSA" | tee $FILE
+wget http://download.boulder.ibm.com/ibmdl/pub/systems/support/system_x/ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
+echo "Installing DSA" | tee -a $FILE
+rpm -Uvh ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
+echo "Remove Download" | tee -a $FILE
+rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
+
+echo "service cfengine3 stop" >> /etc/rc.local
+if [ -e /etc/enterprise-release ]; then
+	echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
+else
+	echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
+fi
+
+cat >> /etc/rc.local << END
+
+rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh
+rm /etc/ssh/ssh_host*
+for i in {0..1}; do /usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log; done
+END
+
+echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
+echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local && shutdown -rf 1" >> /etc/rc.local
 
         ;;
 # REMEMBER YOU DID THIS
 "Dell")
-	echo "wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash" >> /etc/rc.local
-	echo "yum -y install srvadmin-all" >> /etc/rc.local
 
-        echo "sh /broad/mirror/linux/dell/hardware/delldset_v2.1.0.112_A00.bin -i" >> /etc/rc.local
+cat >> /etc/rc.local << END
 
-        if [ ! -f /usr/bin/serviceTag ]; then
-		echo "wget -P /usr/bin http://mirror.broadinstitute.org/linux/dell/hardware/serviceTag" >> /etc/rc.local
-        fi
-
+wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash
+yum -y install srvadmin-all
+sh /broad/mirror/linux/dell/hardware/delldset_v2.1.0.112_A00.bin -i
+if [ ! -f /usr/bin/serviceTag ]; then
+    wget -P /usr/bin http://mirror.broadinstitute.org/linux/dell/hardware/serviceTag
+fi
+END
 	#Dell's convoluted way of enabling virtualization settings en masse
-	if [ ! -f /usr/local/sbin/syscfg ]; then
-		echo "
-		#Dell's convoluted way of enabling virtualization settings en masse
-		service cfengine3 stop
-		mkdir /tmp/dtk 
-		mount -o loop -o ro /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso /tmp/dtk/ 
-		cd /tmp/dtk/isolinux/ 
-		cp  SA.2 ~/SA.2.gz 
-		cd; gunzip -f SA.2.gz 
-		mkdir stage2 
-		cd stage2 
-		cpio -i < ../SA.2 
-		cd lofs 
-		mkdir dell 
-		mount -o loop dell.cramfs dell/ 
-		mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ 
-		usr/local/sbin/syscfg --virtualization=enable 
+if [ ! -f /usr/local/sbin/syscfg ]; then
+	#Dell's convoluted way of enabling virtualization settings en masse
+	service cfengine3 stop
+	mkdir /tmp/dtk 
+	mount -o loop -o ro /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso /tmp/dtk/ 
+	cd /tmp/dtk/isolinux/ 
+	cp  SA.2 ~/SA.2.gz 
+	cd; gunzip -f SA.2.gz 
+	mkdir stage2 
+	cd stage2 
+	cpio -i < ../SA.2 
+	cd lofs 
+	mkdir dell 
+	mount -o loop dell.cramfs dell/ 
+	mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ 
+	usr/local/sbin/syscfg --virtualization=enable 
 
-		#Cleanup of DTK
-		umount /tmp/dtk && rm -rf /tmp/dtk 
-		umount ~/stage2/lofs/dell && rm -rf ~/stage2" | tr -d '\t' >> /etc/rc.local
-        fi
+	#Cleanup of DTK
+	umount /tmp/dtk && rm -rf /tmp/dtk 
+	umount ~/stage2/lofs/dell && rm -rf ~/stage2" | tr -d '\t' >> /etc/rc.local
+fi
 
 
 	#Start firmware update block
-	echo "yum -y install dell_ft_install" >> /etc/rc.local
-	echo "yum -y install \$(/usr/sbin/bootstrap_firmware)" >> /etc/rc.local
-        echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt" >> /etc/rc.local
 	if [ -e /etc/enterprise-release ]; then
 		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
 	else
 		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
 	fi
-	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
-	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
 
-        for i in {0..1}; do
-		echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
-        done
-
+cat >> /etc/rc.local
+yum -y install dell_ft_install
+yum -y install \$(/usr/sbin/bootstrap_firmware)
+/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt
+rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh
+rm /etc/ssh/ssh_host*
+for i in {0..1}; do /usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log; done
+END
 	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
-        
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local && shutdown -rf 1" >> /etc/rc.local
 
         ;;
