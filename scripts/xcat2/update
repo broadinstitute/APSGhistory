@@ -32,7 +32,7 @@ if [ -f $LOCAL_MHL ]; then
 			noderm $HOST
                 fi
         
-		if [[ $(echo $ENTRY | grep -c \<) -eq 1 ]]; then
+		if [[ ($(echo $ENTRY | grep -c \<) -eq 1) || ($(echo $ENTRY | awk -F\| '{print NF}') -gt 7) ]]; then
 			if [[ $(nodels $HOST 2>/dev/null | wc -l) -eq 0 ]]; then
 			    nodeadd $HOST groups=$NODEGROUPS hosts.ip=$IP mac.mac=$MAC
 			else
@@ -56,11 +56,9 @@ elif [ ! -f $LOCAL_MHL ]; then
 
 	##Write Required Lines##
 	echo "#node,ip,hostnames,otherinterfaces,comments,disable" > $HOST_FILE
-	echo "#node,interface,mac,comments,disable
-	\"all\",\"eth0\",,," > $MAC_FILE
+	echo -e "#node,interface,mac,comments,disable\n\"all\",\"eth0\",,," > $MAC_FILE
 	echo "#node,groups,status,statustime,appstatus,appstatustime,primarysn,comments,disable" > $NODELIST_FILE
-	echo "#node,bmc,bmcport,username,password,comments,disable
-	\"dell\",\"/\z/-rac/\",,,,," > $IPMI_FILE
+	echo -e "#node,bmc,bmcport,username,password,comments,disable\n\"dell\",\"/\z/-rac/\",,,,," > $IPMI_FILE
 	echo "#node,mpa,id,comments,disable" > $MP_FILE
 
 	for HOST in $HOSTS; do
