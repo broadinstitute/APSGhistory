@@ -1,0 +1,9 @@
+##used for dbconnection
+dbhost = mysql
+dbuser = alvarado
+dbpassword = olincollege
+database = alvarado
+
+##used to direct the .out output files to be saved to a specific location
+saveto = /broad/shptmp/alvarado/tester2
+notifyto = /broad/shptmp/alvarado/notify
