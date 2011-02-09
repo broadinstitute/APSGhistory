@@ -1,6 +1,7 @@
 #Written By Matt Alvarado Broad Institute Intern Fall 2010
 #If there are any issues please contact me at matthew.alvarado@students.olin.eduimport sys
 import os
+import sys
 import stat
 import time
 import subprocess
