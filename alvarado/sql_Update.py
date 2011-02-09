@@ -25,9 +25,10 @@ class Updater():
                              self.dbInfo["dbpassword"],self.dbInfo["database"])
         cursor = db.cursor()
         output = cursor.execute(query)
+        output1 = cursor.fetchall()
         db.commit()
         db.close()
-        return output
+        return output1
     
     #Method used to write the directory totals to the corresponding database tables
     def writeDirTotals(self,fsid,dirTotalDict):
@@ -64,9 +65,10 @@ class Updater():
                     runtime = dirTotalDict[dirid][mainKey]
                     query = "SELECT * FROM runtime WHERE fsid = %d AND dirid = %d" % (int(fsid), int(dirid))
                     pastRuntime = self.dbQuery(query)
-                    if int(pastRuntime) < runtime:
-                        query = "REPLACE INTO runtime (fsid, dirid, runtime) VALUES(%d,%d,%f)" % (fsid, int(dirid), float(runtime))
-                        self.dbQuery(query)
+                    if pastRuntime != ():
+                        if int(pastRuntime[0][2]) < int(runtime):
+                            query = "REPLACE INTO runtime (fsid, dirid, runtime) VALUES(%d,%d,%f)" % (fsid, int(dirid), float(runtime))
+                            self.dbQuery(query)
 
     #Method used to write overall totals to their corresponding databases           
     def writeTotals(self,fsid,totalDict):
