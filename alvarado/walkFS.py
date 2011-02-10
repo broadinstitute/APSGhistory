@@ -53,7 +53,7 @@ if __name__ == '__main__':
             #scan = 'scan'+str(fsid[0][0])+'*'
             #pipe = subprocess.Popen('bsub -P crawler -J waiter -q priority -o waiting.out python waiting.py %s' % (repr(notifyList)) ,shell = True,stdout=subprocess.PIPE)
             #print pipe.communicate()[0]
-            #pipe = subprocess.Popen('bsub -P crawler -q priority -w "exit(%s)" -o %s date' % (scan,notify) ,shell = True,stdout=subprocess.PIPE)
+            #pipe = subprocess.Popen('bsub -P crawler -q priority -w "ended(%s)" -o %s date' % (scan,notify) ,shell = True,stdout=subprocess.PIPE)
             #print pipe.communicate()[0]
             
             

@@ -337,12 +337,16 @@ class Walker(Statter):
                 sbquery = "SELECT * FROM subdir WHERE name = '%s' AND fsid = %d AND deprecated = 0 AND level = %d" % (subDir, fsid,level)
             else:
                 parentquery = "SELECT * FROM subdir WHERE name = '%s' and fsid = %d AND deprecated = 0 AND level = %d" % (parentDir, fsid, level-1)
-                cursor.execute(sbquery)
+                cursor.execute(parentquery)
                 parentData = cursor.fetchall()
-                parentid = parentData[0][1]
+                #match name exactly
+                for row in parentData:
+                    if row[4] == parentDir:
+                        parentid = row[1]
                 sbquery = "SELECT * FROM subdir WHERE name = '%s' AND fsid = %d AND deprecated = 0 AND level = %d AND parent = %d" % (subDir, fsid,level,parentid)
             cursor.execute(sbquery)
             sbdata = cursor.fetchall()
+            #match name exactly
             for row in sbdata:
                 if row[4] == subDir:
                     sbid = row[1]                    
@@ -371,7 +375,10 @@ class Walker(Statter):
                 fsquery = "SELECT * FROM subdir WHERE fsid = %d AND name = '%s' AND deprecated = 0" % (fsid,parentDir)
                 cursor.execute(fsquery)
                 entries = cursor.fetchall()
-                parentId = entries[-1][1]
+                #match name exactly
+                for row in entries:
+                    if row[4] == parentDir:
+                        parentId = row[1]
                 subquery = "INSERT INTO subdir(fsid, dirid, parent, name, level) VALUES(%d, %d, %d, '%s',%d)" % (fsid, dirid+1, parentId, subDir,level)
                 output = cursor.execute(subquery)                
             db.commit()
@@ -393,7 +400,6 @@ class Walker(Statter):
     def dbQuery(self, query, configData):
         try:
             dbinfo = configData.getDBInfo()
-            print configData.getDBInfo()
             db = MySQLdb.connect(dbinfo["dbhost"],dbinfo["dbuser"],dbinfo["dbpassword"],dbinfo["database"])
             cursor = db.cursor()
             cursor.execute(query)

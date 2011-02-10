@@ -67,8 +67,14 @@ class Updater():
                     pastRuntime = self.dbQuery(query)
                     if pastRuntime != ():
                         if int(pastRuntime[0][2]) < int(runtime):
-                            query = "REPLACE INTO runtime (fsid, dirid, runtime) VALUES(%d,%d,%f)" % (fsid, int(dirid), float(runtime))
-                            self.dbQuery(query)
+                            #If the difference in runtimes is less than 200 (incase LSF node was slow)
+                            if (int(runtime) - int(pastRuntime[0][2])) < 200:
+                                query = "REPLACE INTO runtime (fsid, dirid, runtime) VALUES(%d,%d,%f)" % (fsid, int(dirid), float(runtime))
+                                self.dbQuery(query)
+                    #If there exits no previous runtime data
+                    else:
+                        query = "REPLACE INTO runtime (fsid, dirid, runtime) VALUES(%d,%d,%f)" % (fsid, int(dirid), float(runtime))
+                        self.dbQuery(query)
 
     #Method used to write overall totals to their corresponding databases           
     def writeTotals(self,fsid,totalDict):

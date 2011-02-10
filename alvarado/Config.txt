@@ -5,5 +5,5 @@ dbpassword = olincollege
 database = alvarado
 
 ##used to direct the .out output files to be saved to a specific location
-saveto = /broad/shptmp/alvarado/tester2
+saveto = /broad/shptmp/alvarado/2451
 notifyto = /broad/shptmp/alvarado/notify
