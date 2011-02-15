@@ -14,6 +14,11 @@ if ($ARGV[0] eq "-n"){
 	`badmin hclose -C "Wedged Node" $machine`;
 }
 
+$job_count = "bjobs -u all -m $machine 2>/dev/null | wc -l";
+if ($job_count eq 0){
+	exit 0
+}
+
 $cmd = "bjobs -u all -m $machine";
 $bjobsOutput = `$cmd`;
 $cmd = "bjobs -l -u all -m $machine";
