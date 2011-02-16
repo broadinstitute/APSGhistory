@@ -382,7 +382,7 @@ if ($nlink > $MAX_DIRS) {
 
 
 my $res = '';
-$res = "-R \"rusage[${server}_io=5]\"" unless ($server eq 'nitrogen' or $server eq 'vstorage00' or $server eq 'argon');
+$res = "-R \"rusage[${server}_io=5]\"" unless ($server eq 'nitrogen' or $server eq 'nitrogen2' or $server eq 'thumper26' or $server eq 'vstorage00' or $server eq 'argon');
 
 
 unless (-d "$TMP/$opt_t") {
@@ -421,11 +421,11 @@ if (defined $opt_d) {
   }
   $job = "scan_${fsid}_$dotdir";
   $cmd = "$PRG $descend -o $DIR/${dotdir}.csv \"$dir\"";
-  $cmd = "bsub -r -q $queue -P fsstats -R centos -E \"cd $dir\" -o $DIR/${dotdir}.out -J $job $res " . $cmd;
+  $cmd = "bsub -r -q $queue -P fsstats -E \"cd $dir\" -o $DIR/${dotdir}.out -J $job $res " . $cmd;
 } else {
   $job = "scan_${fsid}_0";
   $cmd = "$PRG $descend -o $DIR/0.csv \"$dir\"";
-  $cmd = "bsub -r -q $queue -P fsstats -R centos -E \"cd $dir\" -o $DIR/0.out -J $job $res " . $cmd;
+  $cmd = "bsub -r -q $queue -P fsstats -E \"cd $dir\" -o $DIR/0.out -J $job $res " . $cmd;
 }
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
@@ -434,7 +434,7 @@ for my $d (keys %dbdir) {
   $job = defined $opt_d ? "scan_${fsid}_${opt_d}_${dirid}" :
                           "scan_${fsid}_${dirid}";
   $cmd = "$PRG -o $DIR/${dirid}.csv \"$dir/$d\"";
-  $cmd = "bsub -r -q $queue -P fsstats -R centos -E \"cd $dir\" -J $job -o  $DIR/${dirid}.out $res " . $cmd;
+  $cmd = "bsub -r -q $queue -P fsstats -E \"cd $dir\" -J $job -o  $DIR/${dirid}.out $res " . $cmd;
   print STDERR "$cmd\n" if $DEBUG;
   print `$cmd\n` unless $DRYRUN;
   sleep $SLEEP;
@@ -450,7 +450,7 @@ $dep = "done(\"scan_${fsid}_*\")";
 
 $cmd = "/home/radon01/matter/sandbox/fsstats/upload_stats.pl -d $DIR -t $opt_t";
 $cmd .= " -v" if $DEBUG;
-$cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -R centos -J $job -o $DIR/upload.out " . $cmd;
+$cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -J $job -o $DIR/upload.out " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
 ##
@@ -460,7 +460,7 @@ $dep = "done(\"$job\")";
 $job = "combine_${fsid}";
 $cmd = "/home/radon01/matter/sandbox/fsstats/combine.pl -f $fsid";
 $cmd .= " -v" if $DEBUG;
-$cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -R centos -J $job -o $DIR/combine.out " . $cmd;
+$cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -J $job -o $DIR/combine.out " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
 

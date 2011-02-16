@@ -38,8 +38,8 @@ SELECT s.uid,s.type,s.histogram
   AND s.latest IS TRUE
   AND s.dirid IS NULL
   AND s.uid IS NULL
-  AND f.path like 'nitrogen%'
-  AND s.type=1
+  AND (f.path like 'yin%' or f.path like 'yang%' or f.path like 'zig%' or f.path like 'zag%')
+  AND s.type=15
 SQL
 
 print STDERR "$sql\n" if $DEBUG;
