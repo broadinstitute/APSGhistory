@@ -4,7 +4,7 @@ use warnings;
 use diagnostics;
 use Net::SMTP;
 
-my ($cmd,$bjobsOutput,$bjobsLongOutput,$machine,@recipients,$count);
+my ($job_count,$cmd,$bjobsOutput,$bjobsLongOutput,$machine,@recipients,$count);
 my ($from,$subject,$prefixMessage,$mesg,$mailServer,$smtp,$cc);
 
 if ($ARGV[0] eq "-n"){
