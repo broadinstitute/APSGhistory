@@ -13,23 +13,36 @@ echo 'Usage: chassistomhl.sh <chassis_name>'
 exit 1
 fi
 
+echo "What is the starting node number?  Example: 1589"
+until [[ $nodenumber =~ [0-9]+ ]]
+do
+ read nodenumber
+done
+
+IPLIST="$(grep -w node$nodenumber /sysman/install/broad/master.host.listing)"
+prodIPtmp=$(echo "$IPLIST" | egrep '10\.200\.(9[6-9]|10[0-9]|111)\.[0-9]+'|awk -F\| '{print $1}' | tr -d '#')
+buildIPtmp=$(echo "$IPLIST" | egrep '192\.168\.[0-9]+\.[0-9]+' | awk -F\| '{print $1}')
+racIPtmp=$(echo "$IPLIST" | egrep '172\.16\.[0-9]+\.[0-9]+' | awk -F\ '{print $1}')
+
 chassis_name=$(echo $1 | sed 's/brsa/ufarm/g')
 if [[ $chassis_name != ufarm[0-9][0-9] ]]; then
 	echo 'Invalid Chassis' && exit 1
 fi
 
-echo "What is the starting IP address for the PRODUCTION / VLAN32 interfaces? Example: 69.173.45.2"
+echo "What is the starting IP address for the PRODUCTION / VLAN32 interfaces? Example: 69.173.45.2 [$prodIPtmp]"
  
-until [[ $prodIP =~ 69\.173\.[0-9]+\.[0-9]+ ]]
+until [[ ($prodIP =~ 69\.173\.[0-9]+\.[0-9]+) || ($prodIP =~ 10\.200\.(9[6-9]|10[0-9]|111)\.[0-9]+) ]]
   do
 	read prodIP
+        if [[ $prodIP == "" ]]; then prodIP=$prodIPtmp; fi
 done
 
-echo What is the starting IP address for the BUILD interface? Example: 192.168.32.200
+echo "What is the starting IP address for the BUILD interface? Example: 192.168.32.200 [$buildIPtmp]"
  
 until [[ $buildIP =~ 192\.168\.[0-9]+\.[0-9]+ ]]
   do
 	read buildIP
+        if [[ $buildIP == "" ]]; then buildIP=$buildIPtmp; fi
 done
 
 
@@ -39,14 +52,10 @@ echo Remember the RAC IP addresses go from high to low.
 until [[ $RACIP =~ 172\.16\.[0-9]+\.[0-9]+ ]]
   do
 	read RACIP
+        if [[ $RACIP == "" ]]; then RACIP=$racIPtmp; fi
 done
 
 
-echo "What is the starting node number?  Example: 1589"
-until [[ $nodenumber =~ [0-9]+ ]]
-do
- read nodenumber
-done
 
 #echo "Should I generate nagios entries as well? y/n"
 #read nagios 
@@ -125,7 +134,7 @@ echo -e "\n\nFor addition to master.host.listing - RAC section:"
 # Sort so that we get the "reverse" direction we want
 cat /tmp/${RAND}.rac | sort
 
-echo -e "\n\nFor addition to /etc/hosts on hal9000"
+echo -e "\n\nFor addition to  master.host.listing - xCAT section:"
 cat /tmp/${RAND}.build
 
 
