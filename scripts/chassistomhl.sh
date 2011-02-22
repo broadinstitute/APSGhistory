@@ -21,8 +21,8 @@ done
 
 IPLIST="$(grep -w node$nodenumber /sysman/install/broad/master.host.listing)"
 prodIPtmp=$(echo "$IPLIST" | egrep '10\.200\.(9[6-9]|10[0-9]|111)\.[0-9]+'|awk -F\| '{print $1}' | tr -d '#')
-buildIPtmp=$(echo "$IPLIST" | egrep '192\.168\.[0-9]+\.[0-9]+' | awk -F\| '{print $1}')
-racIPtmp=$(echo "$IPLIST" | egrep '172\.16\.[0-9]+\.[0-9]+' | awk -F\ '{print $1}')
+buildIPtmp=$(echo "$IPLIST" | egrep '192\.168\.[0-9]+\.[0-9]+' | awk -F\| '{print $1}' | awk '{print $2}')
+racIPtmp=$(echo "$IPLIST" | egrep '172\.16\.[0-9]+\.[0-9]+' | awk -F\| '{print $1}')
 
 chassis_name=$(echo $1 | sed 's/brsa/ufarm/g')
 if [[ $chassis_name != ufarm[0-9][0-9] ]]; then
