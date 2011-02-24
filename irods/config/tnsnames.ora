@@ -1,0 +1,13 @@
+APSGTST=
+ (DESCRIPTION=
+  (ADDRESS=
+   (PROTOCOL=TCP)
+   (HOST=tantalum)
+   (PORT=1521)
+  )
+  (CONNECT_DATA=
+   (SID=apsgtst)
+  )
+ ) 
+
+

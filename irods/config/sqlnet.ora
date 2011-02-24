@@ -1,0 +1,3 @@
+SQLNET.KERBEROS5_KEYTAB=/opt/iRODS/server/config/krb5.keytab
+SQLNET.KERBEROS5_CONF=/etc/krb5.conf
+DIAG_ADR_ENABLED = false

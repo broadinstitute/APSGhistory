@@ -1,0 +1,5 @@
+irodsHost 'irods'
+irodsPort 1247
+irodsUserName 'irods'
+irodsZone 'broad'
+irodsAuthScheme 'KRB'

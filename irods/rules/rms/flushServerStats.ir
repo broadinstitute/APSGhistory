@@ -1,0 +1,4 @@
+acFlushStat||delayExec(<EF>1h</EF>,msiFlushMonStat(1,serverload)##msiFlushMonStat(1,serverloaddigest),nop)|nop
+null
+ruleExecOut
+

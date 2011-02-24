@@ -1,0 +1,4 @@
+acFlushStatNow||msiFlushMonStat(1,serverload)##msiFlushMonStat(1,serverloaddigest)|nop
+null
+ruleExecOut
+

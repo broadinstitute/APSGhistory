@@ -1,0 +1,4 @@
+acDigestMonStat||delayExec(<EF>15m</EF>,msiDigestMonStat(1,2,1,2,4,0,0),nop)|nop
+null
+ruleExecOut
+
