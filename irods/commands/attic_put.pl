@@ -28,14 +28,15 @@ my $mkdirRule = "$rulesLoc/broadAtticMkdir.ir";
 my $num_files = 0;
 my $num_dirs = 0;
 my $num_bytes = 0;
+my $num_links = 0;
+my %symlinks = ();
 my $start_ts;
 my $end_ts;
-my $errors = 0;
+my $num_errors = 0;
 my %error_msgs = ();
-my $symlinks = 0;
 
 my %args;
-getopts('c:e:f:htv', \%args);
+getopts('c:e:f:hrtv', \%args);
 
 if ($args{h}) {
     usage();
@@ -126,7 +127,10 @@ $start_ts = time();
 
 my $dir;
 foreach $dir (@ARGV) {
-    find({ wanted => \&put_to_archive, no_chdir => 1 }, abs_path($dir));
+    find({ wanted => \&put_to_archive, 
+	   postprocess => \&cleanup_dir, 
+	   no_chdir => 1 }, 
+	 abs_path($dir));
 }
 
 $end_ts = time();
@@ -134,30 +138,61 @@ $end_ts = time();
 my $elapsed = $end_ts - $start_ts;
 $elapsed = 1 if $elapsed eq 0;
 my $num_mb = $num_bytes / (1024.0 * 1024.0);
-print "Transfer statistics:\n";
+print "\nTransfer statistics:\n";
 print "\tnumber of directories : $num_dirs\n";
 print "\tnumber of files       : $num_files\n";
 printf "\tnumber of megabytes   : %.2f\n", $num_mb;
 printf "\telapsed time          : %dh:%02dm:%02ds (%d secs)\n",
     int($elapsed/(60*60)), ($elapsed/60)%60, $elapsed%60, $elapsed;
 printf "\toverall throughput    : %.2f MB/sec\n", $num_mb / $elapsed;
-print "\tnumber of errors      : $errors\n";
-print "\tnumber of symlinks    : $symlinks\n";
+print "\tnumber of errors      : $num_errors\n";
+print "\tnumber of symlinks    : $num_links\n";
+if ($num_links) {
+    print "\nList of encountered symlinks:\n";
+    foreach my $symlink (keys %symlinks) {
+        print "\t$symlink\n";
+    }
+}
+if ($num_errors) {
+    print "\nList of errors:\n";
+    foreach my $file (keys %error_msgs) {
+        print "\t$file\n";
+	print "\t\t$error_msgs{$file}"; 
+    }
+}
 
 exit 0;
 
+sub cleanup_dir {
+    if ($args{r}) {
+        print "Removing directory $File::Find::dir ... " if $args{v}; 
+	if (not rmdir $File::Find::dir) {
+	    if ($! =~ /not empty/) {
+	        print "not empty, so not removed.\n" if $args{v};
+	    }
+	    else {
+	        print "\n";
+	        print STDERR "ERROR: could not remove directory: $!\n";
+	    }
+	}
+	else {
+	    print "done\n" if $args{v};
+	}
+    }
+}
 
 sub put_to_archive {
     my $st_info = lstat($_);
     if (not $st_info) {
 	print STDERR "ERROR: cannot stat $File::Find::name: $!\n";
-	$errors++;
+	$num_errors++;
 	return;
     }
 
     if (S_ISLNK($st_info->mode)) {
         print STDERR "WARNING: file $File::Find::name is a symlink ... ignoring.\n";
-	$symlinks++;
+	$num_links++;
+	$symlinks{$_} = 1;
 	return;
     }
 
@@ -194,11 +229,11 @@ sub put_to_archive {
 	$metadata .= "%broadSourceDirectory=$srcDir";
 	print "Creating collection $newObj\n" if $args{v};
 	print "irule -F $mkdirRule $newObj $expiry $metadata $user $owner $group $groupmode $pubmode\n" if $args{t};
-	my @out =`irule -F $mkdirRule $newObj $expiry $metadata $user $owner $group $groupmode $pubmode` if not $args{t};
+	my @out =`irule -F $mkdirRule $newObj $expiry $metadata $user $owner $group $groupmode $pubmode 2>&1` if not $args{t};
 	if ($?) {
-            $errors++;
-	    $error_msgs{"$destColl/$destObj"} = join ' ', @out;
-            print @out;
+            $num_errors++;
+	    $error_msgs{"$destColl/$destObj"} = join "\t\t", @out;
+            #print @out;
 	    return;
         }
 	$num_dirs++;
@@ -212,11 +247,11 @@ sub put_to_archive {
 	printf("Copying file %s (%.2f MB) to %s (%s)\n", "$srcDir/$srcFile", $mb, $newObj, $destResc) if $args{v};
 	print "irule -F $putRule $srcDir/$srcFile $destResc $newObj $expiry $metadata $user $owner $group $groupmode $pubmode\n" if $args{t};
 	my $pre_ts = time();
-	@out = `irule -F $putRule $srcDir/$srcFile $destResc $newObj $expiry $metadata $user $owner $group $groupmode $pubmode` if not $args{t};
+	@out = `irule -F $putRule $srcDir/$srcFile $destResc $newObj $expiry $metadata $user $owner $group $groupmode $pubmode 2>&1` if not $args{t};
 	if ($?) {
-            $errors++;
-            $error_msgs{"$destColl/$destObj"} = join ' ', @out;
-            print @out;
+            $num_errors++;
+            $error_msgs{"$destColl/$destObj"} = join "\t\t", @out;
+            #print @out;
 	    return;
         }
 	my $post_ts = time();
@@ -229,6 +264,11 @@ sub put_to_archive {
 	}
 	$num_files++;
 	$num_bytes += $st_info->size;
+	
+	if ($args{r}) {
+	    print "Removing file $_...\n" if $args{v};
+	    unlink $_ or print STDERR "ERROR: could not unlink file: $!\n";
+	}
     }
 }
 
@@ -371,6 +411,8 @@ Options are:
   -f paramFile - a file containing the the meta-data key/value pairs 
        that you'd like to associate with all the files being copied.
   -h   this message.
+  -r   remove files and directories after successful ingest into
+       the archive system. 
   -t   test mode. No iRODS commands will actually be executed.
   -v   verbose.\n";
 }
