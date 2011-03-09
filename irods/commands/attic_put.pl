@@ -5,8 +5,19 @@ use File::Find;
 use File::stat;
 use Fcntl ':mode';
 use Time::localtime;
+use Time::Local;
 use Cwd 'abs_path';
 use File::Basename;
+
+# Expiry parameters:
+#
+# default expiry period is set here in days
+# (setting to 1 year plus some buffer time)
+my $default_expiry_period = 365 + 60;
+#
+# max expiry period in days - can't set expiry longer than this
+# (5 years ... can override by modifying iRODS meta-data directly)
+my $max_expiry_period = 365 * 5;
 
 # directory where your rules files are
 my $rulesLoc = '/home/radon00/irods/commands';
@@ -54,21 +65,40 @@ if ($args{f}) {
     close(PARAMS);
 }
 
-# check if the expiry data format is correct
-# should be 'YYYY-MM-DD[.hh:mm:ss]'
 my $expiry = $args{e};
 if ($expiry) {
-    if ($expiry =~ /^\d\d\d\d-\d\d-\d\d$/) {
-	$expiry .= '.00:00:00';
-    }
-    elsif ($expiry !~ /^\d{4}-\d{2}-\d{2}\.\d{2}:\d{2}:\d{2}$/) {
+    # check if the input expiry data format is correct
+    # should be 'YYYY-MM-DD[.hh:mm:ss]'
+    my ($h, $m, $s);
+    if ($expiry !~ /^(\d{4})-(\d{2})-(\d{2})(\.(\d{2}):(\d{2}):(\d{2}))?$/) {
 	print STDERR "Expiry date should be in the form YYYY-MM-DD[.hh:mm:ss]\n";
+	usage();
+    }
+    if ($4) {
+        $h = $5;
+        $m = $6;
+        $s = $7;
+    }
+    else {
+        $expiry .= ".00:00:00";
+        $h = 0;
+        $m = 0;
+        $s = 0;
+    }
+    # check if it's within the maximum expiry limit
+    my $expiry_seconds = timelocal($s, $m, $h, $3, $2 - 1, $1);
+    if (($expiry_seconds - time()) > ($max_expiry_period * 24 * 60 * 60)) {
+        print STDERR "Expiry data must not be longer than $max_expiry_period days from today.\n";
 	usage();
     }
 }
 else {
-    # must set expiry
-    usage();
+    # by default, expiry will be set to today + $default_expiry_period 
+    my $expiry_seconds = time() + ($default_expiry_period * 24 * 60 * 60);
+    my $expiry_tm = localtime($expiry_seconds);
+    $expiry = sprintf("%4d-%02d-%02d.%02d:%02d:%02d", 
+        $expiry_tm->year+1900, $expiry_tm->mon+1, $expiry_tm->mday,
+        $expiry_tm->hour, $expiry_tm->min, $expiry_tm->sec);
 }
 
 my $destResc = 'archive1';
@@ -327,14 +357,17 @@ sub escape_chars {
 }    
 
 sub usage {
-    die "Usage: $0 [-htv] -e YYYY-MM-DD[.hh:mm:ss] [-c destColl] [-f paramFile] localFile|localDir ...
+    die "Usage: $0 [-htv] [-e YYYY-MM-DD[.hh:mm:ss]] [-c destColl] [-f paramFile] localFile|localDir ...
 Options are:
   -c destColl - the destination collection path in iRODS where files
        will be copied into. Default is the current iRODS collection
        (shown with ipwd).
   -e expiryDate - a date/time string of the form YYYY-MM-DD.hh:mm:ss
        that defines the date after which the files in the archive
-       maybe be purged.
+       maybe be purged. If not provided, the default expiry date
+       will be the date today plus $default_expiry_period days. If a
+       date value is provided it can only be $max_expiry_period days
+       from today. 
   -f paramFile - a file containing the the meta-data key/value pairs 
        that you'd like to associate with all the files being copied.
   -h   this message.
