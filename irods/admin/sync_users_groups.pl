@@ -122,8 +122,8 @@ while (<YPCAT>) {
     print "User $user already in iRODS.\n";
   }
   else {
-    print "Adding role user $user to iRODS user DB.\n";
-    addIrodsUser($user, 0);
+    print "Adding user $user to iRODS user DB.\n";
+    addIrodsUser($user, 1);
     $irods_users{$user} = 1;
   }
 }
