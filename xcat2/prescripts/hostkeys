@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 OIFS=$IFS
 IFS=','
 NODE_LIST=$NODES
 for NODE in node1072;do
 	if [ -f /sysman/install/hostdata/${NODE}.tar.gz.gpg ]; then
-		sudo -l sh -c "cat /sysman/install/hostdata/${NODE}.tar.gz.gpg | gpg -d > /tftpboot/hostkeys/${NODE}.tgz"
+		sudo -i "cat /sysman/install/hostdata/${NODE}.tar.gz.gpg | gpg -d > /tftpboot/hostkeys/${NODE}.tgz"
 	fi
 done
 
