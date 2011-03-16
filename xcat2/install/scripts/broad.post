@@ -14,6 +14,7 @@ if [ -z $IP ]
 then
 	dhclient eth0
 	IP=$(/sbin/ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
+        FoundBuild=1
 fi
 echo "search #TABLE:site:key=domain:value#" >/etc/resolv.conf
 for i in $(echo #TABLE:site:key=nameservers:value# | tr ',' ' ')
@@ -25,16 +26,22 @@ done >>/etc/resolv.conf
 
 #echo "GATEWAYDEV=eth1" >> /etc/sysconfig/network-scripts/ifcfg-eth0
 
+FoundProd=0
 echo Trying to determine the right interface in the build network
 for dev in $(ifconfig -a | awk '/^eth/ { print $1 }')
 do 
+if [[ $FoundProd -eq 1 && $FoundBuild -eq 1 ]]; then
+  continue
+fi
+
 /sbin/ifconfig $dev up 
 /sbin/dhclient -pf /tmp/$dev $dev
  if /sbin/ifconfig $dev | grep -q '192.168'
    then 
    export PRINIC=$dev
+        FoundBuild=1
  fi
- if /sbin/ifconfig $dev  | grep -q '69.173' && [ -n "$PRINIC" ]
+ if /sbin/ifconfig $dev  | egrep -q '69.173.(6[4-9]|7[0-9]|8[0-7])|10.200.[0-9]{1,2}.[0-9]{1,2}' && [ -n "$PRINIC" ]
    then 
    export GATEWAYNIC=$dev
    echo "GATEWAYDEV=$dev" >> /etc/sysconfig/network-scripts/ifcfg-$PRINIC
@@ -43,10 +50,12 @@ do
 		echo "Found interface in VLAN32"
 		/sbin/ifconfig $dev mtu 9000
 		echo "MTU=9000" >> /etc/sysconfig/network-scripts/ifcfg-$dev
+                FoundProd=1
 	elif /sbin/ifconfig $dev | egrep -q '69.173.(8[0-7])'; then
 		echo "Found interface in VLAN18"
 		/sbin/ifconfig $dev mtu 1500
 		echo "MTU=1500" >> /etc/sysconfig/network-scripts/ifcfg-$dev
+                FoundProd=1
 	fi
  fi
 done
@@ -163,6 +172,11 @@ if [ -e /etc/enterprise-release ]; then
 	yum -y groupremove "Dialup Networking Support"
 	yum clean all
 
+        # Copy SSH keys to local
+        echo "mkdir /mnt/xcat" >> /etc/rc.local
+        echo "mount xcat2:/tftpboot/hostkeys /mnt/xcat" >> /etc/rc.local
+        echo "cp /mnt/xcat/$(hostname).tgz /tmp" >> /etc/rc.local
+        echo "umount /mnt/xcat && rmdir -v /mnt/xcat" >> /etc/rc.local
 	# Start CFENGINE3 installation
         wget -P /tmp http://mirror/linux/cfengine3/install.sh
         sh /tmp/install.sh
@@ -180,9 +194,14 @@ else
 	yum -y groupinstall yum-utils
 	##Convert to home-grown mirror and clean
 	echo Changing to Broad-hosted CentOS mirror..
-	wget http://www/~apsg/software/yumConfig/CentOS-Base.repo
+	wget http://mirror/linux/apsg/software/yumConfig/CentOS-Base.repo
 	mv -f CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo
 
+        # Copy SSH keys to local
+        echo "mkdir /mnt/xcat" >> /etc/rc.local
+        echo "mount xcat2:/tftpboot/hostkeys /mnt/xcat" >> /etc/rc.local
+        echo "cp /mnt/xcat/$(hostname).tgz /tmp" >> /etc/rc.local
+        echo "umount /mnt/xcat && rmdir -v /mnt/xcat" >> /etc/rc.local
 	cp /etc/security/limits.conf{,.orig}
 	# Start CFENGINE3 installation
         wget -P /tmp http://mirror/linux/cfengine3/install.sh
@@ -199,7 +218,7 @@ else
 
 	##Yum customization and package foo
 	echo Updating installed packages..
-	wget http://www/~apsg/software/yumConfig/yum.conf
+	wget http://mirror/linux/apsg/software/yumConfig/yum.conf
 	rm -f /etc/yum.conf
 	mv yum.conf /etc
 	yum -y groupremove "Dialup Networking Support"
@@ -231,6 +250,9 @@ case $VENDOR in
 	fi
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/local
+        #Add restored keys
+        echo "tar xzvfpP /tmp/$(hostname).tgz" >> /etc/rc.local
+        echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
 	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
 	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
 	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
@@ -268,7 +290,7 @@ case $VENDOR in
 		mkdir dell 
 		mount -o loop dell.cramfs dell/ 
 		mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ 
-		usr/local/sbin/syscfg --virtualization=enable 
+		/usr/local/sbin/syscfg --virtualization=enable 
 
 		#Cleanup of DTK
 		umount /tmp/dtk && rm -rf /tmp/dtk 
@@ -287,6 +309,9 @@ case $VENDOR in
 	fi
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
+        #Add restored keys
+        echo "tar xzvfpP /tmp/$(hostname).tgz" >> /etc/rc.local
+        echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
 
         for i in {0..1}; do
 		echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
@@ -297,6 +322,28 @@ case $VENDOR in
         echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local && shutdown -rf 1" >> /etc/rc.local
 
         ;;
+"HP")
+	if [ -e /etc/enterprise-release ]; then
+		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
+	else
+		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
+	fi
+	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
+	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
+        #Add restored keys
+        echo "tar xzvfpP /tmp/$(hostname).tgz" >> /etc/rc.local
+        echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
+
+	for i in {0..1}; do
+		echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
+	done
+
+	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
+
+	echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local && shutdown -rf 1" >> /etc/rc.local
+
+	;;
+
 *)
         echo "Oops.  Fix me."
 esac
