@@ -400,8 +400,8 @@ sub usage {
     die "Usage: $0 [-htv] [-e YYYY-MM-DD[.hh:mm:ss]] [-c destColl] [-f paramFile] localFile|localDir ...
 Options are:
   -c destColl - the destination collection path in iRODS where files
-       will be copied into. Default is the current iRODS collection
-       (shown with ipwd).
+       will be copied into. Default is the calling user's home iRODS 
+       collection.
   -e expiryDate - a date/time string of the form YYYY-MM-DD.hh:mm:ss
        that defines the date after which the files in the archive
        maybe be purged. If not provided, the default expiry date
