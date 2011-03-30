@@ -45,6 +45,11 @@ my $end_ts;
 my $num_errors = 0;
 my %error_msgs = ();
 
+# for managing collection ACLs in the post-processing function
+my %collection_owner = ();
+my %collection_acl = ();
+my %collection_name = ();
+
 # support the exclusion of certain file/directory names using
 # perl regex patterns contained in a file. At pre-defined patterns
 # here to make them default.
@@ -166,7 +171,7 @@ $start_ts = time();
 my $dir;
 foreach $dir (@ARGV) {
   find({ wanted => \&put_to_archive, 
-         postprocess => \&cleanup_dir,
+         postprocess => \&postprocess_dir,
          preprocess => \&exclude_entries,
        }, abs_path($dir));
 }
@@ -208,7 +213,18 @@ if ($num_errors) {
 
 exit 0;
 
-sub cleanup_dir {
+sub postprocess_dir {
+
+  if (defined $collection_name{$File::Find::dir}) {
+    $ENV{clientUserName} = $collection_owner{$File::Find::dir} if $adminuser;
+    print "ichmod $collection_acl{$File::Find::dir} public $collection_name{$File::Find::dir}\n" if $args{t};
+    my @out = `ichmod $collection_acl{$File::Find::dir} public $collection_name{$File::Find::dir} 2>&1` if not $args{t};
+    if ($?) {
+      $num_errors++;
+      $error_msgs{$File::Find::dir} = join "\t\t", @out;
+    }
+  }
+
   if ($args{r}) {
     print "Removing directory $File::Find::dir ... " if $args{v}; 
     if (defined $error_msgs{$File::Find::dir}) {
@@ -304,9 +320,16 @@ sub put_to_archive {
   if (S_ISDIR($st_info->mode)) {
     my $srcDir = escape_chars($File::Find::name);
     $metadata .= "%broadSourceDirectory=$srcDir";
+    # we set the public ACL for the new collection to 'write' so that
+    # there are no permissions issues creating sub-collections and files
+    # owned by other users. This is set to the proper ACL in the 
+    # post-processing hook
+    $collection_name{$File::Find::name} = $newObj;
+    $collection_owner{$File::Find::name} = $owner;
+    $collection_acl{$File::Find::name} = $pubmode;
     print "Creating collection $newObj\n" if $args{v};
-    print "irule -F $mkdirRule $newObj $expiry $metadata $user $owner $group $groupmode $pubmode\n" if $args{t};
-    my @out =`irule -F $mkdirRule $newObj $expiry $metadata $user $owner $group $groupmode $pubmode 2>&1` if not $args{t};
+    print "irule -F $mkdirRule $newObj $expiry $metadata $user $owner $group $groupmode write\n" if $args{t};
+    my @out =`irule -F $mkdirRule $newObj $expiry $metadata $user $owner $group $groupmode write 2>&1` if not $args{t};
     if ($?) {
       # Error code -809000 means the collection already exists ... not a problem
       my $rc = grep(/809000/, @out);
