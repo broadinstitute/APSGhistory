@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 ###Import Block###
 from getpass import getpass,getuser
 from time import sleep,time
@@ -7,6 +7,8 @@ from sys import exit
 from datetime import datetime
 from subprocess import *
 from socket import gethostbyname,gethostname
+from configobj import ConfigObj
+from threading import *
 import shutil
 
 import logging,string
@@ -60,8 +62,11 @@ def get_config(list,cmd,user_pass,en_pass,ip):
 			logging.warning("%s/%s already exists...skipping" % (smb_rdir,item))
 
 def getDevices(model):
-	FILE = "%s" % smb_mount + "/Networking/Switch, Router, & Firewall Configs/devicelist.txt"
-#	FILE = "%s" % exp_path + "devicelist.txt"
+        try:
+		FILE = eval(config['devicelist'])
+        except:
+                FILE = config['devicelist']
+
         infile = open("%s" % FILE)
         result = []
         for line in infile:
@@ -77,6 +82,11 @@ def getDevices(model):
 ###End Functions###
 
 
+rundir = "/usr/local/bin/"
+config=ConfigObj("%s/config.ini" % rundir)
+smb_config=config['smb']
+
+
 ###Set TFTP IP###
 tftpIP="%s" % gethostbyname(gethostname())
 
@@ -87,44 +97,88 @@ tftpdir= "/tftpboot/"
 basedir = tftpdir + date
 
 ###Before Anything else, remove expired config downloads###
-clear_old_dir(1209600) ##This set the expiration rate @ 2 weeks
+try:
+	clear_old_dir(1209600) ##This set the expiration rate @ 2 weeks
+except:
+        print "Cleanup failed"
 
 ###Configure Samba###
-smb_user = getuser()
-#smb_user = "ali"  ##User hard-coded for non-NIS environment.  Useless without password anyway.
-smb_dom = "charles"
-smb_password = getpass("Please enter your Active Directory password:")
-smb_share = "//oxygen/systems/" #share
-smb_mount = "/mnt/oxygen" #mount point
-smb_rdir = smb_mount + "/Networking/Switch, Router, & Firewall Configs/%s" % date
+try:
+	smb_user = eval(smb_config['user'])
+except:
+	smb_user = smb_config['user']
+
+try:
+	smb_dom = smb_config['domain']
+except:
+        print "Setting Domain failed"
+        exit(1)
+
+try:
+        smb_password = eval(smb_config['password'])
+except:
+        print "Setting Password Failed"
+        exit(1)
+
+try:
+	smb_share = smb_config['share']
+except:
+        print "Setting Share Failed"
+        exit(1)
+
+try:
+        smb_mount = smb_config['mount']
+except:
+        print "Setting Mount Point Failed"
+        exit(1)
+
+try:
+	smb_rdir = eval(smb_config['remote_dir'])
+except:
+	smb_rdir = smb_config['remote_dir']
 
 ###Mount Share###
 Popen(["sudo","mount", "-t", "cifs", "-o", "username=%s,domain=%s,password=%s" % (smb_user,smb_dom,smb_password), "%s" % smb_share, "%s" % smb_mount])
 
 
 ###Prompt for device passwords###
-netdev_user_pass = getpass("Please enter device user password:")
-netdev_en_pass = getpass("Please enter enable mode password:")
-voipdev_en_pass="password" ## Password left in file, as this one is not considered "secure" and is provided to vendor
-util_pass = getpass("Please enter util password:")
+pass_config=config['passwords']
+try:
+	netdev_user_pass = eval(pass_config['user'])
+except:
+	netdev_user_pass = pass_config['user']
+
+try:
+        netdev_en_pass = eval(pass_config['enable'])
+except:
+        netdev_en_pass = pass_config['enable']
+
+try:
+        voipdev_en_pass = eval(pass_config['voip'])
+except:
+        voipdev_en_pass = pass_config['voip']
+
+try:
+        san_pass = eval(pass_config['san'])
+except:
+        san_pass = pass_config['san']
 
 ###Expect Scripts###
-exp_path = "/usr/local/bin/"
 ##Cisco##
-ios_cmd = exp_path + "getIOS.exp"
-fos_cmd = exp_path + "getFOS.exp"
-nxos_cmd = exp_path + "getNXOS.exp"
-nxos_san_cmd = exp_path + "getNXOS-SAN.exp"
-iosxe_cmd = exp_path + "getIOSXE.exp"
+ios_cmd = rundir + "getIOS.exp"
+fos_cmd = rundir + "getFOS.exp"
+nxos_cmd = rundir + "getNXOS.exp"
+nxos_san_cmd = rundir + "getNXOS-SAN.exp"
+iosxe_cmd = rundir + "getIOSXE.exp"
 
 ##Force10##
-ftos_cmd = exp_path + "getFTOS.exp"
-sftos_cmd = exp_path + "getSFTOS.exp"
+ftos_cmd = rundir + "getFTOS.exp"
+sftos_cmd = rundir + "getSFTOS.exp"
 
 ##Others##
-ent_cmd = exp_path + "getEnt.exp"
-dell_cmd = exp_path + "getDell.exp"
-dellv2_cmd = exp_path + "getDellv2.exp"
+ent_cmd = rundir + "getEnt.exp"
+dell_cmd = rundir + "getDell.exp"
+dellv2_cmd = rundir + "getDellv2.exp"
 
 ###Device List By OS###
 ##Cisco
@@ -161,16 +215,38 @@ logging.basicConfig(filename=LOG,level=logging.INFO,filemode='w',format="%(ascti
 
 ###Config Import###
 ##Cisco##
-get_config(ios,ios_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
-get_config(fos,fos_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
-get_config(nxos,nxos_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
-get_config(nxos_san,nxos_san_cmd,util_pass,netdev_en_pass,tftpIP)
-get_config(voip,ios_cmd,netdev_user_pass,voipdev_en_pass,tftpIP)
-get_config(iosxe,iosxe_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
+iosThread=Thread(target=get_config,args=(ios,ios_cmd,netdev_user_pass,netdev_en_pass,tftpIP))
+fosThread=Thread(target=get_config,args=(fos,fos_cmd,netdev_user_pass,netdev_en_pass,tftpIP))
+nxosThread=Thread(target=get_config,args=(nxos,nxos_cmd,netdev_user_pass,netdev_en_pass,tftpIP))
+sanThread=Thread(target=get_config,args=(nxos_san,nxos_san_cmd,san_pass,netdev_en_pass,tftpIP))
+voipThread=Thread(target=get_config,args=(voip,ios_cmd,netdev_user_pass,voipdev_en_pass,tftpIP))
+iosxeThread=Thread(target=get_config,args=(iosxe,iosxe_cmd,netdev_user_pass,netdev_en_pass,tftpIP))
 ##Force10##
-get_config(ftos,ftos_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
+ftosThread=Thread(target=get_config,args=(ftos,ftos_cmd,netdev_user_pass,netdev_en_pass,tftpIP))
 #get_config(sftos,sftos_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
 ##Others##
-get_config(ent,ent_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
-get_config(dell,dell_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
-get_config(dellv2,dellv2_cmd,netdev_user_pass,netdev_en_pass,tftpIP)
+entThread=Thread(target=get_config,args=(ent,ent_cmd,netdev_user_pass,netdev_en_pass,tftpIP))
+dellThread=Thread(target=get_config,args=(dell,dell_cmd,netdev_user_pass,netdev_en_pass,tftpIP))
+dellv2Thread=Thread(target=get_config,args=(dellv2,dellv2_cmd,netdev_user_pass,netdev_en_pass,tftpIP))
+
+iosThread.start()
+fosThread.start()
+nxosThread.start()
+sanThread.start()
+voipThread.start()
+iosxeThread.start()
+ftosThread.start()
+entThread.start()
+dellThread.start()
+dellv2Thread.start()
+
+iosThread.join()
+fosThread.join()
+nxosThread.join()
+sanThread.join()
+voipThread.join()
+iosxeThread.join()
+ftosThread.join()
+entThread.join()
+dellThread.join()
+dellv2Thread.join()
