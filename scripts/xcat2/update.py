@@ -5,6 +5,7 @@ from threading import *
 from tempfile import NamedTemporaryFile
 
 
+
 def prepareHosts(ip,mac,host,groups,chassis,slot):
     if len(chassis)>0 and len(slot)>0:
         hostInfo="nodeadd {0} groups={1} mac.interface=eth0 hosts.ip={2} mac.mac={3} mp.mpa={4} mp.id={5}".format(host,groups,ip,mac,chassis,slot)
