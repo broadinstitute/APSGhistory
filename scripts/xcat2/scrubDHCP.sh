@@ -13,5 +13,3 @@ sudo rm -f /etc/dhcpd.conf
 /opt/xcat/sbin/makedhcp -n
 /opt/xcat/sbin/makedhcp -a
 sudo /sbin/service dhcpd restart
-
-awk '$1 ~ /#xCAT#/ {print $2}' /sysman/install/broad/master.host.listing > /broad/tools/scripts/xcat2/build.host.listing

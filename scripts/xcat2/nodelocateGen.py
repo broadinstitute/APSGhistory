@@ -9,7 +9,7 @@ import ssh
 
 ofile_path = '/tmp/'
 
-for cmcNum in range(50,90):
+for cmcNum in range(50,92):
 	cmc = "brsa%s" % cmcNum
 	try:
 		tempFile = '%s/temp-%s' % (ofile_path,cmc)
@@ -42,8 +42,8 @@ for filename in glob.glob(os.path.join(ofile_path, 'brsa*')):
 destination.close()
 
 #Clean up here
-for filename in glob.glob(os.path.join(ofile_path, 'brsa*')):
-	os.remove(filename)
+#for filename in glob.glob(os.path.join(ofile_path, 'brsa*')):
+	#os.remove(filename)
 
 #Sort Here
 file = open('%s/nodepos.csv' % ofile_path, 'r')
@@ -56,6 +56,6 @@ for line in sorted(lines, key = str.lower):
 ofile.close()
 
 #Popen(["tabrestore",'%s/nodepos.csv' % ofile_path],stdin=None,stdout=open('/dev/null','w'),stderr=open('/dev/null','w'))
-Popen(["tabrestore",'%s/nodepos.csv' % ofile_path])
+#Popen(["tabrestore",'%s/nodepos.csv' % ofile_path])
 
 #os.remove('%s/nodepos.csv' % ofile_path)

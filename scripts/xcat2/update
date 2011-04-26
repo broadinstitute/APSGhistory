@@ -23,16 +23,16 @@ if [ -f $LOCAL_MHL ]; then
         fi
 
 	for ENTRY in "$MHL_ENTRIES"; do
-		HOST=$(echo $ENTRY | cut -f3 -d\|)
-		NODEGROUPS=$(echo $ENTRY | cut -f4 -d\|)
-		IP=$(echo $ENTRY | cut -f1 -d\|)
-		MAC=$(echo $ENTRY | cut -f2 -d\|)
+		HOST=$(echo "$ENTRY" | cut -f3 -d\|)
+		NODEGROUPS=$(echo "$ENTRY" | cut -f4 -d\|)
+		IP=$(echo "$ENTRY" | cut -f1 -d\|)
+		MAC=$(echo "$ENTRY" | cut -f2 -d\|)
 
 		if [[ $(nodels $HOST 2>/dev/null | wc -l) -eq 1 ]]; then
 			noderm $HOST
                 fi
         
-		if [[ ($(echo $ENTRY | grep -c \<) -eq 1) || ($(echo $ENTRY | awk -F\| '{print NF}') -gt 7) ]]; then
+		if [[ ($(echo "$ENTRY" | grep -c \<) -eq 1) || ($(echo "$ENTRY" | awk -F\| '{print NF}' | head -n 1) -gt 7) ]]; then
 			if [[ $(nodels $HOST 2>/dev/null | wc -l) -eq 0 ]]; then
 			    nodeadd $HOST groups=$NODEGROUPS hosts.ip=$IP mac.mac=$MAC
 			else
