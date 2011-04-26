@@ -3,7 +3,7 @@ import pexpect,sys,time
 from sys import argv,exit
 from getpass import getpass
 
-opass = getpass("Current Password:")
+#opass = getpass("Current Password:")
 npass = getpass("New Password:")
 npassConfirm = getpass("Confirm New Password:")
 debugMode = True
@@ -13,8 +13,8 @@ if npass == npassConfirm:
 		child = pexpect.spawn("ssh %s" % host)
 		if debugMode:
 			child.logfile = sys.stdout
-		child.expect("root@%s.*'s password:" % host)
-		child.sendline("%s" % opass)
+	#	child.expect("root@%s.*'s password:" % host)
+	#	child.sendline("%s" % opass)
 		time.sleep(2)
 		#child.expect('$')
 		child.expect(['$', '>'])

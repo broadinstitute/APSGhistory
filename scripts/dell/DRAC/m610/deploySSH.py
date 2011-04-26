@@ -24,12 +24,12 @@ for host in argv[1:]:
 		child = pexpect.spawn("ssh %s" % host)
 		if debugMode:
 			child.logfile = sys.stdout
-		child.expect("root@%s.*'s password:" % host, timeout=5)
+		child.expect("root@%s.*'s password:" % host, timeout=15)
 		child.sendline("%s" % password)
-		child.expect('$')
+		child.expect(['$', '>'])
 		for configItem in configList:
 			child.sendline("racadm %s" % configItem)
-		child.expect('$')
+		child.expect(['$', '>'])
 		child.sendline("exit")
 		child.expect(pexpect.EOF)
 		argv.pop(1)
