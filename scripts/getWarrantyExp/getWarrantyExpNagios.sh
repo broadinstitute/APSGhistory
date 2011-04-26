@@ -152,7 +152,7 @@ case "$SYS_VENDOR" in
 	IBM)
 		EXPIRE_DATE=$(dateToDays "$(IBMInfo)")
 		;;
-	"Dell Inc.")
+	Dell*)
 		EXPIRE_DATE="$(DellInfo)"
 		;;
 	HP)
