@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [[ $HOST == "vc" ]]
+then
+    SVNLOOK="/usr/bin/svnlook"
+else
+    SVNLOOK="/broad/tools/scripts/s Subversion-1.6 svnlook"
+fi
+
+exec $SVNLOOK "$@"

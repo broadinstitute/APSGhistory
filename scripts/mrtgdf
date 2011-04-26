@@ -6,6 +6,7 @@ import os,sys
 #import rrdtool
 
 for filesys in sys.argv[1:]:
+    os.chdir(filesys)
     fsinfo = os.statvfs(filesys)
     k_per_block = fsinfo.f_bsize / 1024
     #print filesys, fsinfo.f_blocks * k_per_block, fsinfo.f_bavail * k_per_block
@@ -19,6 +20,7 @@ for filesys in sys.argv[1:]:
     print fsinfo.f_bavail * k_per_block
     # outgoing = used space screws up the scaling...oh well
     #print (fsinfo.f_blocks - fsinfo.f_bavail) * k_per_block
-    print 0
+    #print 0
+    print fsinfo.f_blocks * k_per_block
     # uptime of target, what would that mean for df
     # name of target
