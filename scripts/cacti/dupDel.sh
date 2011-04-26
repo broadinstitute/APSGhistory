@@ -27,6 +27,7 @@ SQL_CMD="$MYSQL_BIN -e \"${SQL_CODE}\" -u${USER} -p${PASSWORD} -h ${DB_SERVER} $
 SQL_OUT=$(echo "$SQL_CMD" | bash | grep -vi host_id)
 
 TREE_ID=$(php -q $CLI_DIR/add_tree.php --list-trees | grep -i "$DEST_TREE_NAME" | awk '{print $1}')
+
 if [ -n "${TREE_ID:+x}" ]; then
 	SQL_CODE="
 	DELETE FROM graph_tree_items WHERE host_id IN
