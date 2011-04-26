@@ -2,6 +2,10 @@
 import sys,re,os
 from subprocess import *
 from tempfile import NamedTemporaryFile
+from getpass import getpass
+
+#Get sudo pass, save for later
+password=getpass("Please enter your password:\n")
 
 #Functions
 def addHosts(line):
@@ -24,6 +28,7 @@ def removeHosts(line):
 lsdefAttr='ip,mac,groups,mpa,id'
 lsdefCMD=['lsdef','-t','node','-i',lsdefAttr]
 lsdef=Popen(lsdefCMD,stdout=PIPE).communicate()[0].split('\n\n')
+scrubDHCP='/broad/tools/scripts/xcat2/scrubDHCP.sh'
 
 #Files
 buildFile=NamedTemporaryFile(delete=False)
@@ -69,3 +74,44 @@ for line in mhlList:
 #Cleanup
 buildFile.close()
 os.remove(buildFileName)
+
+#Refresh DNS/DHCP
+service='/sbin/service'
+p1=Popen(['/opt/xcat/sbin/makehosts','-n'],stdout=PIPE)
+p1.stdout.read()
+
+p2=Popen(['sudo','-S',service,'named','stop'],stdin=PIPE,stdout=PIPE)
+p2.stdin.write("{0}".format(password))
+p2.stdout.read()
+
+p3=Popen('sudo -S rm -f /etc/named.conf'.split(),stdin=PIPE,stdout=PIPE)
+p3.stdin.write("{0}".format(password))
+p3.stdout.read()
+
+p4=Popen('/opt/xcat/sbin/makedns',stdout=PIPE)
+p4.stdout.read()
+
+p5=Popen(['sudo',service,'named','start'],stdin=PIPE,stdout=PIPE)
+p5.stdin.write("{0}".format(password))
+p5.stdout.read()
+
+p6=Popen(['sudo',service,'dhcpd','stop'],stdin=PIPE,stdout=PIPE)
+p6.stdin.write("{0}".format(password))
+p6.stdout.read()
+
+p7=Popen('sudo rm -f /etc/dhcpd.conf'.split(),stdin=PIPE,stdout=PIPE)
+p7.stdin.write("{0}".format(password))
+p7.stdout.read()
+
+p8=Popen('/opt/xcat/sbin/makedhcp -a -d'.split(),stdout=PIPE)
+p8.stdout.read()
+
+p9=Popen('/opt/xcat/sbin/makedhcp -n'.split(),stdout=PIPE)
+p9.stdout.read()
+
+p10=Popen('/opt/xcat/sbin/makedhcp -a'.split(),stdout=PIPE)
+p10.stdout.read()
+
+p11=Popen(['sudo',service,'dhcpd','restart'],stdin=PIPE,stdout=PIPE)
+p11.stdin.write("{0}".format(password))
+p11.stdout.read() 
