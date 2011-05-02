@@ -1,8 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import sys,os
 
 ssh_lib_path = '/broad/tools/scripts'
-ofile_path='/tmp'
+ofile_path='/sysman/scratch/cfengine3'
 destination = open('%s/nodepos.csv' % ofile_path, 'w')
 destination.write("#node,rack,u,chassis,slot,room,comments,disable\n")
 
@@ -18,12 +18,16 @@ for cmcNum in range(50,93):
 	s.close()
 
 	for item in output:
-		if 'Slot' in item or 'SLOT' in item: continue
+		if (
+			'Slot' in item or
+			'SLOT' in item or
+			'node1493' in item
+			): continue
 		fields=item.split()
 		slot=fields[0]
 		if len(fields)==2: hostname=fields[1]
 		elif len(fields)==3: hostname=fields[2]
-		print("{0}|{1}|{2:02d}|".format(hostname,cmc,int(slot)))
+#		print("{0}|{1}|{2:02d}|".format(hostname,cmc,int(slot)))
 		destination.write("{0},,,{1},{2:02d},,\n".format(hostname,cmc,int(slot)))
 		
 	#except Exception:
