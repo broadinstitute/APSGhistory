@@ -19,10 +19,10 @@ part raid.22 --size=1024    --ondisk=sdb --grow
 
 raid /       --fstype=ext3  --device=md0 --level=1 raid.01 raid.02
 raid swap                   --device=md1 --level=1 raid.11 raid.12
-raid /local  --fstype=ext4  --device=md0 --level=1 raid.21 raid.22
+raid /local  --fstype=ext4  --device=md2 --level=1 raid.21 raid.22
 END
 
-elif grep -q sda /proc/partitions; then
+elif egrep -q 'sda' /proc/partitions; then
     #single-disk system
 #ignoredisk --only-use=sda
 cat >> /tmp/part-include << END
@@ -32,5 +32,16 @@ clearpart --all --drives=sda --initlabel
 part /      --fstype=ext3 --size=12288 --ondisk=sda
 part swap                 --size=8192  --ondisk=sda
 part /local --fstype=ext4 --size=1024  --ondisk=sda --grow
+END
+
+elif egrep -q 'c0d0' /proc/partitions; then
+    #single-disk system HP
+cat >> /tmp/part-include << END
+
+clearpart --all --drives=cciss/c0d0 --initlabel
+
+part /      --fstype=ext3 --size=12288 --ondisk=cciss/c0d0
+part swap                 --size=8192  --ondisk=cciss/c0d0
+part /local --fstype=ext4 --size=1024  --ondisk=cciss/c0d0 --grow
 END
 fi

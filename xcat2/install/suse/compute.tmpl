@@ -38,12 +38,10 @@
     </partitioning>
     <software>
       <patterns config:type="list">
-        <pattern>base</pattern>
-	    <pattern>x11</pattern>
+        #INCLUDE_DEFAULT_PTRNLIST_S#
       </patterns>
       <packages config:type="list">
-        <package>xntp</package>
-        <package>rsync</package>
+        #INCLUDE_DEFAULT_PKGLIST_S#
       </packages>
     </software>
   </install>
