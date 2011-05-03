@@ -1,5 +1,6 @@
 #egan@us.ibm.com
 #
+cmdline
 
 lang en_US
 langsupport en_US
@@ -146,33 +147,7 @@ reboot
 #end of section
 #
 %packages --resolvedeps
-@ Network Servers
-@ System Tools
-@ X Window System
-@ Legacy Software Development
-autofs
-ksh
-tcsh
-ntp
-tftp
-xinetd
-rsh
-rsh-server
-psacct
-nfs-utils
-net-snmp
-rsync
-yp-tools
-ypserv
-ypbind
-m4
-sendmail-cf
-gdb
-bzip2
-binutils
-openssh-server
-util-linux
-compat-libstdc++-33
+#INCLUDE_DEFAULT_PKGLIST#
 %pre
 #INCLUDE:#ENV:XCATROOT#/share/xcat/install/scripts/pre.rh#
 %post

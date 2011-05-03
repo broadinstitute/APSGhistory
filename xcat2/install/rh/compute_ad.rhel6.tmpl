@@ -3,8 +3,6 @@
 cmdline
 
 lang en_US
-langsupport en_US
-network --bootproto dhcp
 
 #
 # Where's the source?
@@ -34,10 +32,9 @@ key --skip
 
 #No RAID
 #/boot really significant for this sort of setup nowadays?
-part None --fstype "PPC PReP Boot" --size 8
-part /boot --size 50 --fstype ext3
+#part /boot --size 50 --fstype ext3
 part swap --size 1024 
-part / --size 1 --grow --fstype ext3
+part / --size 1 --grow --fstype ext4
 
 #RAID 0 /scr for performance
 #part / --size 1024 --ondisk sda
@@ -93,12 +90,6 @@ text
 firewall --disabled
 
 #
-# mouse selection
-#
-#mouse genericps/2 --emulthree
-mouse none
-
-#
 # Select a zone
 # Add the --utc switch if your hardware clock is set to GMT
 #
@@ -147,9 +138,14 @@ reboot
 #
 #end of section
 #
-%packages --resolvedeps
+%packages
 #INCLUDE_DEFAULT_PKGLIST#
+pam_krb5
+krb5-workstation
+nss-pam-ldapd
+cyrus-sasl-gssapi
 %pre
 #INCLUDE:#ENV:XCATROOT#/share/xcat/install/scripts/pre.rh#
 %post
+export TEMPHOSTPASS=#MACHINEPASSWORD#
 #INCLUDE:#ENV:XCATROOT#/share/xcat/install/scripts/post.rh#
