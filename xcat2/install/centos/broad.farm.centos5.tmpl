@@ -29,57 +29,6 @@ zerombr yes
 #clearpart --linux
 
 %include /tmp/part-include
-#
-# Customize to fit your needs
-#
-#Partition Table for non-raided systems
-#part / --size 12288 --fstype ext3
-#part swap --size 8192
-#part /local --size 1024 --grow --fstype ext4
-
-#No RAID
-#/boot really significant for this sort of setup nowadays?
-#part /boot --size 50 --fstype ext3
-#part / --size 8192 --fstype ext3
-#part /usr --size 8192 --fstype ext3
-#part /var --size 8192 --fstype ext3
-#part swap --size 8192
-#part /tmp --size 8192 --fstype ext3
-#part /local --size 1024 --grow --fstype ext3
-
-
-#RAID 0 /scr for performance
-#part /boot --size 50 --fstype ext3
-#part / --size 512 --grow --ondisk sda
-#part /usr --size 4096 --ondisk sda
-#part /var --size 1024 --ondisk sdb
-#part swap --size 8192 --ondisk sda
-#part /tmp --size 2048 --ondisk sda
-#part swap --size 8192 --ondisk sdb
-#part raid.01 --size 8192 --grow --ondisk sda
-#part raid.02 --size 8192 --grow --ondisk sdb
-#raid /local --level 0 --device md0 raid.01 raid.02
-
-#Full RAID 1 Sample
-#part raid.01 --size 50 --ondisk sda
-#part raid.02 --size 50 --ondisk sdb
-#raid /boot --level 1 --device md0 raid.01 raid.02
-#
-#part raid.11 --size 1024 --ondisk sda
-#part raid.12 --size 1024 --ondisk sdb
-#raid / --level 1 --device md1 raid.11 raid.12
-#
-#part raid.21 --size 1024 --ondisk sda
-#part raid.22 --size 1024 --ondisk sdb
-#raid /var --level 1 --device md2 raid.21 raid.22
-#
-#part raid.31 --size 1024 --ondisk sda
-#part raid.32 --size 1024 --ondisk sdb
-#raid swap --level 1 --device md3 raid.31 raid.32
-#
-#part raid.41 --size 1 --grow --ondisk sda
-#part raid.42 --size 1 --grow --ondisk sdb
-#raid /scr --level 1 --device md4 raid.41 raid.42
 
 #
 # bootloader config
