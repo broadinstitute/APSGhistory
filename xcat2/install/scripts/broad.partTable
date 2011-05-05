@@ -1,12 +1,13 @@
 #!/bin/bash  
 
+if grep -q sda /proc/partitions; then
+	#use standard naming conventions
 partSizeCommand=$(cat /proc/partitions | awk '$3 ~ /[0-9]+/ && $4 ~ /sd[ab]$/')
 sdaSize=$(echo "$partSizeCommand" | awk '$NF ~ /sda/ {print $3}')
 sdbSize=$(echo "$partSizeCommand" | awk '$NF ~ /sdb/ {print $3}')
 sdbSize=${sdbSize:-0}
 
-if grep -q sdb /proc/partitions; then
-if [ $sdaSize -eq $sdbSize ]; then
+if grep -q sdb /proc/partitions && [ $sdaSize -eq $sdbSize ]; then
     # two-disk system
 cat >> /tmp/part-include << END
 
@@ -38,9 +39,11 @@ part /      --fstype=ext3 --size=12288 --ondisk=sda
 part swap                 --size=8192  --ondisk=sda
 part /local --fstype=ext4 --size=1024  --ondisk=sda --grow
 END
+fi
 
 elif egrep -q 'c0d0' /proc/partitions; then
-    #single-disk system HP
+	#use HP naming convention
+    #single-disk system
 cat >> /tmp/part-include << END
 
 clearpart --all --drives=cciss/c0d0 --initlabel
@@ -49,4 +52,5 @@ part /      --fstype=ext3 --size=12288 --ondisk=cciss/c0d0
 part swap                 --size=8192  --ondisk=cciss/c0d0
 part /local --fstype=ext4 --size=1024  --ondisk=cciss/c0d0 --grow
 END
+fi
 fi
