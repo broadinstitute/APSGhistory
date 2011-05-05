@@ -1,7 +1,12 @@
-#!/bin/sh  
+#!/bin/bash  
 
+partSizeCommand=$(cat /proc/partitions | awk '$3 ~ /[0-9]+/ && $4 ~ /sd[ab]$/')
+sdaSize=$(echo "$partSizeCommand" | awk '$NF ~ /sda/ {print $3}')
+sdbSize=$(echo "$partSizeCommand" | awk '$NF ~ /sdb/ {print $3}')
+sdbSize=${sdbSize:-0}
 
 if grep -q sdb /proc/partitions; then
+if [ $sdaSize -eq $sdbSize ]; then
     # two-disk system
 cat >> /tmp/part-include << END
 
