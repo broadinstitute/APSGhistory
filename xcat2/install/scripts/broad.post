@@ -251,7 +251,7 @@ case $VENDOR in
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/local
         #Add restored keys
-        echo "tar xzvfpP /tmp/$(hostname).tgz" >> /etc/rc.local
+        echo "tar xzvfpP /tmp/$(hostname).tgz /etc/ssh/*key*" >> /etc/rc.local
         echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
 	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
 	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
@@ -311,7 +311,7 @@ case $VENDOR in
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
         #Add restored keys
-        echo "tar xzvfpP /tmp/$(hostname).tgz" >> /etc/rc.local
+        echo "tar xzvfpP /tmp/$(hostname).tgz /etc/ssh/*key*" >> /etc/rc.local
         echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
 
         for i in {0..1}; do
@@ -334,7 +334,7 @@ echo "pwconv"  >> /etc/rc.local
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
         #Add restored keys
-        echo "tar xzvfpP /tmp/$(hostname).tgz" >> /etc/rc.local
+        echo "tar xzvfpP /tmp/$(hostname).tgz /etc/ssh/*key*" >> /etc/rc.local
         echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
 
 	for i in {0..1}; do
