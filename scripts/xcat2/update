@@ -1,0 +1,16 @@
+#!/bin/bash
+
+sudo foo 2>/dev/null
+/broad/tools/scripts/s Python-2.6 /broad/tools/scripts/xcat2/update.py
+
+/opt/xcat/sbin/makehosts -n
+sudo service named stop
+sudo rm -f /etc/named.conf
+/opt/xcat/sbin/makedns
+sudo service named start 
+sudo service dhcpd stop
+sudo rm -f /etc/dhcpd.conf
+/opt/xcat/sbin/makedhcp -a -d
+/opt/xcat/sbin/makedhcp -n
+/opt/xcat/sbin/makedhcp -a
+sudo service dhcpd restart
