@@ -91,15 +91,15 @@ p3.stdout.read()
 p4=Popen('/opt/xcat/sbin/makedns',stdout=PIPE)
 p4.stdout.read()
 
-p5=Popen(['sudo',service,'named','start'],stdin=PIPE,stdout=PIPE)
+p5=Popen(['sudo','-S',service,'named','start'],stdin=PIPE,stdout=PIPE)
 p5.stdin.write("{0}".format(password))
 p5.stdout.read()
 
-p6=Popen(['sudo',service,'dhcpd','stop'],stdin=PIPE,stdout=PIPE)
+p6=Popen(['sudo','-S',service,'dhcpd','stop'],stdin=PIPE,stdout=PIPE)
 p6.stdin.write("{0}".format(password))
 p6.stdout.read()
 
-p7=Popen('sudo rm -f /etc/dhcpd.conf'.split(),stdin=PIPE,stdout=PIPE)
+p7=Popen('sudo -S rm -f /etc/dhcpd.conf'.split(),stdin=PIPE,stdout=PIPE)
 p7.stdin.write("{0}".format(password))
 p7.stdout.read()
 
@@ -112,6 +112,6 @@ p9.stdout.read()
 p10=Popen('/opt/xcat/sbin/makedhcp -a'.split(),stdout=PIPE)
 p10.stdout.read()
 
-p11=Popen(['sudo',service,'dhcpd','restart'],stdin=PIPE,stdout=PIPE)
+p11=Popen(['sudo','-S',service,'dhcpd','restart'],stdin=PIPE,stdout=PIPE)
 p11.stdin.write("{0}".format(password))
 p11.stdout.read() 
