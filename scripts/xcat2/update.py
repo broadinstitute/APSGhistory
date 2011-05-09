@@ -2,10 +2,6 @@
 import sys,re,os
 from subprocess import *
 from tempfile import NamedTemporaryFile
-from getpass import getpass
-
-#Get sudo pass, save for later
-password=getpass("Please enter your password:\n")
 
 #Functions
 def addHosts(line):
