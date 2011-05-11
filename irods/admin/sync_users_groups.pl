@@ -2,13 +2,22 @@
 
 use strict;
 
+my $debug = 0;
 
-# Using users from NIS now
-#my $rusers = '/home/radon00/irods/admin/role_users.txt';
-#my $binddn = 'cn=Jean Chang,ou=UserOU,dc=broad,dc=mit,dc=edu';
 my $iadmin = '/opt/iRODS/clients/icommands/bin/iadmin';
 
-my $debug = 0;
+my %nis_group_map = (
+  52 => "sequence",
+  53 => "genotypegrp",
+  63 => "medpopgp",
+  77 => "xchipgrp",
+  78 => "cvargrp",
+  98 => "kinome",
+  482 => "cbnmr",
+  484 => "cbplatgrp",
+  1015 => "broad",
+  2022 => "cbntgrp",
+  );
 
 my $run_iadmin;
 if ($debug eq 1) {
@@ -38,10 +47,16 @@ my %nis_groups_by_gid = ();
 my ($group, $pw, $gid, $members);
 open(YPCAT, "ypcat group|") or die "Can't run ypcat: $!\n";
 while (<YPCAT>) {
-  chop;
+  chomp;
   ($group, $pw, $gid, $members) = split /:/;
+  $group = $nis_group_map{$gid} if exists $nis_group_map{$gid};
   $nis_groups_by_gid{$gid} = $group;
-  $nis_groups_by_name{$group} = $members;
+  if (exists $nis_groups_by_name{$group}) {
+    $nis_groups_by_name{$group} .= ",$members";
+  }
+  else {
+    $nis_groups_by_name{$group} = $members;
+  }
 }
 close(YPCAT);
 
@@ -64,55 +79,6 @@ foreach $group (keys %nis_groups_by_name) {
   }
 }
 
-# DEPRECATED in favour of using NIS users
-#
-# Get the list of users to add to the system. The list comes from the 
-# "Broad users" group from Active Directory, which corresponds to all
-# real users (vs role users)
-#
-#print "Connecting to AD as user \"$binddn\" to retrieve members of group 'Broad users'.\n";
-#my @broad_users = `ldapsearch -E 'pr=1000/noprompt' -LLL -D "$binddn" -W -x -h ldapdc1 -b 'ou=UserOU,dc=broad,dc=mit,dc=edu' '(&(memberOf=CN=Broad Users,OU=User Security Groups,OU=UserOU,DC=broad,DC=mit,DC=edu)(objectclass=person))' sAMAccountName`;
-
-#
-# Extract the user name from the record and add to iRODS if it isn't 
-# already in iRODS. Normalize the user name to lower case along the way.
-#
-#print "Synchronizing iRODS user DB with members of AD group 'Broad users'.\n";
-#my $user;
-#foreach (@broad_users) {
-#  chop;
-#  next if /^$/;
-#  next if /^dn: /;
-#  if (/^sAMAccountName: (\w+)$/) {
-#    $user = lc $1;
-#    if ($irods_users{$user}) {
-#      print "User $user already in iRODS.\n";
-#    }
-#    else {
-#      addIrodsUser($user, 1);
-#      $irods_users{$user} = 1;
-#    }	
-#  }
-#}
-
-#
-# Add the role users from a file
-#
-#print "Synchronizing iRODS user DB with role users from $rusers.\n";
-#open(RU, $rusers) or die "Cannot open $rusers: $!";
-#foreach $user (<RU>) {
-#  chop $user;
-#  if ($irods_users{$user}) {
-#    print "User $user already in iRODS.\n";
-#  }
-#  else {
-#    print "Adding role user $user to iRODS user DB.\n";
-#    addIrodsUser($user, 0);
-#    $irods_users{$user} = 1;
-#  }
-#}
-#close(RU);
-
 # Get the list of NIS users to add to iRODS.
 print "Synchronizing iRODS user DB with NIS users.\n";
 open(YPCAT, "ypcat passwd|") or die "Can't run ypcat passwd: $!";
@@ -122,7 +88,6 @@ while (<YPCAT>) {
     print "User $user already in iRODS.\n";
   }
   else {
-    print "Adding user $user to iRODS user DB.\n";
     addIrodsUser($user, 1);
     $irods_users{$user} = 1;
   }
@@ -151,7 +116,7 @@ use String::Random qw(random_regex);
 sub addIrodsUser {
 	my ($user, $addprinc) = @_;
 
-        print "Adding $user to iRODS user DB.\n";
+        print "Adding user $user to iRODS user DB.\n";
         print "$iadmin mkuser $user rodsuser\n" if $debug;
 	my @out = `$run_iadmin mkuser $user rodsuser 2>&1`;
         print @out if $debug;
@@ -181,8 +146,9 @@ sub addIrodsUser {
 
         my @pwent = getpwnam($user);
         if (exists($nis_groups_by_gid{$pwent[3]})) {
+	  my $group = $nis_groups_by_gid{$pwent[3]};
           print "Adding $user to iRODS group $group.\n";
-          addIrodsUserToGroup($user, $nis_groups_by_gid{$pwent[3]});
+          addIrodsUserToGroup($user, $group);
         }
         
 	return;
