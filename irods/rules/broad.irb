@@ -16,7 +16,7 @@
 # resources. Local admins can delete files from the archive. 
 # Magic number '5' comes from lib/core/include/rodsUser.h
 # and is the LOCAL_PRIV_USER_AUTH value of authFlag.
-acDataDeletePolicy|($privClient < 5) && ($rescName like archive*)|msiDeleteDisallowed|nop
+acDataDeletePolicy|($userNameClient != cgaadm) && ($userNameClient != dvoet) && ($privClient < 5) && ($rescName like archive*)|msiDeleteDisallowed|nop
 
 #
 # Turn off the "Trash Can"
@@ -72,9 +72,10 @@ acSetRescSchemeForCreate||msiSetNoDirectRescInp(archive_1_1%archive_1_2%archive_
 # replica can go to the other group than the one that the iput goes to.
 #
 acPostProcForPut|$rescGroupName == archive1|acBroadGetChksum($dataId,*sum)##msiGetIcatTime(*humanDate,null)##msiHumanToSystemTime(*humanDate,*timestamp)##acAddMetadataFromString(now,$objPath,broadEntryDate=*humanDate%broadEntryTimestamp=*timestamp%broadChecksum=*sum,-d)##delayExec(<PLUSET>1s</PLUSET>,msiDataObjRepl($objPath,destRescName=archive2++++verifyChksum=,*replstatus), msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive2, nop))|msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive2 2, nop)
-acPostProcForPut|$rescGroupName == archive2|msiDataObjChksum($objPath,verifyChksum,*sum)##msiGetIcatTime(*humanDate,null)##msiHumanToSystemTime(*humanDate,*timestamp)##acAddMetadataFromString(now,$objPath,broadEntryDate=*humanDate%broadEntryTimestamp=*timestamp%broadChecksum=*sum,-d)##delayExec(<PLUSET>1s</PLUSET>,msiDataObjRepl($objPath,destRescName=archive1++++verifyChksum=,*replstatus), msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive1, nop))|msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive1 2, nop)
+acPostProcForPut|$rescGroupName == archive2|acBroadGetChksum($dataId,*sum)##msiGetIcatTime(*humanDate,null)##msiHumanToSystemTime(*humanDate,*timestamp)##acAddMetadataFromString(now,$objPath,broadEntryDate=*humanDate%broadEntryTimestamp=*timestamp%broadChecksum=*sum,-d)##delayExec(<PLUSET>1s</PLUSET>,msiDataObjRepl($objPath,destRescName=archive1++++verifyChksum=,*replstatus), msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive1, nop))|msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive1 2, nop)
 
-acBroadGetChksum(*dataId,*Sum)||acGetIcatResults(replica,DATA_ID = '*dataId',*List)##forEachExec(*List,msiGetValByKey(*List,DATA_SIZE,*size)##ifExec(*size <= 0,assign(*Sum,none),nop,msiGetValByKey(*List,DATA_CHECKSUM,*origSum)##ifExec(X*origSum == X,msiDataObjChksum(*Object,verifyChksum,*newSum)##assign(*Sum,*newSum),nop,assign(*Sum,*origSum),nop),nop),nop)|msiWriteRodsLog(*** acBroadStoreChksum failed, nop)
+acBroadGetChksum(*dataId,*Sum)||acGetIcatResults(replica,DATA_ID = '*dataId',*List)##forEachExec(*List,msiGetValByKey(*List,DATA_SIZE,*size)##ifExec(*size <= 0,assign(*Sum,none),nop,msiGetValByKey(*List,DATA_CHECKSUM,*origSum)##ifExec(X*origSum == X,msiDataObjChksum($objPath,verifyChksum,*newSum)##assign(*Sum,*newSum),nop,assign(*Sum,*origSum),nop),nop),nop)|msiWriteRodsLog(*** acBroadStoreChksum failed, nop)
+
 
 
 #
@@ -150,7 +151,6 @@ acAddMetadataWithExpiryFromString(*Action,*rodsPath,*KVString,*humanDate,*objTyp
 #
 # calls msiDataObjUnlink if it fails
 #
-#acBroadObjPutWithAttrs(*rodsPath,*localFilePath, *resource, *expiryDate, *params, *outstatus)||msiDataObjPut(*rodsPath,*resource,localPath=*localFilePath++++verifyChksum=,*outstatus)##acAddMetadataFromString(now, *rodsPath, *params, -d)##msiHumanToSystemTime(*expiryDate, *expirySeconds)##acConvertToInt(*expirySeconds)##assign(*KVString, broadExpiryDate=*expiryDate%broadExpiryTimestamp=*expirySeconds)##msiString2KeyValPair(*KVString,*KVPair)##msiAssociateKeyValuePairsToObj(*KVPair,*rodsPath, -d)|msiWriteRodsLog(acBroadObjPutWithAttrs RULE ERROR - error writing object: *rodsPath  *resource *localFilePath *params, nop)##msiDataObjUnlink(*rodsPath,*deleteStatus)
 acBroadObjPutWithAttrs(*rodsPath,*localFilePath, *resource, *expiryDate, *params, *outstatus)||msiDataObjPut(*rodsPath,*resource,localPath=*localFilePath++++numThreads=4++++verifyChksum=,*outstatus)##acAddMetadataFromString(now, *rodsPath, *params, -d)##msiHumanToSystemTime(*expiryDate, *expirySeconds)##acConvertToInt(*expirySeconds)##assign(*KVString, broadExpiryDate=*expiryDate%broadExpiryTimestamp=*expirySeconds)##msiString2KeyValPair(*KVString,*KVPair)##msiAssociateKeyValuePairsToObj(*KVPair,*rodsPath, -d)|msiWriteRodsLog(acBroadObjPutWithAttrs RULE ERROR - error writing object: *rodsPath  *resource *localFilePath *params, nop)##msiDataObjUnlink(*rodsPath,*deleteStatus)
 
 acBroadCollCreateWithAttrs(*rodsPath, *expiryDate, *params, *outstatus)||msiCollCreate(*rodsPath,0,*outstatus)##acAddMetadataFromString(now, *rodsPath, *params, -C)##msiHumanToSystemTime(*expiryDate, *expirySeconds)##acConvertToInt(*expirySeconds)##assign(*KVString, broadExpiryDate=*expiryDate%broadExpiryTimestamp=*expirySeconds)##msiString2KeyValPair(*KVString,*KVPair)##msiAssociateKeyValuePairsToObj(*KVPair,*rodsPath, -C)|msiWriteRodsLog(acBroadCollCreateWithAttrs RULE ERROR - error writing object: *rodsPath  *resource *localFilePath *params, nop)##msiRmColl(*rodsPath,forceFlag=,*deleteStatus)
@@ -197,7 +197,7 @@ acBroadDeleteExpiredFiles(*Condition, *Days)||msiGetIcatTime(*Time,unix)##acConv
 # some acGetIcatResults rules (i.e. query the icat database)
 #
 acGetIcatResults(*Action,*Condition,*GenQOut)|*Action == replica|msiMakeQuery("DATA_EXPIRY, DATA_NAME, COLL_NAME, DATA_REPL_NUM, DATA_REPL_STATUS, DATA_CHECKSUM, DATA_ID, DATA_SIZE",*Condition,*Query)##msiExecStrCondQuery(*Query, *GenQOut)|msiWriteRodsLog(*** acGetIcatResults replica failed *Condition,nop)
-acGetIcatResults(*Action,*Condition,*GenQOut)|(*Action == expire)|msiMakeQuery("DATA_NAME, META_DATA_ATTR_VALUE, COLL_NAME, DATA_EXPIRY, DATA_REPL_NUM",*Condition,*Query)##msiExecStrCondQuery(*Query, *GenQOut)##cut|nop##nop
+acGetIcatResults(*Action,*Condition,*GenQOut)|(*Action == expire)|msiMakeQuery("COLL_NAME, DATA_NAME, DATA_ID, META_DATA_ATTR_NAME, META_DATA_ATTR_VALUE, DATA_EXPIRY, DATA_REPL_NUM",*Condition,*Query)##msiExecStrCondQuery(*Query, *GenQOut)##cut|nop##nop
 
 
 #

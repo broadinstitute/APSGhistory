@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
-my $broad_rules = "$ENV{'HOME'}/rules/broad.irb";
-my $core_rules = "$ENV{'HOME'}/rules/core.irb";
+my $broad_rules = "$ENV{'HOME'}/irods/rules/broad.irb";
+my $core_rules = "$ENV{'HOME'}/irods/rules/core.irb";
 my $icathost = 'irods01.broadinstitute.org';
 my $hostname;
 my @hostlist;
