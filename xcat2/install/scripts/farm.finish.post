@@ -1,0 +1,14 @@
+#Turn services off
+for SERVICE in iptables bluetooth cups gpm
+do
+	chkconfig $SERVICE off
+done
+
+sed -i "s/$(hostname)//g" /etc/hosts
+
+echo "
+	xCAT build from xcat2
+	 $(hostname) postinstall
+	at $(date)" | mail -s "xCAT build from xCAT2  -- $(hostname) postbuild ($(date +%F | tr -d '-'))" xcat@broadinstitute.org
+
+exit 0

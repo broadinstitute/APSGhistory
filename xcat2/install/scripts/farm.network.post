@@ -1,0 +1,65 @@
+#
+# Setup hostname
+#
+echo "post scripts" >/root/post.log
+
+
+#export PRINIC=#TABLE:noderes:THISNODE:primarynic#
+if [ -z "$PRINIC" ]
+then
+    export PRINIC=eth0
+fi
+IP=$(/sbin/ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
+if [ -z $IP ]
+then
+	dhclient eth0
+	IP=$(/sbin/ifconfig $PRINIC | grep inet | awk '{print $2}' | awk -F: '{print $2}')
+        FoundBuild=1
+fi
+echo "search #TABLE:site:key=domain:value#" >/etc/resolv.conf
+for i in $(echo #TABLE:site:key=nameservers:value# | tr ',' ' ')
+do
+	echo "nameserver $i"
+done >>/etc/resolv.conf
+#export HOSTNAME=$(host $IP 2>/dev/null | awk '{print $5}' | awk -F. '{print $1}')
+#hostname $HOSTNAME
+
+#echo "GATEWAYDEV=eth1" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+
+FoundProd=0
+echo Trying to determine the right interface in the build network
+for dev in $(ifconfig -a | awk '/^eth/ { print $1 }')
+do 
+if [[ $FoundProd -eq 1 && $FoundBuild -eq 1 ]]; then
+  continue
+fi
+
+/sbin/ifconfig $dev up 
+/sbin/dhclient -pf /tmp/$dev $dev
+ if /sbin/ifconfig $dev | grep -q '192.168'
+   then 
+   export PRINIC=$dev
+        FoundBuild=1
+ fi
+ if /sbin/ifconfig $dev  | egrep -q '69.173.(6[4-9]|7[0-9]|8[0-7])|10.200.[0-9]{1,2}.[0-9]{1,2}' && [ -n "$PRINIC" ]
+   then 
+   export GATEWAYNIC=$dev
+   echo "GATEWAYDEV=$dev" >> /etc/sysconfig/network-scripts/ifcfg-$PRINIC
+   sed -i 's/ONBOOT=no/ONBOOT=yes/g;/ONBOOT/ i\BOOTPROTO=dhcp' /etc/sysconfig/network-scripts/ifcfg-$dev
+	if /sbin/ifconfig $dev | egrep -q '69.173.(6[4-9]|7[0-9])|10.200.[0-9]{1,2}.[0-9]{1,2}'; then
+		echo "Found interface in VLAN32"
+		/sbin/ifconfig $dev mtu 9000
+		echo "MTU=9000" >> /etc/sysconfig/network-scripts/ifcfg-$dev
+                FoundProd=1
+	elif /sbin/ifconfig $dev | egrep -q '69.173.(8[0-7])'; then
+		echo "Found interface in VLAN18"
+		/sbin/ifconfig $dev mtu 1500
+		echo "MTU=1500" >> /etc/sysconfig/network-scripts/ifcfg-$dev
+                FoundProd=1
+	fi
+ fi
+done
+
+ifup $GATEWAYNIC 
+
+echo GATEWAYDEV=$GATEWAYNIC
