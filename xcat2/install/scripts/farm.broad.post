@@ -1,8 +1,28 @@
+mkdir /local/scratch
+chmod -R 1777 /local/scratch
+
+# modprobe seems necessary for reasons unknown.
+/sbin/modprobe nfs 
+for SERVICE in portmap ypbind autofs nfs
+do
+	/etc/init.d/$SERVICE restart
+	sleep 1
+done
+echo "Linking tcsh"
+ln -sin /bin/tcsh /usr/bin/tcsh
+##tune4fs for tuning.  tune4fs is backwards-compatible, but tune2fs is not; therefore, we are using tune4fs to both ext3 and ext4.
+for x in `fdisk -l | grep -v swap | awk '/Linux/ {print $1}'`; do tune4fs -c 0 -i 0 $x; done
+
+chmod 600 /root/.ssh
+
+#Change this if trp key changes:
+echo "ssh-dss AAAAB3NzaC1kc3MAAACBAMdPwPbhgProKuYZZLUVRGrVoJYsWoR0Vyd+MGvv7HWngBvNLQ4i3CoixE34wpWhdS/jCX/nYkKWlt+AsENOUrxpmE/uMTp18If6gx8PPxZQkoz7sDQ85ICpeo2HS73jHVdvb2ssLdY3tj5Aqt7lqyMWVFNEF0Ub3S/Zrvx5pD4XAAAAFQDwUVkm5hx0Wc3TwpTfxFKdO40Y6wAAAIB2klA/DaHRZ8UNlcjdu7ie4xd8jaVtc3ZLLdxC4wM98AgCmj9MgwbNpxS8XdTrWgra+Tj+SuN9u6Z9WnC1shHiJYqMG0y3SJDYfgT654GpggeZxiFgmq9baFfr69F3GfXgkzC+nEqaXn5aLwr6QDb+slTKK3Ind7hX/LikzHLNrwAAAIAmRk7ROAMTgGYu7qUNMx1r4z4bJO9dQol/sYPcw5jmd+H1NUC1RQxcY798b0hHVtH04Thzb2EsJtxkz0HeTZkZSa3zptKYSR0XjiOgfcK2EcjNdt2rP9IRVDphUb3Tv7kxkYqEilqihf1LKqaMG4hJaTWCAODalHN9sZcH7TBYqQ== root@tryptophan.broad.mit.edu" >> /root/.ssh/authorized_keys
+
 # The following MUST go above the Dell OMSA tools otherwise we end up getting packages from upstream RHEL release that is probable
 # a version or more ahead of what we are using 5.5.
 if [ -e /etc/enterprise-release ]; then
 	yum -y groupinstall yum-utils
-	for PACKAGE in autofs ksh tcsh ntp tftp xinetd rsh rsh-server psacct\
+	for PACKAGE in autofs ksh tcsh tftp xinetd rsh rsh-server psacct\
 	 nfs-utils net-snmp rsync yp-tools ypserv ypbind m4 sendmail-cf gdb\
 	 bzip2 binutils openssh-server util-linux compat-libstdc++-33 oracle*\
 	sg3_utils xterm vim-enhanced
@@ -21,7 +41,7 @@ if [ -e /etc/enterprise-release ]; then
         echo "umount /mnt/xcat && rmdir -v /mnt/xcat" >> /etc/rc.local
 	# Start CFENGINE3 installation
         wget -P /tmp http://mirror/linux/cfengine3/install.sh
-        sh /tmp/install.sh
+        sh /tmp/install.sh > /var/log/cfInstall.log 2>&1
         #wget -P /tmp http://mirror/linux/cfengine3/cfengine-community-latest.centos5.x86_64.rpm
         #wget -P /tmp http://mirror/linux/cfengine3/base_promises.tar
         #rpm -ivh /tmp/cfengine-community-latest.centos5.x86_64.rpm
@@ -47,7 +67,7 @@ else
 	cp /etc/security/limits.conf{,.orig}
 	# Start CFENGINE3 installation
         wget -P /tmp http://mirror/linux/cfengine3/install.sh
-        sh /tmp/install.sh
+        sh /tmp/install.sh > /var/log/cfInstall.log 2>&1
         #wget -P /tmp http://mirror/linux/cfengine3/cfengine-community-latest.centos5.x86_64.rpm
         #wget -P /tmp http://mirror/linux/cfengine3/base_promises.tar
 	#rpm -ivh /tmp/cfengine-community-latest.centos5.x86_64.rpm
@@ -70,165 +90,3 @@ else
 	yum -y groupinstall "Broad Base" || echo "Yum Broad Base Group Install Failed" >> /etc/motd
 
 fi
-
-
-#Is this IBM/Dell/HP/SMC?  Plan Accordingly
-VENDOR=$(dmidecode -s system-manufacturer | cut -f1 -d' ')
-case $VENDOR in
-"IBM")
-	FILE="/var/log/ibmInst.log"
-	echo "Downloading DSA" | tee $FILE
-	wget http://download.boulder.ibm.com/ibmdl/pub/systems/support/system_x/ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
-	echo "Installing DSA" | tee -a $FILE
-	rpm -Uvh ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
-	echo "Remove Download" | tee -a $FILE
-	rm ibm_utl_dsa_230i_rhel5_x86-64.rpm | tee -a $FILE
-
-	echo "service cfengine3 stop" >> /etc/rc.local
-	if [ -e /etc/enterprise-release ]; then
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
-	else
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
-	fi
-	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
-	echo "rm /etc/ssh/ssh_host*" >> /etc/local
-        #Add restored keys
-        echo "tar xzvfpP /tmp/$(hostname).tgz /etc/ssh/*key*" >> /etc/rc.local
-        echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
-	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
-	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
-	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
-	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
-	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
-	echo " [ $(/broad/tools/scripts/limitschk.sh  | awk '{print $4}') -eq 131072 ] || echo \"Setting Limits Failed\"" >> /etc/rc.local
-    echo "pwconv"  >> /etc/rc.local
-        echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local" >> /etc/rc.local
-
-        ;;
-# REMEMBER YOU DID THIS
-"Dell")
-	echo "wget -O - http://mirror.broadinstitute.org/linux/dell/hardware/OMSA_6.2/bootstrap.cgi  | bash" >> /etc/rc.local
-	echo "yum -y install srvadmin-all" >> /etc/rc.local
-
-        echo "sh /broad/mirror/linux/dell/hardware/delldset_v2.1.0.112_A00.bin -i" >> /etc/rc.local
-
-        if [ ! -f /usr/bin/serviceTag ]; then
-		echo "wget -P /usr/bin http://mirror.broadinstitute.org/linux/dell/hardware/serviceTag" >> /etc/rc.local
-        fi
-
-	#Dell's convoluted way of enabling virtualization settings en masse
-	if [ ! -f /usr/local/sbin/syscfg ]; then
-		echo "
-		#Dell's convoluted way of enabling virtualization settings en masse
-		service cfengine3 stop
-		mkdir /tmp/dtk 
-		mount -o loop -o ro /broad/mirror/linux/dell/hardware/dtk_2.5_80_Linux.iso /tmp/dtk/ 
-		cd /tmp/dtk/isolinux/ 
-		cp  SA.2 ~/SA.2.gz 
-		cd; gunzip -f SA.2.gz 
-		mkdir stage2 
-		cd stage2 
-		cpio -i < ../SA.2 
-		cd lofs 
-		mkdir dell 
-		mount -o loop dell.cramfs dell/ 
-		mkdir -p /usr/local/sbin ; cp dell/toolkit/bin/syscfg /usr/local/sbin/ 
-		/usr/local/sbin/syscfg --virtualization=enable 
-
-		#Cleanup of DTK
-		umount /tmp/dtk && rm -rf /tmp/dtk 
-		umount ~/stage2/lofs/dell && rm -rf ~/stage2" | tr -d '\t' >> /etc/rc.local
-        fi
-
-
-	#Start firmware update block
-	echo "yum -y install dell_ft_install" >> /etc/rc.local
-	echo "yum -y install \$(/usr/sbin/bootstrap_firmware)" >> /etc/rc.local
-        echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt" >> /etc/rc.local
-	if [ -e /etc/enterprise-release ]; then
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
-	else
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
-	fi
-	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
-	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
-        #Add restored keys
-        echo "tar xzvfpP /tmp/$(hostname).tgz /etc/ssh/*key*" >> /etc/rc.local
-        echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
-
-        for i in {0..1}; do
-		echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
-        done
-
-	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
-echo "pwconv"  >> /etc/rc.local
-        
-        echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local && shutdown -rf 1" >> /etc/rc.local
-
-        ;;
-"HP")
-    
-	if [ -e /etc/enterprise-release ]; then
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
-	else
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
-	fi
-	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
-	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
-        #Add restored keys
-        echo "tar xzvfpP /tmp/$(hostname).tgz /etc/ssh/*key*" >> /etc/rc.local
-        echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
-
-	for i in {0..1}; do
-		echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
-	done
-
-	echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
-    echo "pwconv"  >> /etc/rc.local
-
-	echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local && shutdown -rf 1" >> /etc/rc.local
-
-	;;
-
-"Supermicro")
-    if [ -e /etc/enterprise-release ]; then
-        echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
-    else
-        echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
-    fi  
-    echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
-    echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
-        #Add restored keys
-        echo "tar xzvfpP /tmp/$(hostname).tgz /etc/ssh/*key*" >> /etc/rc.local
-        echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
-
-    for i in {0..1}; do
-        echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
-    done
-
-    echo -e "xCAT build from xcat2\n$(hostname) boot\n at $(date) | mail -s \"xCAT build from xCAT2  -- $(hostname) boot ($(date +%F
- | tr -d '-'))\" xcat@broadinstitute.org" >> /etc/rc.local
-    echo "pwconv"  >> /etc/rc.local
-
-    echo "echo \"touch /var/lock/subsys/local\" > /etc/rc.local && shutdown -rf 1" >> /etc/rc.local
-
-    ;;
-*)
-        echo "Oops.  Fix me." ;;
-esac
-#End IBM/Dell Logic.
-
-#Turn services off
-for SERVICE in iptables bluetooth cups gpm
-do
-	chkconfig $SERVICE off
-done
-
-sed -i "s/$(hostname)//g" /etc/hosts
-
-echo "
-	xCAT build from xcat2
-	 $(hostname) postinstall
-	at $(date)" | mail -s "xCAT build from xCAT2  -- $(hostname) postbuild ($(date +%F | tr -d '-'))" xcat@broadinstitute.org
-
-exit 0

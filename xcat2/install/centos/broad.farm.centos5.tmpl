@@ -114,6 +114,7 @@ reboot
 tcsh
 sed
 mailx
+ntp
 %pre
 #INCLUDE:../scripts/broad.partTable#
 #INCLUDE:../scripts/pre.rh#
@@ -121,14 +122,57 @@ mailx
 exec < /dev/tty3 > /dev/tty3
 chvt 3
 echo 
-echo "################################"
-echo "# Running Post Configuration   #"
-echo "#  			     #"
-echo "# Tail /var/log/postBuild.log  #"
-echo "# for further details	     #"
-echo "################################"
+echo "##################################################"
+echo "# Running Network Post Configuration             #"
+echo "# -------                                        #"
+echo "# Tail /var/log/postBuild-Network.log            #"
+echo "# for further details	                           #"
+echo "##################################################"
+(
+#INCLUDE:../scripts/farm.network.post#
+) &> /var/log/postBuild-Network.log
+chvt 3
+echo 
+echo "##################################################"
+echo "# Running xCAT Post Configuration                #"
+echo "# -------                                        #"
+echo "# Tail /var/log/postBuild-xCAT.log               #"
+echo "# for further details	                           #"
+echo "##################################################"
 (
 #INCLUDE:../scripts/farm.xcat.post#
+) &> /var/log/postBuild-xCAT.log
+chvt 3
+echo 
+echo "##################################################"
+echo "# Running Broad-Specific Post Configuration      #"
+echo "# -------                                        #"
+echo "# Tail /var/log/postBuild-Broad.log              #"
+echo "# for further details	                           #"
+echo "##################################################"
+(
 #INCLUDE:../scripts/farm.broad.post#
-) &> /var/log/postBuild.log
+) &> /var/log/postBuild-Broad.log
+chvt 3
+echo 
+echo "##################################################"
+echo "# Running Vendor-Specific Post Configuration     #"
+echo "# -------                                        #"
+echo "# Tail /var/log/postBuild-Vendor.log             #"
+echo "# for further details	                           #"
+echo "##################################################"
+(
+#INCLUDE:../scripts/farm.vendor.post#
+) &> /var/log/postBuild-Vendor.log
+chvt 3
+echo 
+echo "##################################################"
+echo "# Finishing Post Configuration                   #"
+echo "# -------                                        #"
+echo "# Tail /var/log/postBuild-Finish.log             #"
+echo "# for further details	                           #"
+echo "##################################################"
+(
+#INCLUDE:../scripts/farm.finish.post#
+) &> /var/log/postBuild-Finish.log
 chvt 1
