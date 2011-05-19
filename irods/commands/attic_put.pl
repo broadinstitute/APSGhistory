@@ -417,15 +417,17 @@ sub get_acls_from_file_mode {
   my ($st_info) = @_;
 
   my $username = getusername($st_info->uid);
-  # map user 'root' to iRODS user 'irods'
-  $username = 'irods' if $username eq 'root';
+  # if a username is not in NIS (and thus won't be in iRODS)
+  # just map the user to iRODS user 'irods'
+  $username = 'irods' if $username eq '__LOCAL__';
   
   my $groupname = getgroupname($st_info->gid);
   
   # Parse out the file modes and translate to iRODS permissions
   my $groupmode;
-  if ($groupname eq 'root') {
-    # special case for root group ... just make no group permission
+  if ($groupname eq '__LOCAL__') {
+    # if the group owner is not in NIS (and thus not
+    # in iRODS), just set no group permission
     $groupmode = 'null';
   }
   elsif ($st_info->mode & S_IWGRP) {
@@ -456,8 +458,15 @@ sub get_acls_from_file_mode {
 my %userlist = {};
 sub getusername {
   my ($uid) = @_;
+  my $user;
+  my $out;
   if (!defined($userlist{$uid})) {
-    $userlist{$uid} = getpwuid($uid);
+    $user = getpwuid($uid);
+    $out = `ypmatch $user passwd`;
+    if ($out =~ /^Can\'t match key/) {
+      $user = '__LOCAL__';
+    }
+    $userlist{$uid} = $user;
   }
   return $userlist{$uid};
 }
@@ -465,8 +474,15 @@ sub getusername {
 my %grouplist = {};
 sub getgroupname {
   my ($gid) = @_;
+  my $group;
+  my $out;
   if (!defined($grouplist{$gid})) {
-    $grouplist{$gid} = getgrgid($gid);
+    $group = getgrgid($gid);
+    $out = `ypmatch $group group`;
+    if ($out =~ /^Can\'t match key/) {
+      $group = '__LOCAL__';
+    }
+    $grouplist{$gid} = $group;
   }
   return $grouplist{$gid};
 }
