@@ -206,7 +206,8 @@ acPostProcForPhymv||nop|nop
 # acSetNumThreads||msiSetNumThreads(16,4,default)|nop  
 # acSetNumThreads||msiSetNumThreads(default,16,default)|nop  
 # acSetNumThreads|$rescName == macResc|msiSetNumThreads(default,0,default)|nop  
-acSetNumThreads||msiSetNumThreads(default,16,default)|nop  
+# BROAD change ... commented out rule below. Defined in broad.irb instead
+#acSetNumThreads||msiSetNumThreads(default,16,default)|nop  
 # 10) acDataDeletePolicy - This rule set the policy for deleting data objects.
 #     This is the PreProcessing rule for delete.
 # Only one function can be called:

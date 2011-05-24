@@ -205,6 +205,12 @@ acGetIcatResults(*Action,*Condition,*GenQOut)|(*Action == expire)|msiMakeQuery("
 #
 # This rule can be used to set the TCP window size to 16Mb
 # vs the default 1Mb. Supposedly increases transfer rate.
+# Default
+#acSetNumThreads||msiSetNumThreads(default,16,default)|nop
+# Set window size
 #acSetNumThreads||msiSetNumThreads(default,16,16777216)|nop
+# For Jargon testing
+acSetNumThreads||msiSetNumThreads(default,1,default)|nop
+
 
 # EOF
