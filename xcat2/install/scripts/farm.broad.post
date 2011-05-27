@@ -62,8 +62,10 @@ else
         # Copy SSH keys to local
         echo "mkdir /mnt/xcat" >> /etc/rc.local
         echo "mount xcat2:/tftpboot/hostkeys /mnt/xcat" >> /etc/rc.local
+        echo "if [ -f /mnt/xcat/$(hostname).tgz ]; then" >> /etc/rc.local
         echo "cp /mnt/xcat/$(hostname).tgz /tmp" >> /etc/rc.local
         echo "umount /mnt/xcat && rmdir -v /mnt/xcat" >> /etc/rc.local
+        echo "fi" >> /etc/rc.local
 	cp /etc/security/limits.conf{,.orig}
 	# Start CFENGINE3 installation
         wget -P /tmp http://mirror/linux/cfengine3/install.sh

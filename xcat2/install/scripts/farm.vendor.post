@@ -12,15 +12,17 @@ case $VENDOR in
 
 	echo "service cfengine3 stop" >> /etc/rc.local
 	if [ -e /etc/enterprise-release ]; then
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
+		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.py $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
 	else
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
+		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.py $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
 	fi
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/local
         #Add restored keys
+        echo " if [ -f /tmp/$(hostname.tgz) ]; then" >> /etc/rc.local
         echo "tar xzvfpP /tmp/$(hostname).tgz /etc/ssh/*key*" >> /etc/rc.local
         echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
+        echo "fi" >> /etc/rc.local
 	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
 	echo "cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)" >> /etc/rc.local
 	echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
@@ -72,15 +74,17 @@ case $VENDOR in
 	echo "yum -y install \$(/usr/sbin/bootstrap_firmware)" >> /etc/rc.local
         echo "/usr/sbin/update_firmware -yv | tee /root/bios-update-results.txt" >> /etc/rc.local
 	if [ -e /etc/enterprise-release ]; then
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
+		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.py $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
 	else
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
+		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.py $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
 	fi
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
         #Add restored keys
+        echo " if [ -f /tmp/$(hostname.tgz) ]; then" >> /etc/rc.local
         echo "tar xzvfpP /tmp/$(hostname).tgz /etc/ssh/*key*" >> /etc/rc.local
         echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
+        echo "fi" >> /etc/rc.local
 
         for i in {0..1}; do
 		echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
@@ -95,15 +99,17 @@ echo "pwconv"  >> /etc/rc.local
 "HP")
     
 	if [ -e /etc/enterprise-release ]; then
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
+		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.py $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
 	else
-		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
+		echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.py $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
 	fi
 	echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
 	echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
         #Add restored keys
+        echo " if [ -f /tmp/$(hostname.tgz) ]; then" >> /etc/rc.local
         echo "tar xzvfpP /tmp/$(hostname).tgz /etc/ssh/*key*" >> /etc/rc.local
         echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
+        echo "fi" >> /etc/rc.local
 
 	for i in {0..1}; do
 		echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
@@ -118,15 +124,17 @@ echo "pwconv"  >> /etc/rc.local
 
 "Supermicro")
     if [ -e /etc/enterprise-release ]; then
-        echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
+        echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.py $(hostname) data pzCuQMLd ucd" >> /etc/rc.local
     else
-        echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.sh $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
+        echo "ssh cacti /broad/tools/scripts/cacti/addCactiDevice.py $(hostname) centos pzCuQMLd ucd" >> /etc/rc.local
     fi  
     echo "rm ~/.ssh/id_rsa; rm ~/.ssh/id_rsa.pub; rm ~/.ssh/copy.sh" >> /etc/rc.local
     echo "rm /etc/ssh/ssh_host*" >> /etc/rc.local
         #Add restored keys
+        echo " if [ -f /tmp/$(hostname.tgz) ]; then" >> /etc/rc.local
         echo "tar xzvfpP /tmp/$(hostname).tgz /etc/ssh/*key*" >> /etc/rc.local
         echo "rm -f /tmp/$(hostname).tgz" >> /etc/rc.local
+        echo "fi" >> /etc/rc.local
 
     for i in {0..1}; do
         echo "/usr/local/sbin/cf-agent -Kv >> /var/log/cfBuild.log" >> /etc/rc.local
