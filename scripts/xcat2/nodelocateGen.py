@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/bin/env python
 # $Id$
 import sys,string,os,shutil,glob
 from subprocess import *
@@ -7,53 +7,57 @@ ssh_lib_path = '/broad/tools/scripts'
 sys.path.append(ssh_lib_path)
 import ssh
 
-ofile_path = '/tmp/'
+ofile_path = '/tmp'
+ofile="{0}/nodepos.csv".format(ofile_path)
+outDict = {}
+nodeposBody=""
 
-for cmcNum in range(50,92):
-	cmc = "brsa%s" % cmcNum
+for cmcNum in range(50,93):
+	cmc = "brsa{0}".format(cmcNum)
 	try:
-		tempFile = '%s/temp-%s' % (ofile_path,cmc)
-		file = open (tempFile, 'w')
 		s = ssh.Connection(cmc,'service')
 		output = s.execute('getslotname')
 		s.close()
+		
+		outDict[cmc]=[]
 		for item in output:
-			item = item.rstrip()
-			itemList = item.split()
+			outDict[cmc].append(item)
 
-			if "Host" not in item and len(itemList) < 4:
-				if len(itemList) == 3:
-					file.write('"%s",,,"%s","%s",,,\n' %(itemList[2],cmc,itemList[0]))
-	except Exception:
-		file.close()
-		os.remove(tempFile)
+	except Exception as e:
+		print("{0} Failed with Exception {1}".format(cmc,e)) 
 		continue
-	else:
-		file.close()
-		file = '%s/%s'  % (ofile_path,cmc)
-		shutil.move(tempFile,file)
+
 
 os.remove('%s/ssh.pyc' % ssh_lib_path)
+for key in sorted(outDict.keys()):
+	for entry in outDict[key]:
+		if "Host" in entry: continue
+		itemList=entry.split()
+		if len(itemList)==2: host=itemList[1]
+		if len(itemList)==3: host=itemList[2]
+		else: continue
+		if 'SLOT' in host: continue
+		slot=itemList[0]
+		nodeposBody=("{0}\n\"{1}\",,,\"{2}\",\"{3:02d}\",,".format(nodeposBody,host,key,int(slot)))
+		
+nodeposHead="#node,rack,u,chassis,slot,room,comments,disable"
 
-#ConCat here
-destination = open('%s/nodepos.csv' % ofile_path, 'w')
-for filename in glob.glob(os.path.join(ofile_path, 'brsa*')):
-	shutil.copyfileobj(open(filename, 'r'), destination)
-destination.close()
 
-#Clean up here
-#for filename in glob.glob(os.path.join(ofile_path, 'brsa*')):
-	#os.remove(filename)
+FILE=open(ofile,'w')
+FILE.write(nodeposBody)
+FILE.close()
 
-#Sort Here
-file = open('%s/nodepos.csv' % ofile_path, 'r')
-lines = file.readlines()
-file.close()
-ofile = open('%s/nodepos.csv' % ofile_path, 'w')
-ofile.write("#node,rack,u,chassis,slot,room,comments,disable\n")
-for line in sorted(lines, key = str.lower):
-        ofile.write(line)
-ofile.close()
+FILE=open(ofile,'r')
+lines=FILE.readlines()
+FILE.close()
+
+FILE=open(ofile,'w')
+FILE.write("{0}".format(nodeposHead))
+for line in sorted(lines, key=str.lower):
+	FILE.write(line)
+FILE.close()
+
+
 
 #Popen(["tabrestore",'%s/nodepos.csv' % ofile_path],stdin=None,stdout=open('/dev/null','w'),stderr=open('/dev/null','w'))
 #Popen(["tabrestore",'%s/nodepos.csv' % ofile_path])
