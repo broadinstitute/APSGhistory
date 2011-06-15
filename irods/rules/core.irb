@@ -294,7 +294,8 @@ acSetVaultPathPolicy||msiSetGraftPathScheme(no,1)|nop
 #    in the range 0-4. A value of 0 means no forking. numProc will be set to 
 #    1 if "default" is the input. 
 #
-acSetReServerNumProc||msiSetReServerNumProc(default)|nop
+# BROAD change ... commented out rule below. Defined in broad.irb instead
+#acSetReServerNumProc||msiSetReServerNumProc(default)|nop
 #
 # 18) acPreprocForCollCreate - This is the PreProcessing rule for creating
 # a collection. Currently there is no function written specifically

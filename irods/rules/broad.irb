@@ -206,11 +206,19 @@ acGetIcatResults(*Action,*Condition,*GenQOut)|(*Action == expire)|msiMakeQuery("
 # This rule can be used to set the TCP window size to 16Mb
 # vs the default 1Mb. Supposedly increases transfer rate.
 # Default
-#acSetNumThreads||msiSetNumThreads(default,16,default)|nop
+acSetNumThreads||msiSetNumThreads(default,16,default)|nop
 # Set window size
 #acSetNumThreads||msiSetNumThreads(default,16,16777216)|nop
 # For Jargon testing
-acSetNumThreads||msiSetNumThreads(default,1,default)|nop
+#acSetNumThreads||msiSetNumThreads(default,1,default)|nop
 
+#
+# Set concurrent delayed rule executions
+#
+# This rule can be used to increase the concurrency of the
+# rule engine when processing delayed execution rules. Specifically
+# this will increase the throughput of archive replications for
+# the Broad attic. The 'default' is 1, and the max is 4.
+acSetReServerNumProc||msiSetReServerNumProc(4)|nop
 
 # EOF
