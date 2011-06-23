@@ -477,10 +477,12 @@ sub getgroupname {
   my $group;
   my $out;
   if (!defined($grouplist{$gid})) {
-    $group = getgrgid($gid);
-    $out = `ypmatch $group group`;
+    $out = `ypmatch $gid group.bygid`;
     if ($out =~ /^Can\'t match key/) {
       $group = '__LOCAL__';
+    }
+    else {
+      ($group) = split(':', $out, 2);
     }
     $grouplist{$gid} = $group;
   }
