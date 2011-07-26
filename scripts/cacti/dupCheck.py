@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import MySQLdb,re,smtplib
+import MySQLdb,re,smtplib,sys
 from email.MIMEText import MIMEText
 from getpass import getuser
 
@@ -10,7 +10,7 @@ class DB:
 		self.passwd=configDict['database_password']
 		self.database=configDict['database_default']
 
-mailList="ali@broadinstitute.org frans@broadinstitute.org teixeira@broadinstitute.org".split()
+mailList="cacti@broadinstitute.org"
 configFile="/etc/cacti/db.php"
 pattern=re.compile("[;$' ]")
 configDict={}
@@ -59,8 +59,7 @@ for key in sorted(resultsDict.keys()):
 msg=MIMEText(output)
 msg['Subject']="Cacti Duplicate Check"
 msg['From']=getuser()
-msg['To']=mailList
 
 send=smtplib.SMTP(smtpServer)
-send.sendmail(msg['From'],msg['To'],msg.as_string())
+send.sendmail(msg['From'],mailList,msg.as_string())
 send.quit()
