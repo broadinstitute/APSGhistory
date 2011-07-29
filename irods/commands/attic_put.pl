@@ -53,7 +53,7 @@ my %collection_name = ();
 # support the exclusion of certain file/directory names using
 # perl regex patterns contained in a file. At pre-defined patterns
 # here to make them default.
-my @exclude_patterns = ("core");
+my @exclude_patterns = ("core", "\.DS_Store");
 my %excluded_files = ();
 my $num_excluded = 0;
 
