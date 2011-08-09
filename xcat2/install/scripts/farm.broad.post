@@ -22,17 +22,10 @@ echo "ssh-dss AAAAB3NzaC1kc3MAAACBAMdPwPbhgProKuYZZLUVRGrVoJYsWoR0Vyd+MGvv7HWngB
 # a version or more ahead of what we are using 5.5.
 if [ -e /etc/enterprise-release ]; then
 	yum -y groupinstall yum-utils
-	for PACKAGE in autofs ksh tcsh tftp xinetd rsh rsh-server psacct\
-	 nfs-utils net-snmp rsync yp-tools ypserv ypbind m4 sendmail-cf gdb\
-	 bzip2 binutils openssh-server util-linux compat-libstdc++-33 oracle*\
-	sg3_utils xterm vim-enhanced
-	do
-		yum -y install $PACKAGE
-	done
-
-	##Yum customization and package foo
-	yum -y groupremove "Dialup Networking Support"
-	yum clean all
+	##Convert to home-grown mirror and clean
+	echo Changing to Broad-hosted OEL mirror..
+	wget http://mirror/linux/apsg/software/yumConfig/OEL-Base.repo
+	mv -f OEL-Base.repo /etc/yum.repos.d/OEL-Base.repo
 
         # Copy SSH keys to local
         echo "mkdir /mnt/xcat" >> /etc/rc.local
@@ -42,14 +35,18 @@ if [ -e /etc/enterprise-release ]; then
 	# Start CFENGINE3 installation
         wget -P /tmp http://mirror/linux/cfengine3/install.sh
         sh /tmp/install.sh > /var/log/cfInstall.log 2>&1
-        #wget -P /tmp http://mirror/linux/cfengine3/cfengine-community-latest.centos5.x86_64.rpm
-        #wget -P /tmp http://mirror/linux/cfengine3/base_promises.tar
-        #rpm -ivh /tmp/cfengine-community-latest.centos5.x86_64.rpm
-        #tar xvfP /tmp/base_promises.tar
-        #/sbin/chkconfig --add cfengine3
-        #/var/cfengine/bin/cf-key
-        #/var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
-        #/var/cfengine/bin/cf-agent -Kv >> /var/log/cfBuild.log
+
+
+	##Yum customization and package foo
+	echo Updating installed packages..
+	wget http://mirror/linux/apsg/software/yumConfig/yum.conf
+	rm -f /etc/yum.conf
+	mv yum.conf /etc
+	yum -y groupremove "Dialup Networking Support"
+	yum clean all
+	yum -y upgrade || echo "Yum Upgrade Failed" >> /etc/motd
+	echo Installing Broad package group "OEL Base"
+	yum -y groupinstall "OEL Base" || echo "Yum OEL Base Group Install Failed" >> /etc/motd
 
 else
 	###Apparently, yum needs utils before switching to our local mirror
@@ -70,15 +67,6 @@ else
 	# Start CFENGINE3 installation
         wget -P /tmp http://mirror/linux/cfengine3/install.sh
         sh /tmp/install.sh > /var/log/cfInstall.log 2>&1
-        #wget -P /tmp http://mirror/linux/cfengine3/cfengine-community-latest.centos5.x86_64.rpm
-        #wget -P /tmp http://mirror/linux/cfengine3/base_promises.tar
-	#rpm -ivh /tmp/cfengine-community-latest.centos5.x86_64.rpm
-	#tar xvfP /tmp/base_promises.tar
-	#/sbin/chkconfig --add cfengine3
-	#/var/cfengine/bin/cf-key
-	#/var/cfengine/bin/cf-agent -f /var/cfengine/inputs/failsafe.cf
-	#/var/cfengine/bin/cf-agent -Kv >> /var/log/cfBuild.log
-	#cp /etc/security/limits.conf /tmp/limits.conf-$(date +%Y%m%d.%R)
 
 	##Yum customization and package foo
 	echo Updating installed packages..
