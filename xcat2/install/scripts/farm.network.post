@@ -46,8 +46,13 @@ fi
    export GATEWAYNIC=$dev
    echo "GATEWAYDEV=$dev" >> /etc/sysconfig/network-scripts/ifcfg-$PRINIC
    sed -i 's/ONBOOT=no/ONBOOT=yes/g;/ONBOOT/ i\BOOTPROTO=dhcp' /etc/sysconfig/network-scripts/ifcfg-$dev
-	if /sbin/ifconfig $dev | egrep -q '69.173.(6[4-9]|7[0-9])|10.200.[0-9]{1,2}.[0-9]{1,2}'; then
+	if /sbin/ifconfig $dev | egrep -q '69.173.(6[4-9]|7[0-9])'; then 
 		echo "Found interface in VLAN32"
+		/sbin/ifconfig $dev mtu 9000
+		echo "MTU=9000" >> /etc/sysconfig/network-scripts/ifcfg-$dev
+                FoundProd=1
+    elif /sbin/ifconfig $dev | egrep -q '10.200.[0-9]{1,2}.[0-9]{1,2}'; then
+		echo "Found interface in VLAN200"
 		/sbin/ifconfig $dev mtu 9000
 		echo "MTU=9000" >> /etc/sysconfig/network-scripts/ifcfg-$dev
                 FoundProd=1
