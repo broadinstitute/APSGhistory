@@ -1,6 +1,8 @@
 #!/usr/bin/env python
-import sys,re,os
+import os
 from subprocess import *
+from socket import gethostname
+import sys
 from tempfile import NamedTemporaryFile
 
 #Functions
@@ -16,6 +18,7 @@ def addHosts(line):
 
 def removeHosts(line):
     fields=line.split('|')
+    if len(fields) < 4: return 
     node=fields[2]
     nodermCMD="noderm {0}".format(node)
     
@@ -23,40 +26,57 @@ def removeHosts(line):
 #Commands
 lsdefAttr='ip,mac,groups,mpa,id'
 lsdefCMD=['lsdef','-t','node','-i',lsdefAttr]
-lsdef=Popen(lsdefCMD,stdout=PIPE).communicate()[0].split('\n\n')
-scrubDHCP='/broad/tools/scripts/xcat2/scrubDHCP.sh'
+lsdef=Popen(lsdefCMD,stdout=PIPE).communicate()[0].split('Object')
 
 #Files
-buildFile=NamedTemporaryFile(delete=False)
+buildFile=NamedTemporaryFile(mode='a',delete=False)
 buildFileName=buildFile.name
+buildfile_entries=""
 masterHost='/sysman/install/broad/master.host.listing'
 
-for line in lsdef:
-    if len(line.split('\n'))==0:continue
-    #print line.split('\n')
-    for entry in line.split('\n'):
-        if len(entry.rstrip())==0:continue
-        if 'Object' in entry: hostName=entry.split(':')[1].lstrip(' ')
-        if 'groups=' in entry: groups=entry.split('=')[1]
-        if 'id=' in entry: id=entry.split('=')[1]
-        if 'ip=' in entry: ip=entry.split('=')[1]
-        if 'mac=' in entry: mac=entry.split('=')[1]
-        if 'mpa=' in entry: mpa=entry.split('=')[1]
-    buildFile.write("#xCAT# {0}|{1}|{2}|{3}|{4}|{5}|\n".format(ip,mac,hostName,groups,mpa,id))
+for block in lsdef:
+    if len(block.split('\n'))==0:continue
+    hostName=None
+    groups=None
+    id=None
+    ip=None
+    mac=None
+    mpa=None
+    for line in block.split('\n'):
+        if len(line.rstrip())==0:continue
+        if 'name' in line: hostName=line.split(':')[1].lstrip()
+        if 'groups=' in line: groups=line.split('=')[1]
+        if 'id=' in line: id=line.split('=')[1]
+        if 'ip=' in line: ip=line.split('=')[1]
+        if 'mac=' in line: mac=line.split('=')[1]
+        if 'mpa=' in line: mpa=line.split('=')[1]
+    if (hostName is None or
+	groups is None or
+	ip is None or
+	mac is None): continue
+    buildfile_entries="{0}#xCAT# {1}|{2}|{3}|{4}|{5}|{6}|\n".format(buildfile_entries,ip,mac,hostName,groups,mpa,id)
+buildFile.write(buildfile_entries)
 buildFile.close()
 
-buildFile=open(buildFileName,'r')
-buildFileList=buildFile.readlines()
+with open(buildFileName,'r') as buildfile:
+	buildFileList=buildfile.readlines()
+os.remove(buildFileName)
 
-mhl=open(masterHost,'r')
 mhlList=[]
 
-for line in mhl:
-    if not re.match('#xCAT#',line):continue
-    mhlList.append(line)
+with open(masterHost,'r') as mhl:
+	for line in mhl:
+	    if not line.startswith('#xCAT#'):continue
+	    if '7cc' in line and 'xcat2s' in gethostname():
+		continue
+	    elif '1ss' in line and ('xcat2' == gethostname() or
+	    'xcat2.broadinstitute.org' == gethostname()):
+		continue
+	    mhlList.append(line)
 
 for line in buildFileList:
     if line in mhlList: continue
+    if len(line.split('|')) < 4: continue
     print("To be removed: {0}".format(line.rstrip()))
     removeHosts(line)
     
@@ -65,10 +85,3 @@ for line in mhlList:
     print("To be added/modified: {0}".format(line.rstrip()))
     removeHosts(line)
     addHosts(line)
-
-    
-#Cleanup
-buildFile.close()
-os.remove(buildFileName)
-
-
