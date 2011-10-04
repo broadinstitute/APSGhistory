@@ -1,3 +1,3 @@
 #!/usr/bin/perl
 
-print " another\n\nTest new newtest\n";
+print "\n\nTest new newtest\n";
