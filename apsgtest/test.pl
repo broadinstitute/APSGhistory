@@ -1,3 +1,3 @@
 #!/usr/bin/perl
 
-print "\n new test asdfnew test sdf\n";
+print "\n new asdfnew test sdf\n";
