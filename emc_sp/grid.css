@@ -1,0 +1,158 @@
+.grid
+{
+    border: solid 1px;
+    border-collapse: collapse;
+}
+
+/* <Border settings> */
+table.grid,
+table.grid tr td,
+table.grid tr th
+{
+    border-color: #888888;
+}
+
+table.grid tr td,
+table.grid tr th
+{
+    border-bottom-style: solid;
+    border-bottom-width: 0px;
+    border-right-style: solid;
+    border-right-width: 1px;
+}
+
+table.grid tr td.grid_menu_bottom
+{
+    border-top-style: solid;
+    border-top-width: 1px;
+}
+/* </Border settings> */
+
+/* <Empty grid style> */
+table.grid tr td.emplygrid
+{
+    background-color: #F8F8F8;
+    color: #828282;
+    text-align: center;
+    vertical-align: middle;
+}
+/* <Empty grid style> */
+
+/* <Grid Menu> */
+table.grid tr td.grid_menu
+{
+    background-color: #C8E3FF;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    color: #000000;
+}
+
+table.grid tr td.grid_menu a
+{
+    color: #000000;
+}
+/* </Grid Menu> */
+
+/* <Grid Head> */
+table.grid tr th.even
+{
+    background-color: #429AFE;
+    color: #333300;
+}
+table.grid tr th.odd
+{
+    background-color: #429AFE;
+    color: #333300;
+}
+/* Grid head links */
+table.grid tr th.odd a:hover, 
+table.grid tr th.odd a:active, 
+table.grid tr th.even a:hover, 
+table.grid tr th.even a:active
+{
+    color: #333300;
+}
+table.grid tr th.even a, 
+table.grid tr th.even a:visited, 
+table.grid tr th.odd a, 
+table.grid tr th.odd a:visited
+{
+    color: #333300;
+}
+/* </Grid Head> */
+
+/* <Rows> */
+table.grid tr.highlited td
+{
+    background-color: #d2dbe3 !important;
+    color: #FFFFFF;
+}
+
+/* Common cell style */
+table.grid tr td
+{
+    padding: 2px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Even row, odd column style */
+table.grid tr.even td.odd
+{
+    background-color: #EDF6FF;
+    color: #000000;
+}
+
+/* Even row, even column style */
+table.grid tr.even td.even
+{
+    background-color: #EDF6FF;
+    color: #000000;
+}
+
+/* Odd row, odd column style */
+table.grid tr.odd td.odd
+{
+    background-color: #DBEDFF;
+    color: #000000;
+}
+
+/* Odd row, Even column style */
+table.grid tr.odd td.even
+{
+    background-color: #DBEDFF;
+    color: #000000;
+}
+
+/* Odd row style */
+table.grid tr.odd
+{
+    background-color: #EDF5FF;
+    color: #000000;
+}
+
+/* Even row style */
+table.grid tr.even
+{
+    background-color: #FFFFFF;
+    color: #000000;
+}
+/* </Rows> */
+
+table.grid a, 
+table.grid a:visited
+{
+    color: #462412;
+}
+
+table.grid a:hover, 
+table.grid a:active
+{
+    color: #FE8242;
+}
+
+table.grid tr.editor_buttons td
+{
+    border-top-style: solid;
+    border-top-width: 1px;
+}

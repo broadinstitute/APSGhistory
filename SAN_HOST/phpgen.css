@@ -1,0 +1,363 @@
+body
+{
+    margin-top: 0px;
+    margin-left: 0px;
+    margin-right: 0px;
+    background-color: #F8F8F8;
+}
+
+
+body, .grid
+{
+    font-size: 10pt;
+    font-family: Tahoma;
+}
+
+a, a:visited
+{
+    color: #000000;
+}
+
+a:hover, a:active
+{
+    color: #FF0000;
+}
+
+img
+{
+    border: 0px;
+}
+
+/* Input styles */
+input, select
+{
+    font-size: 9pt;
+    font-family: Tahoma;
+    /* background-color: #FFFFFF; input bg tags color */
+}
+
+.sm_comboBox
+{
+    border: solid 1px #AAAAAA; /* input border tags color */
+    width: 200px;
+}
+
+.sm_button
+{
+    border: solid 1px #AAAAAA; /* input border tags color */
+    width: 100px;
+    font-weight: bold;
+}
+
+.sm_text
+{
+    background-color: #FFFFFF; /* input bg tags color */
+    border: solid 1px #AAAAAA; /* input border tags color */
+    width: 155px;
+}
+
+/* Search control */
+.sfilter_text, select.sfilter_comboBox
+{
+    background-color: #FFFFFF;
+    border: solid 1px #AAAAAA;
+    margin: 0px;
+    padding: 0px;
+    font-size: 10pt;
+}
+
+
+/* layout styles */
+
+#datagrid
+{
+    width: 100%;
+}
+
+iframe.hidden
+{
+	display: none;
+}
+
+iframe.shown
+{
+	display: none;
+}
+
+.hidden { padding-left: 5px; padding-right: 5px; }
+
+.shown { padding-left: 5px; padding-right: 5px; }
+
+/* Advanced Filter */
+
+table.adv_filter
+{
+     border: solid 1px #AAAAAA;
+     border-collapse: collapse;
+     font-size: 10pt;
+}
+
+table.adv_filter tr.adv_filter_title
+{
+    background-color: #B0D2E9;
+    text-align: center;
+    font-weight: bold;
+    font-size: 12pt;
+    border-bottom: solid 1px #AAAAAA;
+}
+
+table.adv_filter tr.adv_filter_title td
+{
+    padding: 3px;
+}
+
+table.adv_filter tr.adv_filter_type td
+{
+    padding: 3px;
+    text-align: center;
+    border-bottom: solid 1px #AAAAAA;
+}
+
+table.adv_filter tr.adv_filter_head td
+{
+    background-color: #B0D2E9;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: solid 1px #AAAAAA;
+}
+
+table.adv_filter tr.adv_filter_head td.adv_filter_field_head
+{}
+
+table.adv_filter tr.adv_filter_head td.adv_filter_not_head
+{
+    border-left: solid 1px #AAAAAA;
+    border-right: solid 1px #AAAAAA;
+}
+
+table.adv_filter tr.adv_filter_head td.adv_filter_editors_head
+{}
+
+table.adv_filter tr.adv_filter_row td
+{
+    padding: 4px;
+}
+
+table.adv_filter tr.adv_filter_row td.adv_filter_field_name_cell
+{
+    font-weight: bold;
+}
+
+table.adv_filter tr.adv_filter_row td.adv_filter_not_cell
+{
+    border-left: solid 1px #AAAAAA;
+    border-right: solid 1px #AAAAAA;
+}
+
+table.adv_filter tr.adv_filter_row td.adv_filter_operator_cell {}
+table.adv_filter tr.adv_filter_row td.adv_filter_editor1_cell, table.adv_filter tr.adv_filter_row td.adv_filter_editor2_cell
+{
+    width: 160px;
+    text-align: center;
+}
+
+a.adv_filter_link
+{
+    font-size: 10pt;
+    color: #3E87C5;
+}
+
+table.adv_filter tr.adv_filter_footer td
+{
+    border-top: solid 1px #AAAAAA;
+    text-align: center;
+}
+
+
+img.collapsed
+{
+    border: 0;
+}
+
+img.expanded
+{
+    border: 0;
+}
+
+h2.page_header
+{
+    font-family: Tahoma;
+    font-size: 16pt;
+    color: #1F98C7;
+}
+
+/* Page header */
+div.site_header
+{
+    background-image: url(images/header_bg.gif);
+    padding: 0px;
+    margin: 0px;
+    width: 100%;
+}
+
+div.site_header table
+{
+    padding: 9px;
+}
+
+div.site_header_underline
+{
+    font-size: 0;
+    padding: 0px;
+    margin: 0px;
+    height: 6px;
+    width: 100%;
+    background-color: #B0D2E9;
+}
+
+h1.site_header
+{
+    color: #FFFFFF;
+    font-family: Tahoma;
+    font-size: 20pt;
+}
+
+/* Page List */
+div.page_list #current_page_text
+{
+    font-size: 11px;
+    color: #FF7D00;
+    font-weight: bold;
+    margin-right: 8px;
+    margin-left: 4px;
+}
+div.page_list #current_page
+{
+    font-size: 11px;
+    color: #3E87C5;
+    font-weight: bold;
+}
+div.page_list h3
+{
+    font-weight: bold;
+    font-size: 14px;
+    color: #D94B2B;
+    margin-bottom: 5px;
+}
+div.page_list ul
+{
+    list-style-image: url(images/menu_arrow.gif);
+    padding-left: 20px;
+    margin-top: 0px;
+    margin-left: 0px;
+}
+div.page_list li a, div.page_list li a:visited
+{
+    color: #888888;
+    text-decoration: none;
+}
+div.page_list li a:hover
+{
+    color: #FF8888;
+    text-decoration: underline;
+}
+
+/* Page navigator */
+div.page_navigator
+{
+    font-size: 12px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+div.page_navigator #current_page_text
+{
+    color: #FF7D00;
+    font-weight: bold;
+    margin-right: 8px;
+    margin-left: 4px;
+}
+div.page_navigator #current_page
+{
+    background-color: #FF7D00;
+    color: #000000;
+    font-weight: bold;
+}
+div.page_navigator a.page_link
+{
+    color: #3E87C5;
+    font-weight: bold;
+}
+.grid
+{
+    width: 100%;
+}
+
+
+/* <Calendar> */
+.DynarchCalendar, .DynarchCalendar-focused {
+  background-color: #d4d0c8;
+}
+
+.DynarchCalendar-topBar,
+.DynarchCalendar-bottomBar,
+.DynarchCalendar-focused .DynarchCalendar-topBar,
+.DynarchCalendar-focused .DynarchCalendar-bottomBar {
+  background-color: #B0D2E9; /* #848078; */
+  color: #fff;
+}
+
+.DynarchCalendar-title div { color: #fff; }
+
+.DynarchCalendar-dayNames { background-color: #f2f2f2; }
+
+.DynarchCalendar-hover-navBtn div,
+.DynarchCalendar-hover-title div,
+.DynarchCalendar-hover-bottomBar-today {
+  border-color: #f4f0e8 #444038 #444038 #f4f0e8;
+  background-color: #d4d0c8;
+  color: #000;
+}
+.DynarchCalendar-menu table td div.DynarchCalendar-hover-navBtn {
+  border-color: #f4f0e8 #444038 #444038 #f4f0e8;
+  background-color: #e4e0d8;
+  color: #000;
+}
+
+.DynarchCalendar-pressed-navBtn div,
+.DynarchCalendar-pressed-title div,
+.DynarchCalendar-pressed-bottomBar-today,
+.DynarchCalendar-menu table td div.DynarchCalendar-pressed-navBtn {
+  border-color: #444038 #f4f0e8 #f4f0e8 #444038;
+  background-color: #646058;
+  color: #fff;
+}
+
+.DynarchCalendar-hover-date {
+  border-color: #f4f0e8 #444038 #444038 #f4f0e8;
+  background-color: #e4e0d8;
+}
+.DynarchCalendar-day {
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  border-radius: 0;
+}
+
+.DynarchCalendar-day-disabled {
+  background: #c4c0b8;
+}
+
+.DynarchCalendar-hover-week { background-color: #e4e0d8 !important; }
+
+.DynarchCalendar-day-selected {
+  background-color: #e4e0d8;
+  border: 1px solid;
+  border-color: #444038 #f4f0e8 #f4f0e8 #444038;
+  margin: 0;
+}
+
+.DynarchCalendar-day-today.DynarchCalendar-day-selected { background-color: #e4e0d8; }
+
+.DynarchCalendar-menu {
+  background-color: #d4d0c8;
+}
+/* </Calendar> */

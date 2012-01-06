@@ -1,0 +1,139 @@
+.grid
+{
+    border: 1px solid #9F9F9F;
+    border-collapse: collapse;
+}
+
+/* <Border settings> */
+table.grid tr td, 
+table.grid tr th 
+{
+    border-left-style: none;
+    border-top-style: none;
+    border-bottom: solid 1px #9F9F9F;
+    border-right: solid 1px #9F9F9F;
+}
+/* </Border settings> */
+
+/* <Empty grid style> */
+table.grid tr td.emplygrid
+{
+    background-color: #F8F8F8;
+    color: #828282;
+    vertical-align: middle;
+    text-align: center;
+}
+/* <Empty grid style> */
+
+/* <Grid Menu> */
+table.grid tr td.grid_menu
+{
+    color: #000000;
+    background-color: #E2E2E2;
+    border-bottom: solid 1px #9F9F9F;
+}
+
+/* <Grid Head> */
+table.grid tr th.even
+{
+    background-color: #40546A;
+    color: #FFFFFF;
+}
+table.grid tr th.odd
+{
+    background-color: #40546A;
+    color: #FFFFFF;
+}
+
+/* Grid head links */
+table.grid tr th.odd a:hover, 
+table.grid tr th.odd a:active, 
+table.grid tr th.even a:hover, 
+table.grid tr th.even a:active
+{
+    color: #8888FF;
+}
+table.grid tr th.even a, 
+table.grid tr th.even a:visited, 
+table.grid tr th.odd a, 
+table.grid tr th.odd a:visited
+{
+    color: #FFFFFF;
+}
+/* </Grid Head> */
+
+/* <Rows> */
+table.grid tr.highlited td
+{
+    background-color: #EAEAEA !important;
+    color: #FFFFFF;
+}
+
+/* Common cell style */
+table.grid tr td
+{
+    padding: 2px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Even row, odd column style */
+table.grid tr.even td.odd
+{
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+/* Even row, even column style */
+table.grid tr.even td.even
+{
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+/* Odd row, odd column style */
+table.grid tr.odd td.odd
+{
+    background-color: #F7F6F3;
+    color: #000000;
+}
+
+/* Odd row, Even column style */
+table.grid tr.odd td.even
+{
+    background-color: #F7F6F3;
+    color: #000000;
+}
+
+/* Odd row style */
+table.grid tr.odd
+{
+    background-color: #EDF5FF;
+    color: #000000;
+}
+
+/* Even row style */
+table.grid tr.even
+{
+    background-color: #FFFFFF;
+    color: #000000;
+}
+/* </Rows> */
+
+table.grid a, 
+table.grid a:visited
+{
+    color: #284775;
+}
+
+table.grid a:hover, 
+table.grid a:active
+{
+    color: #FF8888;
+}
+
+table.grid tr.editor_buttons td
+{
+    border-top-style: solid;
+    border-top-width: 1px;
+}

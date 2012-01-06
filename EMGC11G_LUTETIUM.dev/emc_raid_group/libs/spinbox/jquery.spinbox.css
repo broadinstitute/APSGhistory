@@ -1,0 +1,21 @@
+input.spinbox-active {
+	background-repeat:no-repeat;
+	background-position:right 0px;
+	background-image:url(spinbox-sprite.png);
+}
+input.spinbox-active.spinbox-up-hover {
+	background-position:right -20px;
+	cursor:default;
+}
+input.spinbox-active.spinbox-down-hover {
+	background-position:right -40px;
+	cursor:default;
+}
+input.spinbox-active.spinbox-up {
+	background-position:right -80px;
+	cursor:default;
+}
+input.spinbox-active.spinbox-down {
+	background-position:right -60px;
+	cursor:default;
+}

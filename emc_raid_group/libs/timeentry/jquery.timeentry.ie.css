@@ -1,0 +1,17 @@
+/* <IE only> */
+.timeEntry_control {
+    top: 0;
+    margin-left: 0;
+}
+
+span.time-edit-wrapper
+{
+    padding: 0 0 0 1px;
+}
+
+input.time-edit
+{
+    position: relative;
+    top: 1px;
+}
+/* </IE only> */

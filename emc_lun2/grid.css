@@ -1,0 +1,122 @@
+.grid
+{
+    border-collapse: collapse;
+    border-right: solid 1px #AAAAAA;
+    border-bottom: solid 1px #AAAAAA;
+    border-left: solid 1px #AAAAAA;
+    border-top: solid 1px  #AAAAAA;
+}
+
+/* <Border settings> */
+table.grid tr td, 
+table.grid tr th 
+{
+    border-left-style: none;
+    border-top-style: none;
+    border-bottom: solid 1px #AAAAAA;
+    border-right: solid 1px #AAAAAA;
+}
+/* </Border settings> */
+
+/* <Empty grid style> */
+table.grid tr td.emplygrid
+{
+    background-color: #F8F8F8;
+    color: #828282;
+    vertical-align: middle;
+    text-align: center;
+}
+/* </Empty grid style> */
+
+/* <Grid Menu> */
+table.grid tr th.grid_menu,
+table.grid tr td.grid_menu
+{
+    color: #000000;
+    background-color: #E2E2E2;
+    border-bottom: solid 1px #AAAAAA;
+}
+/* </Grid Menu> */
+
+/* <Grid Head> */
+table.grid tr th.even
+{
+    color: #000000;
+    background-color: #B0D2E9;
+}
+
+table.grid tr th.odd
+{
+    color: #000000;
+    background-color: #B0D2E9;
+}
+/* </Grid Head> */
+
+/* <Rows> */
+table.grid tr.highlited td
+{
+    color: #FFFFFF;
+    background-color: #E8E8E8 !important;
+}
+
+/* Common cell style */
+table.grid tr td
+{
+    padding: 2px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+/* Even row, odd column style */
+table.grid tr.even td.odd
+{
+    color: #000000;
+    background-color: #F2F2F2;
+}
+
+/* Even row, even column style */
+table.grid tr.even td.even
+{
+    color: #000000;
+    background-color: #F2F2F2;
+}
+
+/* Odd row, odd column style */
+table.grid tr.odd td.odd
+{
+    color: #000000;
+    background-color: #FFFFFF;
+}
+
+/* Odd row, Even column style */
+table.grid tr.odd td.even
+{
+    color: #000000;
+    background-color: #FFFFFF;
+}
+
+/* Odd row style */
+table.grid tr.odd
+{
+    color: #000000;
+    background-color: #FFFFFF;
+}
+
+/* Even row style */
+table.grid tr.even
+{
+    color: #000000; /* even row text color */
+    background-color: #FFFFFF;  /* even row color */
+}
+/* </Rows> */
+
+table.grid tr.editor_buttons td
+{
+    border-top-style: solid;
+    border-top-width: 1px;
+}
+
+table.grid .grid-totals
+{
+    background-color: #ccc;
+}
