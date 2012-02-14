@@ -1,0 +1,22 @@
+- make sure the root filesystem doesn't run out of space due
+  to the irods log file
+  - compress and optionally store old logs
+
+- check that iRODS is running and responding on IES and resource servers
+  - restart services if necessary
+  - notify if major problems
+
+- monitor the free space in the resources
+  - notify admins if space goes below a certain threshold in
+    any of the resource servers
+
+- check iRODS responsiveness
+  - set up a "test suite" using a set of known data objects
+    and collections. 
+  - make sure the contents of this "basket" maintains integrity
+  - do timing on various operations and record over time to
+    measure how the system scales up
+
+Open questions:
+- preferred monitoring framework if any?
+
