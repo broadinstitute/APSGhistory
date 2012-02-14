@@ -6,20 +6,23 @@ my $icathost = 'irods01.broadinstitute.org';
 my $hostname;
 my @hostlist;
 
+my %already_pushed = {};
 open(HOSTLIST, "iquest 'select RESC_LOC'|")
 	|| die "Can't run iquest: $!\n";
 while (<HOSTLIST>) {
 	next if !/^RESC_LOC/;
 	($d, $d, $hostname) = split;
+	next if defined $already_pushed{$hostname};
 	next if $hostname =~ /localhost/;
 	print "Pushing configuration to host $hostname ...\n";
 	system "ssh $hostname cp $broad_rules /opt/iRODS/server/config/reConfigs";
 	system "ssh $hostname cp $core_rules /opt/iRODS/server/config/reConfigs";
+	$already_pushed{$hostname} = 1;
 }
 close(HOSTLIST);
 
 print "Restarting the ICAT-enabled iRODS server $icathost ...\n";
-system "ssh $icathost /opt/iRODS/irodsctl irestart";
+#system "ssh $icathost /opt/iRODS/irodsctl irestart";
 
 exit 0;
 
