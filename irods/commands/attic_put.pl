@@ -26,11 +26,8 @@ my $rulesLoc = '/home/radon00/irods/commands';
 my $putRule = "$rulesLoc/broadAtticPut.ir";
 my $mkdirRule = "$rulesLoc/broadAtticMkdir.ir";
 
-# iRODS resources where files should be placed. The 
-# archive1 resource group is composed of a number of
-# thumpers, and has rules to auto-replicate to a second
-# resource group (archive2)
-my $destResc = 'archive1';
+# iRODS resources where files should be placed. 
+my $destResc = 'archive3';
 
 # timing and statistics
 my $num_files = 0;
@@ -462,9 +459,13 @@ sub getusername {
   my $out;
   if (!defined($userlist{$uid})) {
     $user = getpwuid($uid);
-    $out = `ypmatch $user passwd`;
-    if ($out =~ /^Can\'t match key/) {
+    if (!defined $user) {
       $user = '__LOCAL__';
+    } else {
+      $out = `ypmatch $user passwd 2>&1`;
+      if ($out =~ /^Can\'t match key/) {
+        $user = '__LOCAL__';
+      }
     }
     $userlist{$uid} = $user;
   }
@@ -477,7 +478,7 @@ sub getgroupname {
   my $group;
   my $out;
   if (!defined($grouplist{$gid})) {
-    $out = `ypmatch $gid group.bygid`;
+    $out = `ypmatch $gid group.bygid 2>&1`;
     if ($out =~ /^Can\'t match key/) {
       $group = '__LOCAL__';
     }
@@ -518,7 +519,7 @@ sub escape_chars {
   # the shell. Set of special characters is: ;&|><*?`$(){}[]!#
   # Also includes space.
   $escaped_name =~ s/ /\\ /g; # spaces
-  $escaped_name =~ s/([;<>\*\|`&\$!#\(\)\[\]\{\}:'"])/\\$1/g; # special chars
+  $escaped_name =~ s/([,;<>\*\|`&\$!#\(\)\[\]\{\}:'"])/\\$1/g; # special chars
   return $escaped_name;
 }    
 
