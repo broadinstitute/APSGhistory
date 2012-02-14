@@ -45,7 +45,7 @@ acAclPolicy||msiAclPolicy(STRICT)|nop
 #
 # For this rule to work properly, all acSetRescSchemeForCreate 
 # rules were commented out in core.irb.
-acSetRescSchemeForCreate||msiSetNoDirectRescInp(archive_1_1%archive_1_2%archive_1_3%archive_2_1%archive_2_2%archive_2_3)##msiSetDefaultResc(archive1,preferred)##msiSetRescSortScheme(random)|nop##nop##nop
+acSetRescSchemeForCreate||msiSetNoDirectRescInp(archive_3_1%archive_3_2%archive_3_3%archive_3_4%archive_3_5%archive_3_6)##msiSetDefaultResc(archive3,preferred)##msiSetRescSortScheme(random)|nop##nop##nop
 
 #
 # Rules for managing the ingest of files into the archive
@@ -73,6 +73,9 @@ acSetRescSchemeForCreate||msiSetNoDirectRescInp(archive_1_1%archive_1_2%archive_
 #
 acPostProcForPut|$rescGroupName == archive1|acBroadGetChksum($dataId,*sum)##msiGetIcatTime(*humanDate,null)##msiHumanToSystemTime(*humanDate,*timestamp)##acAddMetadataFromString(now,$objPath,broadEntryDate=*humanDate%broadEntryTimestamp=*timestamp%broadChecksum=*sum,-d)##delayExec(<PLUSET>1s</PLUSET>,msiDataObjRepl($objPath,destRescName=archive2++++verifyChksum=,*replstatus), msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive2, nop))|msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive2 2, nop)
 acPostProcForPut|$rescGroupName == archive2|acBroadGetChksum($dataId,*sum)##msiGetIcatTime(*humanDate,null)##msiHumanToSystemTime(*humanDate,*timestamp)##acAddMetadataFromString(now,$objPath,broadEntryDate=*humanDate%broadEntryTimestamp=*timestamp%broadChecksum=*sum,-d)##delayExec(<PLUSET>1s</PLUSET>,msiDataObjRepl($objPath,destRescName=archive1++++verifyChksum=,*replstatus), msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive1, nop))|msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive1 2, nop)
+
+# With the new archive3, the replication isn't required.
+acPostProcForPut|$rescGroupName == archive3|acBroadGetChksum($dataId,*sum)##msiGetIcatTime(*humanDate,null)##msiHumanToSystemTime(*humanDate,*timestamp)##acAddMetadataFromString(now,$objPath,broadEntryDate=*humanDate%broadEntryTimestamp=*timestamp%broadChecksum=*sum,-d)|msiWriteRodsLog(*** acPostProcForPut for archive3 failed, nop)
 
 acBroadGetChksum(*dataId,*Sum)||acGetIcatResults(replica,DATA_ID = '*dataId',*List)##forEachExec(*List,msiGetValByKey(*List,DATA_SIZE,*size)##ifExec(*size <= 0,assign(*Sum,none),nop,msiGetValByKey(*List,DATA_CHECKSUM,*origSum)##ifExec(X*origSum == X,msiDataObjChksum($objPath,verifyChksum,*newSum)##assign(*Sum,*newSum),nop,assign(*Sum,*origSum),nop),nop),nop)|msiWriteRodsLog(*** acBroadStoreChksum failed, nop)
 
@@ -108,7 +111,7 @@ acBulkPutPostProcPolicy||msiSetBulkPutPostProcPolicy(on)|nop
 #
 acAddMetadataFromString(*Action,*rodsPath,*KVString,*objType)|(*Action == delay)|msiWriteRodsLog(*** acAddMetadataFromString delay mode, nop)##delayExec(<PLUSET>1m</PLUSET>, msiString2KeyValPair(*KVString,*KVPair)##msiAssociateKeyValuePairsToObj(*KVPair,*rodsPath,*objType), nop)|msiWriteRodsLog(*** acAddMetadataFromString delay RULE ERROR *rodsPath, nop)
 
-acAddMetadataFromString(*Action,*rodsPath,*KVString,*objType)|(*Action == now)|msiWriteRodsLog(*** acAddMetadataFromString immediate mode, nop)##msiString2KeyValPair(*KVString,*KVPair)##msiAssociateKeyValuePairsToObj(*KVPair,*rodsPath,*objType)|msiWriteRodsLog(*** acAddMetadataFromString now RULE ERROR *rodsPath, nop)
+acAddMetadataFromString(*Action,*rodsPath,*KVString,*objType)|(*Action == now)|msiString2KeyValPair(*KVString,*KVPair)##msiAssociateKeyValuePairsToObj(*KVPair,*rodsPath,*objType)|msiWriteRodsLog(*** acAddMetadataFromString now RULE ERROR *rodsPath, nop)
 
 #acAddMetadataFromString(*Action,*rodsPath,*humanDate,*objType)|(*Action == expiry)|msiHumanToSystemTime(*humanDate, *secondsDate)##msiWriteRodsLog(*** acAddMetadataFromString expiry *humanDate *secondsDate, nop )##acConvertToInt(*secondsDate)##assign(*KVString, broadExpiryDate=*secondsDate)##msiString2KeyValPair(*KVString,*KVPair)##msiAssociateKeyValuePairsToObj(*KVPair,*rodsPath,*objType)|msiWriteRodsLog(*** acAddMetadataFromString expiry RULE ERROR *rodsPath, nop)
 
