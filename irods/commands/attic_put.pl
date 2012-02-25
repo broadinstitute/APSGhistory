@@ -22,9 +22,9 @@ my $default_expiry_period = 365 + 60;
 my $max_expiry_period = 365 * 5;
 
 # directory where the rules files are
-my $rulesLoc = '/home/radon00/irods/commands';
-my $putRule = "$rulesLoc/broadAtticPut.ir";
-my $mkdirRule = "$rulesLoc/broadAtticMkdir.ir";
+my $rulesLoc = dirname($0);
+my $putRule = "$rulesLoc/broadAtticPut.r";
+my $mkdirRule = "$rulesLoc/broadAtticMkdir.r";
 
 # iRODS resources where files should be placed. 
 my $destResc = 'archive3';
@@ -325,8 +325,17 @@ sub put_to_archive {
     $collection_owner{$File::Find::name} = $owner;
     $collection_acl{$File::Find::name} = $pubmode;
     print "Creating collection $newObj\n" if $args{v};
-    print "irule -F $mkdirRule $newObj $expiry $metadata $user $owner $group $groupmode write\n" if $args{t};
-    my @out =`irule -F $mkdirRule $newObj $expiry $metadata $user $owner $group $groupmode write 2>&1` if not $args{t};
+    my $irule_cmd = "irule -F $mkdirRule";
+    $irule_cmd .= " \"*rodsPath='$newObj'\"";
+    $irule_cmd .= " \"*expiryDate='$expiry'\"";
+    $irule_cmd .= " \"*params='$metadata'\"";
+    $irule_cmd .= " \"*user='$user'\"";
+    $irule_cmd .= " \"*owner='$owner'\"";
+    $irule_cmd .= " \"*group='$group'\"";
+    $irule_cmd .= " \"*groupMode='$groupmode'\"";
+    $irule_cmd .= " \"*pubMode='write'\"";
+    print "$irule_cmd\n" if $args{t};
+    my @out = `$irule_cmd 2>&1` if not $args{t};
     if ($?) {
       # Error code -809000 means the collection already exists ... not a problem
       my $rc = grep(/809000/, @out);
@@ -348,9 +357,20 @@ sub put_to_archive {
     $metadata .= "%broadSourceFilename=$srcFile";
     my $mb = ($st_info->size/(1024.0*1024.0));
     printf("Copying file %s (%.2f MB) to %s (%s)\n", "$srcDir/$srcFile", $mb, $newObj, $destResc) if $args{v};
-    print "irule -F $putRule $srcDir/$srcFile $destResc $newObj $expiry $metadata $user $owner $group $groupmode $pubmode\n" if $args{t};
+    my $irule_cmd = "irule -F $putRule";
+    $irule_cmd .= " \"*localFilePath='$srcDir/$srcFile'\"";
+    $irule_cmd .= " \"*rodsResource='$destResc'\"";
+    $irule_cmd .= " \"*rodsPath='$newObj'\"";
+    $irule_cmd .= " \"*expiryDate='$expiry'\"";
+    $irule_cmd .= " \"*params='$metadata'\"";
+    $irule_cmd .= " \"*user='$user'\"";
+    $irule_cmd .= " \"*owner='$owner'\"";
+    $irule_cmd .= " \"*group='$group'\"";
+    $irule_cmd .= " \"*groupMode='$groupmode'\"";
+    $irule_cmd .= " \"*pubMode='$pubmode'\"";
+    print "$irule_cmd\n" if $args{t};
     my $pre_ts = time();
-    my @out = `irule -F $putRule $srcDir/$srcFile $destResc $newObj $expiry $metadata $user $owner $group $groupmode $pubmode 2>&1` if not $args{t};
+    my @out = `$irule_cmd 2>&1` if not $args{t};
     if ($?) {
       # Error code -312000 says iRODS won't overwrite without a force flag. I.e. file exists. Not a problem.
       my $rc = grep(/312000/, @out);
