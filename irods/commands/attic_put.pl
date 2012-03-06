@@ -312,10 +312,10 @@ sub put_to_archive {
   my $prefix = dirname($File::Find::topdir)."/";
   my $destObj = "$File::Find::name";
   $destObj =~ s/^$prefix//;
-  my $newObj = escape_chars("$destColl/$destObj");
+  my $newObj = escape_irods(escape_chars("$destColl/$destObj"));
   
   if (S_ISDIR($st_info->mode)) {
-    my $srcDir = escape_chars($File::Find::name);
+    my $srcDir = escape_irods(escape_chars($File::Find::name));
     $metadata .= "%broadSourceDirectory=$srcDir";
     # we set the public ACL for the new collection to 'write' so that
     # there are no permissions issues creating sub-collections and files
@@ -351,8 +351,8 @@ sub put_to_archive {
     $num_dirs++;
   }
   elsif (S_ISREG($st_info->mode)) {
-    my $srcDir = escape_chars(dirname($File::Find::name));
-    my $srcFile = escape_chars(basename($File::Find::name));
+    my $srcDir = escape_irods(escape_chars(dirname($File::Find::name)));
+    my $srcFile = escape_irods(escape_chars(basename($File::Find::name)));
     $metadata .= "%broadSourceDirectory=$srcDir";
     $metadata .= "%broadSourceFilename=$srcFile";
     my $mb = ($st_info->size/(1024.0*1024.0));
@@ -540,6 +540,14 @@ sub escape_chars {
   # Also includes space.
   $escaped_name =~ s/ /\\ /g; # spaces
   $escaped_name =~ s/([,;<>\*\|`&\$!#\(\)\[\]\{\}:'"])/\\$1/g; # special chars
+  return $escaped_name;
+}    
+
+sub escape_irods {
+  my ($escaped_name) = @_;
+  # this pass is to "extra escape" characters that are 
+  # interpreted by the iRODS rule engine
+  $escaped_name =~ s/\$/\\\\\$/g; # deal with $
   return $escaped_name;
 }    
 
