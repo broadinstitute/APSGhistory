@@ -234,7 +234,7 @@ if ($nlink > $MAX_DIRS) {
   ##
   ## Find all top-level directories in directory specified
   ##
-  $cmd = "find $dir -noleaf -maxdepth 1 -mindepth 1 -type d -not -name '.snapshot'";
+  $cmd = "find \"$dir\" -noleaf -maxdepth 1 -mindepth 1 -type d -not -name '.snapshot' -not -name '.\$EXTEND'";
   print STDERR "$cmd\n" if $DEBUG;
   open FIND, "$cmd |" or die "could not run find on $mount: $!";
   my (@newdir, @olddir);
@@ -382,8 +382,9 @@ if ($nlink > $MAX_DIRS) {
 
 
 my $res = '';
-$res = "-R \"rusage[${server}_io=5]\"" unless ($server eq 'nitrogen' or $server eq 'nitrogen2' or $server eq 'thumper26' or $server eq 'vstorage00' or $server eq 'argon');
+$res = "-R \"rusage[${server}_io=5]\"" unless ($server eq 'nitrogen' or $server eq 'nitrogen2' or $server eq 'fluorine' or $server eq 'thumper26' or $server eq 'vstorage00' or $server eq 'argon' or $server eq 'argon-NL' or $server eq 'knox');
 
+exit 13 unless -d "$TMP";
 
 unless (-d "$TMP/$opt_t") {
   mkdir "$TMP/$opt_t", 0755 or die "could not mkdir $TMP/$opt_t: $!";
@@ -421,11 +422,11 @@ if (defined $opt_d) {
   }
   $job = "scan_${fsid}_$dotdir";
   $cmd = "$PRG $descend -o $DIR/${dotdir}.csv \"$dir\"";
-  $cmd = "bsub -r -q $queue -P fsstats -E \"cd $dir\" -o $DIR/${dotdir}.out -J $job $res " . $cmd;
+  $cmd = "bsub -Q \"13\" -r -q $queue -P fsstats -E \"cd \'$dir\'\" -o $DIR/${dotdir}.out -J $job $res " . $cmd;
 } else {
   $job = "scan_${fsid}_0";
   $cmd = "$PRG $descend -o $DIR/0.csv \"$dir\"";
-  $cmd = "bsub -r -q $queue -P fsstats -E \"cd $dir\" -o $DIR/0.out -J $job $res " . $cmd;
+  $cmd = "bsub -Q \"13\" -r -q $queue -P fsstats -E \"cd \'$dir\'\" -o $DIR/0.out -J $job $res " . $cmd;
 }
 print STDERR "$cmd\n" if $DEBUG;
 print `$cmd\n` unless $DRYRUN;
@@ -434,7 +435,7 @@ for my $d (keys %dbdir) {
   $job = defined $opt_d ? "scan_${fsid}_${opt_d}_${dirid}" :
                           "scan_${fsid}_${dirid}";
   $cmd = "$PRG -o $DIR/${dirid}.csv \"$dir/$d\"";
-  $cmd = "bsub -r -q $queue -P fsstats -E \"cd $dir\" -J $job -o  $DIR/${dirid}.out $res " . $cmd;
+  $cmd = "bsub -Q \"13\" -r -q $queue -P fsstats -E \"cd \'$dir\'\" -J $job -o  $DIR/${dirid}.out $res " . $cmd;
   print STDERR "$cmd\n" if $DEBUG;
   print `$cmd\n` unless $DRYRUN;
   sleep $SLEEP;
