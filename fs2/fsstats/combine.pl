@@ -113,7 +113,7 @@ unless (defined $t) {
 ## Off we go
 ##
 if ($opt_f == 0) {		# Global rollup
-  $sql = "SELECT s.uid, s.type, s.histogram FROM fsstat s INNER JOIN filesystem f ON s.fsid=f.id WHERE f.parent IS NULL AND f.deprecated IS FALSE AND s.latest IS TRUE AND s.dirid IS NULL AND s.fsid>0";
+  $sql = "SELECT s.uid, s.type, s.histogram FROM fsstat s INNER JOIN filesystem f ON s.fsid=f.id WHERE f.parent IS NULL AND f.deprecated IS FALSE AND s.latest IS TRUE AND s.dirid IS NULL AND s.fsid>0 AND s.fsid <> 2003";
 } elsif (defined($opt_d)) {	# Directory rollup
   $sql = "SELECT s.uid, s.type, s.histogram FROM fsstat s INNER JOIN subdir d ON s.dirid=d.dirid AND s.fsid=d.fsid WHERE s.fsid=$opt_f AND d.parent=$opt_d AND d.deprecated IS FALSE AND s.latest IS TRUE";
 }  else {			# Filesystem rollup
