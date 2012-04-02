@@ -91,7 +91,25 @@ if ($nr > 0) {
   ($fsid,$mount,$maxdepth)  = $sth->fetchrow_array();
   print "Scanning $mount (fsid $fsid)\n";
 } else {
-  die "No mount found for $file";
+  warn "No mount found for $file";
+  next;
+}
+
+##
+## Check for lock
+##
+unless (defined $opt_d) {
+  $sql = qq{SELECT * FROM fslock WHERE fsid=$file AND end IS NULL};
+  print STDERR "$sql\n" if $DEBUG;
+  $sth = $dbh->prepare($sql) or print $dbh->err;
+  $nr  = $sth->execute();
+  if ($nr > 0) {
+    my ($id,$start,$end);
+    ($id, $fsid, $start, $end) =  $sth->fetchrow_array();
+    my $when = scalar localtime($start);
+    print STDERR "A lock exists for $fsid. Scan started $when. Skipping.\n";
+    next;
+  }
 }
 
 ##
@@ -150,11 +168,21 @@ if ($nr > 0) {
           print STDERR "Update forced.\n\n";
         } else {
           print STDERR "Skipping. (Use --force-update to override.)\n";
-          exit;
+          next;
         }
   }
 } else {
   warn "could not retrieve historical info for $fsid";
+}
+
+##
+## Set scan lock
+##
+unless (defined $opt_d) {
+  my $when = time();
+  $sql = qq{INSERT INTO fslock(fsid,start) VALUES ($fsid, $when)};
+  print STDERR "$sql\n" if $DEBUG;
+  $dbh->do($sql) unless $DRYRUN;
 }
 
 ##

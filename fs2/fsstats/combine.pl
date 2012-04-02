@@ -276,3 +276,21 @@ for my $uid (keys %csum) {
     }
   }
 }
+
+##
+## Update lock status
+##
+exit if $opt_f == 0 or defined $opt_d;
+$sql = qq{SELECT MAX(id) FROM fslock WHERE fsid=$opt_f AND END IS NULL};
+printf STDERR "$sql\n" if $DEBUG;
+$sth = $dbh->prepare($sql);
+$nr  = $sth->execute();
+my $id = ($sth->fetchrow_array())[0];
+unless (defined $id) {
+  warn "no lock found for $opt_f";
+  exit;
+}
+my $now = time();
+$sql = qq{UPDATE fslock SET end=$now WHERE id=$id};
+printf STDERR "$sql\n" if $DEBUG;
+$dbh->do($sql) unless $DRYRUN;
