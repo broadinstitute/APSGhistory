@@ -24,16 +24,18 @@ my $MAX_DIRS = 4000;
 my ($opt_f,$opt_d,$opt_t,$opt_v,$opt_q);
 $opt_f = $opt_d = $opt_t = $opt_v = $opt_q = undef;
 my $force   = '';
+my $sscid   = '';
 my $descend = '-1';
 GetOptions(
-           "f=s@" => \$opt_f,
-           "d=i" => \$opt_d,
-           "t=i" => \$opt_t,
-           "v" => \$DEBUG,
-           "q=s" => \$opt_q,
+           "f=s@"         => \$opt_f,
+           "d=i"          => \$opt_d,
+           "t=i"          => \$opt_t,
+           "v"            => \$DEBUG,
+           "q=s"          => \$opt_q,
            "force-update" =>\$force,
+           "sscid=i"      =>\$sscid,
           );
-unless (defined $opt_f) {
+unless (defined $opt_f or defined $sscid) {
   warn "usage: $0: -f {filesystem|fsid} <-t timestamp> <-d dirid>";
   exit 1;
 }
@@ -56,6 +58,17 @@ $dsn = "DBI:mysql:database=matter;host=mysql;port=3306";
 $dbh = DBI->connect($dsn, "matter", "tyhjcZ30Y");
 
 my ($sql, $sth, $nr);
+
+if (defined $sscid) {
+  $sql = qq{SELECT id FROM filesystem WHERE sscid=$sscid AND deprecated IS FALSE AND parent IS NULL};
+  $sth = $dbh->prepare($sql);
+  $nr  = $sth->execute(); 
+  if ($nr > 0) {
+    while (my $fsid = ($sth->fetchrow_array())[0]) {
+      push @{$opt_f}, $fsid;
+    }
+  }
+}
 
 ##
 ## Loop over filesystems
