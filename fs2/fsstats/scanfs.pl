@@ -59,8 +59,8 @@ $dbh = DBI->connect($dsn, "matter", "tyhjcZ30Y");
 
 my ($sql, $sth, $nr);
 
-if (defined $sscid) {
-  $sql = qq{SELECT id FROM filesystem WHERE sscid=$sscid AND deprecated IS FALSE AND parent IS NULL};
+if (defined $sscid and $sscid>0) {
+  $sql = qq{SELECT id FROM filesystem WHERE sscid=$sscid AND deprecated IS FALSE};
   $sth = $dbh->prepare($sql);
   $nr  = $sth->execute(); 
   if ($nr > 0) {
