@@ -58,8 +58,16 @@ acAclPolicy {
 # rules were commented out in core.re.
 #
 acSetRescSchemeForCreate {
-  msiSetNoDirectRescInp("archive_3_1%archive_3_2%archive_3_3%archive_3_4%archive_3_5%archive_3_6");
-  msiSetDefaultResc("archive3","preferred");
+  #msiSetNoDirectRescInp("archive_3_1%archive_3_2%archive_3_3%archive_3_4%archive_3_5%archive_3_6");
+  msiSetNoDirectRescInp("knox28%knox29");
+  #msiSetDefaultResc("archive3","preferred");
+  msiSetDefaultResc("knox","preferred");
+  msiSetRescSortScheme("random"); 
+}
+
+acSetRescSchemeForRepl {
+  msiSetNoDirectRescInp("knox28%knox29");
+  msiSetDefaultResc("knox","preferred");
   msiSetRescSortScheme("random"); 
 }
 
@@ -90,9 +98,9 @@ acSetRescSchemeForCreate {
 # OLD STYLE -- acPostProcForPut|$rescGroupName == archive1|acBroadGetChksum($dataId,*sum)##msiGetIcatTime(*humanDate,null)##msiHumanToSystemTime(*humanDate,*timestamp)##acAddMetadataFromString(now,$objPath,broadEntryDate=*humanDate%broadEntryTimestamp=*timestamp%broadChecksum=*sum,-d)##delayExec(<PLUSET>1s</PLUSET>,msiDataObjRepl($objPath,destRescName=archive2++++verifyChksum=,*replstatus), msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive2, nop))|msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive2 2, nop)
 # OLD STYLE -- acPostProcForPut|$rescGroupName == archive2|acBroadGetChksum($dataId,*sum)##msiGetIcatTime(*humanDate,null)##msiHumanToSystemTime(*humanDate,*timestamp)##acAddMetadataFromString(now,$objPath,broadEntryDate=*humanDate%broadEntryTimestamp=*timestamp%broadChecksum=*sum,-d)##delayExec(<PLUSET>1s</PLUSET>,msiDataObjRepl($objPath,destRescName=archive1++++verifyChksum=,*replstatus), msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive1, nop))|msiWriteRodsLog(*** acPostProcForPut failure to replicate to archive1 2, nop)
 
-# With the new archive3, the replication isn't required.
+# With the new knox resource group, the replication isn't required.
 acPostProcForPut {
- ON($rescGroupName == "archive3") {
+ ON($rescGroupName == "knox") {
   acBroadGetChksum($dataId,*sum);
   msiGetIcatTime(*humanDate,"null");
   msiHumanToSystemTime(*humanDate,*timestamp);
@@ -328,6 +336,15 @@ acGetIcatResults(*Action,*Condition,*GenQOut) {
                  *Condition, *Query);
     msiExecStrCondQuery(*Query, *GenQOut);
   }
+}
+
+# Set default number of threads for transfers
+#
+# This rule sets the maximum number of threads that a transfer will
+# use. A client can request less, but not more than this. The default
+# value in core.re is 16, but 8 seems to work better in the Broad network
+acSetNumThreads {
+  msiSetNumThreads("default","8","default");
 }
 
 #

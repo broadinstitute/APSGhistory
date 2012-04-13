@@ -27,7 +27,7 @@ my $putRule = "$rulesLoc/broadAtticPut.r";
 my $mkdirRule = "$rulesLoc/broadAtticMkdir.r";
 
 # iRODS resources where files should be placed. 
-my $destResc = 'archive3';
+my $destResc = 'knox';
 
 # timing and statistics
 my $num_files = 0;
