@@ -12,7 +12,7 @@ use Getopt::Long;
 
 
 my $PRG = "perl /sysman/scratch/matter/sandbox/fsstats/mystats";
-my $TMP = "/broad/shptmp/fsstats";
+my $TMP = "/broad/hptmp/fsstats";
 my $DRYRUN = 0;
 my $SLEEP = 0;
 my $MAX_SIZE = 1;	# Units now TB
@@ -99,7 +99,7 @@ if ($nr > 0) {
 ## Check for lock
 ##
 unless (defined $opt_d) {
-  $sql = qq{SELECT * FROM fslock WHERE fsid=$file AND end IS NULL};
+  $sql = qq{SELECT * FROM fslock WHERE fsid=$fsid AND end IS NULL};
   print STDERR "$sql\n" if $DEBUG;
   $sth = $dbh->prepare($sql) or print $dbh->err;
   $nr  = $sth->execute();
