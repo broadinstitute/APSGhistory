@@ -94,7 +94,7 @@ for my $f (@csv) {
     /^$/ and do {
       next unless $hist;
       next unless $sumcnt;		# Skip if count==0;
-      unless ($tid == 1 or $tid == 2 or $tid = 11 or $tid = 13 or $tid == 15) {
+      unless ($tid == 1 or $tid == 2 or $tid == 11 or $tid == 13 or $tid == 15) {
         next;
       }
       if (defined $uid) {
