@@ -107,8 +107,16 @@ unless (defined $opt_d) {
     my ($id,$start,$end);
     ($id, $fsid, $start, $end) =  $sth->fetchrow_array();
     my $when = scalar localtime($start);
-    print STDERR "A lock exists for $fsid. Scan started $when. Skipping.\n";
-    next;
+    print STDERR "A lock exists for $fsid. Scan started $when.\n";
+    if ($force) {
+      print STDERR "Update forced. Removing lock.\n\n";
+      $sql = "DELETE FROM fslock WHERE id=$id";
+      print STDERR "$sql\n" if $DEBUG;
+      $dbh->do($sql) unless $DRYRUN;
+    } else {
+      print STDERR "Skipping. (Use --force-update to override.)\n";
+      next;
+    }
   }
 }
 
