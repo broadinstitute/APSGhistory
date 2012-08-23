@@ -10,6 +10,10 @@ use DBI;
 use DBD::mysql;
 use Getopt::Long;
 
+unless (defined $ENV{'LSF_CLUSTER_NAME'}) {
+  print STDERR "You muse \'use LSF\' before running this. (Did you \`sudo -E\`?)\n";
+  exit 1;
+}
 
 my $PRG = "perl /sysman/scratch/matter/sandbox/fsstats/mystats";
 my $TMP = "/broad/hptmp/fsstats";
@@ -54,7 +58,7 @@ $dirid = $opt_d if defined $opt_d;
 ## Initiate DB connection
 ##
 my ($dsn,$dbh);
-$dsn = "DBI:mysql:database=matter;host=mysql;port=3306";
+$dsn = "DBI:mysql:database=bitstore;host=apsgdb04;port=3306";
 $dbh = DBI->connect($dsn, "matter", "tyhjcZ30Y");
 
 my ($sql, $sth, $nr);

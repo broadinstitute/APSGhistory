@@ -30,16 +30,15 @@ my ($upd, $ush);
 ##
 ## Ad hoc SELECT goes here
 $sql = <<SQL;
-SELECT s.uid,s.type,s.histogram 
-  FROM fsstat s
-    INNER JOIN filesystem f on s.fsid = f.id
-  WHERE f.parent IS NULL
-  AND f.deprecated IS FALSE
-  AND s.latest IS TRUE
-  AND s.dirid IS NULL
-  AND s.uid IS NULL
-  AND (f.path like 'yin%' or f.path like 'yang%' or f.path like 'zig%' or f.path like 'zag%')
-  AND s.type=15
+select s.type,s.histogram
+from fsstat s inner join filesystem f on s.fsid=f.id
+where f.parent is null
+and f.deprecated is false
+and s.latest is true
+and s.dirid is null
+and s.uid is null
+and s.type=15
+and (f.path like 'sunexa%' or f.path like 'thumper%')
 SQL
 
 print STDERR "$sql\n" if $DEBUG;

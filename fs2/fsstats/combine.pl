@@ -9,6 +9,7 @@ use DBI;
 use DBD::mysql;
 use Getopt::Long;
 
+require 'dbconnect.pl';
 
 my $DRYRUN = 0;
 
@@ -32,8 +33,7 @@ unless (defined $opt_f) {
 ##
 ## Initiate DB connection
 ##
-my $dsn = "DBI:mysql:database=matter;host=mysql;port=3306";
-my $dbh = DBI->connect($dsn, "matter", "tyhjcZ30Y");
+my $dbh = DBI->connect($dsn, $dbuser, $dbpw);
 
 my ($sql, $sth, $nr);
 my $cmd;
@@ -182,7 +182,7 @@ for my $type (keys %{$csum{'all'}}) {
     ##
     ## Mark previous entries as "old"
     ##
-    $sql = "UPDATE fsstat SET latest=0 WHERE fsid=$opt_f AND dirid=$opt_d  AND uid IS NULL AND type=$type AND checked < $t";
+    $sql = "UPDATE fsstat SET latest=0 WHERE fsid=$opt_f AND dirid=$opt_d AND type=$type AND checked < $t";
     printf STDERR "$sql\n" if $DEBUG;
     $dbh->do($sql) unless $DRYRUN;
     ##
@@ -199,15 +199,15 @@ for my $type (keys %{$csum{'all'}}) {
     $dbh->do($sql) unless $DRYRUN;
   } else {
     ##
-    ## Mark previous entries as "old"
+    ## Move previous entries to history table
     ##
-    $sql = "UPDATE fsstat SET latest=0 WHERE fsid=$opt_f AND dirid IS NULL  AND uid IS NULL AND type=$type AND checked < $t";
+    $sql = "INSERT INTO fsstat_history SELECT * FROM fsstat WHERE fsid=$opt_f AND dirid IS NULL AND type=$type AND checked < $t";
     printf STDERR "$sql\n" if $DEBUG;
     $dbh->do($sql) unless $DRYRUN;
     ##
-    ##  Delete old rollups, if any
+    ##  Delete previous entries, including old rollups, if any
     ##
-    $sql = "DELETE FROM fsstat WHERE fsid=$opt_f AND dirid IS NULL AND uid IS NULL AND type=$type AND checked = $t";
+    $sql = "DELETE FROM fsstat WHERE fsid=$opt_f AND dirid IS NULL AND type=$type AND checked <= $t";
     printf STDERR "$sql\n" if $DEBUG;
     $dbh->do($sql) unless $DRYRUN;
     ##

@@ -22,7 +22,7 @@ $opt_d =~ s,/$,,;
 ##
 ## Initiate DB connection
 ##
-my $dsn = "DBI:mysql:database=matter;host=mysql;port=3306";
+my $dsn = "DBI:mysql:database=bitstore;host=apsgdb04;port=3306";
 my $dbh = DBI->connect($dsn, "matter", "tyhjcZ30Y");
 
 my $sql = "SELECT * FROM stat_type";
