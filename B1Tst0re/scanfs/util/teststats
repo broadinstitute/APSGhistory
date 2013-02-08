@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+
+use File::Find;
+
+find(\&prtstat, @ARGV);
+
+
+sub prtstat {
+  if (-f) {
+    print join ",", $_,lstat();
+    print "\n";
+  }
+}

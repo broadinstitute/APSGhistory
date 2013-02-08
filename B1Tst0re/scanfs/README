@@ -1,0 +1,30 @@
+The fsstats tool collects and aggregates various statistics about the
+files in a filesystem.  Full documentation is provided in POD format
+in the "fsstats" file itself.  To read it, run
+    % perldoc fsstats
+
+You can also use "pod2man", "pod2html", etc. to translate the
+documentation to other formats.
+
+fsstats is designed to be portable to a wide variety of Perl versions,
+and makes minimal requirements in terms of non-standard Perl modules.
+One important caveat is that if your Perl is not compiled with 64-bit
+integer support, files larger than 2 GB will not be tabulated
+correctly.
+
+fsstats is distributed under the terms of the GNU General Public
+License.  See the COPYING file for licensing information.
+
+If you have questions or comments, contact:
+    Shobhit Dayal 
+    Carnegie Mellon University
+
+    sdayal@andrew.cmu.edu
+
+    Marc Unangst
+    Panasas, Inc.
+    Suite 400
+    1501 Reedsdale St.
+    Pittsburgh, PA 15217
+
+    munangst@panasas.com
