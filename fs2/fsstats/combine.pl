@@ -9,7 +9,7 @@ use DBI;
 use DBD::mysql;
 use Getopt::Long;
 
-require 'dbconnect.pl';
+require '/broad/B1Tst0re/scanfs/dbconnect.pl';
 
 my $DRYRUN = 0;
 

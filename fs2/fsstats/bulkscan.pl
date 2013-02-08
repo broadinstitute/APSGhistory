@@ -22,7 +22,8 @@ my ($sql, $sth, $nr);
 ##
 ## Get list of filesystems to look at
 ##
-$sql = qq{SELECT id FROM filesystem WHERE acct>1 AND parent IS NULL AND deprecated IS FALSE};
+#$sql = qq{SELECT id FROM filesystem WHERE acct>1 AND parent IS NULL AND deprecated IS FALSE};
+$sql = qq{SELECT DISTINCT(fsid) FROM accounting a INNER JOIN filesystem f on a.fsid=f.id WHERE a.mask>1 AND f.export > 2};
 $sth = $dbh->prepare($sql);
 $nr  = $sth->execute();
 print STDERR "Found $nr filesystems to scan\n" if $DEBUG;

@@ -15,7 +15,7 @@ unless (defined $ENV{'LSF_CLUSTER_NAME'}) {
   exit 1;
 }
 
-my $PRG = "perl /sysman/scratch/matter/sandbox/fsstats/mystats";
+my $PRG = "perl /broad/B1Tst0re/scanfs/mystats";
 my $TMP = "/broad/hptmp/fsstats";
 my $DRYRUN = 0;
 my $SLEEP = 0;
@@ -385,10 +385,9 @@ if ($nlink > $MAX_DIRS) {
     print STDERR "$sql\n" if $DEBUG;
     $sth = $dbh->prepare($sql);
     $nr  = $sth->execute();
-    if ($nr > 0) {
+    if ($nr > 0 or (defined $maxdepth and $level < $maxdepth)) {
       ##
       ## Yes, we have been subscanned before. Submit me.
-      ##
       ##
       ## First ensure there exists a "." entry for me.
       ##
@@ -408,6 +407,9 @@ if ($nlink > $MAX_DIRS) {
       delete $dbdir{$d};
       next; 
     }
+    ##
+    ## Was I big enough last time that I should be subscanned?
+    ##
     $sql = qq{SELECT sumval FROM fsstat WHERE fsid=$fsid AND dirid=$dirid AND type=2 AND uid IS NULL AND latest=1};
     print STDERR "$sql\n" if $DEBUG;
     $sth = $dbh->prepare($sql);
@@ -435,7 +437,7 @@ if ($nlink > $MAX_DIRS) {
 
 
 my $res = '';
-$res = "-R \"rusage[${server}_io=5]\"" unless ($server eq 'nitrogen' or $server eq 'nitrogen2' or $server eq 'fluorine' or $server eq 'thumper26' or $server eq 'vstorage00' or $server eq 'argon' or $server eq 'argon-NL' or $server eq 'knox');
+$res = "-R \"rusage[${server}_io=5]\"" unless ($server eq 'nitrogen' or $server eq 'nitrogen2' or $server eq 'fluorine' or $server eq 'thumper26' or $server eq 'vstorage00' or $server eq 'argon' or $server eq 'argon-NL' or $server eq 'knox' or $server eq 'twister' or $server eq 'bragg');
 
 exit 13 unless -d "$TMP";
 
