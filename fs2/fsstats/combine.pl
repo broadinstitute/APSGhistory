@@ -38,6 +38,32 @@ my $dbh = DBI->connect($dsn, $dbuser, $dbpw);
 my ($sql, $sth, $nr);
 my $cmd;
 ##
+## Make sure there's no old data lying around
+##
+if ($opt_f > 0 and !defined $opt_d) {
+  $sql = <<SQL;
+SELECT MAX(checked) 
+  FROM fsstat f 
+  INNER JOIN subdir d ON f.fsid=d.fsid AND f.dirid=d.dirid
+    WHERE f.fsid=$opt_f 
+    AND f.latest=1 
+    AND f.type=2 
+    AND f.uid IS NULL  
+    AND d.parent IS NULL
+SQL
+  print STDERR "$sql\n" if $DEBUG;
+  $sth = $dbh->prepare($sql);
+  $nr = $sth->execute();
+  unless ($nr > 0) {
+    warn "unable to query DB.\n";
+    exit 1;
+  }
+  my $t0 = ($sth->fetchrow_array())[0];
+  $sql = "UPDATE fsstat SET latest=0 WHERE fsid=$opt_f and checked < $t0";
+  print STDERR "$sql\n" if $DEBUG;
+  $dbh->do($sql);
+}
+##
 ## See if we have rollup to do
 ##
 unless (defined $opt_d or $opt_f == 0 or $norollup) {

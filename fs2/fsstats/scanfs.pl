@@ -504,7 +504,7 @@ exit 0 if defined $opt_d;
 $job = "upload_${fsid}";
 $dep = "done(\"scan_${fsid}_*\")";
 
-$cmd = "/home/radon01/matter/sandbox/fsstats/upload_stats.pl -d $DIR -t $opt_t";
+$cmd = "/broad/B1Tst0re/scanfs/upload_stats.pl -d $DIR -t $opt_t";
 $cmd .= " -v" if $DEBUG;
 $cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -J $job -o $DIR/upload.out " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
@@ -514,7 +514,7 @@ print `$cmd\n` unless $DRYRUN;
 ##
 $dep = "done(\"$job\")";
 $job = "combine_${fsid}";
-$cmd = "/home/radon01/matter/sandbox/fsstats/combine.pl -f $fsid";
+$cmd = "/broad/B1Tst0re/scanfs/combine.pl -f $fsid";
 $cmd .= " -v" if $DEBUG;
 $cmd = "bsub -r -q $queue -E \"perl -e 'use DBD::mysql'\" -P fsstats -w '$dep' -J $job -o $DIR/combine.out " . $cmd;
 print STDERR "$cmd\n" if $DEBUG;
