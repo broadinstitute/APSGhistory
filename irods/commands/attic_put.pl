@@ -27,7 +27,7 @@ my $putRule = "$rulesLoc/broadAtticPut.r";
 my $mkdirRule = "$rulesLoc/broadAtticMkdir.r";
 
 # iRODS resources where files should be placed. 
-my $destResc = 'knox';
+my $destResc = 'izbox';
 
 # timing and statistics
 my $num_files = 0;
@@ -50,12 +50,13 @@ my %collection_name = ();
 # support the exclusion of certain file/directory names using
 # perl regex patterns contained in a file. At pre-defined patterns
 # here to make them default.
+my @include_patterns = ();
 my @exclude_patterns = ("core", "\.DS_Store");
 my %excluded_files = ();
 my $num_excluded = 0;
 
 my %args;
-getopts('c:e:f:hrtvx:', \%args);
+getopts('c:e:f:hi:rtvx:', \%args);
 
 if ($#ARGV eq -1 or $args{h}) {
     usage();
@@ -150,9 +151,16 @@ if ($?) {
 }
 
 #
-# Read a file containing perl regexp patterns of files to
-# exclude from the ingest. 
-if ($args{x} and open(EXCLUDE, $args{x})) {
+# Read files containing perl regexp patterns of files to
+# include and/or exclude from the ingest.
+if ($args{i} and open(INCLUDE, $args{i})) {
+  while (<INCLUDE>) {
+    chop;
+    push(@include_patterns, $_);
+  }
+  close(INCLUDE);
+}
+elsif ($args{x} and open(EXCLUDE, $args{x})) {
   while (<EXCLUDE>) {
     chop;
     push(@exclude_patterns, $_);
@@ -244,20 +252,33 @@ sub postprocess_dir {
 
 sub exclude_entries {
   my @file_list = ();
-  my $name;
-  my $pattern;
 
-  foreach $name (@_) {
-    my $match = "";
-    foreach my $pattern (@exclude_patterns) {
-      if ($name =~ m/^$pattern$/) {
-        $match = $pattern;
-        $excluded_files{"$File::Find::dir/$name"} = $pattern;
-        $num_excluded++;
-        last;
+  foreach my $name (@_) {
+    my $include;
+    if ($#include_patterns == -1) {
+      $include = 1; # include by default
+      foreach my $pattern (@exclude_patterns) {
+        if ($name =~ m/^$pattern$/) {
+          $include = 0;
+          $num_excluded++;
+          $excluded_files{"$File::Find::dir/$name"} = "matched exclude pattern: $pattern";
+          last;
+        }
       }
     }
-    if ($match eq "") {
+    elsif (-d "$File::Find::dir/${name}") {
+      $include = 1;
+    }
+    else {
+      $include = 0; # don't include by default
+      foreach my $pattern (@include_patterns) {
+        if ($name =~ m/^$pattern$/) {
+          $include = 1;
+          last;
+        }
+      }
+    }
+    if ($include) {
       push(@file_list, $name);
     }
   }
@@ -567,6 +588,18 @@ Options are:
   -f paramFile - a file containing the the meta-data key/value pairs 
        that you'd like to associate with all the files being copied.
   -h   this message.
+  -i includeFile - a file containing patterns, in the form of perl 
+       regular expressions (see 'perldoc perlre'), that indicate
+       files that should be included in the ingest (all directories
+       are traversed when using include patterns).
+       Note that perl regular expressions are not quite the same as
+       the ones in csh or sh. For example, the wildcard character
+       '*', which matches any character 0 or more times when used in
+       the shell, is done in perl with the expression '.*', which 
+       says to match any character (indicated with '.'), 0 or more
+       times (indicated with '*').  If both include patterns and
+       exclude patterns are provided, then the include pattern is
+       given precedence.
   -r   remove files and directories after successful ingest into
        the archive system. 
   -t   test mode. No iRODS commands will actually be executed.
@@ -580,6 +613,8 @@ Options are:
        '*', which matches any character 0 or more times when used in
        the shell, is done in perl with the expression '.*', which 
        says to match any character (indicated with '.'), 0 or more
-       times (indicated with '*').\n";
+       times (indicated with '*'). If both include patterns and
+       exclude patterns are provided, then the include pattern is
+       given precedence.\n";
 }
 
