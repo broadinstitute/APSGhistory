@@ -4,7 +4,7 @@ use strict;
 
 my $debug = 0;
 
-my $iadmin = '/opt/iRODS/clients/icommands/bin/iadmin';
+my $iadmin = 'iadmin';
 
 my %nis_group_map = (
   52 => "sequence",
@@ -17,6 +17,13 @@ my %nis_group_map = (
   484 => "cbplatgrp",
   1015 => "broad",
   2022 => "cbntgrp",
+  );
+
+# for cases where there is a user and group with
+# the same name, tell the script to not try
+# and synchronize the group
+my %ignore_group = (
+  "rpmbuild" => 1,
   );
 
 my $run_iadmin;
@@ -49,6 +56,7 @@ open(YPCAT, "ypcat group|") or die "Can't run ypcat: $!\n";
 while (<YPCAT>) {
   chomp;
   ($group, $pw, $gid, $members) = split /:/;
+  next if $ignore_group{$group};
   $group = $nis_group_map{$gid} if exists $nis_group_map{$gid};
   $nis_groups_by_gid{$gid} = $group;
   if (exists $nis_groups_by_name{$group}) {
