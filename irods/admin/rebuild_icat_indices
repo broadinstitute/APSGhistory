@@ -1,0 +1,11 @@
+#!/bin/bash -f
+
+eval `/broad/software/dotkit/init -b`
+
+scriptdir=`dirname $0`
+
+use -q Oracle-full-client
+
+sqlplus irods/irods@icat @${scriptdir}/rebuild_icat_indices.sql
+
+exit $?
