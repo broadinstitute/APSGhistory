@@ -22,7 +22,7 @@ my $default_expiry_period = 365 + 60;
 my $max_expiry_period = 365 * 5;
 
 # directory where the rules files are
-my $rulesLoc = dirname($0);
+my $rulesLoc = abs_path(dirname($0));
 my $putRule = "$rulesLoc/broadAtticPut.r";
 my $mkdirRule = "$rulesLoc/broadAtticMkdir.r";
 
@@ -56,7 +56,7 @@ my %excluded_files = ();
 my $num_excluded = 0;
 
 my %args;
-getopts('c:e:f:hi:rtvx:', \%args);
+getopts('c:e:f:hi:qrtvx:', \%args);
 
 if ($#ARGV eq -1 or $args{h}) {
     usage();
@@ -65,6 +65,11 @@ if ($#ARGV eq -1 or $args{h}) {
 # if we're in test mode, go verbose
 if ($args{t}) {
     $args{v} = 1;
+}
+
+# if we're in quiet mode, clear the verbose flag
+if ($args{q}) {
+    $args{v} = 0;
 }
 
 my $scriptuser = getpwuid($<);
@@ -168,7 +173,7 @@ elsif ($args{x} and open(EXCLUDE, $args{x})) {
   close(EXCLUDE);
 }
 
-print "Putting files in $destColl on resource $destResc\n";
+print "Putting files in $destColl on resource $destResc\n" if not $args{q};
 print "Files will have an expiry date of $expiry.\n" if $args{v};
 
 $start_ts = time();
@@ -186,27 +191,30 @@ $end_ts = time();
 my $elapsed = $end_ts - $start_ts;
 $elapsed = 1 if $elapsed eq 0;
 my $num_mb = $num_bytes / (1024.0 * 1024.0);
-print "\nTransfer statistics:\n";
-print "\tnumber of directories : $num_dirs ($num_dirs_exist already in iRODS)\n";
-print "\tnumber of files       : $num_files ($num_files_exist already in iRODS)\n";
-printf "\tnumber of megabytes   : %.2f\n", $num_mb;
-printf "\telapsed time          : %dh:%02dm:%02ds (%d secs)\n",
-  int($elapsed/(60*60)), ($elapsed/60)%60, $elapsed%60, $elapsed;
-printf "\toverall throughput    : %.2f MB/sec\n", $num_mb / $elapsed;
-print "\tnumber excluded       : $num_excluded\n";
-print "\tnumber of symlinks    : $num_links\n";
-print "\tnumber of errors      : $num_errors\n";
-if ($num_excluded) {
-  print "\nList of files and directories excluded by exclusion patterns:\n";
-  foreach my $excluded (keys %excluded_files) {
-    print "\t$excluded\n";
-  }
-}
-if ($num_links) {
-  print "\nList of encountered symlinks:\n";
-  foreach my $symlink (keys %symlinks) {
-    print "\t$symlink\n";
-  }
+
+if (not $args{q}) {
+    print "\nTransfer statistics:\n";
+    print "\tnumber of directories : $num_dirs ($num_dirs_exist already in iRODS)\n";
+    print "\tnumber of files       : $num_files ($num_files_exist already in iRODS)\n";
+    printf "\tnumber of megabytes   : %.2f\n", $num_mb;
+    printf "\telapsed time          : %dh:%02dm:%02ds (%d secs)\n",
+      int($elapsed/(60*60)), ($elapsed/60)%60, $elapsed%60, $elapsed;
+    printf "\toverall throughput    : %.2f MB/sec\n", $num_mb / $elapsed;
+    print "\tnumber excluded       : $num_excluded\n";
+    print "\tnumber of symlinks    : $num_links\n";
+    print "\tnumber of errors      : $num_errors\n";
+    if ($num_excluded) {
+      print "\nList of files and directories excluded by exclusion patterns:\n";
+      foreach my $excluded (keys %excluded_files) {
+        print "\t$excluded\n";
+      }
+    }
+    if ($num_links) {
+      print "\nList of encountered symlinks:\n";
+      foreach my $symlink (keys %symlinks) {
+        print "\t$symlink\n";
+      }
+    }
 }
 if ($num_errors) {
   print "\nList of errors:\n";
