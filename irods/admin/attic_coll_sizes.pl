@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
-my $size_threshold = 250 * 1024 * 1024 * 1024;
-my $max_level = 3;
+my $size_threshold = 500 * 1024 * 1024 * 1024;
+my $max_level = 1;
 
 my $topcoll = '/broad/attic';
 if ($#ARGV == 0) {
@@ -12,7 +12,7 @@ printf "%-56s:", $topcoll;
 my $sq = 'iquest "%s:%s" ';
 $sq .= '"select sum(DATA_SIZE), count(DATA_ID)';
 $sq .= " where COLL_NAME like '${topcoll}%'";
-$sq .= " and DATA_RESC_GROUP_NAME = 'knox'\"";
+$sq .= " and DATA_RESC_NAME = 'izbox'\"";
 my $result = `$sq 2>/dev/null`;
 chomp $result;
 my ($size, $num) = split(':', $result);
@@ -33,10 +33,12 @@ sub process_collection {
     chomp $scoll;
     my $s = ' ' x ($level*2);
     $s .= substr($scoll, rindex($scoll, '/') + 1);
-    printf "%-56s:", $s;
+    my $out = sprintf "%-56s:", $s;
+    $out =~ s/^(\s+)/"_" x length $1/e;
+    print $out;
     my $sq = 'iquest "%s:%s" "select sum(DATA_SIZE), count(DATA_ID)';
     $sq .= " where COLL_NAME like '${scoll}%'";
-    $sq .= " and DATA_RESC_GROUP_NAME = 'knox'\"";
+    $sq .= " and DATA_RESC_NAME like 'stack%'\"";
     my $result = `$sq 2>/dev/null`;
     chomp $result;
     my ($size, $num) = split(':', $result);
